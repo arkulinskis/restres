@@ -65,12 +65,14 @@ def _slot_state(ctx, d, t, party, exclude=None):
 
 # ---------------------------------------------------------------- the booking form
 @anvil.server.callable
-def get_booking_form(slug):
+def get_booking_form(slug, lang=None):
     r = _find(slug)
     if r is None:
         return {"ok": False, "error": "We couldn't find this restaurant. Check the link and try again."}
     ctx = B.Ctx(r)
-    return {"ok": True, "restaurant": B.public_restaurant(r), "days": _days(ctx), "today": B.local_now(r).date().isoformat()}
+    lang = B.pick_language(r, lang)
+    return {"ok": True, "restaurant": B.public_restaurant(r, lang), "days": _days(ctx), "today": B.local_now(r).date().isoformat(),
+            "lang": lang, "privacy": {x: B.public_restaurant(r, x)["privacy_text"] for x in B.languages(r)}}
 
 
 @anvil.server.callable
@@ -97,7 +99,7 @@ def get_slots(slug, day, party, token=None):
 
 
 @tables.in_transaction
-def _book(r, d, t, party, guest, consent_text):
+def _book(r, d, t, party, guest, consent_text, lang="en"):
     ctx = B.Ctx(r)
     state = _slot_state(ctx, d, t, party)
     if state != "open":
@@ -113,7 +115,7 @@ def _book(r, d, t, party, guest, consent_text):
         restaurant=r, token=B.new_token(), date=d, start_min=t, duration=dur, party=party,
         name=guest["name"], email=guest["email"], phone=guest["phone"], notes=guest["notes"],
         status=status, source="online", tables=unit["ids"], review_reason=reason, capacity_pct=pct,
-        consent=True, consent_text=consent_text, consent_at=now, created=now, updated=now, history=[])
+        consent=True, consent_text=consent_text, consent_at=now, created=now, updated=now, history=[], language=lang)
     B.add_history(res, "guest", "Booked online for %d on %s at %s%s." % (
         party, d.isoformat(), B.hm(t), "" if status == "confirmed" else " (awaiting approval)"))
     return res, None
@@ -139,8 +141,9 @@ def book(slug, data):
     guest, err = _clean_guest(data, r)
     if err:
         return {"ok": False, "error": err}
-    consent_text = B.public_restaurant(r)["privacy_text"]
-    res, err = _book(r, d, t, party, guest, consent_text)
+    lang = B.pick_language(r, data.get("language"))
+    consent_text = B.public_restaurant(r, lang)["privacy_text"]
+    res, err = _book(r, d, t, party, guest, consent_text, lang)
     if err:
         return {"ok": False, "error": err}
     _notify_new(res)
@@ -177,7 +180,7 @@ def _can(res):
 def _guest_reply(res):
     r = res["restaurant"]
     can_change, can_cancel = _can(res)
-    out = {"ok": True, "reservation": B.reservation_view(res), "restaurant": B.public_restaurant(r),
+    out = {"ok": True, "reservation": B.reservation_view(res), "restaurant": B.public_restaurant(r, res["language"]),
            "can_change": can_change, "can_cancel": can_cancel,
            "guest": {"email": res["email"] or "", "phone": res["phone"] or ""}}
     if can_change:

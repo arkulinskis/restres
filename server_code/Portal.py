@@ -1,6 +1,7 @@
 # Portal — Server Module. Everything a signed-in restaurant manager can do.
 # Every table is "No access" for client code; these callables check that the signed-in user
 # owns the restaurant before reading or writing anything (see _rest).
+import re
 from datetime import date, datetime, time, timedelta
 
 import anvil.server
@@ -11,6 +12,7 @@ from anvil.tables import app_tables
 from . import Booking as B
 
 MAX_RESTAURANTS = 50
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 # ---------------------------------------------------------------- access
@@ -21,17 +23,47 @@ def _user():
     return u
 
 
-def _rest(rid):
-    """The restaurant with this id, if the signed-in user may manage it."""
+ROLES = {"staff": 1, "manager": 2, "owner": 3}
+ROLE_NAMES = {"owner": "Owner", "manager": "Manager", "staff": "Staff"}
+
+
+def _role(r, u):
+    """The user's role at restaurant r: owner, manager, staff, or None. An invite by email is
+    claimed the first time that user turns up."""
+    if r is None or u is None:
+        return None
+    if r["owner"] == u:
+        return "owner"
+    email = (u["email"] or "").strip().lower()
+    for m in app_tables.members.search(restaurant=r):
+        if m["user"] == u or (m["user"] is None and email and (m["email"] or "") == email):
+            if m["user"] is None:
+                m["user"] = u
+            return m["role"] if m["role"] in ROLES else "staff"
+    return None
+
+
+def _rest(rid, need="staff"):
+    """The restaurant with this id, if the signed-in user's role there is at least `need`."""
     u = _user()
     r = app_tables.restaurants.get_by_id(rid) if rid else None
-    if r is None or r["owner"] != u:
-        raise anvil.server.PermissionDenied("You don't have access to this restaurant.")
+    role = _role(r, u)
+    if role is None or ROLES[role] < ROLES[need]:
+        raise anvil.server.PermissionDenied("You don't have access to this." if role else "You don't have access to this restaurant.")
     return r
 
 
 def _mine():
-    return sorted(app_tables.restaurants.search(owner=_user()), key=lambda r: (r["position"] or 0, B._created_key(r)))
+    """Every restaurant the user owns or is a member of (own ones first)."""
+    u = _user()
+    seen, out = set(), []
+    email = (u["email"] or "").strip().lower()
+    members = list(app_tables.members.search(user=u)) + (list(app_tables.members.search(email=email)) if email else [])
+    for r in list(app_tables.restaurants.search(owner=u)) + [m["restaurant"] for m in members]:
+        if r is not None and r.get_id() not in seen and _role(r, u):
+            seen.add(r.get_id())
+            out.append(r)
+    return sorted(out, key=lambda r: (r["owner"] != u, r["position"] or 0, B._created_key(r)))
 
 
 def _child(table, rid_row, item_id):
@@ -47,7 +79,8 @@ def _pending(r):
 
 
 def _nav(r):
-    return {"restaurant": {"id": r.get_id(), "name": r["name"], "slug": r["slug"], "pending": len(_pending(r))},
+    return {"restaurant": {"id": r.get_id(), "name": r["name"], "slug": r["slug"], "pending": len(_pending(r)),
+                           "role": _role(r, _user())},
             "restaurants": [{"id": x.get_id(), "name": x["name"]} for x in _mine()]}
 
 
@@ -107,7 +140,7 @@ def get_dashboard():
         out.append({"id": r.get_id(), "name": r["name"], "slug": r["slug"], "address": r["address"] or "",
                     "today": _today_line(ctx, today), "bookings": len(res), "covers": sum(int(x["party"] or 0) for x in res),
                     "pending": len(_pending(r)), "tables": len(ctx.tables), "seats": ctx.total_seats,
-                    "accepting": r["accepting"] is not False})
+                    "accepting": r["accepting"] is not False, "role": _role(r, _user())})
     return {"restaurants": out, "me": get_me()}
 
 
@@ -152,7 +185,7 @@ def create_restaurant(name, timezone_name="UTC", sample=True):
 @anvil.server.callable(require_user=True)
 def duplicate_restaurant(rid, name=None):
     """Copy a restaurant's settings, hours, special days, tables and joins (not its reservations)."""
-    src = _rest(rid)
+    src = _rest(rid, "manager")
     if len(_mine()) >= MAX_RESTAURANTS:
         return {"ok": False, "error": "You've reached the limit of %d restaurants." % MAX_RESTAURANTS}
     name = str(name or "").strip()[:80] or (src["name"] + " (copy)")
@@ -172,15 +205,20 @@ def duplicate_restaurant(rid, name=None):
     for j in app_tables.table_joins.search(restaurant=src):
         app_tables.table_joins.add_row(restaurant=r, tables=[ids[i] for i in (j["tables"] or []) if i in ids], seats=j["seats"],
                                        label=j["label"], hours=j["hours"], days=j["days"], created=j["created"] or now)
+    for sec in app_tables.menu_sections.search(restaurant=src):
+        ns = app_tables.menu_sections.add_row(restaurant=r, title=sec["title"], description=sec["description"], position=sec["position"])
+        for it in app_tables.menu_items.search(section=sec):
+            app_tables.menu_items.add_row(restaurant=r, section=ns, **{c: it[c] for c in ("name", "description", "price", "tags", "position", "available")})
     return {"ok": True, "id": r.get_id()}
 
 
 @anvil.server.callable(require_user=True)
 def delete_restaurant(rid, confirm_name):
-    r = _rest(rid)
+    r = _rest(rid, "owner")
     if str(confirm_name or "").strip() != r["name"]:
         return {"ok": False, "error": "Type the restaurant's name exactly to confirm."}
-    for table in (app_tables.reservations, app_tables.periods, app_tables.special_days, app_tables.dining_tables, app_tables.table_joins):
+    for table in (app_tables.reservations, app_tables.periods, app_tables.special_days, app_tables.dining_tables, app_tables.table_joins,
+                  app_tables.members, app_tables.menu_items, app_tables.menu_sections):
         for row in list(table.search(restaurant=r)):
             row.delete()
     r.delete()
@@ -189,7 +227,7 @@ def delete_restaurant(rid, confirm_name):
 
 @anvil.server.callable(require_user=True)
 def reorder_restaurants(ids):
-    mine = {r.get_id(): r for r in _mine()}
+    mine = {r.get_id(): r for r in _mine() if r["owner"] == _user()}
     for i, rid in enumerate(ids or []):
         if rid in mine:
             mine[rid]["position"] = i
@@ -198,26 +236,30 @@ def reorder_restaurants(ids):
 
 # ---------------------------------------------------------------- settings
 TEXT_FIELDS = {"name": 80, "description": 400, "address": 200, "phone": 40, "email": 200, "website": 200,
-               "form_note": 600, "privacy_text": 4000}
+               "form_note": 600, "privacy_text": 4000, "notify_email": 200, "msg_confirmed": 1000, "msg_pending": 1000,
+               "msg_declined": 1000}
 
 
 def _settings_view(r):
     v = {k: r[k] or "" for k in TEXT_FIELDS}
     v.update({k: B.setting(r, k) for k in B.SETTINGS})
     v.update({"id": r.get_id(), "slug": r["slug"], "timezone": r["timezone"] or "UTC", "accepting": r["accepting"] is not False,
-              "over_capacity": r["over_capacity"] or "review", "default_privacy": B.DEFAULT_PRIVACY})
+              "over_capacity": r["over_capacity"] or "review", "default_privacy": B.DEFAULT_PRIVACY,
+              "emails_on": r["emails_on"] is not False, "language": B.language(r), "languages": B.languages(r),
+              "owner_email": r["owner"]["email"] if r["owner"] else ""})
     return v
 
 
 @anvil.server.callable(require_user=True)
 def get_settings(rid):
-    r = _rest(rid)
-    return {"nav": _nav(r), "settings": _settings_view(r), "origin": anvil.server.get_app_origin()}
+    r = _rest(rid, "manager")
+    return {"nav": _nav(r), "settings": _settings_view(r), "origin": anvil.server.get_app_origin(), "team": _team(r),
+            "role": _role(r, _user())}
 
 
 @anvil.server.callable(require_user=True)
 def save_settings(rid, data):
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     data = dict(data or {})
     upd = {}
     for k, n in TEXT_FIELDS.items():
@@ -240,6 +282,14 @@ def save_settings(rid, data):
         upd["timezone"] = data["timezone"]
     if "accepting" in data:
         upd["accepting"] = bool(data["accepting"])
+    if "emails_on" in data:
+        upd["emails_on"] = bool(data["emails_on"])
+    if "language" in data:
+        upd["language"] = data["language"] if data["language"] in B.LANGS else "en"
+    if "languages" in data:
+        upd["languages"] = [x for x in B.LANGS if x in (data["languages"] or [])]
+    if upd.get("notify_email") and not EMAIL_RE.match(upd["notify_email"]):
+        return {"ok": False, "error": "The alert email address doesn't look right."}
     if "over_capacity" in data:
         upd["over_capacity"] = data["over_capacity"] if data["over_capacity"] in B.OVER_CAPACITY else "review"
     r.update(**upd)
@@ -270,7 +320,7 @@ def _calendar(ctx, first):
 
 @anvil.server.callable(require_user=True)
 def get_hours(rid, month=None):
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     ctx = B.Ctx(r)
     today = B.local_now(r).date()
     try:
@@ -296,7 +346,7 @@ def _clean_week(week):
 
 @anvil.server.callable(require_user=True)
 def save_period(rid, data, month=None):
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     data = dict(data or {})
     name = str(data.get("name") or "").strip()[:60] or "Opening hours"
     try:
@@ -316,7 +366,7 @@ def save_period(rid, data, month=None):
 
 @anvil.server.callable(require_user=True)
 def delete_period(rid, pid, month=None):
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     _child(app_tables.periods, r, pid).delete()
     return dict(get_hours(rid, month), ok=True)
 
@@ -324,7 +374,7 @@ def delete_period(rid, pid, month=None):
 @anvil.server.callable(require_user=True)
 def save_special(rid, data, month=None):
     """One special day, or the same hours for every date from `date` to `to` (at most 62 days)."""
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     data = dict(data or {})
     try:
         d = B.parse_date(data.get("date"))
@@ -358,7 +408,7 @@ def save_special(rid, data, month=None):
 
 @anvil.server.callable(require_user=True)
 def delete_special(rid, sid, month=None):
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     _child(app_tables.special_days, r, sid).delete()
     return dict(get_hours(rid, month), ok=True)
 
@@ -385,12 +435,12 @@ def _tables_reply(r):
 
 @anvil.server.callable(require_user=True)
 def get_tables(rid):
-    return _tables_reply(_rest(rid))
+    return _tables_reply(_rest(rid, "manager"))
 
 
 @anvil.server.callable(require_user=True)
 def save_table(rid, data):
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     data = dict(data or {})
     existing = list(app_tables.dining_tables.search(restaurant=r))
     fields = {}
@@ -427,7 +477,7 @@ def save_table(rid, data):
 
 @anvil.server.callable(require_user=True)
 def delete_table(rid, tid):
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     t = _child(app_tables.dining_tables, r, tid)
     for j in list(app_tables.table_joins.search(restaurant=r)):
         if tid in (j["tables"] or []):
@@ -442,7 +492,7 @@ def delete_table(rid, tid):
 
 @anvil.server.callable(require_user=True)
 def save_positions(rid, positions):
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     mine = {t.get_id(): t for t in app_tables.dining_tables.search(restaurant=r)}
     for p in positions or []:
         t = mine.get(p.get("id"))
@@ -454,7 +504,7 @@ def save_positions(rid, positions):
 @anvil.server.callable(require_user=True)
 def save_join(rid, data):
     """Join two or more tables into one bookable table for some hours of the day, on some weekdays."""
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     data = dict(data or {})
     ctx = B.Ctx(r)
     ids = [i for i in dict.fromkeys(data.get("tables") or []) if i in {t.get_id() for t in ctx.all_tables}]
@@ -493,7 +543,7 @@ def save_join(rid, data):
 
 @anvil.server.callable(require_user=True)
 def delete_join(rid, jid):
-    r = _rest(rid)
+    r = _rest(rid, "manager")
     _child(app_tables.table_joins, r, jid).delete()
     return _tables_reply(r)
 
@@ -632,6 +682,13 @@ def save_reservation(rid, data):
     r = _rest(rid)
     out = _save_reservation(r, dict(data or {}))
     if out.get("ok"):
+        if data.get("notify"):  # "Email the guest" ticked in the booking editor
+            try:
+                from . import Notify
+                out["emailed"] = Notify.reservation_event(app_tables.reservations.get_by_id(out["id"]),
+                                                          "changed" if data.get("id") else "created")
+            except Exception as e:
+                print("notify failed:", e)
         out["day"] = get_day(rid, data.get("date"))
     return out
 
@@ -661,3 +718,61 @@ def set_status(rid, res_id, status, day=None):
     except Exception as e:
         print("notify failed:", e)
     return {"ok": True, "day": get_day(rid, day or B.iso(res["date"])), "alerts": get_alerts()}
+
+
+# ---------------------------------------------------------------- team (owners, managers, staff)
+def _team(r):
+    owner = r["owner"]
+    rows = [{"id": None, "email": owner["email"] if owner else "", "name": (owner["display_name"] or "") if owner else "",
+             "role": "owner", "joined": True}]
+    for m in sorted(app_tables.members.search(restaurant=r), key=B._created_key):
+        rows.append({"id": m.get_id(), "email": m["email"] or "", "name": (m["user"]["display_name"] or "") if m["user"] else "",
+                     "role": m["role"], "joined": m["user"] is not None})
+    return rows
+
+
+@anvil.server.callable(require_user=True)
+def get_team(rid):
+    return {"ok": True, "team": _team(_rest(rid, "manager"))}
+
+
+@anvil.server.callable(require_user=True)
+def invite_member(rid, email, role="staff"):
+    """Give someone access by email. They see the restaurant when they sign in with that address."""
+    r = _rest(rid, "owner")
+    email = str(email or "").strip().lower()
+    if not EMAIL_RE.match(email):
+        return {"ok": False, "error": "Enter a valid email address."}
+    if role not in ("manager", "staff"):
+        return {"ok": False, "error": "Pick a role."}
+    if r["owner"] and (r["owner"]["email"] or "").lower() == email:
+        return {"ok": False, "error": "That's the owner's address."}
+    team = list(app_tables.members.search(restaurant=r))
+    if any((m["email"] or "") == email for m in team):
+        return {"ok": False, "error": "%s already has access." % email}
+    if len(team) >= 100:
+        return {"ok": False, "error": "A restaurant can have up to 100 team members."}
+    user = app_tables.users.get(email=email)
+    app_tables.members.add_row(restaurant=r, email=email, user=user, role=role, invited_by=_user(), created=B.now_utc())
+    try:
+        from . import Notify
+        Notify.invite(r, email, role, _user())
+    except Exception as e:
+        print("invite email failed:", e)
+    return {"ok": True, "team": _team(r)}
+
+
+@anvil.server.callable(require_user=True)
+def set_member_role(rid, mid, role):
+    r = _rest(rid, "owner")
+    if role not in ("manager", "staff"):
+        return {"ok": False, "error": "Pick a role."}
+    _child(app_tables.members, r, mid)["role"] = role
+    return {"ok": True, "team": _team(r)}
+
+
+@anvil.server.callable(require_user=True)
+def remove_member(rid, mid):
+    r = _rest(rid, "owner")
+    _child(app_tables.members, r, mid).delete()
+    return {"ok": True, "team": _team(r)}

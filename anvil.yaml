@@ -57,6 +57,120 @@ db_schema:
     indexes: []
     server: full
     title: Dining tables
+  members:
+    client: none
+    columns:
+    - admin_ui:
+        order: 0
+        width: 200
+      name: restaurant
+      target: restaurants
+      type: link_single
+    - admin_ui:
+        order: 1
+        width: 200
+      name: email
+      type: string
+    - admin_ui:
+        order: 2
+        width: 200
+      name: user
+      target: users
+      type: link_single
+    - admin_ui:
+        order: 3
+        width: 200
+      name: role
+      type: string
+    - admin_ui:
+        order: 4
+        width: 200
+      name: invited_by
+      target: users
+      type: link_single
+    - admin_ui:
+        order: 5
+        width: 200
+      name: created
+      type: datetime
+    indexes: []
+    server: full
+    title: Members
+  menu_items:
+    client: none
+    columns:
+    - admin_ui:
+        order: 0
+        width: 200
+      name: restaurant
+      target: restaurants
+      type: link_single
+    - admin_ui:
+        order: 1
+        width: 200
+      name: section
+      target: menu_sections
+      type: link_single
+    - admin_ui:
+        order: 2
+        width: 200
+      name: name
+      type: string
+    - admin_ui:
+        order: 3
+        width: 200
+      name: description
+      type: string
+    - admin_ui:
+        order: 4
+        width: 200
+      name: price
+      type: string
+    - admin_ui:
+        order: 5
+        width: 200
+      name: tags
+      type: simpleObject
+    - admin_ui:
+        order: 6
+        width: 200
+      name: position
+      type: number
+    - admin_ui:
+        order: 7
+        width: 200
+      name: available
+      type: bool
+    indexes: []
+    server: full
+    title: Menu items
+  menu_sections:
+    client: none
+    columns:
+    - admin_ui:
+        order: 0
+        width: 200
+      name: restaurant
+      target: restaurants
+      type: link_single
+    - admin_ui:
+        order: 1
+        width: 200
+      name: title
+      type: string
+    - admin_ui:
+        order: 2
+        width: 200
+      name: description
+      type: string
+    - admin_ui:
+        order: 3
+        width: 200
+      name: position
+      type: number
+    indexes: []
+    server: full
+    title: Menu sections
   periods:
     client: none
     columns:
@@ -208,6 +322,11 @@ db_schema:
         width: 200
       name: history
       type: simpleObject
+    - admin_ui:
+        order: 22
+        width: 200
+      name: language
+      type: string
     indexes: []
     server: full
     title: Reservations
@@ -330,6 +449,41 @@ db_schema:
         width: 200
       name: created
       type: datetime
+    - admin_ui:
+        order: 23
+        width: 200
+      name: notify_email
+      type: string
+    - admin_ui:
+        order: 24
+        width: 200
+      name: emails_on
+      type: bool
+    - admin_ui:
+        order: 25
+        width: 200
+      name: msg_confirmed
+      type: string
+    - admin_ui:
+        order: 26
+        width: 200
+      name: msg_pending
+      type: string
+    - admin_ui:
+        order: 27
+        width: 200
+      name: msg_declined
+      type: string
+    - admin_ui:
+        order: 28
+        width: 200
+      name: language
+      type: string
+    - admin_ui:
+        order: 29
+        width: 200
+      name: languages
+      type: simpleObject
     indexes: []
     server: full
     title: Restaurants
@@ -468,63 +622,65 @@ native_deps:
     \ paper, warm ink, a brass accent. Serif display type, quiet sans for the interface.\n-->\n<link rel=\"preconnect\" href=\"\
     https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"\
     https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap\"\
-    \ rel=\"stylesheet\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\n<style>\n:root {\n\
-    \  --pp-bg: #f6f3ee; --pp-panel: #fffdf9; --pp-panel-2: #f1ede6; --pp-ink: #1d1b18; --pp-muted: #6f6a62; --pp-faint: #a19a8f;\
-    \ --pp-line: #e4ded4;\n  --pp-accent: #1d1b18; --pp-accent-ink: #faf8f4; --pp-brass: #9c7a43; --pp-brass-soft: #f3ebdc;\n\
-    \  --pp-good: #3f6b4e; --pp-good-soft: #e5efe7; --pp-warn: #93650f; --pp-warn-soft: #f7ecd6; --pp-bad: #a23b2c; --pp-bad-soft:\
-    \ #f6e4e0;\n  --pp-info: #3d5a80; --pp-info-soft: #e6ecf4;\n  --pp-shadow: 0 1px 2px rgba(29,27,24,.04), 0 10px 30px rgba(29,27,24,.06);\n\
-    \  --pp-radius: 12px;\n  --pp-serif: \"Cormorant Garamond\", \"Iowan Old Style\", Georgia, serif;\n  --pp-sans: \"Inter\"\
-    , system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n  color-scheme: light;\n}\n@media (prefers-color-scheme:\
-    \ dark) {\n  :root:not([data-theme=\"light\"]) {\n    --pp-bg: #121110; --pp-panel: #1b1a18; --pp-panel-2: #161513; --pp-ink:\
-    \ #ece7de; --pp-muted: #a39d92; --pp-faint: #6f6a62; --pp-line: #2e2b27;\n    --pp-accent: #ece7de; --pp-accent-ink: #151412;\
-    \ --pp-brass: #c9a56a; --pp-brass-soft: #2c2519;\n    --pp-good: #8fbf9c; --pp-good-soft: #1d2a21; --pp-warn: #e2b660;\
-    \ --pp-warn-soft: #2f2615; --pp-bad: #e6907f; --pp-bad-soft: #33201b;\n    --pp-info: #9db7da; --pp-info-soft: #1c2532;\n\
-    \    --pp-shadow: none; color-scheme: dark;\n  }\n}\n:root[data-theme=\"dark\"] {\n  --pp-bg: #121110; --pp-panel: #1b1a18;\
-    \ --pp-panel-2: #161513; --pp-ink: #ece7de; --pp-muted: #a39d92; --pp-faint: #6f6a62; --pp-line: #2e2b27;\n  --pp-accent:\
-    \ #ece7de; --pp-accent-ink: #151412; --pp-brass: #c9a56a; --pp-brass-soft: #2c2519;\n  --pp-good: #8fbf9c; --pp-good-soft:\
-    \ #1d2a21; --pp-warn: #e2b660; --pp-warn-soft: #2f2615; --pp-bad: #e6907f; --pp-bad-soft: #33201b;\n  --pp-info: #9db7da;\
-    \ --pp-info-soft: #1c2532;\n  --pp-shadow: none; color-scheme: dark;\n}\n\n/* Our design owns the page, not the Anvil\
-    \ theme. */\nhtml, body { background: var(--pp-bg) !important; color: var(--pp-ink); }\nbody { font: 15px/1.55 var(--pp-sans);\
-    \ margin: 0; -webkit-font-smoothing: antialiased; }\n\n.pp, .pp * { box-sizing: border-box; }\n.pp { font: 15px/1.55 var(--pp-sans);\
-    \ color: var(--pp-ink); }\n.pp h1, .pp h2, .pp h3 { font-family: var(--pp-serif); font-weight: 500; line-height: 1.1;\
-    \ margin: 0 0 .35em; color: var(--pp-ink); letter-spacing: -.005em; }\n.pp h1 { font-size: 2.6rem; } .pp h2 { font-size:\
-    \ 1.75rem; } .pp h3 { font-size: 1.3rem; }\n.pp p { margin: 0 0 .8em; }\n.pp a { color: inherit; text-decoration-color:\
-    \ var(--pp-brass); text-underline-offset: 3px; }\n.pp [hidden] { display: none !important; }\n.pp .muted { color: var(--pp-muted);\
-    \ } .pp .small { font-size: .85rem; } .pp .faint { color: var(--pp-faint); }\n.pp .eyebrow { font: 600 .7rem/1.2 var(--pp-sans);\
-    \ letter-spacing: .18em; text-transform: uppercase; color: var(--pp-brass); margin-bottom: 10px; }\n.pp .wrap { max-width:\
-    \ 1120px; margin: 0 auto; padding: 32px 20px 96px; }\n.pp .narrow { max-width: 760px; margin: 0 auto; }\n.pp .card { background:\
-    \ var(--pp-panel); border: 1px solid var(--pp-line); border-radius: var(--pp-radius); box-shadow: var(--pp-shadow); }\n\
-    .pp .pad { padding: 22px 24px; }\n.pp .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }\n.pp .spacer\
-    \ { flex: 1; }\n.pp .stack > * + * { margin-top: 14px; }\n.pp .grid2 { display: grid; grid-template-columns: 1fr 1fr;\
-    \ gap: 14px 16px; }\n.pp .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 16px; }\n.pp hr { border:\
-    \ 0; border-top: 1px solid var(--pp-line); margin: 22px 0; }\n.pp .section-title { display: flex; align-items: baseline;\
-    \ gap: 12px; margin: 34px 0 14px; }\n.pp .section-title h2 { margin: 0; }\n.pp :where(button.card) { font: inherit; color:\
-    \ inherit; text-align: left; cursor: pointer; width: 100%; margin: 0; -webkit-appearance: none; appearance: none; }\n\n\
-    .pp .btn { font: 500 .9rem/1.2 var(--pp-sans); border: 1px solid var(--pp-line); background: var(--pp-panel); color: var(--pp-ink);\
-    \ border-radius: 999px; padding: 10px 18px; cursor: pointer; display: inline-flex; align-items: center; justify-content:\
-    \ center; gap: 7px; text-decoration: none; transition: border-color .15s, background .15s, opacity .15s; white-space:\
-    \ nowrap; }\n.pp .btn:hover { border-color: var(--pp-ink); }\n.pp .btn.primary { background: var(--pp-accent); border-color:\
-    \ var(--pp-accent); color: var(--pp-accent-ink); }\n.pp .btn.primary:hover { opacity: .9; }\n.pp .btn.ghost { background:\
-    \ transparent; border-color: transparent; color: var(--pp-muted); }\n.pp .btn.ghost:hover { color: var(--pp-ink); background:\
-    \ var(--pp-panel-2); }\n.pp .btn.good { background: var(--pp-good); border-color: var(--pp-good); color: #fff; }\n.pp\
-    \ .btn.danger { color: var(--pp-bad); }\n.pp .btn.danger:hover { border-color: var(--pp-bad); }\n.pp .btn.sm { padding:\
-    \ 6px 12px; font-size: .82rem; }\n.pp .btn.icon { padding: 8px; width: 36px; height: 36px; }\n.pp .btn.block { width:\
-    \ 100%; }\n.pp .btn:disabled { opacity: .45; cursor: not-allowed; }\n.pp .btn svg, .pp .ic { width: 16px; height: 16px;\
-    \ flex: none; }\n.pp .btn:focus-visible, .pp input:focus-visible, .pp textarea:focus-visible, .pp select:focus-visible,\
-    \ .pp [tabindex]:focus-visible { outline: 2px solid var(--pp-brass); outline-offset: 2px; }\n.pp input:focus, .pp textarea:focus,\
-    \ .pp select:focus { border-color: var(--pp-ink); outline: none; }\n\n.pp input[type=text], .pp input[type=email], .pp\
-    \ input[type=password], .pp input[type=tel], .pp input[type=number], .pp input[type=date], .pp input[type=time], .pp input[type=search],\
-    \ .pp input[type=url], .pp textarea, .pp select {\n  font: inherit; color: var(--pp-ink); background: var(--pp-panel);\
-    \ border: 1px solid var(--pp-line); border-radius: 10px; padding: 10px 12px; width: 100%; margin: 0; box-shadow: none;\
-    \ height: auto; min-height: 42px;\n}\n.pp input[type=number] { -moz-appearance: textfield; }\n.pp textarea { min-height:\
-    \ 90px; resize: vertical; line-height: 1.5; }\n.pp label.f { display: block; font-weight: 500; font-size: .84rem; margin-bottom:\
-    \ 6px; color: var(--pp-ink); }\n.pp .hint { font-size: .8rem; color: var(--pp-muted); margin-top: 5px; line-height: 1.45;\
-    \ }\n.pp .check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; font-size: .9rem; }\n.pp .check\
-    \ input { margin-top: 3px; width: 17px; height: 17px; accent-color: var(--pp-accent); flex: none; }\n.pp .inline { display:\
-    \ flex; align-items: center; gap: 8px; }\n.pp .inline input { width: auto; flex: 1; min-width: 0; }\n\n.pp .badge { display:\
-    \ inline-flex; align-items: center; gap: 5px; font: 500 .74rem/1.3 var(--pp-sans); padding: 3px 10px; border-radius: 99px;\
-    \ background: var(--pp-panel-2); color: var(--pp-muted); white-space: nowrap; letter-spacing: .02em; }\n.pp .badge::before\
-    \ { content: \"\"; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .8; }\n.pp .badge.plain::before\
+    \ rel=\"stylesheet\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<!-- QR codes for the\
+    \ booking page and the menu (Settings → Share). -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js\"\
+    ></script>\n\n<style>\n:root {\n  --pp-bg: #f6f3ee; --pp-panel: #fffdf9; --pp-panel-2: #f1ede6; --pp-ink: #1d1b18; --pp-muted:\
+    \ #6f6a62; --pp-faint: #a19a8f; --pp-line: #e4ded4;\n  --pp-accent: #1d1b18; --pp-accent-ink: #faf8f4; --pp-brass: #9c7a43;\
+    \ --pp-brass-soft: #f3ebdc;\n  --pp-good: #3f6b4e; --pp-good-soft: #e5efe7; --pp-warn: #93650f; --pp-warn-soft: #f7ecd6;\
+    \ --pp-bad: #a23b2c; --pp-bad-soft: #f6e4e0;\n  --pp-info: #3d5a80; --pp-info-soft: #e6ecf4;\n  --pp-shadow: 0 1px 2px\
+    \ rgba(29,27,24,.04), 0 10px 30px rgba(29,27,24,.06);\n  --pp-radius: 12px;\n  --pp-serif: \"Cormorant Garamond\", \"\
+    Iowan Old Style\", Georgia, serif;\n  --pp-sans: \"Inter\", system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n\
+    \  color-scheme: light;\n}\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) {\n    --pp-bg:\
+    \ #121110; --pp-panel: #1b1a18; --pp-panel-2: #161513; --pp-ink: #ece7de; --pp-muted: #a39d92; --pp-faint: #6f6a62; --pp-line:\
+    \ #2e2b27;\n    --pp-accent: #ece7de; --pp-accent-ink: #151412; --pp-brass: #c9a56a; --pp-brass-soft: #2c2519;\n    --pp-good:\
+    \ #8fbf9c; --pp-good-soft: #1d2a21; --pp-warn: #e2b660; --pp-warn-soft: #2f2615; --pp-bad: #e6907f; --pp-bad-soft: #33201b;\n\
+    \    --pp-info: #9db7da; --pp-info-soft: #1c2532;\n    --pp-shadow: none; color-scheme: dark;\n  }\n}\n:root[data-theme=\"\
+    dark\"] {\n  --pp-bg: #121110; --pp-panel: #1b1a18; --pp-panel-2: #161513; --pp-ink: #ece7de; --pp-muted: #a39d92; --pp-faint:\
+    \ #6f6a62; --pp-line: #2e2b27;\n  --pp-accent: #ece7de; --pp-accent-ink: #151412; --pp-brass: #c9a56a; --pp-brass-soft:\
+    \ #2c2519;\n  --pp-good: #8fbf9c; --pp-good-soft: #1d2a21; --pp-warn: #e2b660; --pp-warn-soft: #2f2615; --pp-bad: #e6907f;\
+    \ --pp-bad-soft: #33201b;\n  --pp-info: #9db7da; --pp-info-soft: #1c2532;\n  --pp-shadow: none; color-scheme: dark;\n\
+    }\n\n/* Our design owns the page, not the Anvil theme. */\nhtml, body { background: var(--pp-bg) !important; color: var(--pp-ink);\
+    \ }\nbody { font: 15px/1.55 var(--pp-sans); margin: 0; -webkit-font-smoothing: antialiased; }\n\n.pp, .pp * { box-sizing:\
+    \ border-box; }\n.pp { font: 15px/1.55 var(--pp-sans); color: var(--pp-ink); }\n.pp h1, .pp h2, .pp h3 { font-family:\
+    \ var(--pp-serif); font-weight: 500; line-height: 1.1; margin: 0 0 .35em; color: var(--pp-ink); letter-spacing: -.005em;\
+    \ }\n.pp h1 { font-size: 2.6rem; } .pp h2 { font-size: 1.75rem; } .pp h3 { font-size: 1.3rem; }\n.pp p { margin: 0 0 .8em;\
+    \ }\n.pp a { color: inherit; text-decoration-color: var(--pp-brass); text-underline-offset: 3px; }\n.pp [hidden] { display:\
+    \ none !important; }\n.pp .muted { color: var(--pp-muted); } .pp .small { font-size: .85rem; } .pp .faint { color: var(--pp-faint);\
+    \ }\n.pp .eyebrow { font: 600 .7rem/1.2 var(--pp-sans); letter-spacing: .18em; text-transform: uppercase; color: var(--pp-brass);\
+    \ margin-bottom: 10px; }\n.pp .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px 96px; }\n.pp .narrow { max-width:\
+    \ 760px; margin: 0 auto; }\n.pp .card { background: var(--pp-panel); border: 1px solid var(--pp-line); border-radius:\
+    \ var(--pp-radius); box-shadow: var(--pp-shadow); }\n.pp .pad { padding: 22px 24px; }\n.pp .row { display: flex; align-items:\
+    \ center; gap: 10px; flex-wrap: wrap; }\n.pp .spacer { flex: 1; }\n.pp .stack > * + * { margin-top: 14px; }\n.pp .grid2\
+    \ { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }\n.pp .grid3 { display: grid; grid-template-columns:\
+    \ repeat(3, 1fr); gap: 14px 16px; }\n.pp hr { border: 0; border-top: 1px solid var(--pp-line); margin: 22px 0; }\n.pp\
+    \ .section-title { display: flex; align-items: baseline; gap: 12px; margin: 34px 0 14px; }\n.pp .section-title h2 { margin:\
+    \ 0; }\n.pp :where(button.card) { font: inherit; color: inherit; text-align: left; cursor: pointer; width: 100%; margin:\
+    \ 0; -webkit-appearance: none; appearance: none; }\n\n.pp .btn { font: 500 .9rem/1.2 var(--pp-sans); border: 1px solid\
+    \ var(--pp-line); background: var(--pp-panel); color: var(--pp-ink); border-radius: 999px; padding: 10px 18px; cursor:\
+    \ pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; transition:\
+    \ border-color .15s, background .15s, opacity .15s; white-space: nowrap; }\n.pp .btn:hover { border-color: var(--pp-ink);\
+    \ }\n.pp .btn.primary { background: var(--pp-accent); border-color: var(--pp-accent); color: var(--pp-accent-ink); }\n\
+    .pp .btn.primary:hover { opacity: .9; }\n.pp .btn.ghost { background: transparent; border-color: transparent; color: var(--pp-muted);\
+    \ }\n.pp .btn.ghost:hover { color: var(--pp-ink); background: var(--pp-panel-2); }\n.pp .btn.good { background: var(--pp-good);\
+    \ border-color: var(--pp-good); color: #fff; }\n.pp .btn.danger { color: var(--pp-bad); }\n.pp .btn.danger:hover { border-color:\
+    \ var(--pp-bad); }\n.pp .btn.sm { padding: 6px 12px; font-size: .82rem; }\n.pp .btn.icon { padding: 8px; width: 36px;\
+    \ height: 36px; }\n.pp .btn.block { width: 100%; }\n.pp .btn:disabled { opacity: .45; cursor: not-allowed; }\n.pp .btn\
+    \ svg, .pp .ic { width: 16px; height: 16px; flex: none; }\n.pp .ic.rot { transform: rotate(90deg); }\n.pp .btn:focus-visible,\
+    \ .pp input:focus-visible, .pp textarea:focus-visible, .pp select:focus-visible, .pp [tabindex]:focus-visible { outline:\
+    \ 2px solid var(--pp-brass); outline-offset: 2px; }\n.pp input:focus, .pp textarea:focus, .pp select:focus { border-color:\
+    \ var(--pp-ink); outline: none; }\n\n.pp input[type=text], .pp input[type=email], .pp input[type=password], .pp input[type=tel],\
+    \ .pp input[type=number], .pp input[type=date], .pp input[type=time], .pp input[type=search], .pp input[type=url], .pp\
+    \ textarea, .pp select {\n  font: inherit; color: var(--pp-ink); background: var(--pp-panel); border: 1px solid var(--pp-line);\
+    \ border-radius: 10px; padding: 10px 12px; width: 100%; margin: 0; box-shadow: none; height: auto; min-height: 42px;\n\
+    }\n.pp input[type=number] { -moz-appearance: textfield; }\n.pp textarea { min-height: 90px; resize: vertical; line-height:\
+    \ 1.5; }\n.pp label.f { display: block; font-weight: 500; font-size: .84rem; margin-bottom: 6px; color: var(--pp-ink);\
+    \ }\n.pp .hint { font-size: .8rem; color: var(--pp-muted); margin-top: 5px; line-height: 1.45; }\n.pp .check { display:\
+    \ flex; gap: 10px; align-items: flex-start; cursor: pointer; font-size: .9rem; }\n.pp .check input { margin-top: 3px;\
+    \ width: 17px; height: 17px; accent-color: var(--pp-accent); flex: none; }\n.pp .inline { display: flex; align-items:\
+    \ center; gap: 8px; }\n.pp .inline input { width: auto; flex: 1; min-width: 0; }\n\n.pp .badge { display: inline-flex;\
+    \ align-items: center; gap: 5px; font: 500 .74rem/1.3 var(--pp-sans); padding: 3px 10px; border-radius: 99px; background:\
+    \ var(--pp-panel-2); color: var(--pp-muted); white-space: nowrap; letter-spacing: .02em; }\n.pp .badge::before { content:\
+    \ \"\"; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .8; }\n.pp .badge.plain::before\
     \ { display: none; }\n.pp .badge.confirmed, .pp .badge.good { background: var(--pp-good-soft); color: var(--pp-good);\
     \ }\n.pp .badge.pending, .pp .badge.warn { background: var(--pp-warn-soft); color: var(--pp-warn); }\n.pp .badge.declined,\
     \ .pp .badge.bad { background: var(--pp-bad-soft); color: var(--pp-bad); }\n.pp .badge.cancelled { background: var(--pp-panel-2);\
@@ -646,246 +802,267 @@ native_deps:
     \ === m) close(); });\n    m.addEventListener('click', function (e) { if (e.target.closest('[data-close]')) close(); });\n\
     \    document.addEventListener('keydown', key);\n    document.body.appendChild(m);\n    var f = m.querySelector('[autofocus],\
     \ input, select, textarea, .btn.primary');\n    if (f) f.focus();\n    return { el: m, close: close };\n  };\n  PP.confirm\
-    \ = function (title, text, okLabel, danger) {\n    return new Promise(function (resolve) {\n      var answered = false;\n\
-    \      var d = PP.modal('<h3>' + PP.esc(title) + '</h3><p class=\"muted\">' + PP.esc(text) + '</p>' +\n        '<div class=\"\
-    foot\"><button class=\"btn\" data-close>Keep it</button><button class=\"btn ' + (danger ? 'danger' : 'primary') + '\"\
-    \ data-ok>' + PP.esc(okLabel || 'OK') + '</button></div>',\n        { onclose: function () { if (!answered) resolve(false);\
-    \ } });\n      d.el.querySelector('[data-ok]').onclick = function () { answered = true; d.close(); resolve(true); };\n\
-    \    });\n  };\n\n  // The sub-navigation shown on every restaurant page. Handle clicks with PP.subnavClick.\n  PP.TABS\
-    \ = [['reservations', 'Reservations', 'calendar'], ['hours', 'Opening hours', 'clock'], ['tables', 'Tables & layout',\
-    \ 'table'], ['settings', 'Settings & sharing', 'cog']];\n  PP.subnav = function (nav, active) {\n    var r = nav.restaurant,\
-    \ esc = PP.esc;\n    var others = (nav.restaurants || []).length > 1 ? '<select data-pp-switch aria-label=\"Switch restaurant\"\
-    >' + nav.restaurants.map(function (x) {\n      return '<option value=\"' + esc(x.id) + '\"' + (x.id === r.id ? ' selected'\
-    \ : '') + '>' + esc(x.name) + '</option>';\n    }).join('') + '</select>' : '';\n    return '<div class=\"subnav\"><div\
-    \ class=\"top\"><div class=\"who\"><div class=\"eyebrow\"><button class=\"btn ghost sm\" data-pp-go=\"dashboard\" style=\"\
-    padding:0;margin:0;letter-spacing:inherit;font:inherit;color:inherit\">All restaurants</button></div>' +\n      '<h1>'\
-    \ + esc(r.name) + '</h1></div><span class=\"spacer\"></span>' + others +\n      '<a class=\"btn sm\" target=\"_blank\"\
-    \ rel=\"noopener\" href=\"' + esc(PP.bookUrl(r.slug)) + '\">' + PP.icon('ext') + 'Booking page</a></div>' +\n      '<nav\
-    \ class=\"tabs\">' + PP.TABS.map(function (t) {\n        return '<button data-pp-tab=\"' + t[0] + '\" class=\"' + (t[0]\
-    \ === active ? 'on' : '') + '\">' + t[1] +\n          (t[0] === 'reservations' && r.pending ? '<span class=\"n\" title=\"\
-    Awaiting approval\">' + r.pending + '</span>' : '') + '</button>';\n      }).join('') + '</nav></div>';\n  };\n  PP.subnavClick\
-    \ = function (e, nav, emit) {\n    var t = e.target.closest('[data-pp-tab]');\n    if (t) { emit('go', { page: t.dataset.ppTab,\
-    \ restaurant_id: nav.restaurant.id }); return true; }\n    var g = e.target.closest('[data-pp-go]');\n    if (g) { emit('go',\
-    \ { page: g.dataset.ppGo }); return true; }\n    return false;\n  };\n  PP.subnavChange = function (e, active, emit) {\n\
-    \    var s = e.target.closest('[data-pp-switch]');\n    if (s) { emit('go', { page: active, restaurant_id: s.value });\
-    \ return true; }\n    return false;\n  };\n  PP.appUrl = function () { return location.origin + location.pathname; };\n\
-    \  PP.bookUrl = function (slug) { return PP.appUrl() + '#book/' + slug; };\n  PP.manageUrl = function (token) { return\
-    \ PP.appUrl() + '#r/' + token; };\n\n  // Theme: \"auto\" follows the device; \"light\"/\"dark\" are remembered per device.\n\
-    \  PP.applyTheme = function (t) {\n    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme',\
-    \ t);\n    else document.documentElement.removeAttribute('data-theme');\n  };\n  PP.theme = function () { try { return\
-    \ localStorage.getItem('pp.theme') || 'auto'; } catch (e) { return 'auto'; } };\n  PP.setTheme = function (t) { try {\
-    \ localStorage.setItem('pp.theme', t); } catch (e) {} PP.applyTheme(t); };\n  try { PP.applyTheme(localStorage.getItem('pp.theme'));\
-    \ } catch (e) {}\n\n  PP.wrapEmit = function (emit) {\n    return function (name, payload) {\n      try { return Promise.resolve(emit\
-    \ ? emit(name, JSON.stringify(payload == null ? {} : payload)) : null); }\n      catch (e) { console.error(e); return\
-    \ Promise.reject(e); }\n    };\n  };\n  PP.define = function (name, mountFn) { PP.components[name] = mountFn; };\n  PP.mount\
-    \ = function (name, root, json, emit) {\n    var fn = PP.components[name];\n    if (!fn) { console.error('PP component\
-    \ not loaded: ' + name); return null; }\n    if (!root) { console.error('PP mount: no root node for ' + name); return\
-    \ null; }\n    var data = typeof json === 'string' ? JSON.parse(json || '{}') : (json || {});\n    return fn(root, data,\
-    \ PP.wrapEmit(emit));\n  };\n})();\n</script>\n\n<!-- ===== Main component ===== -->\n<style>\n.pp-header { position:\
-    \ sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--pp-bg) 86%, transparent); backdrop-filter: blur(12px);\
-    \ -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--pp-line); }\n.pp-header .in { max-width: 1120px;\
-    \ margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 18px; }\n.pp-header .brand { all: unset;\
-    \ cursor: pointer; display: flex; align-items: center; gap: 10px; color: var(--pp-ink); }\n.pp-header .brand .mark { width:\
-    \ 28px; height: 28px; color: var(--pp-brass); }\n.pp-header .brand .name { font-family: var(--pp-serif); font-size: 1.45rem;\
-    \ font-weight: 600; letter-spacing: .01em; line-height: 1; }\n.pp-header nav { display: flex; gap: 2px; }\n.pp-header\
-    \ nav button { all: unset; cursor: pointer; color: var(--pp-muted); padding: 7px 12px; border-radius: 99px; font-size:\
-    \ .9rem; }\n.pp-header nav button.on, .pp-header nav button:hover { color: var(--pp-ink); background: var(--pp-panel-2);\
-    \ }\n.pp-header .right { margin-left: auto; display: flex; align-items: center; gap: 6px; position: relative; }\n.pp-header\
-    \ .bell { position: relative; }\n.pp-header .bell .n { position: absolute; top: 1px; right: 0; min-width: 17px; height:\
-    \ 17px; padding: 0 4px; border-radius: 99px; background: var(--pp-warn); color: #fff; font: 600 .66rem/17px var(--pp-sans);\
-    \ text-align: center; }\n.pp-header .me { all: unset; cursor: pointer; width: 34px; height: 34px; border-radius: 50%;\
-    \ display: grid; place-items: center; background: var(--pp-ink); color: var(--pp-bg); font: 600 .8rem var(--pp-sans);\
-    \ }\n.pp-header .me:focus-visible { outline: 2px solid var(--pp-brass); outline-offset: 2px; }\n.pp-header .menu { position:\
-    \ absolute; right: 0; top: calc(100% + 10px); width: 300px; padding: 8px; z-index: 60; }\n.pp-header .menu.alerts { width:\
-    \ 360px; }\n.pp-header .menu .who { padding: 8px 10px 12px; border-bottom: 1px solid var(--pp-line); margin-bottom: 6px;\
-    \ }\n.pp-header .menu .item { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding:\
-    \ 9px 10px; border-radius: 8px; font-size: .9rem; }\n.pp-header .menu .item:hover { background: var(--pp-panel-2); }\n\
-    .pp-header .menu .item .sub { display: block; color: var(--pp-muted); font-size: .8rem; }\n.pp-header .menu .head { padding:\
-    \ 8px 10px; font-weight: 600; font-size: .9rem; }\n.pp-header .menu .none { padding: 8px 10px 12px; color: var(--pp-muted);\
-    \ font-size: .88rem; }\n.pp-header .menu .themes { padding: 6px 10px 10px; }\n.pp-page { min-height: calc(100vh - 140px);\
-    \ }\n.pp-public .pp-page { min-height: 0; }\n.pp-footer { max-width: 1120px; margin: 0 auto; padding: 22px 20px 34px;\
-    \ color: var(--pp-faint); font-size: .78rem; text-align: center; letter-spacing: .04em; }\n@media (max-width: 560px) {\n\
-    \  .pp-header .in { gap: 8px; padding: 10px 14px; } .pp-header nav { display: none; }\n  .pp-header .menu, .pp-header\
-    \ .menu.alerts { position: fixed; left: 12px; right: 12px; top: 60px; width: auto; }\n}\n</style>\n<script>\n(function\
-    \ () {\n  var PP = window.PP;\n  PP.define('header', function (root, data, emit) {\n    var esc = PP.esc;\n    var S =\
-    \ { user: null, active: 'dashboard', open: null, alerts: { pending: 0, items: [] } };\n\n    function initials(u) {\n\
-    \      var n = String(u.display_name || u.email || '?').trim().split(/\\s+/);\n      return ((n[0] || '?')[0] + (n.length\
-    \ > 1 ? n[n.length - 1][0] : '')).toUpperCase();\n    }\n    function alertsMenu() {\n      var a = S.alerts;\n      return\
-    \ '<div class=\"menu alerts card fade-in\" role=\"menu\"><div class=\"head\">Awaiting your approval</div>' +\n       \
-    \ (a.items.length ? a.items.map(function (i) {\n          return '<button class=\"item\" data-action=\"alert\" data-r=\"\
-    ' + esc(i.restaurant_id) + '\" data-date=\"' + esc(i.date) + '\">' +\n            '<strong>' + esc(i.name) + '</strong>\
-    \ · ' + PP.plural(i.party, 'guest') +\n            '<span class=\"sub\">' + esc(i.restaurant) + ' · ' + esc(PP.fmtShort(i.date))\
-    \ + ' at ' + esc(i.time) + '</span></button>';\n        }).join('') + (a.pending > a.items.length ? '<div class=\"none\"\
-    >and ' + (a.pending - a.items.length) + ' more</div>' : '')\n          : '<div class=\"none\">Nothing to approve. New\
-    \ requests show up here when a booking needs a decision.</div>') + '</div>';\n    }\n    function userMenu() {\n     \
-    \ var u = S.user, t = PP.theme();\n      return '<div class=\"menu card fade-in\" role=\"menu\"><div class=\"who\"><strong>'\
-    \ + esc(u.display_name) + '</strong><div class=\"muted small\">' + esc(u.email) + '</div></div>' +\n        '<div class=\"\
-    themes\"><div class=\"small muted\" style=\"margin-bottom:6px\">Appearance</div><div class=\"seg\">' +\n          ['auto',\
-    \ 'light', 'dark'].map(function (k) { return '<button data-action=\"theme\" data-t=\"' + k + '\" class=\"' + (t === k\
-    \ ? 'on' : '') + '\">' + k[0].toUpperCase() + k.slice(1) + '</button>'; }).join('') + '</div></div>' +\n        '<button\
-    \ class=\"item\" data-action=\"nav\" data-page=\"dashboard\">Your restaurants</button>' +\n        '<button class=\"item\"\
-    \ data-action=\"signout\">Sign out</button></div>';\n    }\n    function render() {\n      var u = S.user;\n      document.documentElement.classList.toggle('pp-signed-out',\
-    \ !u);\n      document.title = (S.alerts.pending ? '(' + S.alerts.pending + ') ' : '') + 'PlanPlate';\n      if (!u) {\
-    \ root.innerHTML = ''; return; }\n      root.innerHTML = '<header class=\"pp-header\"><div class=\"in\">' +\n        '<button\
-    \ class=\"brand\" data-action=\"nav\" data-page=\"dashboard\" aria-label=\"PlanPlate home\">' + PP.mark() + '<span class=\"\
-    name\">PlanPlate</span></button>' +\n        '<nav><button data-action=\"nav\" data-page=\"dashboard\" class=\"' + (S.active\
-    \ === 'dashboard' ? 'on' : '') + '\">Restaurants</button></nav>' +\n        '<div class=\"right\">' +\n          '<button\
-    \ class=\"btn ghost icon bell\" data-action=\"alerts\" aria-label=\"Approvals (' + S.alerts.pending + ')\" aria-expanded=\"\
-    ' + (S.open === 'alerts') + '\">' + PP.icon('bell') +\n            (S.alerts.pending ? '<span class=\"n\">' + S.alerts.pending\
-    \ + '</span>' : '') + '</button>' +\n          '<button class=\"me\" data-action=\"menu\" aria-label=\"Account menu\"\
-    \ aria-expanded=\"' + (S.open === 'menu') + '\">' + esc(initials(u)) + '</button>' +\n          (S.open === 'alerts' ?\
-    \ alertsMenu() : S.open === 'menu' ? userMenu() : '') +\n        '</div></div></header>';\n    }\n\n    root.addEventListener('click',\
-    \ function (e) {\n      e.ppHeader = true;\n      var el = e.target.closest('[data-action]');\n      if (!el) return;\n\
-    \      var a = el.dataset.action;\n      if (a === 'alerts' || a === 'menu') { S.open = S.open === a ? null : a; render();\
-    \ return; }\n      if (a === 'theme') { PP.setTheme(el.dataset.t); render(); return; }\n      S.open = null;\n      if\
-    \ (a === 'nav') { S.active = el.dataset.page; render(); emit('nav', { page: el.dataset.page }); }\n      else if (a ===\
-    \ 'alert') { render(); emit('open_alert', { restaurant_id: el.dataset.r, date: el.dataset.date }); }\n      else if (a\
-    \ === 'signout') { render(); emit('signout', {}); }\n    });\n    document.addEventListener('click', function (e) { if\
-    \ (!e.ppHeader && S.open) { S.open = null; render(); } });\n    document.addEventListener('keydown', function (e) { if\
-    \ (e.key === 'Escape' && S.open) { S.open = null; render(); } });\n\n    // New requests arrive while the portal is open:\
-    \ check every minute.\n    setInterval(function () {\n      if (!S.user || document.hidden) return;\n      emit('poll',\
-    \ {}).then(function (a) { if (a && typeof a.pending === 'number') { S.alerts = a; if (!S.open) render(); } }, function\
-    \ () {});\n    }, 60000);\n\n    render();\n    return {\n      setUser: function (json) { var me = json ? JSON.parse(json)\
-    \ : null; S.user = me; if (me && me.alerts) S.alerts = me.alerts; render(); },\n      setActive: function (page) { S.active\
-    \ = page; S.open = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json); render(); }\n \
-    \   };\n  });\n})();\n</script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n.pp-auth { min-height: calc(100vh\
-    \ - 80px); display: grid; grid-template-columns: 1.1fr 1fr; }\n.pp-auth .side { background: #1d1b18; color: #efe9df; padding:\
-    \ 56px 56px 44px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow:\
-    \ hidden; }\n.pp-auth .side .brand { display: flex; align-items: center; gap: 12px; font-family: var(--pp-serif); font-size:\
-    \ 1.7rem; font-weight: 600; }\n.pp-auth .side .brand .mark { width: 34px; height: 34px; color: #c9a56a; }\n.pp-auth .side\
-    \ h1 { color: inherit; font-size: 3.6rem; max-width: 11ch; line-height: 1.02; margin: 0 0 18px; font-weight: 500; }\n\
-    .pp-auth .side h1 em { color: #c9a56a; font-style: italic; }\n.pp-auth .side p { color: #b9b1a4; max-width: 38ch; font-size:\
-    \ 1.02rem; }\n.pp-auth .side ul { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 12px; color: #d8d1c4;\
-    \ font-size: .95rem; }\n.pp-auth .side li { display: flex; gap: 12px; align-items: baseline; }\n.pp-auth .side li::before\
-    \ { content: \"\"; flex: none; width: 18px; height: 1px; background: #c9a56a; transform: translateY(-4px); }\n.pp-auth\
-    \ .side .ring { position: absolute; right: -160px; bottom: -160px; width: 480px; height: 480px; color: rgba(201,165,106,.12);\
-    \ }\n.pp-auth .side .tag { font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: #8e8678; }\n.pp-auth\
-    \ .main { display: grid; place-items: center; padding: 40px 20px; }\n.pp-auth .box { width: min(380px, 100%); }\n.pp-auth\
-    \ .tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--pp-line); margin-bottom: 26px; }\n.pp-auth .tabs button\
-    \ { all: unset; cursor: pointer; padding: 10px 0; font-size: .92rem; color: var(--pp-muted); border-bottom: 2px solid\
-    \ transparent; margin-bottom: -1px; }\n.pp-auth .tabs button.on { color: var(--pp-ink); border-bottom-color: var(--pp-ink);\
-    \ }\n.pp-auth form > div + div { margin-top: 16px; }\n.pp-auth .link { all: unset; cursor: pointer; color: var(--pp-muted);\
-    \ font-size: .84rem; text-decoration: underline; text-decoration-color: var(--pp-line); text-underline-offset: 3px; }\n\
-    .pp-auth .link:hover { color: var(--pp-ink); }\n@media (max-width: 860px) {\n  .pp-auth { grid-template-columns: 1fr;\
-    \ min-height: 0; }\n  .pp-auth .side { padding: 30px 22px; } .pp-auth .side h1 { font-size: 2.3rem; margin-top: 26px;\
-    \ } .pp-auth .side ul, .pp-auth .side .ring, .pp-auth .side .tag { display: none; }\n}\n</style>\n<script>\n(function\
-    \ () {\n  var PP = window.PP;\n  PP.define('auth', function (root, data, emit) {\n    var esc = PP.esc;\n    var S = {\
-    \ mode: 'login', busy: false, msg: null, email: '' };\n\n    function form() {\n      if (S.mode === 'reset') {\n    \
-    \    return '<h2>Reset your password</h2><p class=\"muted small\">We\\'ll email you a link to choose a new one.</p>' +\n\
-    \          '<form data-form=\"reset\"><div><label class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\"\
-    \ name=\"email\" required autocomplete=\"email\" value=\"' + esc(S.email) + '\"></div>' +\n          '<div><button class=\"\
-    btn primary block\" type=\"submit\">Send reset link</button></div></form>' +\n          '<p style=\"margin-top:16px\"\
-    ><button class=\"link\" data-action=\"mode\" data-mode=\"login\">Back to sign in</button></p>';\n      }\n      var signup\
-    \ = S.mode === 'signup';\n      return '<div class=\"tabs\" role=\"tablist\">' +\n          '<button role=\"tab\" data-action=\"\
-    mode\" data-mode=\"login\" class=\"' + (!signup ? 'on' : '') + '\">Sign in</button>' +\n          '<button role=\"tab\"\
-    \ data-action=\"mode\" data-mode=\"signup\" class=\"' + (signup ? 'on' : '') + '\">Create account</button></div>' +\n\
-    \        '<h2>' + (signup ? 'Open your account' : 'Welcome back') + '</h2>' +\n        '<p class=\"muted small\">' + (signup\
-    \ ? 'Set up your restaurants, hours and tables in a few minutes.' : 'Sign in to manage your restaurants and reservations.')\
-    \ + '</p>' +\n        '<form data-form=\"' + S.mode + '\">' +\n          (signup ? '<div><label class=\"f\" for=\"ppN\"\
-    >Your name</label><input type=\"text\" id=\"ppN\" name=\"name\" required autocomplete=\"name\"></div>' : '') +\n     \
-    \     '<div><label class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"\
-    email\" value=\"' + esc(S.email) + '\"></div>' +\n          '<div><label class=\"f\" for=\"ppP\">Password</label><input\
-    \ type=\"password\" id=\"ppP\" name=\"password\" required minlength=\"' + (signup ? 8 : 1) + '\" autocomplete=\"' + (signup\
-    \ ? 'new-password' : 'current-password') + '\">' +\n            (signup ? '<div class=\"hint\">At least 8 characters.</div>'\
-    \ : '<div class=\"hint\" style=\"text-align:right\"><button type=\"button\" class=\"link\" data-action=\"mode\" data-mode=\"\
-    reset\">Forgot your password?</button></div>') + '</div>' +\n          '<div><button class=\"btn primary block\" type=\"\
-    submit\">' + (signup ? 'Create account' : 'Sign in') + '</button></div>' +\n        '</form>';\n    }\n\n    function\
-    \ render() {\n      root.innerHTML = '<div class=\"pp-auth\">' +\n        '<div class=\"side\">' + PP.mark('ring') +\n\
-    \          '<div class=\"brand\">' + PP.mark() + 'PlanPlate</div>' +\n          '<div><h1>Reservations, <em>made simple.</em></h1>'\
-    \ +\n          '<p>One calm place to run bookings for every restaurant you manage: opening hours, tables, approvals and\
-    \ a booking form for your website.</p>' +\n          '<ul><li>Seasonal hours and special days that override them</li><li>Join\
-    \ and split tables hour by hour</li><li>Bookings confirm themselves until you are 80% full</li><li>Guests manage their\
-    \ own reservation from one private link</li></ul></div>' +\n          '<div class=\"tag\">Simple · Smart · Reliable</div></div>'\
-    \ +\n        '<div class=\"main\"><div class=\"box fade-in\">' + form() + '<div data-el=\"msg\"></div></div></div></div>';\n\
-    \      var f = root.querySelector('form');\n      if (f) f.onsubmit = submit;\n      showMsg();\n    }\n    function showMsg()\
-    \ {\n      var box = root.querySelector('[data-el=msg]');\n      if (box) box.innerHTML = S.msg ? '<div class=\"feedback\
-    \ ' + (S.msg.ok ? 'good' : 'bad') + '\">' + esc(S.msg.text) + '</div>' : '';\n    }\n    function setBusy(on) {\n    \
-    \  S.busy = on;\n      root.querySelectorAll('.box button[type=submit]').forEach(function (b) {\n        b.disabled =\
-    \ on;\n        if (on) { b.dataset.label = b.innerHTML; b.innerHTML = '<span class=\"spin\"></span>'; }\n        else\
-    \ if (b.dataset.label) b.innerHTML = b.dataset.label;\n      });\n    }\n    function submit(e) {\n      e.preventDefault();\n\
-    \      if (S.busy) return;\n      var v = {};\n      new FormData(e.target).forEach(function (val, key) { v[key] = String(val);\
-    \ });\n      S.email = v.email || '';\n      S.msg = null; showMsg(); setBusy(true);\n      emit(e.target.dataset.form,\
-    \ v).then(function (res) {\n        setBusy(false);\n        res = res || {};\n        if (res.ok && !res.message) return;\
-    \ // Python navigates away\n        S.msg = res.ok ? { ok: true, text: res.message } : { ok: false, text: res.error ||\
-    \ 'Something went wrong.' };\n        if (res.mode && res.mode !== S.mode) { S.mode = res.mode; render(); } else showMsg();\n\
-    \      }, function (err) { setBusy(false); S.msg = { ok: false, text: PP.err(err) }; showMsg(); });\n    }\n    root.addEventListener('click',\
-    \ function (e) {\n      var el = e.target.closest('[data-action=mode]');\n      if (!el) return;\n      var em = root.querySelector('input[name=email]');\n\
-    \      if (em) S.email = em.value;\n      S.mode = el.dataset.mode; S.msg = null; render();\n      var first = root.querySelector('form\
-    \ input:not([value]), form input[value=\"\"]');\n      if (first) first.focus();\n    });\n    render();\n    return {};\n\
-    \  });\n})();\n</script>\n\n<!-- ===== DashboardPage component ===== -->\n<style>\n.pp-dash .hello { display: flex; align-items:\
-    \ flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }\n.pp-dash .hello h1 { margin: 0; }\n.pp-dash .alert { display:\
-    \ flex; gap: 16px; align-items: center; padding: 16px 20px; margin-bottom: 30px; background: var(--pp-warn-soft); border:\
-    \ 1px solid color-mix(in srgb, var(--pp-warn) 25%, transparent); border-radius: var(--pp-radius); color: var(--pp-ink);\
-    \ flex-wrap: wrap; }\n.pp-dash .alert .ic { width: 22px; height: 22px; color: var(--pp-warn); }\n.pp-dash .alert strong\
-    \ { font-weight: 600; }\n.pp-dash .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));\
-    \ gap: 16px; }\n.pp-dash .rc { display: flex; flex-direction: column; padding: 22px 22px 16px; min-height: 230px; transition:\
-    \ border-color .15s, transform .15s; }\n.pp-dash .rc:hover { border-color: var(--pp-faint); }\n.pp-dash .rc h3 { font-size:\
-    \ 1.55rem; margin-bottom: 2px; overflow-wrap: anywhere; }\n.pp-dash .rc .addr { color: var(--pp-muted); font-size: .84rem;\
-    \ min-height: 1.3em; }\n.pp-dash .rc .today { margin: 14px 0 16px; font-size: .86rem; color: var(--pp-ink); display: flex;\
-    \ gap: 7px; align-items: center; }\n.pp-dash .rc .today .ic { color: var(--pp-brass); }\n.pp-dash .rc .nums { display:\
-    \ grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 0; border-top: 1px solid var(--pp-line); border-bottom:\
-    \ 1px solid var(--pp-line); }\n.pp-dash .rc .nums b { display: block; font: 500 1.6rem/1 var(--pp-serif); }\n.pp-dash\
-    \ .rc .nums span { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-dash\
-    \ .rc .acts { display: flex; gap: 4px; align-items: center; margin-top: auto; padding-top: 12px; }\n.pp-dash .rc .top\
-    \ { display: flex; gap: 10px; align-items: flex-start; }\n.pp-dash .rc .top > div { flex: 1; min-width: 0; }\n.pp-dash\
-    \ .new { display: grid; place-items: center; text-align: center; border-style: dashed; color: var(--pp-muted); min-height:\
-    \ 230px; }\n.pp-dash .new:hover { color: var(--pp-ink); border-color: var(--pp-ink); }\n.pp-dash .new .plus { width: 44px;\
-    \ height: 44px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; margin: 0 auto\
-    \ 10px; }\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.define('dashboard', function (root, data, emit)\
-    \ {\n    var esc = PP.esc;\n    var list = data.restaurants || [], me = data.me || {};\n\n    function greeting() {\n\
-    \      var h = new Date().getHours();\n      return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';\n\
-    \    }\n    function card(r) {\n      return '<div class=\"card rc fade-in\" data-id=\"' + esc(r.id) + '\">' +\n     \
-    \   '<div class=\"top\"><div><h3>' + esc(r.name) + '</h3><div class=\"addr\">' + esc(r.address || '/' + r.slug) + '</div></div>'\
-    \ +\n          (r.pending ? '<span class=\"badge pending\">' + r.pending + ' to approve</span>' : !r.accepting ? '<span\
-    \ class=\"badge cancelled\">Online booking off</span>' : '') + '</div>' +\n        '<div class=\"today\">' + PP.icon('clock')\
-    \ + esc(r.today) + '</div>' +\n        '<div class=\"nums\"><div><b>' + r.bookings + '</b><span>Bookings</span></div><div><b>'\
-    \ + r.covers + '</b><span>Guests</span></div><div><b>' + r.seats + '</b><span>Seats</span></div></div>' +\n        '<div\
-    \ class=\"acts\"><button class=\"btn primary sm\" data-action=\"open\" data-page=\"reservations\">Open</button>' +\n \
-    \         '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"hours\">Hours</button>' +\n          '<button\
-    \ class=\"btn ghost sm\" data-action=\"open\" data-page=\"tables\">Tables</button><span class=\"spacer\"></span>' +\n\
-    \          '<button class=\"btn ghost icon\" data-action=\"copy\" title=\"Copy booking link\" aria-label=\"Copy booking\
-    \ link\">' + PP.icon('link') + '</button>' +\n          '<button class=\"btn ghost icon\" data-action=\"duplicate\" title=\"\
-    Duplicate\" aria-label=\"Duplicate restaurant\">' + PP.icon('copy') + '</button></div></div>';\n    }\n    function render()\
-    \ {\n      var pending = list.reduce(function (n, r) { return n + r.pending; }, 0);\n      var firstName = String(me.display_name\
-    \ || '').split(' ')[0];\n      root.innerHTML = '<div class=\"wrap pp-dash\">' +\n        '<div class=\"hello\"><div><div\
-    \ class=\"eyebrow\">' + esc(new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long'\
-    \ })) + '</div>' +\n          '<h1>' + greeting() + (firstName ? ', ' + esc(firstName) : '') + '</h1></div><span class=\"\
-    spacer\"></span>' +\n          (list.length ? '<button class=\"btn primary\" data-action=\"new\">' + PP.icon('plus') +\
-    \ 'New restaurant</button>' : '') + '</div>' +\n        (pending ? '<div class=\"alert\">' + PP.icon('bell') + '<div><strong>'\
-    \ + PP.plural(pending, 'booking') + ' waiting for your approval.</strong> ' +\n          '<span class=\"muted\">They came\
-    \ in while a restaurant was nearly full, or for a large party.</span></div><span class=\"spacer\"></span>' +\n       \
-    \   list.filter(function (r) { return r.pending; }).map(function (r) {\n            return '<button class=\"btn sm\" data-action=\"\
-    open\" data-page=\"reservations\" data-id=\"' + esc(r.id) + '\">' + esc(r.name) + ' · ' + r.pending + '</button>';\n \
-    \         }).join('') + '</div>' : '') +\n        (list.length ? '<div class=\"section-title\"><h2>Your restaurants</h2><span\
-    \ class=\"muted small\">' + list.length + '</span></div>' +\n          '<div class=\"grid\">' + list.map(card).join('')\
-    \ +\n          '<button class=\"card new\" data-action=\"new\"><div><div class=\"plus\">' + PP.icon('plus') + '</div>Add\
-    \ a restaurant</div></button></div>'\n          : '<div class=\"empty\" style=\"padding:70px 20px\"><h2>Add your first\
-    \ restaurant</h2><p>Start with sample opening hours and tables, then make them yours.</p>' +\n            '<button class=\"\
-    btn primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button></div>') +\n        '</div>';\n    }\n\
-    \n    function zones() {\n      try { return Intl.supportedValuesOf('timeZone'); } catch (e) { return ['UTC', 'Europe/London',\
-    \ 'Europe/Paris', 'Europe/Riga', 'America/New_York', 'America/Toronto', 'America/Los_Angeles']; }\n    }\n    function\
-    \ newModal() {\n      var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';\n      var d = PP.modal('<div\
-    \ class=\"eyebrow\">New restaurant</div><h2>What is it called?</h2>' +\n        '<form><div class=\"stack\"><div><label\
-    \ class=\"f\" for=\"nrName\">Name</label><input id=\"nrName\" name=\"name\" type=\"text\" required maxlength=\"80\" autofocus></div>'\
-    \ +\n        '<div><label class=\"f\" for=\"nrTz\">Time zone</label><input id=\"nrTz\" name=\"timezone\" type=\"text\"\
-    \ list=\"nrZones\" value=\"' + esc(tz) + '\">' +\n          '<datalist id=\"nrZones\">' + zones().map(function (z) { return\
-    \ '<option value=\"' + esc(z) + '\">'; }).join('') + '</datalist>' +\n          '<div class=\"hint\">Booking times are\
-    \ always in the restaurant\\'s local time.</div></div>' +\n        '<label class=\"check\"><input type=\"checkbox\" name=\"\
-    sample\" checked><span>Start with sample opening hours and 9 tables<br><span class=\"muted small\">You can change all\
-    \ of it afterwards.</span></span></label>' +\n        '<div data-el=\"msg\"></div></div>' +\n        '<div class=\"foot\"\
-    ><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\" type=\"submit\">Create\
-    \ restaurant</button></div></form>');\n      var f = d.el.querySelector('form');\n      f.onsubmit = function (e) {\n\
-    \        e.preventDefault();\n        var b = f.querySelector('[type=submit]'); b.disabled = true; b.innerHTML = '<span\
-    \ class=\"spin\"></span>';\n        emit('create', { name: f.name.value, timezone: f.timezone.value, sample: f.sample.checked\
-    \ }).then(function (res) {\n          if (res && res.ok) { d.close(); return; }\n          b.disabled = false; b.textContent\
-    \ = 'Create restaurant';\n          d.el.querySelector('[data-el=msg]').innerHTML = '<div class=\"feedback bad\">' + esc((res\
-    \ && res.error) || 'Could not create it.') + '</div>';\n        }, function (err) { b.disabled = false; b.textContent\
-    \ = 'Create restaurant'; PP.toast(PP.err(err), true); });\n      };\n    }\n    function dupModal(r) {\n      var d =\
-    \ PP.modal('<div class=\"eyebrow\">Duplicate</div><h2>Copy ' + esc(r.name) + '</h2>' +\n        '<p class=\"muted small\"\
-    >The copy gets the same settings, opening hours, special days, tables and joins. Reservations stay with the original.</p>'\
-    \ +\n        '<form><label class=\"f\" for=\"dpName\">Name of the new restaurant</label><input id=\"dpName\" name=\"name\"\
-    \ type=\"text\" required maxlength=\"80\" value=\"' + esc(r.name + ' (copy)') + '\">' +\n        '<div data-el=\"msg\"\
-    ></div><div class=\"foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\"\
+    \ = function (title, text, okLabel, danger, keepLabel) {\n    return new Promise(function (resolve) {\n      var answered\
+    \ = false;\n      var d = PP.modal('<h3>' + PP.esc(title) + '</h3><p class=\"muted\">' + PP.esc(text) + '</p>' +\n   \
+    \     '<div class=\"foot\"><button class=\"btn\" data-close>' + PP.esc(keepLabel || 'Keep it') + '</button><button class=\"\
+    btn ' + (danger ? 'danger' : 'primary') + '\" data-ok>' + PP.esc(okLabel || 'OK') + '</button></div>',\n        { onclose:\
+    \ function () { if (!answered) resolve(false); } });\n      d.el.querySelector('[data-ok]').onclick = function () { answered\
+    \ = true; d.close(); resolve(true); };\n    });\n  };\n\n  // The sub-navigation shown on every restaurant page. Handle\
+    \ clicks with PP.subnavClick.\n  // [page, label, icon, lowest role that sees it]\n  PP.TABS = [['reservations', 'Reservations',\
+    \ 'calendar', 'staff'], ['hours', 'Opening hours', 'clock', 'manager'], ['tables', 'Tables & layout', 'table', 'manager'],\n\
+    \             ['menu', 'Menu', 'list', 'manager'], ['settings', 'Settings & sharing', 'cog', 'manager']];\n  PP.RANK =\
+    \ { staff: 1, manager: 2, owner: 3 };\n  PP.ROLE = { owner: 'Owner', manager: 'Manager', staff: 'Staff' };\n  PP.can =\
+    \ function (nav, need) { return (PP.RANK[(nav.restaurant || nav).role] || 3) >= PP.RANK[need]; };\n  PP.subnav = function\
+    \ (nav, active) {\n    var r = nav.restaurant, esc = PP.esc;\n    var others = (nav.restaurants || []).length > 1 ? '<select\
+    \ data-pp-switch aria-label=\"Switch restaurant\">' + nav.restaurants.map(function (x) {\n      return '<option value=\"\
+    ' + esc(x.id) + '\"' + (x.id === r.id ? ' selected' : '') + '>' + esc(x.name) + '</option>';\n    }).join('') + '</select>'\
+    \ : '';\n    return '<div class=\"subnav\"><div class=\"top\"><div class=\"who\"><div class=\"eyebrow\"><button class=\"\
+    btn ghost sm\" data-pp-go=\"dashboard\" style=\"padding:0;margin:0;letter-spacing:inherit;font:inherit;color:inherit\"\
+    >All restaurants</button></div>' +\n      '<h1>' + esc(r.name) + '</h1></div><span class=\"spacer\"></span>' + (r.role\
+    \ && r.role !== 'owner' ? '<span class=\"badge plain\">' + esc(PP.ROLE[r.role]) + '</span>' : '') + others +\n      '<a\
+    \ class=\"btn sm\" target=\"_blank\" rel=\"noopener\" href=\"' + esc(PP.bookUrl(r.slug)) + '\">' + PP.icon('ext') + 'Booking\
+    \ page</a></div>' +\n      '<nav class=\"tabs\">' + PP.TABS.filter(function (t) { return PP.can(nav, t[3]); }).map(function\
+    \ (t) {\n        return '<button data-pp-tab=\"' + t[0] + '\" class=\"' + (t[0] === active ? 'on' : '') + '\">' + t[1]\
+    \ +\n          (t[0] === 'reservations' && r.pending ? '<span class=\"n\" title=\"Awaiting approval\">' + r.pending +\
+    \ '</span>' : '') + '</button>';\n      }).join('') + '</nav></div>';\n  };\n  PP.subnavClick = function (e, nav, emit)\
+    \ {\n    var t = e.target.closest('[data-pp-tab]');\n    if (t) { emit('go', { page: t.dataset.ppTab, restaurant_id: nav.restaurant.id\
+    \ }); return true; }\n    var g = e.target.closest('[data-pp-go]');\n    if (g) { emit('go', { page: g.dataset.ppGo });\
+    \ return true; }\n    return false;\n  };\n  PP.subnavChange = function (e, active, emit) {\n    var s = e.target.closest('[data-pp-switch]');\n\
+    \    if (s) { emit('go', { page: active, restaurant_id: s.value }); return true; }\n    return false;\n  };\n  PP.appUrl\
+    \ = function () { return location.origin + location.pathname; };\n  PP.menuUrl = function (slug) { return PP.appUrl()\
+    \ + '#menu/' + slug; };\n\n  // QR codes (qrcode-generator from cdnjs). PP.qrSvg → an <svg> string; PP.qrPng downloads\
+    \ a print-size PNG.\n  function qrMatrix(text) {\n    if (!window.qrcode) return null;\n    var q = window.qrcode(0, 'M');\
+    \ q.addData(text); q.make();\n    return q;\n  }\n  PP.qrSvg = function (text, px) {\n    var q = qrMatrix(text);\n  \
+    \  if (!q) return '<div class=\"hint\">QR codes need an internet connection to load.</div>';\n    var n = q.getModuleCount(),\
+    \ m = 2, size = n + m * 2, path = '';\n    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (q.isDark(r, c))\
+    \ path += 'M' + (c + m) + ' ' + (r + m) + 'h1v1h-1z';\n    return '<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"\
+    0 0 ' + size + ' ' + size + '\" width=\"' + (px || 160) + '\" height=\"' + (px || 160) + '\" shape-rendering=\"crispEdges\"\
+    \ role=\"img\" aria-label=\"QR code\"><rect width=\"100%\" height=\"100%\" fill=\"#fff\"/><path d=\"' + path + '\" fill=\"\
+    #1d1b18\"/></svg>';\n  };\n  PP.qrPng = function (text, filename, caption) {\n    var q = qrMatrix(text);\n    if (!q)\
+    \ { PP.toast('QR codes need an internet connection to load.', true); return; }\n    var n = q.getModuleCount(), cell =\
+    \ 24, m = 4, size = (n + m * 2) * cell, extra = caption ? 90 : 0;\n    var cv = document.createElement('canvas'); cv.width\
+    \ = size; cv.height = size + extra;\n    var g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width,\
+    \ cv.height); g.fillStyle = '#1d1b18';\n    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (q.isDark(r, c))\
+    \ g.fillRect((c + m) * cell, (r + m) * cell, cell, cell);\n    if (caption) { g.font = '600 44px Georgia, serif'; g.textAlign\
+    \ = 'center'; g.fillText(caption, size / 2, size + 40); }\n    var a = document.createElement('a'); a.href = cv.toDataURL('image/png');\
+    \ a.download = filename || 'qr.png';\n    document.body.appendChild(a); a.click(); a.remove();\n  };\n  PP.bookUrl = function\
+    \ (slug) { return PP.appUrl() + '#book/' + slug; };\n  PP.manageUrl = function (token) { return PP.appUrl() + '#r/' +\
+    \ token; };\n\n  // Theme: \"auto\" follows the device; \"light\"/\"dark\" are remembered per device.\n  PP.applyTheme\
+    \ = function (t) {\n    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);\n \
+    \   else document.documentElement.removeAttribute('data-theme');\n  };\n  PP.theme = function () { try { return localStorage.getItem('pp.theme')\
+    \ || 'auto'; } catch (e) { return 'auto'; } };\n  PP.setTheme = function (t) { try { localStorage.setItem('pp.theme',\
+    \ t); } catch (e) {} PP.applyTheme(t); };\n  try { PP.applyTheme(localStorage.getItem('pp.theme')); } catch (e) {}\n\n\
+    \  PP.wrapEmit = function (emit) {\n    return function (name, payload) {\n      try { return Promise.resolve(emit ? emit(name,\
+    \ JSON.stringify(payload == null ? {} : payload)) : null); }\n      catch (e) { console.error(e); return Promise.reject(e);\
+    \ }\n    };\n  };\n  PP.define = function (name, mountFn) { PP.components[name] = mountFn; };\n  PP.mount = function (name,\
+    \ root, json, emit) {\n    var fn = PP.components[name];\n    if (!fn) { console.error('PP component not loaded: ' + name);\
+    \ return null; }\n    if (!root) { console.error('PP mount: no root node for ' + name); return null; }\n    var data =\
+    \ typeof json === 'string' ? JSON.parse(json || '{}') : (json || {});\n    return fn(root, data, PP.wrapEmit(emit));\n\
+    \  };\n})();\n</script>\n\n<!-- ===== Main component ===== -->\n<style>\n.pp-header { position: sticky; top: 0; z-index:\
+    \ 50; background: color-mix(in srgb, var(--pp-bg) 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter:\
+    \ blur(12px); border-bottom: 1px solid var(--pp-line); }\n.pp-header .in { max-width: 1120px; margin: 0 auto; padding:\
+    \ 12px 20px; display: flex; align-items: center; gap: 18px; }\n.pp-header .brand { all: unset; cursor: pointer; display:\
+    \ flex; align-items: center; gap: 10px; color: var(--pp-ink); }\n.pp-header .brand .mark { width: 28px; height: 28px;\
+    \ color: var(--pp-brass); }\n.pp-header .brand .name { font-family: var(--pp-serif); font-size: 1.45rem; font-weight:\
+    \ 600; letter-spacing: .01em; line-height: 1; }\n.pp-header nav { display: flex; gap: 2px; }\n.pp-header nav button {\
+    \ all: unset; cursor: pointer; color: var(--pp-muted); padding: 7px 12px; border-radius: 99px; font-size: .9rem; }\n.pp-header\
+    \ nav button.on, .pp-header nav button:hover { color: var(--pp-ink); background: var(--pp-panel-2); }\n.pp-header .right\
+    \ { margin-left: auto; display: flex; align-items: center; gap: 6px; position: relative; }\n.pp-header .bell { position:\
+    \ relative; }\n.pp-header .bell .n { position: absolute; top: 1px; right: 0; min-width: 17px; height: 17px; padding: 0\
+    \ 4px; border-radius: 99px; background: var(--pp-warn); color: #fff; font: 600 .66rem/17px var(--pp-sans); text-align:\
+    \ center; }\n.pp-header .me { all: unset; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; display: grid;\
+    \ place-items: center; background: var(--pp-ink); color: var(--pp-bg); font: 600 .8rem var(--pp-sans); }\n.pp-header .me:focus-visible\
+    \ { outline: 2px solid var(--pp-brass); outline-offset: 2px; }\n.pp-header .menu { position: absolute; right: 0; top:\
+    \ calc(100% + 10px); width: 300px; padding: 8px; z-index: 60; }\n.pp-header .menu.alerts { width: 360px; }\n.pp-header\
+    \ .menu .who { padding: 8px 10px 12px; border-bottom: 1px solid var(--pp-line); margin-bottom: 6px; }\n.pp-header .menu\
+    \ .item { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 9px 10px; border-radius:\
+    \ 8px; font-size: .9rem; }\n.pp-header .menu .item:hover { background: var(--pp-panel-2); }\n.pp-header .menu .item .sub\
+    \ { display: block; color: var(--pp-muted); font-size: .8rem; }\n.pp-header .menu .head { padding: 8px 10px; font-weight:\
+    \ 600; font-size: .9rem; }\n.pp-header .menu .none { padding: 8px 10px 12px; color: var(--pp-muted); font-size: .88rem;\
+    \ }\n.pp-header .menu .themes { padding: 6px 10px 10px; }\n.pp-page { min-height: calc(100vh - 140px); }\n.pp-public .pp-page\
+    \ { min-height: 0; }\n.pp-footer { max-width: 1120px; margin: 0 auto; padding: 22px 20px 34px; color: var(--pp-faint);\
+    \ font-size: .78rem; text-align: center; letter-spacing: .04em; }\n@media (max-width: 560px) {\n  .pp-header .in { gap:\
+    \ 8px; padding: 10px 14px; } .pp-header nav { display: none; }\n  .pp-header .menu, .pp-header .menu.alerts { position:\
+    \ fixed; left: 12px; right: 12px; top: 60px; width: auto; }\n}\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n\
+    \  PP.define('header', function (root, data, emit) {\n    var esc = PP.esc;\n    var S = { user: null, active: 'dashboard',\
+    \ open: null, alerts: { pending: 0, items: [] } };\n\n    function initials(u) {\n      var n = String(u.display_name\
+    \ || u.email || '?').trim().split(/\\s+/);\n      return ((n[0] || '?')[0] + (n.length > 1 ? n[n.length - 1][0] : '')).toUpperCase();\n\
+    \    }\n    function alertsMenu() {\n      var a = S.alerts;\n      return '<div class=\"menu alerts card fade-in\" role=\"\
+    menu\"><div class=\"head\">Awaiting your approval</div>' +\n        (a.items.length ? a.items.map(function (i) {\n   \
+    \       return '<button class=\"item\" data-action=\"alert\" data-r=\"' + esc(i.restaurant_id) + '\" data-date=\"' + esc(i.date)\
+    \ + '\">' +\n            '<strong>' + esc(i.name) + '</strong> · ' + PP.plural(i.party, 'guest') +\n            '<span\
+    \ class=\"sub\">' + esc(i.restaurant) + ' · ' + esc(PP.fmtShort(i.date)) + ' at ' + esc(i.time) + '</span></button>';\n\
+    \        }).join('') + (a.pending > a.items.length ? '<div class=\"none\">and ' + (a.pending - a.items.length) + ' more</div>'\
+    \ : '')\n          : '<div class=\"none\">Nothing to approve. New requests show up here when a booking needs a decision.</div>')\
+    \ + '</div>';\n    }\n    function userMenu() {\n      var u = S.user, t = PP.theme();\n      return '<div class=\"menu\
+    \ card fade-in\" role=\"menu\"><div class=\"who\"><strong>' + esc(u.display_name) + '</strong><div class=\"muted small\"\
+    >' + esc(u.email) + '</div></div>' +\n        '<div class=\"themes\"><div class=\"small muted\" style=\"margin-bottom:6px\"\
+    >Appearance</div><div class=\"seg\">' +\n          ['auto', 'light', 'dark'].map(function (k) { return '<button data-action=\"\
+    theme\" data-t=\"' + k + '\" class=\"' + (t === k ? 'on' : '') + '\">' + k[0].toUpperCase() + k.slice(1) + '</button>';\
+    \ }).join('') + '</div></div>' +\n        '<button class=\"item\" data-action=\"nav\" data-page=\"dashboard\">Your restaurants</button>'\
+    \ +\n        '<button class=\"item\" data-action=\"signout\">Sign out</button></div>';\n    }\n    function render() {\n\
+    \      var u = S.user;\n      document.documentElement.classList.toggle('pp-signed-out', !u);\n      document.title =\
+    \ (S.alerts.pending ? '(' + S.alerts.pending + ') ' : '') + 'PlanPlate';\n      if (!u) { root.innerHTML = ''; return;\
+    \ }\n      root.innerHTML = '<header class=\"pp-header\"><div class=\"in\">' +\n        '<button class=\"brand\" data-action=\"\
+    nav\" data-page=\"dashboard\" aria-label=\"PlanPlate home\">' + PP.mark() + '<span class=\"name\">PlanPlate</span></button>'\
+    \ +\n        '<nav><button data-action=\"nav\" data-page=\"dashboard\" class=\"' + (S.active === 'dashboard' ? 'on' :\
+    \ '') + '\">Restaurants</button></nav>' +\n        '<div class=\"right\">' +\n          '<button class=\"btn ghost icon\
+    \ bell\" data-action=\"alerts\" aria-label=\"Approvals (' + S.alerts.pending + ')\" aria-expanded=\"' + (S.open === 'alerts')\
+    \ + '\">' + PP.icon('bell') +\n            (S.alerts.pending ? '<span class=\"n\">' + S.alerts.pending + '</span>' : '')\
+    \ + '</button>' +\n          '<button class=\"me\" data-action=\"menu\" aria-label=\"Account menu\" aria-expanded=\"'\
+    \ + (S.open === 'menu') + '\">' + esc(initials(u)) + '</button>' +\n          (S.open === 'alerts' ? alertsMenu() : S.open\
+    \ === 'menu' ? userMenu() : '') +\n        '</div></div></header>';\n    }\n\n    root.addEventListener('click', function\
+    \ (e) {\n      e.ppHeader = true;\n      var el = e.target.closest('[data-action]');\n      if (!el) return;\n      var\
+    \ a = el.dataset.action;\n      if (a === 'alerts' || a === 'menu') { S.open = S.open === a ? null : a; render(); return;\
+    \ }\n      if (a === 'theme') { PP.setTheme(el.dataset.t); render(); return; }\n      S.open = null;\n      if (a ===\
+    \ 'nav') { S.active = el.dataset.page; render(); emit('nav', { page: el.dataset.page }); }\n      else if (a === 'alert')\
+    \ { render(); emit('open_alert', { restaurant_id: el.dataset.r, date: el.dataset.date }); }\n      else if (a === 'signout')\
+    \ { render(); emit('signout', {}); }\n    });\n    document.addEventListener('click', function (e) { if (!e.ppHeader &&\
+    \ S.open) { S.open = null; render(); } });\n    document.addEventListener('keydown', function (e) { if (e.key === 'Escape'\
+    \ && S.open) { S.open = null; render(); } });\n\n    // New requests arrive while the portal is open: check every minute.\n\
+    \    setInterval(function () {\n      if (!S.user || document.hidden) return;\n      emit('poll', {}).then(function (a)\
+    \ { if (a && typeof a.pending === 'number') { S.alerts = a; if (!S.open) render(); } }, function () {});\n    }, 60000);\n\
+    \n    render();\n    return {\n      setUser: function (json) { var me = json ? JSON.parse(json) : null; S.user = me;\
+    \ if (me && me.alerts) S.alerts = me.alerts; render(); },\n      setActive: function (page) { S.active = page; S.open\
+    \ = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json); render(); }\n    };\n  });\n})();\n\
+    </script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n.pp-auth { min-height: calc(100vh - 80px); display: grid;\
+    \ grid-template-columns: 1.1fr 1fr; }\n.pp-auth .side { background: #1d1b18; color: #efe9df; padding: 56px 56px 44px;\
+    \ display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }\n.pp-auth\
+    \ .side .brand { display: flex; align-items: center; gap: 12px; font-family: var(--pp-serif); font-size: 1.7rem; font-weight:\
+    \ 600; }\n.pp-auth .side .brand .mark { width: 34px; height: 34px; color: #c9a56a; }\n.pp-auth .side h1 { color: inherit;\
+    \ font-size: 3.6rem; max-width: 11ch; line-height: 1.02; margin: 0 0 18px; font-weight: 500; }\n.pp-auth .side h1 em {\
+    \ color: #c9a56a; font-style: italic; }\n.pp-auth .side p { color: #b9b1a4; max-width: 38ch; font-size: 1.02rem; }\n.pp-auth\
+    \ .side ul { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 12px; color: #d8d1c4; font-size: .95rem;\
+    \ }\n.pp-auth .side li { display: flex; gap: 12px; align-items: baseline; }\n.pp-auth .side li::before { content: \"\"\
+    ; flex: none; width: 18px; height: 1px; background: #c9a56a; transform: translateY(-4px); }\n.pp-auth .side .ring { position:\
+    \ absolute; right: -160px; bottom: -160px; width: 480px; height: 480px; color: rgba(201,165,106,.12); }\n.pp-auth .side\
+    \ .tag { font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: #8e8678; }\n.pp-auth .main { display:\
+    \ grid; place-items: center; padding: 40px 20px; }\n.pp-auth .box { width: min(380px, 100%); }\n.pp-auth .tabs { display:\
+    \ flex; gap: 22px; border-bottom: 1px solid var(--pp-line); margin-bottom: 26px; }\n.pp-auth .tabs button { all: unset;\
+    \ cursor: pointer; padding: 10px 0; font-size: .92rem; color: var(--pp-muted); border-bottom: 2px solid transparent; margin-bottom:\
+    \ -1px; }\n.pp-auth .tabs button.on { color: var(--pp-ink); border-bottom-color: var(--pp-ink); }\n.pp-auth form > div\
+    \ + div { margin-top: 16px; }\n.pp-auth .link { all: unset; cursor: pointer; color: var(--pp-muted); font-size: .84rem;\
+    \ text-decoration: underline; text-decoration-color: var(--pp-line); text-underline-offset: 3px; }\n.pp-auth .link:hover\
+    \ { color: var(--pp-ink); }\n@media (max-width: 860px) {\n  .pp-auth { grid-template-columns: 1fr; min-height: 0; }\n\
+    \  .pp-auth .side { padding: 30px 22px; } .pp-auth .side h1 { font-size: 2.3rem; margin-top: 26px; } .pp-auth .side ul,\
+    \ .pp-auth .side .ring, .pp-auth .side .tag { display: none; }\n}\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n\
+    \  PP.define('auth', function (root, data, emit) {\n    var esc = PP.esc;\n    var S = { mode: 'login', busy: false, msg:\
+    \ null, email: '' };\n\n    function form() {\n      if (S.mode === 'reset') {\n        return '<h2>Reset your password</h2><p\
+    \ class=\"muted small\">We\\'ll email you a link to choose a new one.</p>' +\n          '<form data-form=\"reset\"><div><label\
+    \ class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"email\"\
+    \ value=\"' + esc(S.email) + '\"></div>' +\n          '<div><button class=\"btn primary block\" type=\"submit\">Send reset\
+    \ link</button></div></form>' +\n          '<p style=\"margin-top:16px\"><button class=\"link\" data-action=\"mode\" data-mode=\"\
+    login\">Back to sign in</button></p>';\n      }\n      var signup = S.mode === 'signup';\n      return '<div class=\"\
+    tabs\" role=\"tablist\">' +\n          '<button role=\"tab\" data-action=\"mode\" data-mode=\"login\" class=\"' + (!signup\
+    \ ? 'on' : '') + '\">Sign in</button>' +\n          '<button role=\"tab\" data-action=\"mode\" data-mode=\"signup\" class=\"\
+    ' + (signup ? 'on' : '') + '\">Create account</button></div>' +\n        '<h2>' + (signup ? 'Open your account' : 'Welcome\
+    \ back') + '</h2>' +\n        '<p class=\"muted small\">' + (signup ? 'Set up your restaurants, hours and tables in a\
+    \ few minutes.' : 'Sign in to manage your restaurants and reservations.') + '</p>' +\n        '<form data-form=\"' + S.mode\
+    \ + '\">' +\n          (signup ? '<div><label class=\"f\" for=\"ppN\">Your name</label><input type=\"text\" id=\"ppN\"\
+    \ name=\"name\" required autocomplete=\"name\"></div>' : '') +\n          '<div><label class=\"f\" for=\"ppE\">Email</label><input\
+    \ type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"email\" value=\"' + esc(S.email) + '\"></div>' +\n\
+    \          '<div><label class=\"f\" for=\"ppP\">Password</label><input type=\"password\" id=\"ppP\" name=\"password\"\
+    \ required minlength=\"' + (signup ? 8 : 1) + '\" autocomplete=\"' + (signup ? 'new-password' : 'current-password') +\
+    \ '\">' +\n            (signup ? '<div class=\"hint\">At least 8 characters.</div>' : '<div class=\"hint\" style=\"text-align:right\"\
+    ><button type=\"button\" class=\"link\" data-action=\"mode\" data-mode=\"reset\">Forgot your password?</button></div>')\
+    \ + '</div>' +\n          '<div><button class=\"btn primary block\" type=\"submit\">' + (signup ? 'Create account' : 'Sign\
+    \ in') + '</button></div>' +\n        '</form>';\n    }\n\n    function render() {\n      root.innerHTML = '<div class=\"\
+    pp-auth\">' +\n        '<div class=\"side\">' + PP.mark('ring') +\n          '<div class=\"brand\">' + PP.mark() + 'PlanPlate</div>'\
+    \ +\n          '<div><h1>Reservations, <em>made simple.</em></h1>' +\n          '<p>One calm place to run bookings for\
+    \ every restaurant you manage: opening hours, tables, approvals and a booking form for your website.</p>' +\n        \
+    \  '<ul><li>Seasonal hours and special days that override them</li><li>Join and split tables hour by hour</li><li>Bookings\
+    \ confirm themselves until you are 80% full</li><li>Guests manage their own reservation from one private link</li></ul></div>'\
+    \ +\n          '<div class=\"tag\">Simple · Smart · Reliable</div></div>' +\n        '<div class=\"main\"><div class=\"\
+    box fade-in\">' + form() + '<div data-el=\"msg\"></div></div></div></div>';\n      var f = root.querySelector('form');\n\
+    \      if (f) f.onsubmit = submit;\n      showMsg();\n    }\n    function showMsg() {\n      var box = root.querySelector('[data-el=msg]');\n\
+    \      if (box) box.innerHTML = S.msg ? '<div class=\"feedback ' + (S.msg.ok ? 'good' : 'bad') + '\">' + esc(S.msg.text)\
+    \ + '</div>' : '';\n    }\n    function setBusy(on) {\n      S.busy = on;\n      root.querySelectorAll('.box button[type=submit]').forEach(function\
+    \ (b) {\n        b.disabled = on;\n        if (on) { b.dataset.label = b.innerHTML; b.innerHTML = '<span class=\"spin\"\
+    ></span>'; }\n        else if (b.dataset.label) b.innerHTML = b.dataset.label;\n      });\n    }\n    function submit(e)\
+    \ {\n      e.preventDefault();\n      if (S.busy) return;\n      var v = {};\n      new FormData(e.target).forEach(function\
+    \ (val, key) { v[key] = String(val); });\n      S.email = v.email || '';\n      S.msg = null; showMsg(); setBusy(true);\n\
+    \      emit(e.target.dataset.form, v).then(function (res) {\n        setBusy(false);\n        res = res || {};\n     \
+    \   if (res.ok && !res.message) return; // Python navigates away\n        S.msg = res.ok ? { ok: true, text: res.message\
+    \ } : { ok: false, text: res.error || 'Something went wrong.' };\n        if (res.mode && res.mode !== S.mode) { S.mode\
+    \ = res.mode; render(); } else showMsg();\n      }, function (err) { setBusy(false); S.msg = { ok: false, text: PP.err(err)\
+    \ }; showMsg(); });\n    }\n    root.addEventListener('click', function (e) {\n      var el = e.target.closest('[data-action=mode]');\n\
+    \      if (!el) return;\n      var em = root.querySelector('input[name=email]');\n      if (em) S.email = em.value;\n\
+    \      S.mode = el.dataset.mode; S.msg = null; render();\n      var first = root.querySelector('form input:not([value]),\
+    \ form input[value=\"\"]');\n      if (first) first.focus();\n    });\n    render();\n    return {};\n  });\n})();\n</script>\n\
+    \n<!-- ===== DashboardPage component ===== -->\n<style>\n.pp-dash .hello { display: flex; align-items: flex-end; gap:\
+    \ 16px; flex-wrap: wrap; margin-bottom: 30px; }\n.pp-dash .hello h1 { margin: 0; }\n.pp-dash .alert { display: flex; gap:\
+    \ 16px; align-items: center; padding: 16px 20px; margin-bottom: 30px; background: var(--pp-warn-soft); border: 1px solid\
+    \ color-mix(in srgb, var(--pp-warn) 25%, transparent); border-radius: var(--pp-radius); color: var(--pp-ink); flex-wrap:\
+    \ wrap; }\n.pp-dash .alert .ic { width: 22px; height: 22px; color: var(--pp-warn); }\n.pp-dash .alert strong { font-weight:\
+    \ 600; }\n.pp-dash .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }\n\
+    .pp-dash .rc { display: flex; flex-direction: column; padding: 22px 22px 16px; min-height: 230px; transition: border-color\
+    \ .15s, transform .15s; }\n.pp-dash .rc:hover { border-color: var(--pp-faint); }\n.pp-dash .rc h3 { font-size: 1.55rem;\
+    \ margin-bottom: 2px; overflow-wrap: anywhere; }\n.pp-dash .rc .addr { color: var(--pp-muted); font-size: .84rem; min-height:\
+    \ 1.3em; }\n.pp-dash .rc .today { margin: 14px 0 16px; font-size: .86rem; color: var(--pp-ink); display: flex; gap: 7px;\
+    \ align-items: center; }\n.pp-dash .rc .today .ic { color: var(--pp-brass); }\n.pp-dash .rc .nums { display: grid; grid-template-columns:\
+    \ repeat(3, 1fr); gap: 8px; padding: 14px 0; border-top: 1px solid var(--pp-line); border-bottom: 1px solid var(--pp-line);\
+    \ }\n.pp-dash .rc .nums b { display: block; font: 500 1.6rem/1 var(--pp-serif); }\n.pp-dash .rc .nums span { font-size:\
+    \ .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-dash .rc .acts { display: flex;\
+    \ gap: 4px; align-items: center; margin-top: auto; padding-top: 12px; }\n.pp-dash .rc .top { display: flex; gap: 10px;\
+    \ align-items: flex-start; }\n.pp-dash .rc .top > div { flex: 1; min-width: 0; }\n.pp-dash .new { display: grid; place-items:\
+    \ center; text-align: center; border-style: dashed; color: var(--pp-muted); min-height: 230px; }\n.pp-dash .new:hover\
+    \ { color: var(--pp-ink); border-color: var(--pp-ink); }\n.pp-dash .new .plus { width: 44px; height: 44px; border-radius:\
+    \ 50%; border: 1px solid currentColor; display: grid; place-items: center; margin: 0 auto 10px; }\n</style>\n<script>\n\
+    (function () {\n  var PP = window.PP;\n  PP.define('dashboard', function (root, data, emit) {\n    var esc = PP.esc;\n\
+    \    var list = data.restaurants || [], me = data.me || {};\n\n    function greeting() {\n      var h = new Date().getHours();\n\
+    \      return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';\n    }\n    function card(r) {\n \
+    \     return '<div class=\"card rc fade-in\" data-id=\"' + esc(r.id) + '\">' +\n        '<div class=\"top\"><div><h3>'\
+    \ + esc(r.name) + '</h3><div class=\"addr\">' + esc(r.address || '/' + r.slug) + '</div></div>' +\n          (r.pending\
+    \ ? '<span class=\"badge pending\">' + r.pending + ' to approve</span>' : !r.accepting ? '<span class=\"badge cancelled\"\
+    >Online booking off</span>' : '') +\n          (r.role && r.role !== 'owner' ? '<span class=\"badge plain\">' + esc(PP.ROLE[r.role])\
+    \ + '</span>' : '') + '</div>' +\n        '<div class=\"today\">' + PP.icon('clock') + esc(r.today) + '</div>' +\n   \
+    \     '<div class=\"nums\"><div><b>' + r.bookings + '</b><span>Bookings</span></div><div><b>' + r.covers + '</b><span>Guests</span></div><div><b>'\
+    \ + r.seats + '</b><span>Seats</span></div></div>' +\n        '<div class=\"acts\"><button class=\"btn primary sm\" data-action=\"\
+    open\" data-page=\"reservations\">Open</button>' +\n          (r.role !== 'staff' ? '<button class=\"btn ghost sm\" data-action=\"\
+    open\" data-page=\"hours\">Hours</button>' +\n          '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"\
+    tables\">Tables</button>' : '') + '<span class=\"spacer\"></span>' +\n          '<button class=\"btn ghost icon\" data-action=\"\
+    copy\" title=\"Copy booking link\" aria-label=\"Copy booking link\">' + PP.icon('link') + '</button>' +\n          (r.role\
+    \ !== 'staff' ? '<button class=\"btn ghost icon\" data-action=\"duplicate\" title=\"Duplicate\" aria-label=\"Duplicate\
+    \ restaurant\">' + PP.icon('copy') + '</button>' : '') + '</div></div>';\n    }\n    function render() {\n      var pending\
+    \ = list.reduce(function (n, r) { return n + r.pending; }, 0);\n      var firstName = String(me.display_name || '').split('\
+    \ ')[0];\n      root.innerHTML = '<div class=\"wrap pp-dash\">' +\n        '<div class=\"hello\"><div><div class=\"eyebrow\"\
+    >' + esc(new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })) + '</div>' +\n\
+    \          '<h1>' + greeting() + (firstName ? ', ' + esc(firstName) : '') + '</h1></div><span class=\"spacer\"></span>'\
+    \ +\n          (list.length ? '<button class=\"btn primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button>'\
+    \ : '') + '</div>' +\n        (pending ? '<div class=\"alert\">' + PP.icon('bell') + '<div><strong>' + PP.plural(pending,\
+    \ 'booking') + ' waiting for your approval.</strong> ' +\n          '<span class=\"muted\">They came in while a restaurant\
+    \ was nearly full, or for a large party.</span></div><span class=\"spacer\"></span>' +\n          list.filter(function\
+    \ (r) { return r.pending; }).map(function (r) {\n            return '<button class=\"btn sm\" data-action=\"open\" data-page=\"\
+    reservations\" data-id=\"' + esc(r.id) + '\">' + esc(r.name) + ' · ' + r.pending + '</button>';\n          }).join('')\
+    \ + '</div>' : '') +\n        (list.length ? '<div class=\"section-title\"><h2>Your restaurants</h2><span class=\"muted\
+    \ small\">' + list.length + '</span></div>' +\n          '<div class=\"grid\">' + list.map(card).join('') +\n        \
+    \  '<button class=\"card new\" data-action=\"new\"><div><div class=\"plus\">' + PP.icon('plus') + '</div>Add a restaurant</div></button></div>'\n\
+    \          : '<div class=\"empty\" style=\"padding:70px 20px\"><h2>Add your first restaurant</h2><p>Start with sample\
+    \ opening hours and tables, then make them yours.</p>' +\n            '<button class=\"btn primary\" data-action=\"new\"\
+    >' + PP.icon('plus') + 'New restaurant</button></div>') +\n        '</div>';\n    }\n\n    function zones() {\n      try\
+    \ { return Intl.supportedValuesOf('timeZone'); } catch (e) { return ['UTC', 'Europe/London', 'Europe/Paris', 'Europe/Riga',\
+    \ 'America/New_York', 'America/Toronto', 'America/Los_Angeles']; }\n    }\n    function newModal() {\n      var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone)\
+    \ || 'UTC';\n      var d = PP.modal('<div class=\"eyebrow\">New restaurant</div><h2>What is it called?</h2>' +\n     \
+    \   '<form><div class=\"stack\"><div><label class=\"f\" for=\"nrName\">Name</label><input id=\"nrName\" name=\"name\"\
+    \ type=\"text\" required maxlength=\"80\" autofocus></div>' +\n        '<div><label class=\"f\" for=\"nrTz\">Time zone</label><input\
+    \ id=\"nrTz\" name=\"timezone\" type=\"text\" list=\"nrZones\" value=\"' + esc(tz) + '\">' +\n          '<datalist id=\"\
+    nrZones\">' + zones().map(function (z) { return '<option value=\"' + esc(z) + '\">'; }).join('') + '</datalist>' +\n \
+    \         '<div class=\"hint\">Booking times are always in the restaurant\\'s local time.</div></div>' +\n        '<label\
+    \ class=\"check\"><input type=\"checkbox\" name=\"sample\" checked><span>Start with sample opening hours and 9 tables<br><span\
+    \ class=\"muted small\">You can change all of it afterwards.</span></span></label>' +\n        '<div data-el=\"msg\"></div></div>'\
+    \ +\n        '<div class=\"foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn\
+    \ primary\" type=\"submit\">Create restaurant</button></div></form>');\n      var f = d.el.querySelector('form');\n  \
+    \    f.onsubmit = function (e) {\n        e.preventDefault();\n        var b = f.querySelector('[type=submit]'); b.disabled\
+    \ = true; b.innerHTML = '<span class=\"spin\"></span>';\n        emit('create', { name: f.name.value, timezone: f.timezone.value,\
+    \ sample: f.sample.checked }).then(function (res) {\n          if (res && res.ok) { d.close(); return; }\n          b.disabled\
+    \ = false; b.textContent = 'Create restaurant';\n          d.el.querySelector('[data-el=msg]').innerHTML = '<div class=\"\
+    feedback bad\">' + esc((res && res.error) || 'Could not create it.') + '</div>';\n        }, function (err) { b.disabled\
+    \ = false; b.textContent = 'Create restaurant'; PP.toast(PP.err(err), true); });\n      };\n    }\n    function dupModal(r)\
+    \ {\n      var d = PP.modal('<div class=\"eyebrow\">Duplicate</div><h2>Copy ' + esc(r.name) + '</h2>' +\n        '<p class=\"\
+    muted small\">The copy gets the same settings, opening hours, special days, tables and joins. Reservations stay with the\
+    \ original.</p>' +\n        '<form><label class=\"f\" for=\"dpName\">Name of the new restaurant</label><input id=\"dpName\"\
+    \ name=\"name\" type=\"text\" required maxlength=\"80\" value=\"' + esc(r.name + ' (copy)') + '\">' +\n        '<div data-el=\"\
+    msg\"></div><div class=\"foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\"\
     \ type=\"submit\">Duplicate</button></div></form>');\n      var f = d.el.querySelector('form');\n      f.name.select();\n\
     \      f.onsubmit = function (e) {\n        e.preventDefault();\n        var b = f.querySelector('[type=submit]'); b.disabled\
     \ = true; b.innerHTML = '<span class=\"spin\"></span>';\n        emit('duplicate', { id: r.id, name: f.name.value }).then(function\
@@ -1082,52 +1259,56 @@ native_deps:
     \ '</option>';\n          }).join('') + '</select></div></div>' +\n        '<div><label class=\"f\">Guest\\'s requests</label><textarea\
     \ name=\"notes\" maxlength=\"1000\" style=\"min-height:60px\">' + esc(r.notes) + '</textarea></div>' +\n        '<div><label\
     \ class=\"f\">Staff note <span class=\"faint\">(guests never see this)</span></label><textarea name=\"staff_note\" maxlength=\"\
-    1000\" style=\"min-height:60px\">' + esc(r.staff_note) + '</textarea></div>' +\n        (isNew ? '' : '<div class=\"linkbox\"\
-    ><code>' + esc(PP.manageUrl(r.token)) + '</code><button type=\"button\" class=\"btn sm\" data-copy>' + PP.icon('copy')\
-    \ + 'Guest link</button></div>') +\n        '<div data-el=\"msg\"></div></div>' +\n        '<div class=\"foot\">' +\n\
-    \          (!isNew && r.status === 'pending' ? '<button type=\"button\" class=\"btn good\" data-st=\"confirmed\">' + PP.icon('check')\
-    \ + 'Approve</button><button type=\"button\" class=\"btn danger\" data-st=\"declined\">Decline</button>' : '') +\n   \
-    \       (!isNew && r.status === 'confirmed' ? '<button type=\"button\" class=\"btn danger\" data-st=\"cancelled\">Cancel\
-    \ booking</button>' : '') +\n          (!isNew && (r.status === 'cancelled' || r.status === 'declined') ? '<button type=\"\
-    button\" class=\"btn\" data-st=\"confirmed\">Restore booking</button>' : '') +\n          '<span class=\"spacer\"></span><button\
-    \ type=\"button\" class=\"btn\" data-close>Close</button><button class=\"btn primary\" type=\"submit\">' + (isNew ? 'Add\
-    \ booking' : 'Save changes') + '</button></div></form>' +\n        (!isNew && r.history && r.history.length ? '<details><summary>History</summary><ul\
-    \ class=\"hist\">' + r.history.slice().reverse().map(function (h) {\n          return '<li><time>' + esc(PP.fmtStamp(h.at))\
-    \ + '</time><span>' + esc(h.what) + '</span></li>';\n        }).join('') + '</ul></details>' : '') +\n        (!isNew\
-    \ && r.consent ? '<p class=\"hint\">The guest agreed to the privacy notice on ' + esc(PP.fmtStamp(r.consent_at)) + '.</p>'\
-    \ : '') + '</div>';\n      var d = PP.modal(html, { wide: true });\n      var f = d.el.querySelector('form'), optBox =\
-    \ d.el.querySelector('[data-el=opt]'), msg = d.el.querySelector('[data-el=msg]');\n      var seq = 0;\n      function\
-    \ refreshOptions() {\n        var my = ++seq;\n        optBox.innerHTML = '<span class=\"spin\"></span>';\n        emit('options',\
-    \ { date: f.date.value, time: f.time.value, party: f.party.value, duration: f.duration.value, id: isNew ? null : r.id\
-    \ }).then(function (o) {\n          if (my !== seq) return;\n          if (!o || !o.ok) { optBox.textContent = (o && o.error)\
-    \ || ''; return; }\n          var best = o.units[0];\n          optBox.innerHTML = (o.open ? '' : '<span style=\"color:var(--pp-bad)\"\
-    >Closed at this time. </span>') +\n            (best ? 'Best fit: ' + esc(best.label) + ' (' + best.seats + ')' : '<span\
-    \ style=\"color:var(--pp-bad)\">No free table fits.</span>') + ' · ' + o.pct + '% booked';\n        });\n      }\n   \
-    \   ['date', 'time', 'party', 'duration'].forEach(function (n) { f[n].addEventListener('change', refreshOptions); });\n\
-    \      f.table_mode.addEventListener('change', function () { d.el.querySelector('[data-el=manual]').hidden = f.table_mode.value\
-    \ !== 'manual'; });\n      refreshOptions();\n      var copy = d.el.querySelector('[data-copy]');\n      if (copy) copy.onclick\
-    \ = function () { PP.copy(PP.manageUrl(r.token), 'Guest link'); };\n      d.el.querySelectorAll('[data-st]').forEach(function\
+    1000\" style=\"min-height:60px\">' + esc(r.staff_note) + '</textarea></div>' +\n        '<label class=\"check small\"\
+    ><input type=\"checkbox\" name=\"notify\"' + (isNew ? ' checked' : '') + '><span>Email the guest ' + (isNew ? 'a confirmation'\
+    \ : 'about this change') + ' <span class=\"faint\">(when there is an email address)</span></span></label>' +\n       \
+    \ (isNew ? '' : '<div class=\"linkbox\"><code>' + esc(PP.manageUrl(r.token)) + '</code><button type=\"button\" class=\"\
+    btn sm\" data-copy>' + PP.icon('copy') + 'Guest link</button></div>') +\n        '<div data-el=\"msg\"></div></div>' +\n\
+    \        '<div class=\"foot\">' +\n          (!isNew && r.status === 'pending' ? '<button type=\"button\" class=\"btn\
+    \ good\" data-st=\"confirmed\">' + PP.icon('check') + 'Approve</button><button type=\"button\" class=\"btn danger\" data-st=\"\
+    declined\">Decline</button>' : '') +\n          (!isNew && r.status === 'confirmed' ? '<button type=\"button\" class=\"\
+    btn danger\" data-st=\"cancelled\">Cancel booking</button>' : '') +\n          (!isNew && (r.status === 'cancelled' ||\
+    \ r.status === 'declined') ? '<button type=\"button\" class=\"btn\" data-st=\"confirmed\">Restore booking</button>' :\
+    \ '') +\n          '<span class=\"spacer\"></span><button type=\"button\" class=\"btn\" data-close>Close</button><button\
+    \ class=\"btn primary\" type=\"submit\">' + (isNew ? 'Add booking' : 'Save changes') + '</button></div></form>' +\n  \
+    \      (!isNew && r.history && r.history.length ? '<details><summary>History</summary><ul class=\"hist\">' + r.history.slice().reverse().map(function\
+    \ (h) {\n          return '<li><time>' + esc(PP.fmtStamp(h.at)) + '</time><span>' + esc(h.what) + '</span></li>';\n  \
+    \      }).join('') + '</ul></details>' : '') +\n        (!isNew && r.consent ? '<p class=\"hint\">The guest agreed to\
+    \ the privacy notice on ' + esc(PP.fmtStamp(r.consent_at)) + '.</p>' : '') + '</div>';\n      var d = PP.modal(html, {\
+    \ wide: true });\n      var f = d.el.querySelector('form'), optBox = d.el.querySelector('[data-el=opt]'), msg = d.el.querySelector('[data-el=msg]');\n\
+    \      var seq = 0;\n      function refreshOptions() {\n        var my = ++seq;\n        optBox.innerHTML = '<span class=\"\
+    spin\"></span>';\n        emit('options', { date: f.date.value, time: f.time.value, party: f.party.value, duration: f.duration.value,\
+    \ id: isNew ? null : r.id }).then(function (o) {\n          if (my !== seq) return;\n          if (!o || !o.ok) { optBox.textContent\
+    \ = (o && o.error) || ''; return; }\n          var best = o.units[0];\n          optBox.innerHTML = (o.open ? '' : '<span\
+    \ style=\"color:var(--pp-bad)\">Closed at this time. </span>') +\n            (best ? 'Best fit: ' + esc(best.label) +\
+    \ ' (' + best.seats + ')' : '<span style=\"color:var(--pp-bad)\">No free table fits.</span>') + ' · ' + o.pct + '% booked';\n\
+    \        });\n      }\n      ['date', 'time', 'party', 'duration'].forEach(function (n) { f[n].addEventListener('change',\
+    \ refreshOptions); });\n      f.table_mode.addEventListener('change', function () { d.el.querySelector('[data-el=manual]').hidden\
+    \ = f.table_mode.value !== 'manual'; });\n      refreshOptions();\n      var copy = d.el.querySelector('[data-copy]');\n\
+    \      if (copy) copy.onclick = function () { PP.copy(PP.manageUrl(r.token), 'Guest link'); };\n      d.el.querySelectorAll('[data-st]').forEach(function\
     \ (b) {\n        b.onclick = function () { setStatus(r.id, b.dataset.st).then(function (done) { if (done) d.close(); });\
-    \ };\n      });\n      function save(force) {\n        var payload = { id: isNew ? null : r.id, force: !!force };\n  \
-    \      ['date', 'time', 'party', 'duration', 'name', 'phone', 'email', 'source', 'notes', 'staff_note'].forEach(function\
-    \ (n) { payload[n] = f[n].value; });\n        payload.tables = f.table_mode.value === 'manual' ? Array.prototype.map.call(f.querySelectorAll('input[name=t]:checked'),\
-    \ function (c) { return c.value; }) : 'auto';\n        if (payload.tables !== 'auto' && !payload.tables.length) payload.tables\
-    \ = 'auto';\n        var b = f.querySelector('[type=submit]'); b.disabled = true;\n        msg.innerHTML = '';\n     \
-    \   emit('save', payload).then(function (res) {\n          b.disabled = false;\n          if (res && res.ok) {\n     \
-    \       d.close(); D = res.day; render();\n            PP.toast(isNew ? 'Booking added' : 'Saved');\n            return;\n\
-    \          }\n          msg.innerHTML = '<div class=\"feedback ' + (res && res.conflict ? 'info' : 'bad') + '\">' + esc((res\
-    \ && res.error) || 'Could not save.') +\n            (res && res.conflict ? ' <button type=\"button\" class=\"btn sm\"\
-    \ data-force style=\"margin-left:6px\">Save anyway</button>' : '') + '</div>';\n          var fb = msg.querySelector('[data-force]');\n\
-    \          if (fb) fb.onclick = function () { save(true); };\n        }, function (e) { b.disabled = false; msg.innerHTML\
-    \ = '<div class=\"feedback bad\">' + esc(PP.err(e)) + '</div>'; });\n      }\n      f.onsubmit = function (e) { e.preventDefault();\
-    \ save(false); };\n      return d;\n    }\n\n    root.addEventListener('click', function (e) {\n      if (PP.subnavClick(e,\
-    \ D.nav, emit)) return;\n      var el = e.target.closest('[data-action]');\n      if (!el) {\n        var lane = e.target.closest('[data-lane]');\n\
-    \        if (lane && !e.target.closest('.blk')) {\n          var rect = lane.getBoundingClientRect();\n          var m\
-    \ = +lane.dataset.lo + (e.clientX - rect.left) / rect.width * +lane.dataset.span;\n          var step = D.settings.slot_min;\n\
-    \          m = Math.max(0, Math.floor(m / step) * step);\n          editor(null, { time: PP.hm(m), tables: lane.dataset.lane\
-    \ ? [lane.dataset.lane] : [] });\n        }\n        return;\n      }\n      var a = el.dataset.action, card = el.closest('[data-id]');\n\
-    \      var id = el.dataset.id || (card && card.dataset.id);\n      if (a === 'shift') load(PP.addDays(D.date, +el.dataset.n));\n\
-    \      else if (a === 'today') load(D.today);\n      else if (a === 'goto') load(el.dataset.date);\n      else if (a ===\
+    \ };\n      });\n      function save(force) {\n        var payload = { id: isNew ? null : r.id, force: !!force, notify:\
+    \ f.notify.checked && !!f.email.value.trim() };\n        ['date', 'time', 'party', 'duration', 'name', 'phone', 'email',\
+    \ 'source', 'notes', 'staff_note'].forEach(function (n) { payload[n] = f[n].value; });\n        payload.tables = f.table_mode.value\
+    \ === 'manual' ? Array.prototype.map.call(f.querySelectorAll('input[name=t]:checked'), function (c) { return c.value;\
+    \ }) : 'auto';\n        if (payload.tables !== 'auto' && !payload.tables.length) payload.tables = 'auto';\n        var\
+    \ b = f.querySelector('[type=submit]'); b.disabled = true;\n        msg.innerHTML = '';\n        emit('save', payload).then(function\
+    \ (res) {\n          b.disabled = false;\n          if (res && res.ok) {\n            d.close(); D = res.day; render();\n\
+    \            PP.toast((isNew ? 'Booking added' : 'Saved') + (res.emailed && res.emailed.indexOf('guest') >= 0 ? ' · guest\
+    \ emailed' : ''));\n            return;\n          }\n          msg.innerHTML = '<div class=\"feedback ' + (res && res.conflict\
+    \ ? 'info' : 'bad') + '\">' + esc((res && res.error) || 'Could not save.') +\n            (res && res.conflict ? ' <button\
+    \ type=\"button\" class=\"btn sm\" data-force style=\"margin-left:6px\">Save anyway</button>' : '') + '</div>';\n    \
+    \      var fb = msg.querySelector('[data-force]');\n          if (fb) fb.onclick = function () { save(true); };\n    \
+    \    }, function (e) { b.disabled = false; msg.innerHTML = '<div class=\"feedback bad\">' + esc(PP.err(e)) + '</div>';\
+    \ });\n      }\n      f.onsubmit = function (e) { e.preventDefault(); save(false); };\n      return d;\n    }\n\n    root.addEventListener('click',\
+    \ function (e) {\n      if (PP.subnavClick(e, D.nav, emit)) return;\n      var el = e.target.closest('[data-action]');\n\
+    \      if (!el) {\n        var lane = e.target.closest('[data-lane]');\n        if (lane && !e.target.closest('.blk'))\
+    \ {\n          var rect = lane.getBoundingClientRect();\n          var m = +lane.dataset.lo + (e.clientX - rect.left)\
+    \ / rect.width * +lane.dataset.span;\n          var step = D.settings.slot_min;\n          m = Math.max(0, Math.floor(m\
+    \ / step) * step);\n          editor(null, { time: PP.hm(m), tables: lane.dataset.lane ? [lane.dataset.lane] : [] });\n\
+    \        }\n        return;\n      }\n      var a = el.dataset.action, card = el.closest('[data-id]');\n      var id =\
+    \ el.dataset.id || (card && card.dataset.id);\n      if (a === 'shift') load(PP.addDays(D.date, +el.dataset.n));\n   \
+    \   else if (a === 'today') load(D.today);\n      else if (a === 'goto') load(el.dataset.date);\n      else if (a ===\
     \ 'view') { view = el.dataset.v; try { localStorage.setItem('pp.resView', view); } catch (x) {} render(); }\n      else\
     \ if (a === 'new') editor(null);\n      else if (a === 'edit' && id) editor(resById(id));\n      else if (a === 'status'\
     \ && id) setStatus(id, el.dataset.status);\n    });\n    root.addEventListener('change', function (e) {\n      if (PP.subnavChange(e,\
@@ -1482,11 +1663,103 @@ native_deps:
     \ for good?', 'They will always be booked separately.', 'Split them', true).then(function (y) { if (y) emit('delete_join',\
     \ { id: jd }).then(function (res) { apply(res, 'Tables split'); }); });\n      }\n    });\n    root.addEventListener('change',\
     \ function (e) { PP.subnavChange(e, 'tables', emit); });\n    render();\n    return {};\n  });\n})();\n</script>\n\n<!--\
-    \ ===== SettingsPage component ===== -->\n<style>\n.pp-set .layout { display: grid; grid-template-columns: 220px minmax(0,\
-    \ 1fr); gap: 36px; align-items: start; }\n.pp-set .toc { position: sticky; top: 84px; display: grid; gap: 2px; }\n.pp-set\
-    \ .toc a { color: var(--pp-muted); text-decoration: none; padding: 7px 12px; border-radius: 8px; font-size: .88rem; }\n\
-    .pp-set .toc a:hover { color: var(--pp-ink); background: var(--pp-panel-2); }\n.pp-set section { padding: 24px 26px; margin-bottom:\
-    \ 18px; scroll-margin-top: 90px; }\n.pp-set section > h2 { margin-bottom: 4px; }\n.pp-set section > .lead { color: var(--pp-muted);\
+    \ ===== MenuEditPage component ===== -->\n<style>\n.pp-menued .intro { color: var(--pp-muted); font-size: .92rem; max-width:\
+    \ 68ch; margin-bottom: 22px; }\n.pp-menued .sec { margin-bottom: 18px; overflow: hidden; }\n.pp-menued .sec .hd { display:\
+    \ flex; align-items: center; gap: 8px; padding: 18px 20px 14px; border-bottom: 1px solid var(--pp-line); flex-wrap: wrap;\
+    \ }\n.pp-menued .sec .hd h3 { margin: 0; }\n.pp-menued .sec .hd .d { width: 100%; color: var(--pp-muted); font-size: .85rem;\
+    \ }\n.pp-menued .it { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 14px; align-items: center;\
+    \ padding: 13px 20px; border-bottom: 1px solid var(--pp-line); }\n.pp-menued .it:last-child { border-bottom: 0; }\n.pp-menued\
+    \ .it .n { font-weight: 500; }\n.pp-menued .it .n .badge { margin-left: 6px; }\n.pp-menued .it .ds { color: var(--pp-muted);\
+    \ font-size: .84rem; }\n.pp-menued .it .pr { font-family: var(--pp-serif); font-size: 1.15rem; white-space: nowrap; }\n\
+    .pp-menued .it.off .n, .pp-menued .it.off .pr { color: var(--pp-faint); text-decoration: line-through; }\n.pp-menued .it\
+    \ .acts { display: flex; gap: 2px; }\n.pp-menued .add-dish { padding: 10px 14px; }\n@media (max-width: 620px) { .pp-menued\
+    \ .it { grid-template-columns: minmax(0, 1fr) auto; } .pp-menued .it .acts { grid-column: 1 / -1; } }\n</style>\n<script>\n\
+    (function () {\n  var PP = window.PP;\n  PP.define('menuedit', function (root, data, emit) {\n    var esc = PP.esc, D\
+    \ = data;\n\n    function item(i, s, k, n) {\n      return '<div class=\"it' + (i.available ? '' : ' off') + '\" data-i=\"\
+    ' + esc(i.id) + '\" data-s=\"' + esc(s.id) + '\"><div><div class=\"n\">' + esc(i.name) +\n          i.tags.map(function\
+    \ (t) { return '<span class=\"badge plain\" title=\"' + esc(D.tags[t]) + '\">' + esc(t) + '</span>'; }).join('') +\n \
+    \         (i.available ? '' : '<span class=\"badge cancelled\">Sold out</span>') + '</div>' + (i.description ? '<div class=\"\
+    ds\">' + esc(i.description) + '</div>' : '') + '</div>' +\n        '<div class=\"pr\">' + esc(i.price) + '</div>' +\n\
+    \        '<div class=\"acts\"><button class=\"btn ghost sm\" data-action=\"toggle\">' + (i.available ? 'Mark sold out'\
+    \ : 'Back on') + '</button>' +\n          '<button class=\"btn ghost icon\" data-action=\"up\" data-kind=\"item\"' + (k\
+    \ ? '' : ' disabled') + ' aria-label=\"Move up\">' + PP.icon('left', 'rot') + '</button>' +\n          '<button class=\"\
+    btn ghost icon\" data-action=\"down\" data-kind=\"item\"' + (k < n - 1 ? '' : ' disabled') + ' aria-label=\"Move down\"\
+    >' + PP.icon('right', 'rot') + '</button>' +\n          '<button class=\"btn ghost icon\" data-action=\"edit-item\" aria-label=\"\
+    Edit\">' + PP.icon('edit') + '</button></div></div>';\n    }\n    function section(s, k) {\n      return '<div class=\"\
+    card sec fade-in\" data-s=\"' + esc(s.id) + '\"><div class=\"hd\"><h3>' + esc(s.title) + '</h3><span class=\"spacer\"\
+    ></span>' +\n          '<button class=\"btn ghost icon\" data-action=\"up\" data-kind=\"section\"' + (k ? '' : ' disabled')\
+    \ + ' aria-label=\"Move section up\">' + PP.icon('left', 'rot') + '</button>' +\n          '<button class=\"btn ghost\
+    \ icon\" data-action=\"down\" data-kind=\"section\"' + (k < D.sections.length - 1 ? '' : ' disabled') + ' aria-label=\"\
+    Move section down\">' + PP.icon('right', 'rot') + '</button>' +\n          '<button class=\"btn ghost icon\" data-action=\"\
+    edit-section\" aria-label=\"Edit section\">' + PP.icon('edit') + '</button>' +\n          '<button class=\"btn ghost icon\"\
+    \ data-action=\"del-section\" aria-label=\"Delete section\">' + PP.icon('trash') + '</button>' +\n          (s.description\
+    \ ? '<div class=\"d\">' + esc(s.description) + '</div>' : '') + '</div>' +\n        s.items.map(function (i, j) { return\
+    \ item(i, s, j, s.items.length); }).join('') +\n        '<div class=\"add-dish\"><button class=\"btn ghost sm\" data-action=\"\
+    new-item\">' + PP.icon('plus') + 'Add a dish</button></div></div>';\n    }\n    function render() {\n      root.innerHTML\
+    \ = '<div class=\"wrap pp-menued\">' + PP.subnav(D.nav, 'menu') +\n        '<div class=\"row\" style=\"margin-bottom:8px\"\
+    ><h2 style=\"margin:0\">Menu</h2><span class=\"spacer\"></span>' +\n          '<a class=\"btn sm\" target=\"_blank\" rel=\"\
+    noopener\" href=\"' + esc(PP.menuUrl(D.slug)) + '\">' + PP.icon('ext') + 'View menu</a>' +\n          '<button class=\"\
+    btn primary sm\" data-action=\"new-section\">' + PP.icon('plus') + 'Add a section</button></div>' +\n        '<p class=\"\
+    intro\">Guests see this menu at its own page, which the menu QR code opens (Settings &amp; sharing). Changes show there,\
+    \ and on your website, straight away, so the QR code never needs reprinting. Sold-out dishes are hidden from guests.</p>'\
+    \ +\n        (D.sections.length ? D.sections.map(section).join('') : '<div class=\"empty\"><h3>Start your menu</h3><p>Add\
+    \ a section such as Starters, then its dishes.</p><button class=\"btn primary\" data-action=\"new-section\">' + PP.icon('plus')\
+    \ + 'Add a section</button></div>') +\n        '</div>';\n    }\n    function apply(res, d, msg) {\n      if (res && res.ok\
+    \ === false) {\n        var box = d && d.el.querySelector('[data-el=msg]');\n        if (box) box.innerHTML = '<div class=\"\
+    feedback bad\">' + esc(res.error) + '</div>'; else PP.toast(res.error, true);\n        return;\n      }\n      if (res)\
+    \ { D = res; render(); }\n      if (d) d.close();\n      if (msg) PP.toast(msg);\n    }\n    function sectionEditor(s)\
+    \ {\n      s = s || { title: '', description: '' };\n      var d = PP.modal('<div class=\"eyebrow\">' + (s.id ? 'Edit\
+    \ section' : 'New section') + '</div><h2>' + (s.id ? esc(s.title) : 'Add a section') + '</h2>' +\n        '<form class=\"\
+    stack\"><div><label class=\"f\">Title</label><input type=\"text\" name=\"title\" maxlength=\"80\" required placeholder=\"\
+    e.g. Starters\" value=\"' + esc(s.title) + '\"></div>' +\n        '<div><label class=\"f\">Note <span class=\"faint\"\
+    >(optional)</span></label><input type=\"text\" name=\"description\" maxlength=\"300\" placeholder=\"e.g. Served until\
+    \ 22:00\" value=\"' + esc(s.description) + '\"></div>' +\n        '<div data-el=\"msg\"></div><div class=\"foot\"><button\
+    \ type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\" type=\"submit\">Save</button></div></form>');\n\
+    \      d.el.querySelector('form').onsubmit = function (e) {\n        e.preventDefault();\n        emit('save_section',\
+    \ { id: s.id || null, title: e.target.title.value, description: e.target.description.value }).then(function (res) { apply(res,\
+    \ d, 'Section saved'); });\n      };\n    }\n    function itemEditor(i, sid) {\n      i = i || { name: '', description:\
+    \ '', price: '', tags: [], available: true };\n      var d = PP.modal('<div class=\"eyebrow\">' + (i.id ? 'Edit dish'\
+    \ : 'New dish') + '</div><h2>' + (i.id ? esc(i.name) : 'Add a dish') + '</h2>' +\n        '<form class=\"stack\"><div\
+    \ class=\"grid2\" style=\"grid-template-columns:2fr 1fr\"><div><label class=\"f\">Name</label><input type=\"text\" name=\"\
+    name\" maxlength=\"120\" required value=\"' + esc(i.name) + '\"></div>' +\n          '<div><label class=\"f\">Price</label><input\
+    \ type=\"text\" name=\"price\" maxlength=\"30\" placeholder=\"€18\" value=\"' + esc(i.price) + '\"></div></div>' +\n \
+    \       '<div><label class=\"f\">Description <span class=\"faint\">(optional)</span></label><textarea name=\"description\"\
+    \ maxlength=\"500\" style=\"min-height:70px\">' + esc(i.description) + '</textarea></div>' +\n        '<div><label class=\"\
+    f\">Section</label><select name=\"section\">' + D.sections.map(function (s) { return '<option value=\"' + esc(s.id) +\
+    \ '\"' + (s.id === sid ? ' selected' : '') + '>' + esc(s.title) + '</option>'; }).join('') + '</select></div>' +\n   \
+    \     '<div><label class=\"f\">Labels</label><div class=\"chips\">' + Object.keys(D.tags).map(function (t) {\n       \
+    \   return '<button type=\"button\" class=\"chip' + (i.tags.indexOf(t) >= 0 ? ' on' : '') + '\" data-tag=\"' + t + '\"\
+    \ title=\"' + esc(D.tags[t]) + '\">' + esc(t) + ' · ' + esc(D.tags[t]) + '</button>'; }).join('') + '</div></div>' +\n\
+    \        '<label class=\"check\"><input type=\"checkbox\" name=\"available\"' + (i.available ? ' checked' : '') + '><span>Available\
+    \ today</span></label>' +\n        '<div data-el=\"msg\"></div><div class=\"foot\">' + (i.id ? '<button type=\"button\"\
+    \ class=\"btn danger\" data-del>Delete dish</button><span class=\"spacer\"></span>' : '') +\n          '<button type=\"\
+    button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\" type=\"submit\">Save</button></div></form>',\
+    \ { wide: true });\n      d.el.addEventListener('click', function (e) { var t = e.target.closest('[data-tag]'); if (t)\
+    \ t.classList.toggle('on'); });\n      var del = d.el.querySelector('[data-del]');\n      if (del) del.onclick = function\
+    \ () { emit('delete_item', { id: i.id }).then(function (res) { apply(res, d, 'Dish deleted'); }); };\n      d.el.querySelector('form').onsubmit\
+    \ = function (e) {\n        e.preventDefault();\n        var f = e.target;\n        emit('save_item', { id: i.id || null,\
+    \ section_id: f.section.value, name: f.name.value, price: f.price.value, description: f.description.value,\n         \
+    \ available: f.available.checked, tags: Array.prototype.map.call(d.el.querySelectorAll('[data-tag].on'), function (b)\
+    \ { return b.dataset.tag; }) })\n          .then(function (res) { apply(res, d, 'Dish saved'); });\n      };\n    }\n\
+    \    function find(sid, iid) {\n      var s = D.sections.filter(function (x) { return x.id === sid; })[0];\n      return\
+    \ { s: s, i: s && iid ? s.items.filter(function (x) { return x.id === iid; })[0] : null };\n    }\n    root.addEventListener('click',\
+    \ function (e) {\n      if (PP.subnavClick(e, D.nav, emit)) return;\n      var el = e.target.closest('[data-action]');\n\
+    \      if (!el) return;\n      var a = el.dataset.action, sEl = el.closest('[data-s]'), iEl = el.closest('[data-i]');\n\
+    \      var f = find(sEl && sEl.dataset.s, iEl && iEl.dataset.i);\n      if (a === 'new-section') sectionEditor(null);\n\
+    \      else if (a === 'edit-section') sectionEditor(f.s);\n      else if (a === 'del-section') PP.confirm('Delete “' +\
+    \ f.s.title + '”?', 'Its ' + PP.plural(f.s.items.length, 'dish', 'dishes') + ' are deleted too.', 'Delete section', true)\n\
+    \        .then(function (y) { if (y) emit('delete_section', { id: f.s.id }).then(function (res) { apply(res, null, 'Section\
+    \ deleted'); }); });\n      else if (a === 'new-item') itemEditor(null, f.s.id);\n      else if (a === 'edit-item') itemEditor(f.i,\
+    \ f.s.id);\n      else if (a === 'toggle') emit('save_item', Object.assign({}, f.i, { section_id: f.s.id, available: !f.i.available\
+    \ })).then(function (res) { apply(res, null, f.i.available ? 'Marked sold out' : 'Back on the menu'); });\n      else\
+    \ if (a === 'up' || a === 'down') emit('move', { kind: el.dataset.kind, id: el.dataset.kind === 'section' ? f.s.id : f.i.id,\
+    \ step: a === 'up' ? -1 : 1 }).then(function (res) { apply(res); });\n    });\n    root.addEventListener('change', function\
+    \ (e) { PP.subnavChange(e, 'menu', emit); });\n    render();\n    return {};\n  });\n})();\n</script>\n\n<!-- ===== SettingsPage\
+    \ component ===== -->\n<style>\n.pp-set .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 36px;\
+    \ align-items: start; }\n.pp-set .toc { position: sticky; top: 84px; display: grid; gap: 2px; }\n.pp-set .toc a { color:\
+    \ var(--pp-muted); text-decoration: none; padding: 7px 12px; border-radius: 8px; font-size: .88rem; }\n.pp-set .toc a:hover\
+    \ { color: var(--pp-ink); background: var(--pp-panel-2); }\n.pp-set section { padding: 24px 26px; margin-bottom: 18px;\
+    \ scroll-margin-top: 90px; }\n.pp-set section > h2 { margin-bottom: 4px; }\n.pp-set section > .lead { color: var(--pp-muted);\
     \ font-size: .9rem; margin-bottom: 20px; }\n.pp-set .rule { display: grid; grid-template-columns: minmax(0, 1fr) 200px;\
     \ gap: 8px 24px; align-items: center; padding: 14px 0; border-top: 1px solid var(--pp-line); }\n.pp-set .rule:first-of-type\
     \ { border-top: 0; }\n.pp-set .rule .t { font-weight: 500; font-size: .92rem; }\n.pp-set .rule .d { color: var(--pp-muted);\
@@ -1500,12 +1773,22 @@ native_deps:
     \ bottom: 16px; z-index: 20; display: flex; gap: 10px; align-items: center; padding: 12px 14px 12px 20px; background:\
     \ var(--pp-ink); color: var(--pp-bg); border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,.2); margin-top: 8px; }\n\
     .pp-set .savebar .btn.primary { background: var(--pp-bg); color: var(--pp-ink); border-color: var(--pp-bg); }\n.pp-set\
-    \ .savebar .btn.ghost { color: var(--pp-bg); opacity: .75; }\n.pp-set .layout > section { grid-column: 2; }\n.pp-set .danger-zone\
-    \ { border-color: color-mix(in srgb, var(--pp-bad) 35%, var(--pp-line)); }\n@media (max-width: 900px) { .pp-set .layout\
-    \ { grid-template-columns: 1fr; } .pp-set .toc { display: none; } .pp-set .layout > section { grid-column: auto; } .pp-set\
-    \ .rule { grid-template-columns: 1fr; } .pp-set section { padding: 20px 18px; } }\n</style>\n<script>\n(function () {\n\
-    \  var PP = window.PP;\n  PP.define('settings', function (root, data, emit) {\n    var esc = PP.esc, D = data, dirty =\
-    \ false;\n\n    function field(name, label, type, opts) {\n      opts = opts || {};\n      var v = D.settings[name];\n\
+    \ .savebar .btn.ghost { color: var(--pp-bg); opacity: .75; }\n.pp-set .layout > section { grid-column: 2; }\n.pp-set .qrs\
+    \ { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 6px; }\n.pp-set .qr { border: 1px solid var(--pp-line);\
+    \ border-radius: 12px; padding: 16px; text-align: center; background: var(--pp-panel-2); }\n.pp-set .qr svg { display:\
+    \ block; margin: 0 auto 10px; border-radius: 6px; max-width: 100%; height: auto; }\n.pp-set .qr strong { display: block;\
+    \ font-size: .9rem; margin-bottom: 8px; }\n.pp-set .team .m { display: flex; align-items: center; gap: 12px; padding:\
+    \ 12px 0; border-top: 1px solid var(--pp-line); flex-wrap: wrap; }\n.pp-set .team .m:first-child { border-top: 0; }\n\
+    .pp-set .team .m .who { flex: 1; min-width: 180px; }\n.pp-set .team .m .who span { display: block; color: var(--pp-muted);\
+    \ font-size: .82rem; }\n.pp-set .team .m select { width: auto; min-height: 34px; padding: 4px 28px 4px 10px; font-size:\
+    \ .85rem; border-radius: 99px; }\n.pp-set .team form { display: grid; grid-template-columns: minmax(0, 1fr) 140px auto;\
+    \ gap: 8px; margin-top: 16px; }\n.pp-set .langs-pick { display: flex; gap: 18px; flex-wrap: wrap; }\n@media (max-width:\
+    \ 620px) { .pp-set .qrs { grid-template-columns: 1fr; } .pp-set .team form { grid-template-columns: 1fr; } }\n.pp-set\
+    \ .danger-zone { border-color: color-mix(in srgb, var(--pp-bad) 35%, var(--pp-line)); }\n@media (max-width: 900px) { .pp-set\
+    \ .layout { grid-template-columns: 1fr; } .pp-set .toc { display: none; } .pp-set .layout > section { grid-column: auto;\
+    \ } .pp-set .rule { grid-template-columns: 1fr; } .pp-set section { padding: 20px 18px; } }\n</style>\n<script>\n(function\
+    \ () {\n  var PP = window.PP;\n  PP.define('settings', function (root, data, emit) {\n    var esc = PP.esc, D = data,\
+    \ dirty = false;\n\n    function field(name, label, type, opts) {\n      opts = opts || {};\n      var v = D.settings[name];\n\
     \      return '<div><label class=\"f\" for=\"st_' + name + '\">' + label + '</label>' +\n        (type === 'textarea'\
     \ ? '<textarea id=\"st_' + name + '\" name=\"' + name + '\" maxlength=\"' + (opts.max || 4000) + '\" placeholder=\"' +\
     \ esc(opts.ph || '') + '\" style=\"min-height:' + (opts.h || 90) + 'px\">' + esc(v) + '</textarea>'\n          : '<input\
@@ -1529,16 +1812,44 @@ native_deps:
     \ class=\"small muted\">Paste this where the button should appear on your website. It opens the booking form in a window\
     \ over your page.</p>' + block('script', script) +\n        '<h3>Use your own button or link</h3><p class=\"small muted\"\
     >Give any element the attribute <code>data-planplate-open</code> and include the script once.</p>' + block('custom', custom)\
-    \ +\n        '<h3>Embed the form in a page</h3>' + block('iframe', iframe) + '</div>';\n    }\n    function render() {\n\
-    \      var s = D.settings;\n      root.innerHTML = '<div class=\"wrap pp-set\">' + PP.subnav(D.nav, 'settings') +\n  \
-    \      '<div class=\"layout\"><nav class=\"toc\"><a href=\"#st-details\">Details</a><a href=\"#st-rules\">Booking rules</a><a\
-    \ href=\"#st-approval\">Approvals</a><a href=\"#st-form\">Booking form</a><a href=\"#st-share\">Share &amp; embed</a><a\
-    \ href=\"#st-danger\">Delete</a></nav>' +\n        '<form data-el=\"form\" novalidate><section class=\"card\" id=\"st-details\"\
-    ><h2>Details</h2><p class=\"lead\">Shown to guests on the booking form and their reservation page.</p><div class=\"stack\"\
-    >' +\n          field('name', 'Restaurant name', 'text', { max: 80, req: true }) +\n          field('description', 'Short\
-    \ description', 'textarea', { max: 400, h: 60, ph: 'Seasonal French cooking in the heart of the old town.' }) +\n    \
-    \      '<div class=\"grid2\">' + field('address', 'Address', 'text', { max: 200 }) + field('phone', 'Phone', 'tel', {\
-    \ max: 40 }) + '</div>' +\n          '<div class=\"grid2\">' + field('email', 'Email', 'email', { max: 200 }) + field('website',\
+    \ +\n        '<h3>Embed the form in a page</h3>' + block('iframe', iframe) +\n        '<h3>QR codes</h3><p class=\"small\
+    \ muted\">For table cards, the window and the door. The menu code always opens your latest menu, so you never reprint\
+    \ it.</p>' +\n        '<div class=\"qrs\"><div class=\"qr\">' + PP.qrSvg(link, 150) + '<strong>Book a table</strong><button\
+    \ type=\"button\" class=\"btn sm\" data-qr-png=\"' + esc(link) + '\" data-kind=\"booking\" data-caption=\"Reserve a table\"\
+    >' + PP.icon('download') + 'Download PNG</button></div>' +\n          '<div class=\"qr\">' + PP.qrSvg(PP.menuUrl(s.slug),\
+    \ 150) + '<strong>Menu</strong><button type=\"button\" class=\"btn sm\" data-qr-png=\"' + esc(PP.menuUrl(s.slug)) + '\"\
+    \ data-kind=\"menu\" data-caption=\"Menu\">' + PP.icon('download') + 'Download PNG</button></div></div>' +\n        '<h3>Live\
+    \ menu on your website</h3><p class=\"small muted\">Put this where the menu should appear. It always shows the menu as\
+    \ it is in PlanPlate.</p>' +\n          block('menu', '<div data-planplate-menu></div>\\n<script src=\"' + origin + '/_/api/menu.js?r='\
+    \ + s.slug + '\"></' + 'script>') +\n        '<h3>Live opening hours on your website</h3>' +\n          block('hours',\
+    \ '<div data-planplate-hours></div>\\n<script src=\"' + origin + '/_/api/hours.js?r=' + s.slug + '\"></' + 'script>')\
+    \ +\n        '<p class=\"small muted\" style=\"margin-top:10px\">Developers can read the same data as JSON: <code>' +\
+    \ esc(origin) + '/_/api/menu?r=' + esc(s.slug) + '</code> and <code>' + esc(origin) + '/_/api/hours?r=' + esc(s.slug)\
+    \ + '</code></p></div>';\n    }\n    var LANGS = { en: 'English', fr: 'Français', lv: 'Latviešu' };\n    function teamHtml()\
+    \ {\n      var owner = D.role === 'owner';\n      return '<div>' + (D.team || []).map(function (m) {\n        var roleCell\
+    \ = m.role === 'owner' ? '<span class=\"badge plain\">Owner</span>'\n          : owner ? '<select data-role=\"' + esc(m.id)\
+    \ + '\" aria-label=\"Role\"><option value=\"manager\"' + (m.role === 'manager' ? ' selected' : '') + '>Manager</option><option\
+    \ value=\"staff\"' + (m.role === 'staff' ? ' selected' : '') + '>Staff</option></select>'\n          : '<span class=\"\
+    badge plain\">' + esc(PP.ROLE[m.role] || m.role) + '</span>';\n        return '<div class=\"m\"><div class=\"who\"><strong>'\
+    \ + esc(m.name || m.email) + '</strong>' + (m.name ? '<span>' + esc(m.email) + '</span>' : '') + '</div>' +\n        \
+    \  (m.joined ? '' : '<span class=\"badge pending\" title=\"They get access when they sign in with this email\">Invited</span>')\
+    \ + roleCell +\n          (owner && m.id ? '<button class=\"btn ghost icon\" data-remove=\"' + esc(m.id) + '\" aria-label=\"\
+    Remove ' + esc(m.email) + '\">' + PP.icon('x') + '</button>' : '') + '</div>';\n      }).join('') + '</div>' +\n     \
+    \   (owner ? '<form data-el=\"invite\"><input type=\"email\" name=\"email\" required placeholder=\"colleague@restaurant.com\"\
+    \ aria-label=\"Email\"><select name=\"role\" aria-label=\"Role\"><option value=\"staff\">Staff</option><option value=\"\
+    manager\">Manager</option></select>' +\n          '<button class=\"btn primary\" type=\"submit\">' + PP.icon('plus') +\
+    \ 'Invite</button></form><p class=\"hint\">They sign in, or create an account, with that email and the restaurant appears\
+    \ in their list. We email them an invitation.</p>' : '');\n    }\n    function render() {\n      var s = D.settings, owner\
+    \ = D.role === 'owner';\n      root.innerHTML = '<div class=\"wrap pp-set\">' + PP.subnav(D.nav, 'settings') +\n     \
+    \   '<div class=\"layout\"><nav class=\"toc\"><a href=\"#st-details\">Details</a><a href=\"#st-rules\">Booking rules</a><a\
+    \ href=\"#st-approval\">Approvals</a><a href=\"#st-form\">Booking form</a><a href=\"#st-emails\">Emails</a><a href=\"\
+    #st-langs\">Languages</a><a href=\"#st-share\">Share &amp; embed</a><a href=\"#st-team\">Team</a>' + (owner ? '<a href=\"\
+    #st-danger\">Delete</a>' : '') + '</nav>' +\n        '<form data-el=\"form\" novalidate><section class=\"card\" id=\"\
+    st-details\"><h2>Details</h2><p class=\"lead\">Shown to guests on the booking form and their reservation page.</p><div\
+    \ class=\"stack\">' +\n          field('name', 'Restaurant name', 'text', { max: 80, req: true }) +\n          field('description',\
+    \ 'Short description', 'textarea', { max: 400, h: 60, ph: 'Seasonal French cooking in the heart of the old town.' }) +\n\
+    \          '<div class=\"grid2\">' + field('address', 'Address', 'text', { max: 200 }) + field('phone', 'Phone', 'tel',\
+    \ { max: 40 }) + '</div>' +\n          '<div class=\"grid2\">' + field('email', 'Email', 'email', { max: 200 }) + field('website',\
     \ 'Website', 'url', { max: 200, ph: 'https://' }) + '</div>' +\n          '<div class=\"grid2\">' + field('slug', 'Booking\
     \ link', 'text', { max: 40, hint: esc(PP.appUrl()) + '#book/<b>' + esc(s.slug) + '</b>' }) +\n            field('timezone',\
     \ 'Time zone', 'text', { list: 'stZones', hint: 'All booking times are in this time zone.' }) + '</div>' +\n         \
@@ -1567,95 +1878,167 @@ native_deps:
     \ { max: 600, h: 70, ph: 'e.g. We hold tables for 15 minutes. For groups over 8, please call us.' }) +\n          field('privacy_text',\
     \ 'Privacy notice', 'textarea', { max: 4000, h: 140, ph: s.default_privacy, hint: 'Guests must tick a box confirming they\
     \ have read this before they can book. Leave it empty to use the standard text shown above. The text each guest agreed\
-    \ to is saved with their booking.' }) +\n        '</div></section>' +\n        '<div class=\"savebar\" data-el=\"savebar\"\
-    \ hidden><span>You have unsaved changes</span><span class=\"spacer\"></span><button type=\"button\" class=\"btn ghost\
-    \ sm\" data-action=\"revert\">Discard</button><button class=\"btn primary sm\" type=\"submit\">Save changes</button></div>'\
-    \ +\n        '</form>' +\n        '<section class=\"card\" id=\"st-share\"><h2>Share &amp; embed</h2><p class=\"lead\"\
-    >Put the booking form on your website.</p>' + codes() + '</section>' +\n        '<section class=\"card danger-zone\" id=\"\
-    st-danger\"><h2>Delete restaurant</h2><p class=\"lead\">Removes the restaurant with its hours, tables and every reservation.\
-    \ This can\\'t be undone.</p>' +\n          '<button class=\"btn danger\" data-action=\"delete\">' + PP.icon('trash')\
-    \ + 'Delete ' + esc(s.name) + '</button></section>' +\n        '</div></div>';\n      var f = root.querySelector('[data-el=form]');\n\
-    \      f.onsubmit = save;\n      f.addEventListener('input', markDirty);\n      f.addEventListener('change', markDirty);\n\
-    \      dirty = false;\n    }\n    function markDirty(e) { if (e && e.target && e.target.matches('[data-pp-switch]')) return;\
-    \ dirty = true; root.querySelector('[data-el=savebar]').hidden = false; }\n    function save(e) {\n      e.preventDefault();\n\
-    \      var f = e.target, v = {};\n      Array.prototype.forEach.call(f.elements, function (el) { if (el.name) v[el.name]\
-    \ = el.type === 'checkbox' ? el.checked : el.value; });\n      var b = f.querySelector('[type=submit]'); b.disabled =\
-    \ true;\n      emit('save', v).then(function (res) {\n        b.disabled = false;\n        if (res && res.ok) { D.settings\
-    \ = res.settings; D.nav = res.nav; render(); PP.toast('Settings saved'); }\n        else PP.toast((res && res.error) ||\
-    \ 'Could not save.', true);\n      }, function (err) { b.disabled = false; PP.toast(PP.err(err), true); });\n    }\n \
-    \   function del() {\n      var name = D.settings.name;\n      var d = PP.modal('<h2>Delete ' + esc(name) + '?</h2><p\
-    \ class=\"muted\">Every reservation, table and opening hour of this restaurant is deleted. Guests\\' links stop working.</p>'\
-    \ +\n        '<form><label class=\"f\">Type <strong>' + esc(name) + '</strong> to confirm</label><input type=\"text\"\
-    \ name=\"c\" autocomplete=\"off\"><div data-el=\"msg\"></div>' +\n        '<div class=\"foot\"><button type=\"button\"\
-    \ class=\"btn\" data-close>Keep it</button><button class=\"btn danger\" type=\"submit\">Delete for good</button></div></form>');\n\
+    \ to is saved with their booking.' }) +\n        '</div></section>' +\n        '<section class=\"card\" id=\"st-emails\"\
+    ><h2>Emails</h2><p class=\"lead\">Guests get an email when they book, when you approve or decline, and when a booking\
+    \ is cancelled. Each includes their private link.</p><div class=\"stack\">' +\n          '<label class=\"check\"><input\
+    \ type=\"checkbox\" name=\"emails_on\"' + (s.emails_on ? ' checked' : '') + '><span><strong>Email guests</strong><br><span\
+    \ class=\"muted small\">Turn off if you contact guests yourself.</span></span></label>' +\n          field('notify_email',\
+    \ 'Send approval alerts to', 'email', { max: 200, ph: s.owner_email, hint: 'The moment a booking needs approval, an alert\
+    \ goes here. Leave empty to use the owner\\'s address (' + esc(s.owner_email) + ').' }) +\n          field('msg_confirmed',\
+    \ 'Added to confirmations', 'textarea', { max: 1000, h: 60, ph: 'e.g. Parking is free behind the building. We hold tables\
+    \ for 15 minutes.' }) +\n          field('msg_pending', 'Added to “request received”', 'textarea', { max: 1000, h: 60,\
+    \ ph: 'e.g. We reply within the hour during opening times.' }) +\n          field('msg_declined', 'Added to declines',\
+    \ 'textarea', { max: 1000, h: 60, ph: 'e.g. Our bar always keeps a few seats for walk-ins.' }) +\n        '</div></section>'\
+    \ +\n        '<section class=\"card\" id=\"st-langs\"><h2>Languages</h2><p class=\"lead\">The booking form, guest page\
+    \ and emails come in these languages. Guests can switch between the ones you offer.</p><div class=\"stack\">' +\n    \
+    \      '<div><label class=\"f\" for=\"st_language\">Main language</label><select id=\"st_language\" name=\"language\"\
+    \ style=\"max-width:240px\">' + Object.keys(LANGS).map(function (l) {\n            return '<option value=\"' + l + '\"\
+    ' + (s.language === l ? ' selected' : '') + '>' + esc(LANGS[l]) + '</option>'; }).join('') + '</select></div>' +\n   \
+    \       '<div><div class=\"f\">Also offer</div><div class=\"langs-pick\">' + Object.keys(LANGS).map(function (l) {\n \
+    \           return '<label class=\"check\"><input type=\"checkbox\" name=\"lang_' + l + '\"' + (s.languages.indexOf(l)\
+    \ >= 0 ? ' checked' : '') + '><span>' + esc(LANGS[l]) + '</span></label>'; }).join('') + '</div></div>' +\n        '</div></section>'\
+    \ +\n        '<div class=\"savebar\" data-el=\"savebar\" hidden><span>You have unsaved changes</span><span class=\"spacer\"\
+    ></span><button type=\"button\" class=\"btn ghost sm\" data-action=\"revert\">Discard</button><button class=\"btn primary\
+    \ sm\" type=\"submit\">Save changes</button></div>' +\n        '</form>' +\n        '<section class=\"card\" id=\"st-share\"\
+    ><h2>Share &amp; embed</h2><p class=\"lead\">Put the booking form on your website.</p>' + codes() + '</section>' +\n \
+    \       '<section class=\"card team\" id=\"st-team\"><h2>Team</h2><p class=\"lead\">' + (owner ? 'Give managers and staff\
+    \ their own sign-in. <b>Managers</b> can change everything except the team; <b>staff</b> see and manage reservations only.'\
+    \ : 'Only the owner can change the team.') + '</p><div data-el=\"team\">' + teamHtml() + '</div></section>' +\n      \
+    \  (owner ? '<section class=\"card danger-zone\" id=\"st-danger\"><h2>Delete restaurant</h2><p class=\"lead\">Removes\
+    \ the restaurant with its hours, tables, menu and every reservation. This can\\'t be undone.</p>' +\n          '<button\
+    \ class=\"btn danger\" data-action=\"delete\">' + PP.icon('trash') + 'Delete ' + esc(s.name) + '</button></section>' :\
+    \ '') +\n        '</div></div>';\n      wireTeam();\n      var f = root.querySelector('[data-el=form]');\n      f.onsubmit\
+    \ = save;\n      f.addEventListener('input', markDirty);\n      f.addEventListener('change', markDirty);\n      dirty\
+    \ = false;\n    }\n    function teamReply(res) {\n      if (res && res.ok) { D.team = res.team; root.querySelector('[data-el=team]').innerHTML\
+    \ = teamHtml(); wireTeam(); return true; }\n      PP.toast((res && res.error) || 'Could not change the team.', true);\
+    \ return false;\n    }\n    function wireTeam() {\n      var inv = root.querySelector('[data-el=invite]');\n      if (inv)\
+    \ inv.onsubmit = function (e) {\n        e.preventDefault();\n        emit('invite', { email: inv.email.value, role: inv.role.value\
+    \ }).then(function (res) { if (teamReply(res)) PP.toast('Invitation sent'); });\n      };\n    }\n    function markDirty(e)\
+    \ { if (e && e.target && e.target.matches('[data-pp-switch]')) return; dirty = true; root.querySelector('[data-el=savebar]').hidden\
+    \ = false; }\n    function save(e) {\n      e.preventDefault();\n      var f = e.target, v = {};\n      Array.prototype.forEach.call(f.elements,\
+    \ function (el) { if (el.name && el.name.indexOf('lang_') !== 0) v[el.name] = el.type === 'checkbox' ? el.checked : el.value;\
+    \ });\n      v.languages = Object.keys(LANGS).filter(function (l) { return f['lang_' + l].checked; });\n      var b =\
+    \ f.querySelector('[type=submit]'); b.disabled = true;\n      emit('save', v).then(function (res) {\n        b.disabled\
+    \ = false;\n        if (res && res.ok) { D.settings = res.settings; D.nav = res.nav; render(); PP.toast('Settings saved');\
+    \ }\n        else PP.toast((res && res.error) || 'Could not save.', true);\n      }, function (err) { b.disabled = false;\
+    \ PP.toast(PP.err(err), true); });\n    }\n    function del() {\n      var name = D.settings.name;\n      var d = PP.modal('<h2>Delete\
+    \ ' + esc(name) + '?</h2><p class=\"muted\">Every reservation, table and opening hour of this restaurant is deleted. Guests\\\
+    ' links stop working.</p>' +\n        '<form><label class=\"f\">Type <strong>' + esc(name) + '</strong> to confirm</label><input\
+    \ type=\"text\" name=\"c\" autocomplete=\"off\"><div data-el=\"msg\"></div>' +\n        '<div class=\"foot\"><button type=\"\
+    button\" class=\"btn\" data-close>Keep it</button><button class=\"btn danger\" type=\"submit\">Delete for good</button></div></form>');\n\
     \      d.el.querySelector('form').onsubmit = function (e) {\n        e.preventDefault();\n        emit('delete', { confirm_name:\
     \ e.target.c.value }).then(function (res) {\n          if (res && res.ok) { d.close(); return; }\n          d.el.querySelector('[data-el=msg]').innerHTML\
     \ = '<div class=\"feedback bad\">' + esc((res && res.error) || 'Could not delete it.') + '</div>';\n        });\n    \
     \  };\n    }\n    root.addEventListener('click', function (e) {\n      if (PP.subnavClick(e, D.nav, emit)) return;\n \
-    \     var toc = e.target.closest('.toc a');\n      if (toc) { e.preventDefault(); var sec = root.querySelector(toc.getAttribute('href'));\
-    \ if (sec) sec.scrollIntoView({ behavior: 'smooth' }); return; }\n      var c = e.target.closest('[data-copy]');\n   \
-    \   if (c) { PP.copy(root.querySelector('[data-code=' + c.dataset.copy + ']').textContent, 'Code'); return; }\n      var\
-    \ a = e.target.closest('[data-action]');\n      if (!a) return;\n      if (a.dataset.action === 'revert') render();\n\
-    \      else if (a.dataset.action === 'delete') del();\n    });\n    root.addEventListener('change', function (e) { PP.subnavChange(e,\
-    \ 'settings', emit); });\n    render();\n    return { isDirty: function () { return dirty; } };\n  });\n})();\n</script>\n\
-    \n<!-- ===== BookPage component ===== -->\n<style>\n.pp-book { min-height: 100vh; padding: 36px 16px 40px; }\n.pp-book\
-    \ .sheet { max-width: 560px; margin: 0 auto; }\n.pp-book .masthead { text-align: center; margin-bottom: 28px; }\n.pp-book\
-    \ .masthead .mark { width: 30px; height: 30px; color: var(--pp-brass); margin-bottom: 10px; }\n.pp-book .masthead h1 {\
-    \ font-size: 2.7rem; margin-bottom: 6px; }\n.pp-book .masthead p { color: var(--pp-muted); max-width: 44ch; margin: 0\
-    \ auto; }\n.pp-book .panel { padding: 26px 26px 24px; }\n.pp-book .step + .step { margin-top: 26px; }\n.pp-book .step\
-    \ h2 { font-family: var(--pp-sans); font-size: .72rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;\
-    \ color: var(--pp-muted); margin: 0 0 12px; }\n.pp-book .note { font-size: .86rem; color: var(--pp-muted); border-left:\
-    \ 2px solid var(--pp-brass); padding: 2px 0 2px 12px; margin-bottom: 24px; }\n.pp-book .summary { display: flex; align-items:\
-    \ center; gap: 10px; padding: 14px 16px; background: var(--pp-panel-2); border-radius: 10px; margin-bottom: 20px; font-size:\
-    \ .92rem; flex-wrap: wrap; }\n.pp-book .summary strong { font-weight: 600; }\n.pp-book .privacy { font-size: .84rem; color:\
-    \ var(--pp-muted); background: var(--pp-panel-2); border-radius: 10px; padding: 12px 14px; margin-top: 10px; white-space:\
-    \ pre-wrap; max-height: 220px; overflow-y: auto; }\n.pp-book .consent { padding: 14px 0 4px; }\n.pp-book .consent a, .pp-book\
-    \ .consent button.lnk { all: unset; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color:\
-    \ var(--pp-brass); }\n.pp-book .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }\n\
-    .pp-book .done { text-align: center; padding: 34px 26px 28px; }\n.pp-book .done .tick { width: 58px; height: 58px; border-radius:\
-    \ 50%; display: grid; place-items: center; margin: 0 auto 16px; background: var(--pp-good-soft); color: var(--pp-good);\
-    \ }\n.pp-book .done .tick.wait { background: var(--pp-warn-soft); color: var(--pp-warn); }\n.pp-book .done .tick svg {\
-    \ width: 28px; height: 28px; }\n.pp-book .done .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;\
-    \ margin: 22px 0; padding: 16px 0; border-top: 1px solid var(--pp-line); border-bottom: 1px solid var(--pp-line); }\n\
-    .pp-book .done .facts b { display: block; font: 500 1.35rem/1.2 var(--pp-serif); }\n.pp-book .done .facts span { font-size:\
-    \ .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-book .done .actions { display:\
-    \ grid; gap: 8px; max-width: 340px; margin: 18px auto 0; }\n.pp-book .foot { text-align: center; color: var(--pp-muted);\
-    \ font-size: .82rem; margin-top: 22px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; }\n.pp-book\
-    \ .foot span { display: inline-flex; gap: 6px; align-items: center; }\n\n/* PP.picker */\n.pp-pick .cal { user-select:\
-    \ none; }\n.pp-pick .cal .hd { display: flex; align-items: center; margin-bottom: 8px; }\n.pp-pick .cal .hd strong { flex:\
-    \ 1; text-align: center; font: 500 1.25rem var(--pp-serif); }\n.pp-pick .cal .g { display: grid; grid-template-columns:\
-    \ repeat(7, 1fr); gap: 4px; }\n.pp-pick .cal .wd { text-align: center; font-size: .66rem; letter-spacing: .12em; text-transform:\
-    \ uppercase; color: var(--pp-faint); padding: 4px 0; }\n.pp-pick .cal .d { all: unset; box-sizing: border-box; aspect-ratio:\
-    \ 1; display: grid; place-items: center; border-radius: 50%; cursor: pointer; font-size: .9rem; font-variant-numeric:\
-    \ tabular-nums; max-height: 46px; margin: 0 auto; width: 100%; max-width: 46px; }\n.pp-pick .cal .d:hover:not(:disabled)\
-    \ { background: var(--pp-panel-2); }\n.pp-pick .cal .d:disabled { color: var(--pp-faint); cursor: default; text-decoration:\
-    \ line-through; text-decoration-color: color-mix(in srgb, var(--pp-faint) 50%, transparent); }\n.pp-pick .cal .d.out {\
-    \ visibility: hidden; }\n.pp-pick .cal .d.on { background: var(--pp-accent); color: var(--pp-accent-ink); }\n.pp-pick\
-    \ .cal .d.today { font-weight: 700; }\n.pp-pick .cal .d:focus-visible { outline: 2px solid var(--pp-brass); }\n.pp-pick\
-    \ .times { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 6px; }\n.pp-pick .times .chip\
-    \ { position: relative; }\n.pp-pick .times .chip.review::after { content: \"\"; position: absolute; top: 5px; right: 6px;\
-    \ width: 5px; height: 5px; border-radius: 50%; background: var(--pp-warn); }\n.pp-pick .times .chip.walk { text-decoration:\
-    \ none; font-size: .72rem; }\n.pp-pick .tnote { font-size: .8rem; color: var(--pp-muted); margin-top: 10px; display: flex;\
-    \ gap: 8px; align-items: center; }\n.pp-pick .tnote i { width: 6px; height: 6px; border-radius: 50%; background: var(--pp-warn);\
-    \ display: inline-block; flex: none; }\n.pp-pick .party .more { width: auto; min-height: 36px; padding: 5px 30px 5px 12px;\
-    \ border-radius: 99px; font-size: .85rem; }\n@media (max-width: 520px) { .pp-book { padding: 22px 12px; } .pp-book .panel\
-    \ { padding: 20px 16px; } .pp-book .masthead h1 { font-size: 2.1rem; } }\n</style>\n<script>\n(function () {\n  var PP\
-    \ = window.PP;\n\n  // Every text a guest sees. Add a language by adding a dictionary with the same keys (see the planplate\
-    \ skill).\n  PP.LANGS = {\n    en: {\n      reserve: 'Reserve a table', guests: 'Guests', date: 'Date', time: 'Time',\
-    \ details: 'Your details',\n      guest: 'guest', guestsN: 'guests', more: 'More…', pickDate: 'Pick a date to see the\
-    \ times.',\n      loading: 'Looking for tables…', noTimes: 'No tables left for {n} on this day. Please try another day.',\n\
-    \      walkIn: 'Walk-in', walkNote: 'We\\'re nearly full at some times. Walk-ins are welcome then.',\n      reviewNote:\
-    \ 'The restaurant confirms requests at these times personally.', closedDay: 'Closed on this day.',\n      name: 'Full\
-    \ name', email: 'Email', phone: 'Phone', notes: 'Special requests', notesPh: 'Allergies, occasions, high chair…', optional:\
-    \ 'optional',\n      change: 'Change', consent: 'I have read the {link} and agree that {r} may use my details to manage\
-    \ this reservation.',\n      privacyLink: 'privacy notice', submit: 'Book table', submitReview: 'Send request', back:\
-    \ 'Back',\n      doneTitle: 'Your table is booked', doneWait: 'Request received', doneText: 'We look forward to welcoming\
-    \ you. Keep this link to change or cancel your reservation:',\n      waitText: 'The restaurant will confirm your request\
-    \ shortly. Use this link to check its status, change or cancel it:',\n      manage: 'Manage your reservation', copy: 'Copy\
-    \ link', calendar: 'Add to calendar', copied: 'Link',\n      closedOnline: 'Online booking is closed right now.', callUs:\
-    \ 'Please call us', notFound: 'Restaurant not found',\n      party: 'Party', at: 'at', bigGroup: 'For larger groups, please\
-    \ contact us.', poweredBy: 'Reservations by PlanPlate'\n    }\n  };\n  PP.T = function (key, vars, lang) {\n    var t\
-    \ = (PP.LANGS[lang || PP.lang || 'en'] || PP.LANGS.en)[key] || PP.LANGS.en[key] || key;\n    Object.keys(vars || {}).forEach(function\
+    \     var rm = e.target.closest('[data-remove]');\n      if (rm) { PP.confirm('Remove this person?', 'They lose access\
+    \ to this restaurant straight away.', 'Remove', true).then(function (y) { if (y) emit('remove_member', { id: rm.dataset.remove\
+    \ }).then(teamReply); }); return; }\n      var qp = e.target.closest('[data-qr-png]');\n      if (qp) { PP.qrPng(qp.dataset.qrPng,\
+    \ D.settings.slug + '-' + qp.dataset.kind + '-qr.png', qp.dataset.caption); return; }\n      var toc = e.target.closest('.toc\
+    \ a');\n      if (toc) { e.preventDefault(); var sec = root.querySelector(toc.getAttribute('href')); if (sec) sec.scrollIntoView({\
+    \ behavior: 'smooth' }); return; }\n      var c = e.target.closest('[data-copy]');\n      if (c) { PP.copy(root.querySelector('[data-code='\
+    \ + c.dataset.copy + ']').textContent, 'Code'); return; }\n      var a = e.target.closest('[data-action]');\n      if\
+    \ (!a) return;\n      if (a.dataset.action === 'revert') render();\n      else if (a.dataset.action === 'delete') del();\n\
+    \    });\n    root.addEventListener('change', function (e) {\n      if (PP.subnavChange(e, 'settings', emit)) return;\n\
+    \      var rs = e.target.closest('[data-role]');\n      if (rs) { e.stopPropagation(); emit('set_role', { id: rs.dataset.role,\
+    \ role: rs.value }).then(function (res) { if (teamReply(res)) PP.toast('Role changed'); }); }\n    });\n    render();\n\
+    \    return { isDirty: function () { return dirty; } };\n  });\n})();\n</script>\n\n<!-- ===== BookPage component =====\
+    \ -->\n<style>\n.pp-book { min-height: 100vh; padding: 36px 16px 40px; }\n.pp-book .sheet { max-width: 560px; margin:\
+    \ 0 auto; }\n.pp-book .masthead { text-align: center; margin-bottom: 28px; }\n.pp-book .masthead .mark { width: 30px;\
+    \ height: 30px; color: var(--pp-brass); margin-bottom: 10px; }\n.pp-book .masthead h1 { font-size: 2.7rem; margin-bottom:\
+    \ 6px; }\n.pp-book .masthead p { color: var(--pp-muted); max-width: 44ch; margin: 0 auto; }\n.pp .langs { display: flex;\
+    \ justify-content: center; gap: 2px; margin-bottom: 18px; }\n.pp .langs button { all: unset; cursor: pointer; font-size:\
+    \ .72rem; letter-spacing: .14em; padding: 4px 9px; border-radius: 99px; color: var(--pp-faint); }\n.pp .langs button.on\
+    \ { color: var(--pp-ink); background: var(--pp-panel-2); }\n.pp .langs button:hover { color: var(--pp-ink); }\n.pp .langs\
+    \ button:focus-visible { outline: 2px solid var(--pp-brass); }\n.pp-book .panel { padding: 26px 26px 24px; }\n.pp-book\
+    \ .step + .step { margin-top: 26px; }\n.pp-book .step h2 { font-family: var(--pp-sans); font-size: .72rem; font-weight:\
+    \ 600; letter-spacing: .18em; text-transform: uppercase; color: var(--pp-muted); margin: 0 0 12px; }\n.pp-book .note {\
+    \ font-size: .86rem; color: var(--pp-muted); border-left: 2px solid var(--pp-brass); padding: 2px 0 2px 12px; margin-bottom:\
+    \ 24px; }\n.pp-book .summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--pp-panel-2);\
+    \ border-radius: 10px; margin-bottom: 20px; font-size: .92rem; flex-wrap: wrap; }\n.pp-book .summary strong { font-weight:\
+    \ 600; }\n.pp-book .privacy { font-size: .84rem; color: var(--pp-muted); background: var(--pp-panel-2); border-radius:\
+    \ 10px; padding: 12px 14px; margin-top: 10px; white-space: pre-wrap; max-height: 220px; overflow-y: auto; }\n.pp-book\
+    \ .consent { padding: 14px 0 4px; }\n.pp-book .consent a, .pp-book .consent button.lnk { all: unset; cursor: pointer;\
+    \ text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--pp-brass); }\n.pp-book .hp { position:\
+    \ absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }\n.pp-book .done { text-align: center; padding:\
+    \ 34px 26px 28px; }\n.pp-book .done .tick { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items:\
+    \ center; margin: 0 auto 16px; background: var(--pp-good-soft); color: var(--pp-good); }\n.pp-book .done .tick.wait {\
+    \ background: var(--pp-warn-soft); color: var(--pp-warn); }\n.pp-book .done .tick svg { width: 28px; height: 28px; }\n\
+    .pp-book .done .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 22px 0; padding: 16px\
+    \ 0; border-top: 1px solid var(--pp-line); border-bottom: 1px solid var(--pp-line); }\n.pp-book .done .facts b { display:\
+    \ block; font: 500 1.35rem/1.2 var(--pp-serif); }\n.pp-book .done .facts span { font-size: .7rem; letter-spacing: .12em;\
+    \ text-transform: uppercase; color: var(--pp-muted); }\n.pp-book .done .actions { display: grid; gap: 8px; max-width:\
+    \ 340px; margin: 18px auto 0; }\n.pp-book .foot { text-align: center; color: var(--pp-muted); font-size: .82rem; margin-top:\
+    \ 22px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; }\n.pp-book .foot span { display: inline-flex;\
+    \ gap: 6px; align-items: center; }\n\n/* PP.picker */\n.pp-pick .cal { user-select: none; }\n.pp-pick .cal .hd { display:\
+    \ flex; align-items: center; margin-bottom: 8px; }\n.pp-pick .cal .hd strong { flex: 1; text-align: center; font: 500\
+    \ 1.25rem var(--pp-serif); }\n.pp-pick .cal .g { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }\n.pp-pick\
+    \ .cal .wd { text-align: center; font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--pp-faint);\
+    \ padding: 4px 0; }\n.pp-pick .cal .d { all: unset; box-sizing: border-box; aspect-ratio: 1; display: grid; place-items:\
+    \ center; border-radius: 50%; cursor: pointer; font-size: .9rem; font-variant-numeric: tabular-nums; max-height: 46px;\
+    \ margin: 0 auto; width: 100%; max-width: 46px; }\n.pp-pick .cal .d:hover:not(:disabled) { background: var(--pp-panel-2);\
+    \ }\n.pp-pick .cal .d:disabled { color: var(--pp-faint); cursor: default; text-decoration: line-through; text-decoration-color:\
+    \ color-mix(in srgb, var(--pp-faint) 50%, transparent); }\n.pp-pick .cal .d.out { visibility: hidden; }\n.pp-pick .cal\
+    \ .d.on { background: var(--pp-accent); color: var(--pp-accent-ink); }\n.pp-pick .cal .d.today { font-weight: 700; }\n\
+    .pp-pick .cal .d:focus-visible { outline: 2px solid var(--pp-brass); }\n.pp-pick .times { display: grid; grid-template-columns:\
+    \ repeat(auto-fill, minmax(74px, 1fr)); gap: 6px; }\n.pp-pick .times .chip { position: relative; }\n.pp-pick .times .chip.review::after\
+    \ { content: \"\"; position: absolute; top: 5px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background:\
+    \ var(--pp-warn); }\n.pp-pick .times .chip.walk { text-decoration: none; font-size: .72rem; }\n.pp-pick .tnote { font-size:\
+    \ .8rem; color: var(--pp-muted); margin-top: 10px; display: flex; gap: 8px; align-items: center; }\n.pp-pick .tnote i\
+    \ { width: 6px; height: 6px; border-radius: 50%; background: var(--pp-warn); display: inline-block; flex: none; }\n.pp-pick\
+    \ .party .more { width: auto; min-height: 36px; padding: 5px 30px 5px 12px; border-radius: 99px; font-size: .85rem; }\n\
+    @media (max-width: 520px) { .pp-book { padding: 22px 12px; } .pp-book .panel { padding: 20px 16px; } .pp-book .masthead\
+    \ h1 { font-size: 2.1rem; } }\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n\n  // Every text a guest sees.\
+    \ Add a language by adding a dictionary with the same keys (see the planplate skill).\n  PP.LANGS = {\n    en: {\n   \
+    \   reserve: 'Reserve a table', guests: 'Guests', date: 'Date', time: 'Time', details: 'Your details',\n      guest: 'guest',\
+    \ guestsN: 'guests', more: 'More…', pickDate: 'Pick a date to see the times.',\n      loading: 'Looking for tables…',\
+    \ noTimes: 'No tables left for {n} on this day. Please try another day.',\n      walkIn: 'Walk-in', walkNote: 'We\\'re\
+    \ nearly full at some times. Walk-ins are welcome then.',\n      reviewNote: 'The restaurant confirms requests at these\
+    \ times personally.', closedDay: 'Closed on this day.',\n      name: 'Full name', email: 'Email', phone: 'Phone', notes:\
+    \ 'Special requests', notesPh: 'Allergies, occasions, high chair…', optional: 'optional',\n      change: 'Change', consent:\
+    \ 'I have read the {link} and agree that {r} may use my details to manage this reservation.',\n      privacyLink: 'privacy\
+    \ notice', submit: 'Book table', submitReview: 'Send request', back: 'Back',\n      doneTitle: 'Your table is booked',\
+    \ doneWait: 'Request received', doneText: 'We look forward to welcoming you. Keep this link to change or cancel your reservation:',\n\
+    \      waitText: 'The restaurant will confirm your request shortly. Use this link to check its status, change or cancel\
+    \ it:',\n      manage: 'Manage your reservation', copy: 'Copy link', calendar: 'Add to calendar', copied: 'Link',\n  \
+    \    closedOnline: 'Online booking is closed right now.', callUs: 'Please call us', notFound: 'Restaurant not found',\n\
+    \      party: 'Party', at: 'at', bigGroup: 'For larger groups, please contact us.', poweredBy: 'Reservations by PlanPlate'\n\
+    \    }\n  };\n  PP.LANGS.fr = {\n    reserve: 'Réserver une table', guests: 'Personnes', date: 'Date', time: 'Heure',\
+    \ details: 'Vos coordonnées',\n    guest: 'personne', guestsN: 'personnes', more: 'Plus…', pickDate: 'Choisissez une date\
+    \ pour voir les horaires.',\n    loading: 'Recherche de tables…', noTimes: 'Plus de table pour {n} ce jour-là. Essayez\
+    \ une autre date.',\n    walkIn: 'Sans réservation', walkNote: 'Nous sommes presque complets à certains horaires : venez\
+    \ sans réserver.',\n    reviewNote: 'Le restaurant confirme personnellement les demandes à ces horaires.', closedDay:\
+    \ 'Fermé ce jour-là.',\n    name: 'Nom complet', email: 'E-mail', phone: 'Téléphone', notes: 'Demandes particulières',\
+    \ notesPh: 'Allergies, occasion spéciale, chaise haute…', optional: 'facultatif',\n    change: 'Modifier', consent: 'J\\\
+    'ai lu la {link} et j\\'accepte que {r} utilise mes coordonnées pour gérer cette réservation.',\n    privacyLink: 'politique\
+    \ de confidentialité', submit: 'Réserver', submitReview: 'Envoyer la demande', back: 'Retour',\n    doneTitle: 'Votre\
+    \ table est réservée', doneWait: 'Demande reçue', doneText: 'Au plaisir de vous accueillir. Gardez ce lien pour modifier\
+    \ ou annuler votre réservation :',\n    waitText: 'Le restaurant confirmera votre demande sous peu. Ce lien vous permet\
+    \ de la suivre, la modifier ou l\\'annuler :',\n    manage: 'Gérer ma réservation', copy: 'Copier le lien', calendar:\
+    \ 'Ajouter au calendrier', copied: 'Lien',\n    closedOnline: 'La réservation en ligne est fermée pour le moment.', callUs:\
+    \ 'Appelez-nous', notFound: 'Restaurant introuvable',\n    party: 'Personnes', at: 'à', bigGroup: 'Pour les groupes plus\
+    \ nombreux, contactez-nous.', poweredBy: 'Réservations par PlanPlate'\n  };\n  PP.LANGS.lv = {\n    reserve: 'Rezervēt\
+    \ galdiņu', guests: 'Viesi', date: 'Datums', time: 'Laiks', details: 'Jūsu dati',\n    guest: 'viesis', guestsN: 'viesi',\
+    \ more: 'Vairāk…', pickDate: 'Izvēlieties datumu, lai redzētu pieejamos laikus.',\n    loading: 'Meklējam galdiņus…',\
+    \ noTimes: 'Šajā dienā nav brīvu galdiņu {n} personām. Lūdzu, izvēlieties citu dienu.',\n    walkIn: 'Bez rezervācijas',\
+    \ walkNote: 'Dažos laikos esam gandrīz pilni, bet tad laipni gaidām arī bez rezervācijas.',\n    reviewNote: 'Pieprasījumus\
+    \ šajos laikos restorāns apstiprina personīgi.', closedDay: 'Šajā dienā slēgts.',\n    name: 'Vārds, uzvārds', email:\
+    \ 'E-pasts', phone: 'Tālrunis', notes: 'Īpaši vēlējumi', notesPh: 'Alerģijas, svētki, bērnu krēsliņš…', optional: 'nav\
+    \ obligāti',\n    change: 'Mainīt', consent: 'Esmu izlasījis {link} un piekrītu, ka {r} izmanto manus datus šīs rezervācijas\
+    \ pārvaldībai.',\n    privacyLink: 'privātuma paziņojumu', submit: 'Rezervēt', submitReview: 'Nosūtīt pieprasījumu', back:\
+    \ 'Atpakaļ',\n    doneTitle: 'Jūsu galdiņš ir rezervēts', doneWait: 'Pieprasījums saņemts', doneText: 'Gaidīsim jūs! Saglabājiet\
+    \ šo saiti, lai mainītu vai atceltu rezervāciju:',\n    waitText: 'Restorāns drīz apstiprinās jūsu pieprasījumu. Ar šo\
+    \ saiti varat pārbaudīt statusu, to mainīt vai atcelt:',\n    manage: 'Pārvaldīt rezervāciju', copy: 'Kopēt saiti', calendar:\
+    \ 'Pievienot kalendāram', copied: 'Saite',\n    closedOnline: 'Tiešsaistes rezervācija pašlaik nav pieejama.', callUs:\
+    \ 'Lūdzu, zvaniet', notFound: 'Restorāns nav atrasts',\n    party: 'Viesi', at: 'plkst.', bigGroup: 'Lielākām grupām,\
+    \ lūdzu, sazinieties ar mums.', poweredBy: 'Rezervācijas: PlanPlate'\n  };\n  PP.LOCALES = { en: 'en-GB', fr: 'fr-FR',\
+    \ lv: 'lv-LV' };\n  PP.LANG_NAMES = { en: 'English', fr: 'Français', lv: 'Latviešu' };\n  PP.setLang = function (l) {\n\
+    \    PP.lang = PP.LANGS[l] ? l : 'en'; PP.locale = PP.LOCALES[PP.lang];\n    try { document.documentElement.lang = PP.lang;\
+    \ } catch (e) {}\n  };\n  // A quiet \"EN · FR · LV\" switcher for the guest pages (only when the restaurant offers more\
+    \ than one).\n  PP.langSwitch = function (langs) {\n    if (!langs || langs.length < 2) return '';\n    return '<div class=\"\
+    langs\" role=\"group\" aria-label=\"Language\">' + langs.map(function (l) {\n      return '<button type=\"button\" data-lang=\"\
+    ' + l + '\" class=\"' + (l === PP.lang ? 'on' : '') + '\" lang=\"' + l + '\" title=\"' + PP.esc(PP.LANG_NAMES[l]) + '\"\
+    >' + l.toUpperCase() + '</button>';\n    }).join('') + '</div>';\n  };\n  PP.T = function (key, vars, lang) {\n    var\
+    \ t = (PP.LANGS[lang || PP.lang || 'en'] || PP.LANGS.en)[key] || PP.LANGS.en[key] || key;\n    Object.keys(vars || {}).forEach(function\
     \ (k) { t = t.split('{' + k + '}').join(vars[k]); });\n    return t;\n  };\n\n  // An .ics calendar file for the reservation\
     \ (floating local time, like the booking itself).\n  PP.ics = function (res, restaurant, link) {\n    function stamp(date,\
     \ min) { return date.replace(/-/g, '') + 'T' + PP.hm(min).replace(':', '') + '00'; }\n    function clean(s) { return String(s\
@@ -1726,145 +2109,201 @@ native_deps:
     \ S.time = null; changed(); load(); } });\n    load();\n    return { state: function () { return { party: S.party, date:\
     \ S.date, time: S.time, review: S.review }; }, reload: load };\n  };\n\n  PP.define('book', function (root, data, emit)\
     \ {\n    var esc = PP.esc, T = PP.T;\n    var R = data.restaurant || {}, step = 'pick', pick = null, result = null, form\
-    \ = { name: '', email: '', phone: '', notes: '', consent: false }, busy = false, err = null;\n    var embedded = window.self\
-    \ !== window.top;\n\n    function masthead() {\n      return '<div class=\"masthead\">' + PP.mark() + '<div class=\"eyebrow\"\
-    >' + esc(T('reserve')) + '</div><h1>' + esc(R.name) + '</h1>' + (R.description ? '<p>' + esc(R.description) + '</p>' :\
-    \ '') + '</div>';\n    }\n    function footer() {\n      return '<div class=\"foot\">' + (R.address ? '<span>' + PP.icon('pin')\
-    \ + esc(R.address) + '</span>' : '') + (R.phone ? '<span>' + PP.icon('phone') + '<a href=\"tel:' + esc(R.phone) + '\"\
-    >' + esc(R.phone) + '</a></span>' : '') + '</div>';\n    }\n    function summary(p) {\n      return '<div class=\"summary\"\
-    >' + PP.icon('calendar') + '<strong>' + esc(PP.fmtDate(p.date)) + '</strong> · ' + esc(p.time) + ' · ' + p.party + ' '\
-    \ + esc(p.party === 1 ? T('guest') : T('guestsN')) +\n        '<span class=\"spacer\"></span><button type=\"button\" class=\"\
-    btn ghost sm\" data-action=\"back\">' + esc(T('change')) + '</button></div>';\n    }\n    function detailsHtml() {\n \
-    \     var p = pick;\n      var consent = T('consent', { link: '<button type=\"button\" class=\"lnk\" data-action=\"privacy\"\
-    >' + esc(T('privacyLink')) + '</button>', r: esc(R.name) });\n      return summary(p) + '<form data-el=\"form\" class=\"\
-    stack\"><div class=\"step\" style=\"margin:0\"><h2>' + esc(T('details')) + '</h2></div>' +\n        '<div><label class=\"\
-    f\" for=\"bkName\">' + esc(T('name')) + '</label><input id=\"bkName\" name=\"name\" type=\"text\" autocomplete=\"name\"\
-    \ required maxlength=\"100\" value=\"' + esc(form.name) + '\"></div>' +\n        '<div class=\"grid2\"><div><label class=\"\
-    f\" for=\"bkEmail\">' + esc(T('email')) + '</label><input id=\"bkEmail\" name=\"email\" type=\"email\" autocomplete=\"\
-    email\" required maxlength=\"200\" value=\"' + esc(form.email) + '\"></div>' +\n          '<div><label class=\"f\" for=\"\
-    bkPhone\">' + esc(T('phone')) + '</label><input id=\"bkPhone\" name=\"phone\" type=\"tel\" autocomplete=\"tel\" required\
-    \ maxlength=\"40\" value=\"' + esc(form.phone) + '\"></div></div>' +\n        '<div><label class=\"f\" for=\"bkNotes\"\
-    >' + esc(T('notes')) + ' <span class=\"faint\">(' + esc(T('optional')) + ')</span></label><textarea id=\"bkNotes\" name=\"\
-    notes\" maxlength=\"1000\" style=\"min-height:70px\" placeholder=\"' + esc(T('notesPh')) + '\">' + esc(form.notes) + '</textarea></div>'\
-    \ +\n        '<div class=\"hp\" aria-hidden=\"true\"><label>Website<input name=\"website\" type=\"text\" tabindex=\"-1\"\
-    \ autocomplete=\"off\"></label></div>' +\n        '<div class=\"consent\"><label class=\"check\"><input type=\"checkbox\"\
-    \ name=\"consent\" required' + (form.consent ? ' checked' : '') + '><span>' + consent + '</span></label>' +\n        \
-    \  '<div class=\"privacy\" data-el=\"privacy\" hidden>' + esc(R.privacy_text) + '</div></div>' +\n        (err ? '<div\
-    \ class=\"feedback bad\">' + esc(err) + '</div>' : '') +\n        '<button class=\"btn primary block\" type=\"submit\"\
-    \ style=\"padding:14px\"' + (busy ? ' disabled' : '') + '>' + (busy ? '<span class=\"spin\"></span>' : esc(p.review ?\
-    \ T('submitReview') : T('submit'))) + '</button></form>';\n    }\n    function doneHtml() {\n      var res = result.reservation,\
-    \ ok = result.status === 'confirmed', link = PP.manageUrl(result.token);\n      return '<div class=\"done fade-in\"><div\
-    \ class=\"tick' + (ok ? '' : ' wait') + '\">' + PP.icon(ok ? 'check' : 'clock') + '</div>' +\n        '<h2>' + esc(ok\
-    \ ? T('doneTitle') : T('doneWait')) + '</h2>' +\n        '<div class=\"facts\"><div><b>' + esc(PP.fmtDate(res.date, {\
-    \ day: 'numeric', month: 'short' })) + '</b><span>' + esc(T('date')) + '</span></div><div><b>' + esc(res.time) + '</b><span>'\
-    \ + esc(T('time')) + '</span></div><div><b>' + res.party + '</b><span>' + esc(T('guests')) + '</span></div></div>' +\n\
-    \        '<p class=\"muted\">' + esc(ok ? T('doneText') : T('waitText')) + '</p>' +\n        '<div class=\"actions\"><a\
-    \ class=\"btn primary\" data-el=\"manage\" href=\"' + esc(link) + '\"' + (embedded ? ' target=\"_blank\" rel=\"noopener\"\
-    ' : '') + '>' + esc(T('manage')) + '</a>' +\n          '<button class=\"btn\" data-action=\"copy\">' + PP.icon('copy')\
-    \ + esc(T('copy')) + '</button>' +\n          '<button class=\"btn ghost\" data-action=\"ics\">' + PP.icon('calendar')\
-    \ + esc(T('calendar')) + '</button></div></div>';\n    }\n    function render() {\n      var body;\n      if (!data.ok)\
-    \ body = '<div class=\"card panel\" style=\"text-align:center\"><h2>' + esc(T('notFound')) + '</h2><p class=\"muted\"\
-    >' + esc(data.error || '') + '</p></div>';\n      else if (!R.accepting) body = '<div class=\"card panel\" style=\"text-align:center\"\
-    ><p>' + esc(T('closedOnline')) + '</p>' + (R.phone ? '<a class=\"btn primary\" href=\"tel:' + esc(R.phone) + '\">' + PP.icon('phone')\
-    \ + esc(T('callUs')) + ' · ' + esc(R.phone) + '</a>' : '') + '</div>';\n      else if (step === 'done') body = '<div class=\"\
-    card\">' + doneHtml() + '</div>';\n      else body = '<div class=\"card panel\">' + (R.form_note && step === 'pick' ?\
-    \ '<div class=\"note\">' + esc(R.form_note) + '</div>' : '') +\n        '<div data-el=\"picker\"' + (step === 'pick' ?\
-    \ '' : ' hidden') + '></div>' +\n        (step === 'pick' ? '<button class=\"btn primary block\" data-action=\"next\"\
-    \ style=\"margin-top:24px;padding:14px\"' + (pick && pick.time ? '' : ' disabled') + '>' + esc(T('details')) + PP.icon('right')\
-    \ + '</button>' +\n          '<p class=\"hint\" style=\"text-align:center;margin-top:12px\">' + esc(T('bigGroup')) + '</p>'\
-    \ : detailsHtml()) + '</div>';\n      root.innerHTML = '<div class=\"pp-book\"><div class=\"sheet\">' + (data.ok ? masthead()\
-    \ : '') + body + (data.ok ? footer() : '') + '</div></div>';\n      var holder = root.querySelector('[data-el=picker]');\n\
+    \ = { name: '', email: '', phone: '', notes: '', consent: false }, busy = false, err = null;\n    PP.setLang(data.lang\
+    \ || R.language || 'en');\n    var embedded = window.self !== window.top;\n\n    function masthead() {\n      return PP.langSwitch(R.languages)\
+    \ + '<div class=\"masthead\">' + PP.mark() + '<div class=\"eyebrow\">' + esc(T('reserve')) + '</div><h1>' + esc(R.name)\
+    \ + '</h1>' + (R.description ? '<p>' + esc(R.description) + '</p>' : '') + '</div>';\n    }\n    function footer() {\n\
+    \      return '<div class=\"foot\">' + (R.address ? '<span>' + PP.icon('pin') + esc(R.address) + '</span>' : '') + (R.phone\
+    \ ? '<span>' + PP.icon('phone') + '<a href=\"tel:' + esc(R.phone) + '\">' + esc(R.phone) + '</a></span>' : '') + '</div>';\n\
+    \    }\n    function summary(p) {\n      return '<div class=\"summary\">' + PP.icon('calendar') + '<strong>' + esc(PP.fmtDate(p.date))\
+    \ + '</strong> · ' + esc(p.time) + ' · ' + p.party + ' ' + esc(p.party === 1 ? T('guest') : T('guestsN')) +\n        '<span\
+    \ class=\"spacer\"></span><button type=\"button\" class=\"btn ghost sm\" data-action=\"back\">' + esc(T('change')) + '</button></div>';\n\
+    \    }\n    function detailsHtml() {\n      var p = pick;\n      var consent = T('consent', { link: '<button type=\"button\"\
+    \ class=\"lnk\" data-action=\"privacy\">' + esc(T('privacyLink')) + '</button>', r: esc(R.name) });\n      return summary(p)\
+    \ + '<form data-el=\"form\" class=\"stack\"><div class=\"step\" style=\"margin:0\"><h2>' + esc(T('details')) + '</h2></div>'\
+    \ +\n        '<div><label class=\"f\" for=\"bkName\">' + esc(T('name')) + '</label><input id=\"bkName\" name=\"name\"\
+    \ type=\"text\" autocomplete=\"name\" required maxlength=\"100\" value=\"' + esc(form.name) + '\"></div>' +\n        '<div\
+    \ class=\"grid2\"><div><label class=\"f\" for=\"bkEmail\">' + esc(T('email')) + '</label><input id=\"bkEmail\" name=\"\
+    email\" type=\"email\" autocomplete=\"email\" required maxlength=\"200\" value=\"' + esc(form.email) + '\"></div>' +\n\
+    \          '<div><label class=\"f\" for=\"bkPhone\">' + esc(T('phone')) + '</label><input id=\"bkPhone\" name=\"phone\"\
+    \ type=\"tel\" autocomplete=\"tel\" required maxlength=\"40\" value=\"' + esc(form.phone) + '\"></div></div>' +\n    \
+    \    '<div><label class=\"f\" for=\"bkNotes\">' + esc(T('notes')) + ' <span class=\"faint\">(' + esc(T('optional')) +\
+    \ ')</span></label><textarea id=\"bkNotes\" name=\"notes\" maxlength=\"1000\" style=\"min-height:70px\" placeholder=\"\
+    ' + esc(T('notesPh')) + '\">' + esc(form.notes) + '</textarea></div>' +\n        '<div class=\"hp\" aria-hidden=\"true\"\
+    ><label>Website<input name=\"website\" type=\"text\" tabindex=\"-1\" autocomplete=\"off\"></label></div>' +\n        '<div\
+    \ class=\"consent\"><label class=\"check\"><input type=\"checkbox\" name=\"consent\" required' + (form.consent ? ' checked'\
+    \ : '') + '><span>' + consent + '</span></label>' +\n          '<div class=\"privacy\" data-el=\"privacy\" hidden>' +\
+    \ esc(R.privacy_text) + '</div></div>' +\n        (err ? '<div class=\"feedback bad\">' + esc(err) + '</div>' : '') +\n\
+    \        '<button class=\"btn primary block\" type=\"submit\" style=\"padding:14px\"' + (busy ? ' disabled' : '') + '>'\
+    \ + (busy ? '<span class=\"spin\"></span>' : esc(p.review ? T('submitReview') : T('submit'))) + '</button></form>';\n\
+    \    }\n    function doneHtml() {\n      var res = result.reservation, ok = result.status === 'confirmed', link = PP.manageUrl(result.token);\n\
+    \      return '<div class=\"done fade-in\"><div class=\"tick' + (ok ? '' : ' wait') + '\">' + PP.icon(ok ? 'check' : 'clock')\
+    \ + '</div>' +\n        '<h2>' + esc(ok ? T('doneTitle') : T('doneWait')) + '</h2>' +\n        '<div class=\"facts\"><div><b>'\
+    \ + esc(PP.fmtDate(res.date, { day: 'numeric', month: 'short' })) + '</b><span>' + esc(T('date')) + '</span></div><div><b>'\
+    \ + esc(res.time) + '</b><span>' + esc(T('time')) + '</span></div><div><b>' + res.party + '</b><span>' + esc(T('guests'))\
+    \ + '</span></div></div>' +\n        '<p class=\"muted\">' + esc(ok ? T('doneText') : T('waitText')) + '</p>' +\n    \
+    \    '<div class=\"actions\"><a class=\"btn primary\" data-el=\"manage\" href=\"' + esc(link) + '\"' + (embedded ? ' target=\"\
+    _blank\" rel=\"noopener\"' : '') + '>' + esc(T('manage')) + '</a>' +\n          '<button class=\"btn\" data-action=\"\
+    copy\">' + PP.icon('copy') + esc(T('copy')) + '</button>' +\n          '<button class=\"btn ghost\" data-action=\"ics\"\
+    >' + PP.icon('calendar') + esc(T('calendar')) + '</button></div></div>';\n    }\n    function render() {\n      var body;\n\
+    \      if (!data.ok) body = '<div class=\"card panel\" style=\"text-align:center\"><h2>' + esc(T('notFound')) + '</h2><p\
+    \ class=\"muted\">' + esc(data.error || '') + '</p></div>';\n      else if (!R.accepting) body = '<div class=\"card panel\"\
+    \ style=\"text-align:center\"><p>' + esc(T('closedOnline')) + '</p>' + (R.phone ? '<a class=\"btn primary\" href=\"tel:'\
+    \ + esc(R.phone) + '\">' + PP.icon('phone') + esc(T('callUs')) + ' · ' + esc(R.phone) + '</a>' : '') + '</div>';\n   \
+    \   else if (step === 'done') body = '<div class=\"card\">' + doneHtml() + '</div>';\n      else body = '<div class=\"\
+    card panel\">' + (R.form_note && step === 'pick' ? '<div class=\"note\">' + esc(R.form_note) + '</div>' : '') +\n    \
+    \    '<div data-el=\"picker\"' + (step === 'pick' ? '' : ' hidden') + '></div>' +\n        (step === 'pick' ? '<button\
+    \ class=\"btn primary block\" data-action=\"next\" style=\"margin-top:24px;padding:14px\"' + (pick && pick.time ? '' :\
+    \ ' disabled') + '>' + esc(T('details')) + PP.icon('right') + '</button>' +\n          '<p class=\"hint\" style=\"text-align:center;margin-top:12px\"\
+    >' + esc(T('bigGroup')) + '</p>' : detailsHtml()) + '</div>';\n      root.innerHTML = '<div class=\"pp-book\"><div class=\"\
+    sheet\">' + (data.ok ? masthead() : '') + body + (data.ok ? footer() : '') + '</div></div>';\n      var holder = root.querySelector('[data-el=picker]');\n\
     \      if (holder) {\n        if (!picker) picker = mkPicker();\n        holder.appendChild(pickerEl);\n      }\n    \
     \  var f = root.querySelector('[data-el=form]');\n      if (f) f.onsubmit = submit;\n    }\n    var pickerEl = document.createElement('div'),\
-    \ picker = null;\n    function mkPicker() {\n      return PP.picker(pickerEl, {\n        days: data.days, today: data.today,\
-    \ maxParty: R.max_party, party: 2,\n        load: function (date, party) { return emit('slots', { date: date, party: party\
-    \ }); },\n        onChange: function (st) { pick = st; var b = root.querySelector('[data-action=next]'); if (b) b.disabled\
-    \ = !st.time; }\n      });\n    }\n    function keep() {\n      var f = root.querySelector('[data-el=form]');\n      if\
-    \ (!f) return;\n      ['name', 'email', 'phone', 'notes'].forEach(function (k) { form[k] = f[k].value; });\n      form.consent\
-    \ = f.consent.checked;\n    }\n    function submit(e) {\n      e.preventDefault();\n      if (busy) return;\n      keep();\n\
-    \      var f = e.target;\n      if (!f.reportValidity()) return;\n      busy = true; err = null; render();\n      emit('book',\
-    \ Object.assign({}, form, { date: pick.date, time: pick.time, party: pick.party, website: f.website.value })).then(function\
+    \ picker = null;\n    function mkPicker() {\n      var was = pick || {};\n      return PP.picker(pickerEl, {\n       \
+    \ days: data.days, today: data.today, maxParty: R.max_party, party: was.party || 2, date: was.date, time: was.time,\n\
+    \        load: function (date, party) { return emit('slots', { date: date, party: party }); },\n        onChange: function\
+    \ (st) { pick = st; var b = root.querySelector('[data-action=next]'); if (b) b.disabled = !st.time; }\n      });\n   \
+    \ }\n    function keep() {\n      var f = root.querySelector('[data-el=form]');\n      if (!f) return;\n      ['name',\
+    \ 'email', 'phone', 'notes'].forEach(function (k) { form[k] = f[k].value; });\n      form.consent = f.consent.checked;\n\
+    \    }\n    function submit(e) {\n      e.preventDefault();\n      if (busy) return;\n      keep();\n      var f = e.target;\n\
+    \      if (!f.reportValidity()) return;\n      busy = true; err = null; render();\n      emit('book', Object.assign({},\
+    \ form, { date: pick.date, time: pick.time, party: pick.party, website: f.website.value, language: PP.lang })).then(function\
     \ (res) {\n        busy = false;\n        if (res && res.ok) { result = res; step = 'done'; render(); window.scrollTo(0,\
     \ 0); return; }\n        err = (res && res.error) || 'Something went wrong.'; render();\n        if (/taken|available/.test(err))\
     \ { picker.reload(); }\n      }, function (x) { busy = false; err = PP.err(x); render(); });\n    }\n    root.addEventListener('click',\
-    \ function (e) {\n      var el = e.target.closest('[data-action]');\n      if (!el) return;\n      var a = el.dataset.action;\n\
-    \      if (a === 'next' && pick && pick.time) { step = 'details'; render(); var n = root.querySelector('#bkName'); if\
-    \ (n) n.focus(); }\n      else if (a === 'back') { keep(); step = 'pick'; err = null; render(); }\n      else if (a ===\
-    \ 'privacy') { var p = root.querySelector('[data-el=privacy]'); p.hidden = !p.hidden; }\n      else if (a === 'copy')\
-    \ PP.copy(PP.manageUrl(result.token), T('copied'));\n      else if (a === 'ics') PP.ics(result.reservation, R, PP.manageUrl(result.token));\n\
-    \    });\n    if (data.ok) document.title = T('reserve') + ' · ' + R.name;\n    render();\n    return {};\n  });\n})();\n\
-    </script>\n\n<!-- ===== ManagePage component ===== -->\n<style>\n.pp-manage .status { text-align: center; padding: 30px\
-    \ 26px 26px; }\n.pp-manage .status .badge { font-size: .8rem; padding: 5px 14px; margin-bottom: 14px; }\n.pp-manage .status\
-    \ h2 { margin-bottom: 6px; }\n.pp-manage .status .lead { color: var(--pp-muted); max-width: 42ch; margin: 0 auto; }\n\
-    .pp-manage .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 22px 0 18px; padding: 16px\
-    \ 0; border-top: 1px solid var(--pp-line); border-bottom: 1px solid var(--pp-line); text-align: center; }\n.pp-manage\
-    \ .facts b { display: block; font: 500 1.35rem/1.2 var(--pp-serif); }\n.pp-manage .facts span { font-size: .7rem; letter-spacing:\
-    \ .12em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-manage .who { font-size: .9rem; text-align: center;\
-    \ color: var(--pp-muted); }\n.pp-manage .acts { display: grid; gap: 8px; max-width: 340px; margin: 22px auto 0; }\n.pp-manage\
-    \ .gone { opacity: .55; }\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.LANGS.en = Object.assign({\n\
-    \    yourRes: 'Your reservation', st_confirmed: 'Your table is confirmed.', st_pending: 'The restaurant will confirm your\
-    \ request shortly.',\n    st_cancelled: 'This reservation has been cancelled.', st_declined: 'Sorry, the restaurant couldn\\\
-    't accept this request. Please call them or pick another time.',\n    changeRes: 'Change reservation', cancelRes: 'Cancel\
-    \ reservation', cancelQ: 'Cancel this reservation?', cancelText: 'Your table will be released for other guests.',\n  \
-    \  keep: 'Keep it', yesCancel: 'Cancel reservation', saveChanges: 'Save changes', nothingChanged: 'Nothing to save yet.',\n\
-    \    saved: 'Your reservation has been updated', cancelled: 'Your reservation is cancelled', noChange: 'To change this\
-    \ reservation, please contact the restaurant.',\n    badLink: 'Reservation not found', bookAgain: 'Book another table'\n\
-    \  }, PP.LANGS.en);\n\n  PP.define('manage', function (root, data, emit) {\n    var esc = PP.esc, T = PP.T;\n    var D\
-    \ = data, mode = 'view', pick = null, err = null, busy = false, picker = null, pickerEl = null;\n\n    function facts(r)\
-    \ {\n      return '<div class=\"facts\"><div><b>' + esc(PP.fmtDate(r.date, { weekday: 'short', day: 'numeric', month:\
-    \ 'short' })) + '</b><span>' + esc(T('date')) + '</span></div>' +\n        '<div><b>' + esc(r.time) + '</b><span>' + esc(T('time'))\
-    \ + '</span></div><div><b>' + r.party + '</b><span>' + esc(T('guests')) + '</span></div></div>';\n    }\n    function\
-    \ view() {\n      var r = D.reservation, R = D.restaurant, live = r.status === 'pending' || r.status === 'confirmed';\n\
-    \      return '<div class=\"card status fade-in' + (live ? '' : ' gone') + '\">' + PP.status(r.status) +\n        '<h2>'\
-    \ + esc(T('yourRes')) + '</h2><p class=\"lead\">' + esc(T('st_' + r.status)) + '</p>' + facts(r) +\n        '<div class=\"\
-    who\">' + esc(r.name) + (r.notes ? '<br><span class=\"small\">“' + esc(r.notes) + '”</span>' : '') + '</div></div>' +\n\
-    \        '<div class=\"acts\">' +\n          (D.can_change ? '<button class=\"btn primary\" data-action=\"change\">' +\
-    \ PP.icon('edit') + esc(T('changeRes')) + '</button>' : '') +\n          (live ? '<button class=\"btn\" data-action=\"\
-    ics\">' + PP.icon('calendar') + esc(T('calendar')) + '</button>' : '') +\n          (D.can_cancel ? '<button class=\"\
-    btn danger\" data-action=\"cancel\">' + esc(T('cancelRes')) + '</button>' : '') +\n          (!live ? '<a class=\"btn\
-    \ primary\" href=\"' + esc(PP.bookUrl(R.slug)) + '\">' + esc(T('bookAgain')) + '</a>' : '') +\n          (live && !D.can_change\
-    \ && R.phone ? '<p class=\"hint\" style=\"text-align:center\">' + esc(T('noChange')) + '</p>' : '') + '</div>';\n    }\n\
-    \    function changeHtml() {\n      var r = D.reservation, g = D.guest || {};\n      return '<div class=\"card panel\"\
-    ><div data-el=\"picker\"></div><hr>' +\n        '<form data-el=\"form\" class=\"stack\"><div class=\"step\" style=\"margin:0\"\
-    ><h2>' + esc(T('details')) + '</h2></div>' +\n        '<div><label class=\"f\" for=\"mgName\">' + esc(T('name')) + '</label><input\
-    \ id=\"mgName\" name=\"name\" type=\"text\" required maxlength=\"100\" value=\"' + esc(r.name) + '\"></div>' +\n     \
-    \   '<div class=\"grid2\"><div><label class=\"f\" for=\"mgEmail\">' + esc(T('email')) + '</label><input id=\"mgEmail\"\
-    \ name=\"email\" type=\"email\" required maxlength=\"200\" value=\"' + esc(g.email) + '\"></div>' +\n          '<div><label\
-    \ class=\"f\" for=\"mgPhone\">' + esc(T('phone')) + '</label><input id=\"mgPhone\" name=\"phone\" type=\"tel\" required\
-    \ maxlength=\"40\" value=\"' + esc(g.phone) + '\"></div></div>' +\n        '<div><label class=\"f\" for=\"mgNotes\">'\
-    \ + esc(T('notes')) + '</label><textarea id=\"mgNotes\" name=\"notes\" maxlength=\"1000\" style=\"min-height:70px\">'\
-    \ + esc(r.notes) + '</textarea></div>' +\n        (err ? '<div class=\"feedback bad\">' + esc(err) + '</div>' : '') +\n\
-    \        '<div class=\"row\"><button type=\"button\" class=\"btn\" data-action=\"view\">' + esc(T('back')) + '</button><span\
-    \ class=\"spacer\"></span>' +\n        '<button class=\"btn primary\" type=\"submit\"' + (busy ? ' disabled' : '') + '>'\
-    \ + (busy ? '<span class=\"spin\"></span>' : esc(T('saveChanges'))) + '</button></div></form></div>';\n    }\n    function\
-    \ render() {\n      var R = D.restaurant || {};\n      var body = !D.ok ? '<div class=\"card panel\" style=\"text-align:center\"\
-    ><h2>' + esc(T('badLink')) + '</h2><p class=\"muted\">' + esc(D.error || '') + '</p></div>'\n        : mode === 'change'\
-    \ ? changeHtml() : view();\n      root.innerHTML = '<div class=\"pp-book pp-manage\"><div class=\"sheet\">' +\n      \
-    \  (D.ok ? '<div class=\"masthead\">' + PP.mark() + '<h1>' + esc(R.name) + '</h1>' + (R.address ? '<p>' + esc(R.address)\
-    \ + '</p>' : '') + '</div>' : '') + body +\n        (D.ok ? '<div class=\"foot\">' + (R.phone ? '<span>' + PP.icon('phone')\
-    \ + '<a href=\"tel:' + esc(R.phone) + '\">' + esc(R.phone) + '</a></span>' : '') + (R.email ? '<span><a href=\"mailto:'\
-    \ + esc(R.email) + '\">' + esc(R.email) + '</a></span>' : '') + '</div>' : '') +\n        '</div></div>';\n      var holder\
-    \ = root.querySelector('[data-el=picker]');\n      if (holder) {\n        if (!picker) {\n          pickerEl = document.createElement('div');\n\
-    \          var r = D.reservation;\n          picker = PP.picker(pickerEl, { days: D.days, today: null, maxParty: R.max_party,\
-    \ party: r.party, date: r.date, time: r.time,\n            load: function (date, party) { return emit('slots', { date:\
-    \ date, party: party }); },\n            onChange: function (st) { pick = st; } });\n        }\n        holder.appendChild(pickerEl);\n\
-    \      }\n      var f = root.querySelector('[data-el=form]');\n      if (f) f.onsubmit = save;\n    }\n    function save(e)\
-    \ {\n      e.preventDefault();\n      var f = e.target;\n      if (!f.reportValidity()) return;\n      var st = pick ||\
-    \ picker.state();\n      if (!st.time) { err = T('pickDate'); render(); return; }\n      busy = true; err = null;\n  \
-    \    var payload = { date: st.date, time: st.time, party: st.party, name: f.name.value, email: f.email.value, phone: f.phone.value,\
-    \ notes: f.notes.value };\n      render();\n      emit('change', payload).then(function (res) {\n        busy = false;\n\
-    \        if (res && res.ok) { D = res; mode = 'view'; picker = null; render(); PP.toast(T('saved')); window.scrollTo(0,\
-    \ 0); return; }\n        err = (res && res.error) || 'Something went wrong.';\n        var keepVals = payload; render();\n\
-    \        var nf = root.querySelector('[data-el=form]');\n        ['name', 'email', 'phone', 'notes'].forEach(function\
-    \ (k) { nf[k].value = keepVals[k]; });\n      }, function (x) { busy = false; err = PP.err(x); render(); });\n    }\n\
-    \    root.addEventListener('click', function (e) {\n      var el = e.target.closest('[data-action]');\n      if (!el)\
-    \ return;\n      var a = el.dataset.action;\n      if (a === 'change') { mode = 'change'; err = null; render(); }\n  \
-    \    else if (a === 'view') { mode = 'view'; picker = null; err = null; render(); }\n      else if (a === 'ics') PP.ics(D.reservation,\
-    \ D.restaurant, location.href);\n      else if (a === 'cancel') {\n        PP.confirm(T('cancelQ'), T('cancelText'), T('yesCancel'),\
-    \ true).then(function (yes) {\n          if (!yes) return;\n          emit('cancel', {}).then(function (res) {\n     \
-    \       if (res && res.ok) { D = res; render(); PP.toast(T('cancelled')); }\n            else PP.toast((res && res.error)\
-    \ || 'Could not cancel.', true);\n          });\n        });\n      }\n    });\n    if (D.ok) document.title = T('yourRes')\
-    \ + ' · ' + D.restaurant.name;\n    render();\n    return {};\n  });\n})();\n</script>\n"
+    \ function (e) {\n      var lb = e.target.closest('[data-lang]');\n      if (lb) {\n        keep(); PP.setLang(lb.dataset.lang);\n\
+    \        if (data.privacy && data.privacy[PP.lang]) R.privacy_text = data.privacy[PP.lang];\n        pickerEl = document.createElement('div');\
+    \ picker = null;\n        document.title = T('reserve') + ' · ' + R.name;\n        render(); return;\n      }\n      var\
+    \ el = e.target.closest('[data-action]');\n      if (!el) return;\n      var a = el.dataset.action;\n      if (a === 'next'\
+    \ && pick && pick.time) { step = 'details'; render(); var n = root.querySelector('#bkName'); if (n) n.focus(); }\n   \
+    \   else if (a === 'back') { keep(); step = 'pick'; err = null; render(); }\n      else if (a === 'privacy') { var p =\
+    \ root.querySelector('[data-el=privacy]'); p.hidden = !p.hidden; }\n      else if (a === 'copy') PP.copy(PP.manageUrl(result.token),\
+    \ T('copied'));\n      else if (a === 'ics') PP.ics(result.reservation, R, PP.manageUrl(result.token));\n    });\n   \
+    \ if (data.ok) document.title = T('reserve') + ' · ' + R.name;\n    render();\n    return {};\n  });\n})();\n</script>\n\
+    \n<!-- ===== ManagePage component ===== -->\n<style>\n.pp-manage .status { text-align: center; padding: 30px 26px 26px;\
+    \ }\n.pp-manage .status .badge { font-size: .8rem; padding: 5px 14px; margin-bottom: 14px; }\n.pp-manage .status h2 {\
+    \ margin-bottom: 6px; }\n.pp-manage .status .lead { color: var(--pp-muted); max-width: 42ch; margin: 0 auto; }\n.pp-manage\
+    \ .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 22px 0 18px; padding: 16px 0; border-top:\
+    \ 1px solid var(--pp-line); border-bottom: 1px solid var(--pp-line); text-align: center; }\n.pp-manage .facts b { display:\
+    \ block; font: 500 1.35rem/1.2 var(--pp-serif); }\n.pp-manage .facts span { font-size: .7rem; letter-spacing: .12em; text-transform:\
+    \ uppercase; color: var(--pp-muted); }\n.pp-manage .who { font-size: .9rem; text-align: center; color: var(--pp-muted);\
+    \ }\n.pp-manage .acts { display: grid; gap: 8px; max-width: 340px; margin: 22px auto 0; }\n.pp-manage .gone { opacity:\
+    \ .55; }\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.LANGS.en = Object.assign({\n    yourRes: 'Your\
+    \ reservation', st_confirmed: 'Your table is confirmed.', st_pending: 'The restaurant will confirm your request shortly.',\n\
+    \    st_cancelled: 'This reservation has been cancelled.', st_declined: 'Sorry, the restaurant couldn\\'t accept this\
+    \ request. Please call them or pick another time.',\n    changeRes: 'Change reservation', cancelRes: 'Cancel reservation',\
+    \ cancelQ: 'Cancel this reservation?', cancelText: 'Your table will be released for other guests.',\n    keep: 'Keep it',\
+    \ yesCancel: 'Cancel reservation', saveChanges: 'Save changes', nothingChanged: 'Nothing to save yet.',\n    saved: 'Your\
+    \ reservation has been updated', cancelled: 'Your reservation is cancelled', noChange: 'To change this reservation, please\
+    \ contact the restaurant.',\n    badLink: 'Reservation not found', bookAgain: 'Book another table'\n  }, PP.LANGS.en);\n\
+    \n  PP.LANGS.en = Object.assign({ bd_confirmed: 'Confirmed', bd_pending: 'Awaiting confirmation', bd_cancelled: 'Cancelled',\
+    \ bd_declined: 'Declined' }, PP.LANGS.en);\n  PP.LANGS.fr = Object.assign({\n    yourRes: 'Votre réservation', st_confirmed:\
+    \ 'Votre table est confirmée.', st_pending: 'Le restaurant confirmera votre demande sous peu.',\n    st_cancelled: 'Cette\
+    \ réservation a été annulée.', st_declined: 'Désolé, le restaurant n\\'a pas pu accepter cette demande. Appelez-le ou\
+    \ choisissez un autre horaire.',\n    changeRes: 'Modifier la réservation', cancelRes: 'Annuler la réservation', cancelQ:\
+    \ 'Annuler cette réservation ?', cancelText: 'Votre table sera libérée pour d\\'autres clients.',\n    keep: 'La garder',\
+    \ yesCancel: 'Annuler la réservation', saveChanges: 'Enregistrer', nothingChanged: 'Rien à enregistrer.',\n    saved:\
+    \ 'Votre réservation a été modifiée', cancelled: 'Votre réservation est annulée', noChange: 'Pour modifier cette réservation,\
+    \ contactez le restaurant.',\n    badLink: 'Réservation introuvable', bookAgain: 'Réserver une autre table',\n    bd_confirmed:\
+    \ 'Confirmée', bd_pending: 'En attente', bd_cancelled: 'Annulée', bd_declined: 'Refusée'\n  }, PP.LANGS.fr);\n  PP.LANGS.lv\
+    \ = Object.assign({\n    yourRes: 'Jūsu rezervācija', st_confirmed: 'Jūsu galdiņš ir apstiprināts.', st_pending: 'Restorāns\
+    \ drīz apstiprinās jūsu pieprasījumu.',\n    st_cancelled: 'Šī rezervācija ir atcelta.', st_declined: 'Diemžēl restorāns\
+    \ nevarēja pieņemt šo pieprasījumu. Lūdzu, piezvaniet vai izvēlieties citu laiku.',\n    changeRes: 'Mainīt rezervāciju',\
+    \ cancelRes: 'Atcelt rezervāciju', cancelQ: 'Atcelt šo rezervāciju?', cancelText: 'Jūsu galdiņš tiks atbrīvots citiem\
+    \ viesiem.',\n    keep: 'Paturēt', yesCancel: 'Atcelt rezervāciju', saveChanges: 'Saglabāt', nothingChanged: 'Nav ko saglabāt.',\n\
+    \    saved: 'Jūsu rezervācija ir mainīta', cancelled: 'Jūsu rezervācija ir atcelta', noChange: 'Lai mainītu šo rezervāciju,\
+    \ sazinieties ar restorānu.',\n    badLink: 'Rezervācija nav atrasta', bookAgain: 'Rezervēt citu galdiņu',\n    bd_confirmed:\
+    \ 'Apstiprināta', bd_pending: 'Gaida apstiprinājumu', bd_cancelled: 'Atcelta', bd_declined: 'Noraidīta'\n  }, PP.LANGS.lv);\n\
+    \n  PP.define('manage', function (root, data, emit) {\n    var esc = PP.esc, T = PP.T;\n    var D = data, mode = 'view',\
+    \ pick = null, err = null, busy = false, picker = null, pickerEl = null;\n    PP.setLang((D.reservation && D.reservation.language)\
+    \ || 'en');\n\n    function facts(r) {\n      return '<div class=\"facts\"><div><b>' + esc(PP.fmtDate(r.date, { weekday:\
+    \ 'short', day: 'numeric', month: 'short' })) + '</b><span>' + esc(T('date')) + '</span></div>' +\n        '<div><b>'\
+    \ + esc(r.time) + '</b><span>' + esc(T('time')) + '</span></div><div><b>' + r.party + '</b><span>' + esc(T('guests'))\
+    \ + '</span></div></div>';\n    }\n    function view() {\n      var r = D.reservation, R = D.restaurant, live = r.status\
+    \ === 'pending' || r.status === 'confirmed';\n      return '<div class=\"card status fade-in' + (live ? '' : ' gone')\
+    \ + '\"><span class=\"badge ' + esc(r.status) + '\">' + esc(T('bd_' + r.status)) + '</span>' +\n        '<h2>' + esc(T('yourRes'))\
+    \ + '</h2><p class=\"lead\">' + esc(T('st_' + r.status)) + '</p>' + facts(r) +\n        '<div class=\"who\">' + esc(r.name)\
+    \ + (r.notes ? '<br><span class=\"small\">“' + esc(r.notes) + '”</span>' : '') + '</div></div>' +\n        '<div class=\"\
+    acts\">' +\n          (D.can_change ? '<button class=\"btn primary\" data-action=\"change\">' + PP.icon('edit') + esc(T('changeRes'))\
+    \ + '</button>' : '') +\n          (live ? '<button class=\"btn\" data-action=\"ics\">' + PP.icon('calendar') + esc(T('calendar'))\
+    \ + '</button>' : '') +\n          (D.can_cancel ? '<button class=\"btn danger\" data-action=\"cancel\">' + esc(T('cancelRes'))\
+    \ + '</button>' : '') +\n          (!live ? '<a class=\"btn primary\" href=\"' + esc(PP.bookUrl(R.slug)) + '\">' + esc(T('bookAgain'))\
+    \ + '</a>' : '') +\n          (live && !D.can_change && R.phone ? '<p class=\"hint\" style=\"text-align:center\">' + esc(T('noChange'))\
+    \ + '</p>' : '') + '</div>';\n    }\n    function changeHtml() {\n      var r = D.reservation, g = D.guest || {};\n  \
+    \    return '<div class=\"card panel\"><div data-el=\"picker\"></div><hr>' +\n        '<form data-el=\"form\" class=\"\
+    stack\"><div class=\"step\" style=\"margin:0\"><h2>' + esc(T('details')) + '</h2></div>' +\n        '<div><label class=\"\
+    f\" for=\"mgName\">' + esc(T('name')) + '</label><input id=\"mgName\" name=\"name\" type=\"text\" required maxlength=\"\
+    100\" value=\"' + esc(r.name) + '\"></div>' +\n        '<div class=\"grid2\"><div><label class=\"f\" for=\"mgEmail\">'\
+    \ + esc(T('email')) + '</label><input id=\"mgEmail\" name=\"email\" type=\"email\" required maxlength=\"200\" value=\"\
+    ' + esc(g.email) + '\"></div>' +\n          '<div><label class=\"f\" for=\"mgPhone\">' + esc(T('phone')) + '</label><input\
+    \ id=\"mgPhone\" name=\"phone\" type=\"tel\" required maxlength=\"40\" value=\"' + esc(g.phone) + '\"></div></div>' +\n\
+    \        '<div><label class=\"f\" for=\"mgNotes\">' + esc(T('notes')) + '</label><textarea id=\"mgNotes\" name=\"notes\"\
+    \ maxlength=\"1000\" style=\"min-height:70px\">' + esc(r.notes) + '</textarea></div>' +\n        (err ? '<div class=\"\
+    feedback bad\">' + esc(err) + '</div>' : '') +\n        '<div class=\"row\"><button type=\"button\" class=\"btn\" data-action=\"\
+    view\">' + esc(T('back')) + '</button><span class=\"spacer\"></span>' +\n        '<button class=\"btn primary\" type=\"\
+    submit\"' + (busy ? ' disabled' : '') + '>' + (busy ? '<span class=\"spin\"></span>' : esc(T('saveChanges'))) + '</button></div></form></div>';\n\
+    \    }\n    function render() {\n      var R = D.restaurant || {};\n      var body = !D.ok ? '<div class=\"card panel\"\
+    \ style=\"text-align:center\"><h2>' + esc(T('badLink')) + '</h2><p class=\"muted\">' + esc(D.error || '') + '</p></div>'\n\
+    \        : mode === 'change' ? changeHtml() : view();\n      root.innerHTML = '<div class=\"pp-book pp-manage\"><div class=\"\
+    sheet\">' +\n        (D.ok ? PP.langSwitch(R.languages) + '<div class=\"masthead\">' + PP.mark() + '<h1>' + esc(R.name)\
+    \ + '</h1>' + (R.address ? '<p>' + esc(R.address) + '</p>' : '') + '</div>' : '') + body +\n        (D.ok ? '<div class=\"\
+    foot\">' + (R.phone ? '<span>' + PP.icon('phone') + '<a href=\"tel:' + esc(R.phone) + '\">' + esc(R.phone) + '</a></span>'\
+    \ : '') + (R.email ? '<span><a href=\"mailto:' + esc(R.email) + '\">' + esc(R.email) + '</a></span>' : '') + '</div>'\
+    \ : '') +\n        '</div></div>';\n      var holder = root.querySelector('[data-el=picker]');\n      if (holder) {\n\
+    \        if (!picker) {\n          pickerEl = document.createElement('div');\n          var r = D.reservation;\n     \
+    \     picker = PP.picker(pickerEl, { days: D.days, today: null, maxParty: R.max_party, party: r.party, date: r.date, time:\
+    \ r.time,\n            load: function (date, party) { return emit('slots', { date: date, party: party }); },\n       \
+    \     onChange: function (st) { pick = st; } });\n        }\n        holder.appendChild(pickerEl);\n      }\n      var\
+    \ f = root.querySelector('[data-el=form]');\n      if (f) f.onsubmit = save;\n    }\n    function save(e) {\n      e.preventDefault();\n\
+    \      var f = e.target;\n      if (!f.reportValidity()) return;\n      var st = pick || picker.state();\n      if (!st.time)\
+    \ { err = T('pickDate'); render(); return; }\n      busy = true; err = null;\n      var payload = { date: st.date, time:\
+    \ st.time, party: st.party, name: f.name.value, email: f.email.value, phone: f.phone.value, notes: f.notes.value };\n\
+    \      render();\n      emit('change', payload).then(function (res) {\n        busy = false;\n        if (res && res.ok)\
+    \ { D = res; mode = 'view'; picker = null; render(); PP.toast(T('saved')); window.scrollTo(0, 0); return; }\n        err\
+    \ = (res && res.error) || 'Something went wrong.';\n        var keepVals = payload; render();\n        var nf = root.querySelector('[data-el=form]');\n\
+    \        ['name', 'email', 'phone', 'notes'].forEach(function (k) { nf[k].value = keepVals[k]; });\n      }, function\
+    \ (x) { busy = false; err = PP.err(x); render(); });\n    }\n    root.addEventListener('click', function (e) {\n     \
+    \ var lb = e.target.closest('[data-lang]');\n      if (lb) { PP.setLang(lb.dataset.lang); if (pickerEl) { pick = picker\
+    \ ? picker.state() : pick; picker = null; } render(); return; }\n      var el = e.target.closest('[data-action]');\n \
+    \     if (!el) return;\n      var a = el.dataset.action;\n      if (a === 'change') { mode = 'change'; err = null; render();\
+    \ }\n      else if (a === 'view') { mode = 'view'; picker = null; err = null; render(); }\n      else if (a === 'ics')\
+    \ PP.ics(D.reservation, D.restaurant, location.href);\n      else if (a === 'cancel') {\n        PP.confirm(T('cancelQ'),\
+    \ T('cancelText'), T('yesCancel'), true, T('keep')).then(function (yes) {\n          if (!yes) return;\n          emit('cancel',\
+    \ {}).then(function (res) {\n            if (res && res.ok) { D = res; render(); PP.toast(T('cancelled')); }\n       \
+    \     else PP.toast((res && res.error) || 'Could not cancel.', true);\n          });\n        });\n      }\n    });\n\
+    \    if (D.ok) document.title = T('yourRes') + ' · ' + D.restaurant.name;\n    render();\n    return {};\n  });\n})();\n\
+    </script>\n\n<!-- ===== MenuPage component ===== -->\n<style>\n.pp-menu { min-height: 100vh; padding: 44px 18px 40px;\
+    \ }\n.pp-menu .sheet { max-width: 640px; margin: 0 auto; }\n.pp-menu .masthead { text-align: center; margin-bottom: 36px;\
+    \ }\n.pp-menu .masthead .mark { width: 30px; height: 30px; color: var(--pp-brass); margin-bottom: 10px; }\n.pp-menu .masthead\
+    \ h1 { font-size: 3rem; margin-bottom: 4px; }\n.pp-menu .masthead p { color: var(--pp-muted); margin: 0; }\n.pp-menu section\
+    \ { margin-bottom: 38px; }\n.pp-menu section h2 { text-align: center; font-size: 1.7rem; margin-bottom: 4px; }\n.pp-menu\
+    \ section h2::after { content: \"\"; display: block; width: 34px; height: 1px; background: var(--pp-brass); margin: 12px\
+    \ auto 0; }\n.pp-menu section .note { text-align: center; color: var(--pp-muted); font-size: .86rem; font-style: italic;\
+    \ margin-top: 8px; }\n.pp-menu .dish { margin: 20px 0; }\n.pp-menu .dish .line { display: flex; align-items: baseline;\
+    \ gap: 10px; }\n.pp-menu .dish .name { font-family: var(--pp-serif); font-size: 1.3rem; font-weight: 500; }\n.pp-menu\
+    \ .dish .dots { flex: 1; border-bottom: 1px dotted var(--pp-faint); transform: translateY(-5px); min-width: 20px; }\n\
+    .pp-menu .dish .price { font-family: var(--pp-serif); font-size: 1.2rem; white-space: nowrap; }\n.pp-menu .dish .ds {\
+    \ color: var(--pp-muted); font-size: .9rem; margin-top: 2px; }\n.pp-menu .dish .tags { font-size: .7rem; letter-spacing:\
+    \ .1em; color: var(--pp-brass); font-weight: 600; }\n.pp-menu .legend { text-align: center; color: var(--pp-faint); font-size:\
+    \ .76rem; margin-top: 10px; }\n.pp-menu .cta { text-align: center; margin-top: 26px; }\n@media (max-width: 520px) { .pp-menu\
+    \ .masthead h1 { font-size: 2.2rem; } .pp-menu .dish .name { font-size: 1.15rem; } }\n</style>\n<script>\n(function ()\
+    \ {\n  var PP = window.PP;\n  PP.define('menu', function (root, data) {\n    var esc = PP.esc, R = data.restaurant ||\
+    \ {};\n    function render() {\n      if (!data.ok) { root.innerHTML = '<div class=\"pp-menu\"><div class=\"sheet card\
+    \ pad\" style=\"text-align:center\"><h2>Menu not found</h2><p class=\"muted\">' + esc(data.error || '') + '</p></div></div>';\
+    \ return; }\n      var used = {};\n      var body = data.sections.map(function (s) {\n        return '<section><h2>' +\
+    \ esc(s.title) + '</h2>' + (s.description ? '<div class=\"note\">' + esc(s.description) + '</div>' : '') +\n         \
+    \ s.items.map(function (i) {\n            i.tags.forEach(function (t) { used[t] = 1; });\n            return '<div class=\"\
+    dish\"><div class=\"line\"><span class=\"name\">' + esc(i.name) + '</span>' + (i.tags.length ? '<span class=\"tags\">'\
+    \ + esc(i.tags.join(' · ')) + '</span>' : '') +\n              '<span class=\"dots\"></span><span class=\"price\">' +\
+    \ esc(i.price) + '</span></div>' + (i.description ? '<div class=\"ds\">' + esc(i.description) + '</div>' : '') + '</div>';\n\
+    \          }).join('') + '</section>';\n      }).join('');\n      root.innerHTML = '<div class=\"pp-menu\"><div class=\"\
+    sheet\"><div class=\"masthead\">' + PP.mark() + '<div class=\"eyebrow\">Menu</div><h1>' + esc(R.name) + '</h1>' +\n  \
+    \        (R.description ? '<p>' + esc(R.description) + '</p>' : '') + '</div>' +\n        (body || '<p class=\"muted\"\
+    \ style=\"text-align:center\">The menu is being written. Please ask your server.</p>') +\n        (Object.keys(used).length\
+    \ ? '<div class=\"legend\">' + Object.keys(used).map(function (t) { return esc(t) + ' ' + esc(data.tags[t]); }).join('\
+    \ · ') + '</div>' : '') +\n        (R.accepting ? '<div class=\"cta\"><a class=\"btn primary\" href=\"' + esc(PP.bookUrl(R.slug))\
+    \ + '\">' + PP.icon('calendar') + 'Reserve a table</a></div>' : '') +\n        '</div></div>';\n    }\n    if (data.ok)\
+    \ document.title = 'Menu · ' + R.name;\n    render();\n    return {};\n  });\n})();\n</script>\n"
 package_name: Scratch_1
 runtime_options:
   client_version: '3'
@@ -1884,6 +2323,9 @@ services:
   server_config:
     user_table: users
   source: /runtime/services/anvil/users.yml
+- client_config: {}
+  server_config: {}
+  source: /runtime/services/anvil/email.yml
 startup:
   module: Main
   type: form

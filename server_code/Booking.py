@@ -32,6 +32,7 @@ SETTINGS = {
     "max_auto_party": (8, 1, 100),       # bigger parties always need approval
 }
 OVER_CAPACITY = ("review", "walk_in")    # past the threshold: ask the manager, or stop online booking
+LANGS = ("en", "fr", "lv")              # languages of the guest pages and emails
 
 DEFAULT_PRIVACY = (
     "We use your name, email address and phone number only to manage this reservation: to confirm it, "
@@ -39,6 +40,17 @@ DEFAULT_PRIVACY = (
     "We keep them for up to 12 months after your visit and then delete them. You can ask us to see, change "
     "or delete your details at any time."
 )
+DEFAULT_PRIVACY_BY_LANG = {
+    "en": DEFAULT_PRIVACY,
+    "fr": ("Nous utilisons votre nom, votre adresse e-mail et votre numéro de téléphone uniquement pour gérer cette réservation : "
+           "la confirmer, vous contacter à son sujet et vous garder votre table. Nous ne vendons pas vos données et ne les utilisons pas "
+           "à des fins commerciales. Nous les conservons au maximum 12 mois après votre visite, puis nous les supprimons. Vous pouvez à "
+           "tout moment nous demander de consulter, modifier ou supprimer vos données."),
+    "lv": ("Jūsu vārdu, e-pasta adresi un tālruņa numuru mēs izmantojam tikai šīs rezervācijas pārvaldībai: lai to apstiprinātu, "
+           "sazinātos ar jums par to un paturētu jums galdiņu. Mēs nepārdodam jūsu datus un neizmantojam tos mārketingam. Mēs tos "
+           "glabājam ne ilgāk kā 12 mēnešus pēc jūsu apmeklējuma un pēc tam dzēšam. Jūs jebkurā laikā varat lūgt mums parādīt, "
+           "labot vai dzēst jūsu datus."),
+}
 
 
 # ---------------------------------------------------------------- small helpers
@@ -356,7 +368,7 @@ def reservation_view(res, ctx=None, staff=False):
         "id": res.get_id(), "token": res["token"], "date": iso(res["date"]), "time": hm(t),
         "end": hm(t + int(res["duration"] or 0)), "start_min": t, "duration": int(res["duration"] or 0),
         "party": int(res["party"] or 0), "name": res["name"] or "", "status": res["status"],
-        "source": res["source"] or "online", "notes": res["notes"] or "",
+        "source": res["source"] or "online", "notes": res["notes"] or "", "language": res["language"] or "en",
     }
     if staff:
         names = []
@@ -383,9 +395,25 @@ def join_view(j):
             "hours": sorted(j["hours"] or []), "days": sorted(j["days"] or [])}
 
 
-def public_restaurant(r):
+def public_restaurant(r, lang=None):
+    lang = pick_language(r, lang)
     return {"name": r["name"], "slug": r["slug"], "description": r["description"] or "", "address": r["address"] or "",
             "phone": r["phone"] or "", "email": r["email"] or "", "website": r["website"] or "",
-            "form_note": r["form_note"] or "", "privacy_text": r["privacy_text"] or DEFAULT_PRIVACY,
+            "form_note": r["form_note"] or "", "privacy_text": r["privacy_text"] or DEFAULT_PRIVACY_BY_LANG.get(lang, DEFAULT_PRIVACY),
             "max_party": setting(r, "max_party"), "accepting": r["accepting"] is not False,
-            "duration_min": setting(r, "duration_min")}
+            "duration_min": setting(r, "duration_min"), "language": language(r), "languages": languages(r)}
+
+
+def language(r):
+    return r["language"] if r["language"] in LANGS else "en"
+
+
+def languages(r):
+    """The languages guests can choose on the form, the restaurant's own first."""
+    offered = [x for x in (r["languages"] or []) if x in LANGS]
+    main = language(r)
+    return [main] + [x for x in offered if x != main]
+
+
+def pick_language(r, wanted):
+    return wanted if wanted in languages(r) else language(r)

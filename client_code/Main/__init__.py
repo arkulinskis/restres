@@ -1,7 +1,8 @@
 # Main — Custom HTML form, the Startup Form. HTML: forms/Main.html
 # Three ways in, chosen by the URL hash:
-#   #book/<slug>   the public booking form (no account; embeddable in an iframe)
-#   #r/<token>     a guest's reservation page (no account; the token is the key)
+#   #book/<slug>[/<lang>]  the public booking form (no account; embeddable in an iframe)
+#   #r/<token>             a guest's reservation page (no account; the token is the key)
+#   #menu/<slug>           the public menu (what the menu QR code opens)
 #   anything else  the manager portal (sign-in required)
 import json
 
@@ -18,6 +19,8 @@ from ..DashboardPage import DashboardPage
 from ..ReservationsPage import ReservationsPage
 from ..HoursPage import HoursPage
 from ..TablesPage import TablesPage
+from ..MenuEditPage import MenuEditPage
+from ..MenuPage import MenuPage
 from ..SettingsPage import SettingsPage
 from ..BookPage import BookPage
 from ..ManagePage import ManagePage
@@ -28,6 +31,7 @@ PAGES = {
     "reservations": ReservationsPage,
     "hours": HoursPage,
     "tables": TablesPage,
+    "menu": MenuEditPage,
     "settings": SettingsPage,
 }
 
@@ -39,6 +43,8 @@ def _route():
         return "book", h[5:].strip("/")
     if h.startswith("r/"):
         return "manage", h[2:].strip("/")
+    if h.startswith("menu/"):
+        return "menu", h[5:].strip("/")
     return "portal", None
 
 
@@ -56,7 +62,13 @@ class Main(MainTemplate):
         if kind != "portal":
             anvil.js.window.document.documentElement.classList.add("pp-public")
             self.header = False
-            self.add_component(BookPage(slug=key) if kind == "book" else ManagePage(token=key))
+            if kind == "book":
+                slug, _, lang = key.partition("/")
+                self.add_component(BookPage(slug=slug, lang=lang or None))
+            elif kind == "menu":
+                self.add_component(MenuPage(slug=key))
+            else:
+                self.add_component(ManagePage(token=key))
             return
         self.header = pp_ui.mount(self, "header", {}, self._on_header_event)
         if anvil.users.get_user():
@@ -69,7 +81,7 @@ class Main(MainTemplate):
         if page != "auth" and not anvil.users.get_user():
             page, kwargs = "auth", {}
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
-        if page in ("reservations", "hours", "tables", "settings") and not kwargs.get("restaurant_id"):
+        if page in ("reservations", "hours", "tables", "menu", "settings") and not kwargs.get("restaurant_id"):
             page, kwargs = "dashboard", {}
         self.clear()
         self.add_component(PAGES[page](**kwargs))

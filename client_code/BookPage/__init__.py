@@ -7,10 +7,10 @@ from .. import pp_ui
 
 
 class BookPage(BookPageTemplate):
-    def __init__(self, slug=None, **properties):
+    def __init__(self, slug=None, lang=None, **properties):
         super().__init__(**properties)
         self.slug = slug
-        self.data = anvil.server.call("get_booking_form", slug)
+        self.data = anvil.server.call("get_booking_form", slug, lang)
         self.add_event_handler("show", self._on_show)
 
     def _on_show(self, **event_args):
