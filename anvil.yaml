@@ -713,13 +713,24 @@ native_deps:
     \ border-bottom: 2px solid transparent; white-space: nowrap; display: inline-flex; gap: 7px; align-items: center; }\n\
     .pp .subnav .tabs button:hover { color: var(--pp-ink); }\n.pp .subnav .tabs button.on { color: var(--pp-ink); border-bottom-color:\
     \ var(--pp-ink); }\n.pp .subnav .tabs .n { background: var(--pp-warn); color: #fff; font-size: .7rem; border-radius: 99px;\
-    \ padding: 1px 7px; font-weight: 600; }\n\n/* Modal (PP.modal) */\n.pp-modal { position: fixed; inset: 0; z-index: 900;\
-    \ background: rgba(18,17,16,.45); display: flex; align-items: flex-start; justify-content: center; padding: 6vh 16px 16px;\
-    \ overflow-y: auto; }\n.pp-modal > .box { width: min(560px, 100%); padding: 26px 26px 22px; position: relative; }\n.pp-modal\
-    \ > .box.wide { width: min(760px, 100%); }\n.pp-modal .x { position: absolute; top: 12px; right: 12px; }\n.pp-modal .foot\
-    \ { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; flex-wrap: wrap; }\n\n#pp-toasts { position:\
-    \ fixed; left: 50%; transform: translateX(-50%); bottom: 20px; z-index: 1000; display: grid; gap: 8px; font: 14px/1.4\
-    \ var(--pp-sans); }\n#pp-toasts .t { background: var(--pp-ink); color: var(--pp-bg); padding: 11px 18px; border-radius:\
+    \ padding: 1px 7px; font-weight: 600; }\n\n/* Time-zone picker (PP.tzField) */\n.pp .pp-tz { position: relative; }\n.pp\
+    \ .pp-tz input.pp-tz-q { padding-right: 38px; text-overflow: ellipsis; }\n.pp .pp-tz > .ic { position: absolute; right:\
+    \ 13px; top: 13px; color: var(--pp-faint); pointer-events: none; }\n.pp .pp-tz-list { position: absolute; left: 0; right:\
+    \ 0; top: calc(100% + 4px); z-index: 60; max-height: 296px; overflow-y: auto; overscroll-behavior: contain; padding: 4px;\n\
+    \  background: var(--pp-panel); border: 1px solid var(--pp-line); border-radius: 10px; box-shadow: 0 12px 32px rgba(29,27,24,.14);\
+    \ }\n.pp .pp-tz-o { display: flex; align-items: baseline; gap: 8px; padding: 8px 10px; border-radius: 7px; cursor: pointer;\
+    \ font-size: .88rem; }\n.pp .pp-tz-o b { font-weight: 500; white-space: nowrap; }\n.pp .pp-tz-o .c { flex: 1; min-width:\
+    \ 0; color: var(--pp-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.pp .pp-tz-o .o { color:\
+    \ var(--pp-faint); font-size: .78rem; white-space: nowrap; font-variant-numeric: tabular-nums; }\n.pp .pp-tz-o.on { background:\
+    \ var(--pp-panel-2); }\n.pp .pp-tz-o.sel { box-shadow: inset 2px 0 0 var(--pp-brass); }\n.pp .pp-tz-o.sel b { color: var(--pp-brass);\
+    \ }\n.pp .pp-tz-empty { padding: 12px 10px; color: var(--pp-muted); font-size: .85rem; }\n@media (max-width: 720px) {\
+    \ .pp .pp-tz-list { max-height: min(296px, 36vh); } }\n\n/* Modal (PP.modal) */\n.pp-modal { position: fixed; inset: 0;\
+    \ z-index: 900; background: rgba(18,17,16,.45); display: flex; align-items: flex-start; justify-content: center; padding:\
+    \ 6vh 16px 16px; overflow-y: auto; }\n.pp-modal > .box { width: min(560px, 100%); padding: 26px 26px 22px; position: relative;\
+    \ }\n.pp-modal > .box.wide { width: min(760px, 100%); }\n.pp-modal .x { position: absolute; top: 12px; right: 12px; }\n\
+    .pp-modal .foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; flex-wrap: wrap; }\n\n#pp-toasts\
+    \ { position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px; z-index: 1000; display: grid; gap: 8px; font:\
+    \ 14px/1.4 var(--pp-sans); }\n#pp-toasts .t { background: var(--pp-ink); color: var(--pp-bg); padding: 11px 18px; border-radius:\
     \ 99px; box-shadow: var(--pp-shadow); max-width: 90vw; text-align: center; }\n#pp-toasts .t.err { background: var(--pp-bad);\
     \ color: #fff; border-radius: 12px; }\n\n@media (max-width: 720px) {\n  .pp h1 { font-size: 2rem; } .pp .pad { padding:\
     \ 18px; } .pp .wrap { padding: 22px 16px 80px; }\n  .pp .grid2, .pp .grid3 { grid-template-columns: 1fr; }\n  .pp-modal\
@@ -752,55 +763,55 @@ native_deps:
     \ s) + '</span>'; };\n\n  var P = 'fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"\
     \ stroke-linejoin=\"round\"';\n  var ICONS = {\n    plus: '<path d=\"M12 5v14M5 12h14\"/>', left: '<path d=\"m15 18-6-6\
     \ 6-6\"/>', right: '<path d=\"m9 18 6-6-6-6\"/>',\n    x: '<path d=\"M18 6 6 18M6 6l12 12\"/>', check: '<path d=\"M20\
-    \ 6 9 17l-5-5\"/>',\n    bell: '<path d=\"M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9\"/><path d=\"M10.3 21a1.94 1.94 0\
-    \ 0 0 3.4 0\"/>',\n    calendar: '<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4M8 2v4M3\
-    \ 10h18\"/>',\n    clock: '<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>',\n    users: '<path d=\"M16\
-    \ 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87M16\
-    \ 3.13a4 4 0 0 1 0 7.75\"/>',\n    table: '<rect x=\"3\" y=\"8\" width=\"18\" height=\"6\" rx=\"1\"/><path d=\"M6 14v6M18\
-    \ 14v6\"/>',\n    cog: '<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0\
-    \ 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65\
-    \ 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65\
-    \ 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0\
-    \ 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65\
-    \ 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z\"/>',\n    copy: '<rect x=\"\
-    9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/>',\n\
-    \    ext: '<path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3\"/>',\n    list: '<path\
-    \ d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/>',\n    timeline: '<path d=\"M3 6h10M7 12h12M3 18h8\"/>',\n\
-    \    link: '<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3\
-    \ 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>',\n    phone: '<path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07\
-    \ 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45\
-    \ 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z\"/>',\n    pin:\
-    \ '<path d=\"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>',\n    edit: '<path\
-    \ d=\"M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z\"/>',\n    trash: '<path d=\"M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2\
-    \ 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/>',\n    join: '<path d=\"M8 12h8M3 7h5v10H3zM16 7h5v10h-5z\"\
-    />', split: '<path d=\"M3 7h6v10H3zM15 7h6v10h-6zM12 4v16\"/>',\n    sun: '<circle cx=\"12\" cy=\"12\" r=\"4\"/><path\
-    \ d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4\"/>',\n    moon:\
-    \ '<path d=\"M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z\"/>',\n    grid: '<rect x=\"3\" y=\"3\" width=\"7\" height=\"\
-    7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/><rect x=\"14\"\
-    \ y=\"14\" width=\"7\" height=\"7\"/>',\n    download: '<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12\
-    \ 15V3\"/>'\n  };\n  PP.icon = function (name, cls) { return '<svg class=\"ic ' + (cls || '') + '\" viewBox=\"0 0 24 24\"\
-    \ ' + P + ' aria-hidden=\"true\">' + (ICONS[name] || '') + '</svg>'; };\n  // The PlanPlate mark: a plate seen from above.\n\
-    \  PP.mark = function (cls) {\n    return '<svg class=\"' + (cls || 'mark') + '\" viewBox=\"0 0 32 32\" aria-hidden=\"\
-    true\" fill=\"none\" stroke=\"currentColor\"><circle cx=\"16\" cy=\"16\" r=\"14\" stroke-width=\"1.4\"/><circle cx=\"\
-    16\" cy=\"16\" r=\"9\" stroke-width=\"1\"/><path d=\"M16 10.5v11\" stroke-width=\"1.4\" stroke-linecap=\"round\"/></svg>';\n\
-    \  };\n\n  PP.toast = function (msg, isErr) {\n    var box = document.getElementById('pp-toasts');\n    if (!box) { box\
-    \ = document.createElement('div'); box.id = 'pp-toasts'; document.body.appendChild(box); }\n    var t = document.createElement('div');\n\
-    \    t.className = 't' + (isErr ? ' err' : '');\n    t.setAttribute('role', 'status');\n    t.textContent = msg;\n   \
-    \ box.appendChild(t);\n    setTimeout(function () { t.remove(); }, isErr ? 7000 : 3200);\n  };\n  PP.copy = function (text,\
-    \ label) {\n    function done() { PP.toast((label || 'Copied') + ' to the clipboard'); }\n    if (navigator.clipboard\
-    \ && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);\n    else fallback();\n\
-    \    function fallback() {\n      var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);\
-    \ ta.select();\n      try { document.execCommand('copy'); done(); } catch (e) { PP.toast('Copy failed: select the text\
-    \ and copy it', true); }\n      ta.remove();\n    }\n  };\n  PP.err = function (e) { return (e && (e.message || e.toString()))\
-    \ || 'Something went wrong.'; };\n\n  // A modal dialog. html goes inside the box; returns {el, close}. Escape and clicking\
-    \ outside close it.\n  PP.modal = function (html, opts) {\n    opts = opts || {};\n    var prev = document.activeElement;\n\
-    \    var m = document.createElement('div');\n    m.className = 'pp pp-modal';\n    m.innerHTML = '<div class=\"box card\
-    \ fade-in' + (opts.wide ? ' wide' : '') + '\" role=\"dialog\" aria-modal=\"true\">' +\n      '<button class=\"btn ghost\
-    \ icon x\" data-close aria-label=\"Close\">' + PP.icon('x') + '</button>' + html + '</div>';\n    function close() { m.remove();\
-    \ document.removeEventListener('keydown', key); if (opts.onclose) opts.onclose(); if (prev && prev.focus) prev.focus();\
-    \ }\n    function key(e) { if (e.key === 'Escape') close(); }\n    m.addEventListener('mousedown', function (e) { if (e.target\
-    \ === m) close(); });\n    m.addEventListener('click', function (e) { if (e.target.closest('[data-close]')) close(); });\n\
-    \    document.addEventListener('keydown', key);\n    document.body.appendChild(m);\n    var f = m.querySelector('[autofocus],\
+    \ 6 9 17l-5-5\"/>', down: '<path d=\"m6 9 6 6 6-6\"/>',\n    bell: '<path d=\"M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9\"\
+    /><path d=\"M10.3 21a1.94 1.94 0 0 0 3.4 0\"/>',\n    calendar: '<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"\
+    2\"/><path d=\"M16 2v4M8 2v4M3 10h18\"/>',\n    clock: '<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>',\n\
+    \    users: '<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4\
+    \ 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/>',\n    table: '<rect x=\"3\" y=\"8\" width=\"18\" height=\"6\" rx=\"1\"\
+    /><path d=\"M6 14v6M18 14v6\"/>',\n    cog: '<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.65 1.65 0 0 0 .33\
+    \ 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65\
+    \ 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0\
+    \ 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65\
+    \ 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2\
+    \ 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z\"\
+    />',\n    copy: '<rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0\
+    \ 1 2-2h9a2 2 0 0 1 2 2v1\"/>',\n    ext: '<path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10\
+    \ 14 21 3\"/>',\n    list: '<path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/>',\n    timeline: '<path d=\"\
+    M3 6h10M7 12h12M3 18h8\"/>',\n    link: '<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path\
+    \ d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>',\n    phone: '<path d=\"M22 16.92v3a2 2 0 0 1-2.18\
+    \ 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36\
+    \ 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1\
+    \ 22 16.92z\"/>',\n    pin: '<path d=\"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z\"/><circle cx=\"12\" cy=\"10\" r=\"\
+    3\"/>',\n    edit: '<path d=\"M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z\"/>',\n    trash: '<path d=\"M3 6h18M8\
+    \ 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/>',\n    join: '<path d=\"M8 12h8M3 7h5v10H3zM16\
+    \ 7h5v10h-5z\"/>', split: '<path d=\"M3 7h6v10H3zM15 7h6v10h-6zM12 4v16\"/>',\n    sun: '<circle cx=\"12\" cy=\"12\" r=\"\
+    4\"/><path d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4\"/>',\n\
+    \    moon: '<path d=\"M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z\"/>',\n    grid: '<rect x=\"3\" y=\"3\" width=\"7\"\
+    \ height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/><rect\
+    \ x=\"14\" y=\"14\" width=\"7\" height=\"7\"/>',\n    download: '<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7\
+    \ 10l5 5 5-5M12 15V3\"/>'\n  };\n  PP.icon = function (name, cls) { return '<svg class=\"ic ' + (cls || '') + '\" viewBox=\"\
+    0 0 24 24\" ' + P + ' aria-hidden=\"true\">' + (ICONS[name] || '') + '</svg>'; };\n  // The PlanPlate mark: a plate seen\
+    \ from above.\n  PP.mark = function (cls) {\n    return '<svg class=\"' + (cls || 'mark') + '\" viewBox=\"0 0 32 32\"\
+    \ aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\"><circle cx=\"16\" cy=\"16\" r=\"14\" stroke-width=\"1.4\"\
+    /><circle cx=\"16\" cy=\"16\" r=\"9\" stroke-width=\"1\"/><path d=\"M16 10.5v11\" stroke-width=\"1.4\" stroke-linecap=\"\
+    round\"/></svg>';\n  };\n\n  PP.toast = function (msg, isErr) {\n    var box = document.getElementById('pp-toasts');\n\
+    \    if (!box) { box = document.createElement('div'); box.id = 'pp-toasts'; document.body.appendChild(box); }\n    var\
+    \ t = document.createElement('div');\n    t.className = 't' + (isErr ? ' err' : '');\n    t.setAttribute('role', 'status');\n\
+    \    t.textContent = msg;\n    box.appendChild(t);\n    setTimeout(function () { t.remove(); }, isErr ? 7000 : 3200);\n\
+    \  };\n  PP.copy = function (text, label) {\n    function done() { PP.toast((label || 'Copied') + ' to the clipboard');\
+    \ }\n    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);\n\
+    \    else fallback();\n    function fallback() {\n      var ta = document.createElement('textarea'); ta.value = text;\
+    \ document.body.appendChild(ta); ta.select();\n      try { document.execCommand('copy'); done(); } catch (e) { PP.toast('Copy\
+    \ failed: select the text and copy it', true); }\n      ta.remove();\n    }\n  };\n  PP.err = function (e) { return (e\
+    \ && (e.message || e.toString())) || 'Something went wrong.'; };\n\n  // A modal dialog. html goes inside the box; returns\
+    \ {el, close}. Escape and clicking outside close it.\n  PP.modal = function (html, opts) {\n    opts = opts || {};\n \
+    \   var prev = document.activeElement;\n    var m = document.createElement('div');\n    m.className = 'pp pp-modal';\n\
+    \    m.innerHTML = '<div class=\"box card fade-in' + (opts.wide ? ' wide' : '') + '\" role=\"dialog\" aria-modal=\"true\"\
+    >' +\n      '<button class=\"btn ghost icon x\" data-close aria-label=\"Close\">' + PP.icon('x') + '</button>' + html\
+    \ + '</div>';\n    function close() { m.remove(); document.removeEventListener('keydown', key); if (opts.onclose) opts.onclose();\
+    \ if (prev && prev.focus) prev.focus(); }\n    function key(e) { if (e.key === 'Escape') close(); }\n    m.addEventListener('mousedown',\
+    \ function (e) { if (e.target === m) close(); });\n    m.addEventListener('click', function (e) { if (e.target.closest('[data-close]'))\
+    \ close(); });\n    document.addEventListener('keydown', key);\n    document.body.appendChild(m);\n    var f = m.querySelector('[autofocus],\
     \ input, select, textarea, .btn.primary');\n    if (f) f.focus();\n    return { el: m, close: close };\n  };\n  PP.confirm\
     \ = function (title, text, okLabel, danger, keepLabel) {\n    return new Promise(function (resolve) {\n      var answered\
     \ = false;\n      var d = PP.modal('<h3>' + PP.esc(title) + '</h3><p class=\"muted\">' + PP.esc(text) + '</p>' +\n   \
@@ -852,208 +863,312 @@ native_deps:
     \   else document.documentElement.removeAttribute('data-theme');\n  };\n  PP.theme = function () { try { return localStorage.getItem('pp.theme')\
     \ || 'auto'; } catch (e) { return 'auto'; } };\n  PP.setTheme = function (t) { try { localStorage.setItem('pp.theme',\
     \ t); } catch (e) {} PP.applyTheme(t); };\n  try { PP.applyTheme(localStorage.getItem('pp.theme')); } catch (e) {}\n\n\
-    \  PP.wrapEmit = function (emit) {\n    return function (name, payload) {\n      try { return Promise.resolve(emit ? emit(name,\
-    \ JSON.stringify(payload == null ? {} : payload)) : null); }\n      catch (e) { console.error(e); return Promise.reject(e);\
-    \ }\n    };\n  };\n  PP.define = function (name, mountFn) { PP.components[name] = mountFn; };\n  PP.mount = function (name,\
-    \ root, json, emit) {\n    var fn = PP.components[name];\n    if (!fn) { console.error('PP component not loaded: ' + name);\
-    \ return null; }\n    if (!root) { console.error('PP mount: no root node for ' + name); return null; }\n    var data =\
-    \ typeof json === 'string' ? JSON.parse(json || '{}') : (json || {});\n    return fn(root, data, PP.wrapEmit(emit));\n\
-    \  };\n})();\n</script>\n\n<!-- ===== Main component ===== -->\n<style>\n.pp-header { position: sticky; top: 0; z-index:\
-    \ 50; background: color-mix(in srgb, var(--pp-bg) 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter:\
-    \ blur(12px); border-bottom: 1px solid var(--pp-line); }\n.pp-header .in { max-width: 1120px; margin: 0 auto; padding:\
-    \ 12px 20px; display: flex; align-items: center; gap: 18px; }\n.pp-header .brand { all: unset; cursor: pointer; display:\
-    \ flex; align-items: center; gap: 10px; color: var(--pp-ink); }\n.pp-header .brand .mark { width: 28px; height: 28px;\
-    \ color: var(--pp-brass); }\n.pp-header .brand .name { font-family: var(--pp-serif); font-size: 1.45rem; font-weight:\
-    \ 600; letter-spacing: .01em; line-height: 1; }\n.pp-header nav { display: flex; gap: 2px; }\n.pp-header nav button {\
-    \ all: unset; cursor: pointer; color: var(--pp-muted); padding: 7px 12px; border-radius: 99px; font-size: .9rem; }\n.pp-header\
-    \ nav button.on, .pp-header nav button:hover { color: var(--pp-ink); background: var(--pp-panel-2); }\n.pp-header .right\
-    \ { margin-left: auto; display: flex; align-items: center; gap: 6px; position: relative; }\n.pp-header .bell { position:\
-    \ relative; }\n.pp-header .bell .n { position: absolute; top: 1px; right: 0; min-width: 17px; height: 17px; padding: 0\
-    \ 4px; border-radius: 99px; background: var(--pp-warn); color: #fff; font: 600 .66rem/17px var(--pp-sans); text-align:\
-    \ center; }\n.pp-header .me { all: unset; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; display: grid;\
-    \ place-items: center; background: var(--pp-ink); color: var(--pp-bg); font: 600 .8rem var(--pp-sans); }\n.pp-header .me:focus-visible\
-    \ { outline: 2px solid var(--pp-brass); outline-offset: 2px; }\n.pp-header .menu { position: absolute; right: 0; top:\
-    \ calc(100% + 10px); width: 300px; padding: 8px; z-index: 60; }\n.pp-header .menu.alerts { width: 360px; }\n.pp-header\
-    \ .menu .who { padding: 8px 10px 12px; border-bottom: 1px solid var(--pp-line); margin-bottom: 6px; }\n.pp-header .menu\
-    \ .item { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 9px 10px; border-radius:\
-    \ 8px; font-size: .9rem; }\n.pp-header .menu .item:hover { background: var(--pp-panel-2); }\n.pp-header .menu .item .sub\
-    \ { display: block; color: var(--pp-muted); font-size: .8rem; }\n.pp-header .menu .head { padding: 8px 10px; font-weight:\
-    \ 600; font-size: .9rem; }\n.pp-header .menu .none { padding: 8px 10px 12px; color: var(--pp-muted); font-size: .88rem;\
-    \ }\n.pp-header .menu .themes { padding: 6px 10px 10px; }\n.pp-page { min-height: calc(100vh - 140px); }\n.pp-public .pp-page\
-    \ { min-height: 0; }\n.pp-footer { max-width: 1120px; margin: 0 auto; padding: 22px 20px 34px; color: var(--pp-faint);\
-    \ font-size: .78rem; text-align: center; letter-spacing: .04em; }\n@media (max-width: 560px) {\n  .pp-header .in { gap:\
-    \ 8px; padding: 10px 14px; } .pp-header nav { display: none; }\n  .pp-header .menu, .pp-header .menu.alerts { position:\
-    \ fixed; left: 12px; right: 12px; top: 60px; width: auto; }\n}\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n\
-    \  PP.define('header', function (root, data, emit) {\n    var esc = PP.esc;\n    var S = { user: null, active: 'dashboard',\
-    \ open: null, alerts: { pending: 0, items: [] } };\n\n    function initials(u) {\n      var n = String(u.display_name\
-    \ || u.email || '?').trim().split(/\\s+/);\n      return ((n[0] || '?')[0] + (n.length > 1 ? n[n.length - 1][0] : '')).toUpperCase();\n\
-    \    }\n    function alertsMenu() {\n      var a = S.alerts;\n      return '<div class=\"menu alerts card fade-in\" role=\"\
-    menu\"><div class=\"head\">Awaiting your approval</div>' +\n        (a.items.length ? a.items.map(function (i) {\n   \
-    \       return '<button class=\"item\" data-action=\"alert\" data-r=\"' + esc(i.restaurant_id) + '\" data-date=\"' + esc(i.date)\
-    \ + '\">' +\n            '<strong>' + esc(i.name) + '</strong> · ' + PP.plural(i.party, 'guest') +\n            '<span\
-    \ class=\"sub\">' + esc(i.restaurant) + ' · ' + esc(PP.fmtShort(i.date)) + ' at ' + esc(i.time) + '</span></button>';\n\
-    \        }).join('') + (a.pending > a.items.length ? '<div class=\"none\">and ' + (a.pending - a.items.length) + ' more</div>'\
-    \ : '')\n          : '<div class=\"none\">Nothing to approve. New requests show up here when a booking needs a decision.</div>')\
-    \ + '</div>';\n    }\n    function userMenu() {\n      var u = S.user, t = PP.theme();\n      return '<div class=\"menu\
-    \ card fade-in\" role=\"menu\"><div class=\"who\"><strong>' + esc(u.display_name) + '</strong><div class=\"muted small\"\
-    >' + esc(u.email) + '</div></div>' +\n        '<div class=\"themes\"><div class=\"small muted\" style=\"margin-bottom:6px\"\
-    >Appearance</div><div class=\"seg\">' +\n          ['auto', 'light', 'dark'].map(function (k) { return '<button data-action=\"\
-    theme\" data-t=\"' + k + '\" class=\"' + (t === k ? 'on' : '') + '\">' + k[0].toUpperCase() + k.slice(1) + '</button>';\
-    \ }).join('') + '</div></div>' +\n        '<button class=\"item\" data-action=\"nav\" data-page=\"dashboard\">Your restaurants</button>'\
-    \ +\n        '<button class=\"item\" data-action=\"signout\">Sign out</button></div>';\n    }\n    function render() {\n\
-    \      var u = S.user;\n      document.documentElement.classList.toggle('pp-signed-out', !u);\n      document.title =\
-    \ (S.alerts.pending ? '(' + S.alerts.pending + ') ' : '') + 'PlanPlate';\n      if (!u) { root.innerHTML = ''; return;\
-    \ }\n      root.innerHTML = '<header class=\"pp-header\"><div class=\"in\">' +\n        '<button class=\"brand\" data-action=\"\
-    nav\" data-page=\"dashboard\" aria-label=\"PlanPlate home\">' + PP.mark() + '<span class=\"name\">PlanPlate</span></button>'\
-    \ +\n        '<nav><button data-action=\"nav\" data-page=\"dashboard\" class=\"' + (S.active === 'dashboard' ? 'on' :\
-    \ '') + '\">Restaurants</button></nav>' +\n        '<div class=\"right\">' +\n          '<button class=\"btn ghost icon\
-    \ bell\" data-action=\"alerts\" aria-label=\"Approvals (' + S.alerts.pending + ')\" aria-expanded=\"' + (S.open === 'alerts')\
-    \ + '\">' + PP.icon('bell') +\n            (S.alerts.pending ? '<span class=\"n\">' + S.alerts.pending + '</span>' : '')\
-    \ + '</button>' +\n          '<button class=\"me\" data-action=\"menu\" aria-label=\"Account menu\" aria-expanded=\"'\
-    \ + (S.open === 'menu') + '\">' + esc(initials(u)) + '</button>' +\n          (S.open === 'alerts' ? alertsMenu() : S.open\
-    \ === 'menu' ? userMenu() : '') +\n        '</div></div></header>';\n    }\n\n    root.addEventListener('click', function\
-    \ (e) {\n      e.ppHeader = true;\n      var el = e.target.closest('[data-action]');\n      if (!el) return;\n      var\
-    \ a = el.dataset.action;\n      if (a === 'alerts' || a === 'menu') { S.open = S.open === a ? null : a; render(); return;\
-    \ }\n      if (a === 'theme') { PP.setTheme(el.dataset.t); render(); return; }\n      S.open = null;\n      if (a ===\
-    \ 'nav') { S.active = el.dataset.page; render(); emit('nav', { page: el.dataset.page }); }\n      else if (a === 'alert')\
-    \ { render(); emit('open_alert', { restaurant_id: el.dataset.r, date: el.dataset.date }); }\n      else if (a === 'signout')\
-    \ { render(); emit('signout', {}); }\n    });\n    document.addEventListener('click', function (e) { if (!e.ppHeader &&\
-    \ S.open) { S.open = null; render(); } });\n    document.addEventListener('keydown', function (e) { if (e.key === 'Escape'\
-    \ && S.open) { S.open = null; render(); } });\n\n    // New requests arrive while the portal is open: check every minute.\n\
-    \    setInterval(function () {\n      if (!S.user || document.hidden) return;\n      emit('poll', {}).then(function (a)\
-    \ { if (a && typeof a.pending === 'number') { S.alerts = a; if (!S.open) render(); } }, function () {});\n    }, 60000);\n\
-    \n    render();\n    return {\n      setUser: function (json) { var me = json ? JSON.parse(json) : null; S.user = me;\
-    \ if (me && me.alerts) S.alerts = me.alerts; render(); },\n      setActive: function (page) { S.active = page; S.open\
-    \ = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json); render(); }\n    };\n  });\n})();\n\
-    </script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n.pp-auth { min-height: calc(100vh - 80px); display: grid;\
-    \ grid-template-columns: 1.1fr 1fr; }\n.pp-auth .side { background: #1d1b18; color: #efe9df; padding: 56px 56px 44px;\
-    \ display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }\n.pp-auth\
-    \ .side .brand { display: flex; align-items: center; gap: 12px; font-family: var(--pp-serif); font-size: 1.7rem; font-weight:\
-    \ 600; }\n.pp-auth .side .brand .mark { width: 34px; height: 34px; color: #c9a56a; }\n.pp-auth .side h1 { color: inherit;\
-    \ font-size: 3.6rem; max-width: 11ch; line-height: 1.02; margin: 0 0 18px; font-weight: 500; }\n.pp-auth .side h1 em {\
-    \ color: #c9a56a; font-style: italic; }\n.pp-auth .side p { color: #b9b1a4; max-width: 38ch; font-size: 1.02rem; }\n.pp-auth\
-    \ .side ul { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 12px; color: #d8d1c4; font-size: .95rem;\
-    \ }\n.pp-auth .side li { display: flex; gap: 12px; align-items: baseline; }\n.pp-auth .side li::before { content: \"\"\
-    ; flex: none; width: 18px; height: 1px; background: #c9a56a; transform: translateY(-4px); }\n.pp-auth .side .ring { position:\
-    \ absolute; right: -160px; bottom: -160px; width: 480px; height: 480px; color: rgba(201,165,106,.12); }\n.pp-auth .side\
-    \ .tag { font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: #8e8678; }\n.pp-auth .main { display:\
-    \ grid; place-items: center; padding: 40px 20px; }\n.pp-auth .box { width: min(380px, 100%); }\n.pp-auth .tabs { display:\
-    \ flex; gap: 22px; border-bottom: 1px solid var(--pp-line); margin-bottom: 26px; }\n.pp-auth .tabs button { all: unset;\
-    \ cursor: pointer; padding: 10px 0; font-size: .92rem; color: var(--pp-muted); border-bottom: 2px solid transparent; margin-bottom:\
-    \ -1px; }\n.pp-auth .tabs button.on { color: var(--pp-ink); border-bottom-color: var(--pp-ink); }\n.pp-auth form > div\
-    \ + div { margin-top: 16px; }\n.pp-auth .link { all: unset; cursor: pointer; color: var(--pp-muted); font-size: .84rem;\
-    \ text-decoration: underline; text-decoration-color: var(--pp-line); text-underline-offset: 3px; }\n.pp-auth .link:hover\
-    \ { color: var(--pp-ink); }\n@media (max-width: 860px) {\n  .pp-auth { grid-template-columns: 1fr; min-height: 0; }\n\
-    \  .pp-auth .side { padding: 30px 22px; } .pp-auth .side h1 { font-size: 2.3rem; margin-top: 26px; } .pp-auth .side ul,\
-    \ .pp-auth .side .ring, .pp-auth .side .tag { display: none; }\n}\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n\
-    \  PP.define('auth', function (root, data, emit) {\n    var esc = PP.esc;\n    var S = { mode: 'login', busy: false, msg:\
-    \ null, email: '' };\n\n    function form() {\n      if (S.mode === 'reset') {\n        return '<h2>Reset your password</h2><p\
-    \ class=\"muted small\">We\\'ll email you a link to choose a new one.</p>' +\n          '<form data-form=\"reset\"><div><label\
-    \ class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"email\"\
-    \ value=\"' + esc(S.email) + '\"></div>' +\n          '<div><button class=\"btn primary block\" type=\"submit\">Send reset\
-    \ link</button></div></form>' +\n          '<p style=\"margin-top:16px\"><button class=\"link\" data-action=\"mode\" data-mode=\"\
-    login\">Back to sign in</button></p>';\n      }\n      var signup = S.mode === 'signup';\n      return '<div class=\"\
-    tabs\" role=\"tablist\">' +\n          '<button role=\"tab\" data-action=\"mode\" data-mode=\"login\" class=\"' + (!signup\
-    \ ? 'on' : '') + '\">Sign in</button>' +\n          '<button role=\"tab\" data-action=\"mode\" data-mode=\"signup\" class=\"\
-    ' + (signup ? 'on' : '') + '\">Create account</button></div>' +\n        '<h2>' + (signup ? 'Open your account' : 'Welcome\
-    \ back') + '</h2>' +\n        '<p class=\"muted small\">' + (signup ? 'Set up your restaurants, hours and tables in a\
-    \ few minutes.' : 'Sign in to manage your restaurants and reservations.') + '</p>' +\n        '<form data-form=\"' + S.mode\
-    \ + '\">' +\n          (signup ? '<div><label class=\"f\" for=\"ppN\">Your name</label><input type=\"text\" id=\"ppN\"\
-    \ name=\"name\" required autocomplete=\"name\"></div>' : '') +\n          '<div><label class=\"f\" for=\"ppE\">Email</label><input\
-    \ type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"email\" value=\"' + esc(S.email) + '\"></div>' +\n\
-    \          '<div><label class=\"f\" for=\"ppP\">Password</label><input type=\"password\" id=\"ppP\" name=\"password\"\
-    \ required minlength=\"' + (signup ? 8 : 1) + '\" autocomplete=\"' + (signup ? 'new-password' : 'current-password') +\
-    \ '\">' +\n            (signup ? '<div class=\"hint\">At least 8 characters.</div>' : '<div class=\"hint\" style=\"text-align:right\"\
-    ><button type=\"button\" class=\"link\" data-action=\"mode\" data-mode=\"reset\">Forgot your password?</button></div>')\
-    \ + '</div>' +\n          '<div><button class=\"btn primary block\" type=\"submit\">' + (signup ? 'Create account' : 'Sign\
-    \ in') + '</button></div>' +\n        '</form>';\n    }\n\n    function render() {\n      root.innerHTML = '<div class=\"\
-    pp-auth\">' +\n        '<div class=\"side\">' + PP.mark('ring') +\n          '<div class=\"brand\">' + PP.mark() + 'PlanPlate</div>'\
-    \ +\n          '<div><h1>Reservations, <em>made simple.</em></h1>' +\n          '<p>One calm place to run bookings for\
-    \ every restaurant you manage: opening hours, tables, approvals and a booking form for your website.</p>' +\n        \
-    \  '<ul><li>Seasonal hours and special days that override them</li><li>Join and split tables hour by hour</li><li>Bookings\
-    \ confirm themselves until you are 80% full</li><li>Guests manage their own reservation from one private link</li></ul></div>'\
-    \ +\n          '<div class=\"tag\">Simple · Smart · Reliable</div></div>' +\n        '<div class=\"main\"><div class=\"\
-    box fade-in\">' + form() + '<div data-el=\"msg\"></div></div></div></div>';\n      var f = root.querySelector('form');\n\
-    \      if (f) f.onsubmit = submit;\n      showMsg();\n    }\n    function showMsg() {\n      var box = root.querySelector('[data-el=msg]');\n\
-    \      if (box) box.innerHTML = S.msg ? '<div class=\"feedback ' + (S.msg.ok ? 'good' : 'bad') + '\">' + esc(S.msg.text)\
-    \ + '</div>' : '';\n    }\n    function setBusy(on) {\n      S.busy = on;\n      root.querySelectorAll('.box button[type=submit]').forEach(function\
-    \ (b) {\n        b.disabled = on;\n        if (on) { b.dataset.label = b.innerHTML; b.innerHTML = '<span class=\"spin\"\
-    ></span>'; }\n        else if (b.dataset.label) b.innerHTML = b.dataset.label;\n      });\n    }\n    function submit(e)\
-    \ {\n      e.preventDefault();\n      if (S.busy) return;\n      var v = {};\n      new FormData(e.target).forEach(function\
-    \ (val, key) { v[key] = String(val); });\n      S.email = v.email || '';\n      S.msg = null; showMsg(); setBusy(true);\n\
-    \      emit(e.target.dataset.form, v).then(function (res) {\n        setBusy(false);\n        res = res || {};\n     \
-    \   if (res.ok && !res.message) return; // Python navigates away\n        S.msg = res.ok ? { ok: true, text: res.message\
-    \ } : { ok: false, text: res.error || 'Something went wrong.' };\n        if (res.mode && res.mode !== S.mode) { S.mode\
-    \ = res.mode; render(); } else showMsg();\n      }, function (err) { setBusy(false); S.msg = { ok: false, text: PP.err(err)\
-    \ }; showMsg(); });\n    }\n    root.addEventListener('click', function (e) {\n      var el = e.target.closest('[data-action=mode]');\n\
-    \      if (!el) return;\n      var em = root.querySelector('input[name=email]');\n      if (em) S.email = em.value;\n\
-    \      S.mode = el.dataset.mode; S.msg = null; render();\n      var first = root.querySelector('form input:not([value]),\
-    \ form input[value=\"\"]');\n      if (first) first.focus();\n    });\n    render();\n    return {};\n  });\n})();\n</script>\n\
-    \n<!-- ===== DashboardPage component ===== -->\n<style>\n.pp-dash .hello { display: flex; align-items: flex-end; gap:\
-    \ 16px; flex-wrap: wrap; margin-bottom: 30px; }\n.pp-dash .hello h1 { margin: 0; }\n.pp-dash .alert { display: flex; gap:\
-    \ 16px; align-items: center; padding: 16px 20px; margin-bottom: 30px; background: var(--pp-warn-soft); border: 1px solid\
-    \ color-mix(in srgb, var(--pp-warn) 25%, transparent); border-radius: var(--pp-radius); color: var(--pp-ink); flex-wrap:\
-    \ wrap; }\n.pp-dash .alert .ic { width: 22px; height: 22px; color: var(--pp-warn); }\n.pp-dash .alert strong { font-weight:\
-    \ 600; }\n.pp-dash .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }\n\
-    .pp-dash .rc { display: flex; flex-direction: column; padding: 22px 22px 16px; min-height: 230px; transition: border-color\
-    \ .15s, transform .15s; }\n.pp-dash .rc:hover { border-color: var(--pp-faint); }\n.pp-dash .rc h3 { font-size: 1.55rem;\
-    \ margin-bottom: 2px; overflow-wrap: anywhere; }\n.pp-dash .rc .addr { color: var(--pp-muted); font-size: .84rem; min-height:\
-    \ 1.3em; }\n.pp-dash .rc .today { margin: 14px 0 16px; font-size: .86rem; color: var(--pp-ink); display: flex; gap: 7px;\
-    \ align-items: center; }\n.pp-dash .rc .today .ic { color: var(--pp-brass); }\n.pp-dash .rc .nums { display: grid; grid-template-columns:\
-    \ repeat(3, 1fr); gap: 8px; padding: 14px 0; border-top: 1px solid var(--pp-line); border-bottom: 1px solid var(--pp-line);\
-    \ }\n.pp-dash .rc .nums b { display: block; font: 500 1.6rem/1 var(--pp-serif); }\n.pp-dash .rc .nums span { font-size:\
-    \ .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-dash .rc .acts { display: flex;\
-    \ gap: 4px; align-items: center; margin-top: auto; padding-top: 12px; }\n.pp-dash .rc .top { display: flex; gap: 10px;\
-    \ align-items: flex-start; }\n.pp-dash .rc .top > div { flex: 1; min-width: 0; }\n.pp-dash .new { display: grid; place-items:\
-    \ center; text-align: center; border-style: dashed; color: var(--pp-muted); min-height: 230px; }\n.pp-dash .new:hover\
-    \ { color: var(--pp-ink); border-color: var(--pp-ink); }\n.pp-dash .new .plus { width: 44px; height: 44px; border-radius:\
-    \ 50%; border: 1px solid currentColor; display: grid; place-items: center; margin: 0 auto 10px; }\n</style>\n<script>\n\
-    (function () {\n  var PP = window.PP;\n  PP.define('dashboard', function (root, data, emit) {\n    var esc = PP.esc;\n\
-    \    var list = data.restaurants || [], me = data.me || {};\n\n    function greeting() {\n      var h = new Date().getHours();\n\
-    \      return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';\n    }\n    function card(r) {\n \
-    \     return '<div class=\"card rc fade-in\" data-id=\"' + esc(r.id) + '\">' +\n        '<div class=\"top\"><div><h3>'\
-    \ + esc(r.name) + '</h3><div class=\"addr\">' + esc(r.address || '/' + r.slug) + '</div></div>' +\n          (r.pending\
-    \ ? '<span class=\"badge pending\">' + r.pending + ' to approve</span>' : !r.accepting ? '<span class=\"badge cancelled\"\
-    >Online booking off</span>' : '') +\n          (r.role && r.role !== 'owner' ? '<span class=\"badge plain\">' + esc(PP.ROLE[r.role])\
-    \ + '</span>' : '') + '</div>' +\n        '<div class=\"today\">' + PP.icon('clock') + esc(r.today) + '</div>' +\n   \
-    \     '<div class=\"nums\"><div><b>' + r.bookings + '</b><span>Bookings</span></div><div><b>' + r.covers + '</b><span>Guests</span></div><div><b>'\
-    \ + r.seats + '</b><span>Seats</span></div></div>' +\n        '<div class=\"acts\"><button class=\"btn primary sm\" data-action=\"\
-    open\" data-page=\"reservations\">Open</button>' +\n          (r.role !== 'staff' ? '<button class=\"btn ghost sm\" data-action=\"\
-    open\" data-page=\"hours\">Hours</button>' +\n          '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"\
-    tables\">Tables</button>' : '') + '<span class=\"spacer\"></span>' +\n          '<button class=\"btn ghost icon\" data-action=\"\
-    copy\" title=\"Copy booking link\" aria-label=\"Copy booking link\">' + PP.icon('link') + '</button>' +\n          (r.role\
-    \ !== 'staff' ? '<button class=\"btn ghost icon\" data-action=\"duplicate\" title=\"Duplicate\" aria-label=\"Duplicate\
-    \ restaurant\">' + PP.icon('copy') + '</button>' : '') + '</div></div>';\n    }\n    function render() {\n      var pending\
-    \ = list.reduce(function (n, r) { return n + r.pending; }, 0);\n      var firstName = String(me.display_name || '').split('\
-    \ ')[0];\n      root.innerHTML = '<div class=\"wrap pp-dash\">' +\n        '<div class=\"hello\"><div><div class=\"eyebrow\"\
-    >' + esc(new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })) + '</div>' +\n\
-    \          '<h1>' + greeting() + (firstName ? ', ' + esc(firstName) : '') + '</h1></div><span class=\"spacer\"></span>'\
-    \ +\n          (list.length ? '<button class=\"btn primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button>'\
-    \ : '') + '</div>' +\n        (pending ? '<div class=\"alert\">' + PP.icon('bell') + '<div><strong>' + PP.plural(pending,\
-    \ 'booking') + ' waiting for your approval.</strong> ' +\n          '<span class=\"muted\">They came in while a restaurant\
-    \ was nearly full, or for a large party.</span></div><span class=\"spacer\"></span>' +\n          list.filter(function\
-    \ (r) { return r.pending; }).map(function (r) {\n            return '<button class=\"btn sm\" data-action=\"open\" data-page=\"\
-    reservations\" data-id=\"' + esc(r.id) + '\">' + esc(r.name) + ' · ' + r.pending + '</button>';\n          }).join('')\
-    \ + '</div>' : '') +\n        (list.length ? '<div class=\"section-title\"><h2>Your restaurants</h2><span class=\"muted\
-    \ small\">' + list.length + '</span></div>' +\n          '<div class=\"grid\">' + list.map(card).join('') +\n        \
-    \  '<button class=\"card new\" data-action=\"new\"><div><div class=\"plus\">' + PP.icon('plus') + '</div>Add a restaurant</div></button></div>'\n\
-    \          : '<div class=\"empty\" style=\"padding:70px 20px\"><h2>Add your first restaurant</h2><p>Start with sample\
-    \ opening hours and tables, then make them yours.</p>' +\n            '<button class=\"btn primary\" data-action=\"new\"\
-    >' + PP.icon('plus') + 'New restaurant</button></div>') +\n        '</div>';\n    }\n\n    function zones() {\n      try\
-    \ { return Intl.supportedValuesOf('timeZone'); } catch (e) { return ['UTC', 'Europe/London', 'Europe/Paris', 'Europe/Riga',\
-    \ 'America/New_York', 'America/Toronto', 'America/Los_Angeles']; }\n    }\n    function newModal() {\n      var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone)\
-    \ || 'UTC';\n      var d = PP.modal('<div class=\"eyebrow\">New restaurant</div><h2>What is it called?</h2>' +\n     \
-    \   '<form><div class=\"stack\"><div><label class=\"f\" for=\"nrName\">Name</label><input id=\"nrName\" name=\"name\"\
-    \ type=\"text\" required maxlength=\"80\" autofocus></div>' +\n        '<div><label class=\"f\" for=\"nrTz\">Time zone</label><input\
-    \ id=\"nrTz\" name=\"timezone\" type=\"text\" list=\"nrZones\" value=\"' + esc(tz) + '\">' +\n          '<datalist id=\"\
-    nrZones\">' + zones().map(function (z) { return '<option value=\"' + esc(z) + '\">'; }).join('') + '</datalist>' +\n \
-    \         '<div class=\"hint\">Booking times are always in the restaurant\\'s local time.</div></div>' +\n        '<label\
-    \ class=\"check\"><input type=\"checkbox\" name=\"sample\" checked><span>Start with sample opening hours and 9 tables<br><span\
-    \ class=\"muted small\">You can change all of it afterwards.</span></span></label>' +\n        '<div data-el=\"msg\"></div></div>'\
-    \ +\n        '<div class=\"foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn\
-    \ primary\" type=\"submit\">Create restaurant</button></div></form>');\n      var f = d.el.querySelector('form');\n  \
-    \    f.onsubmit = function (e) {\n        e.preventDefault();\n        var b = f.querySelector('[type=submit]'); b.disabled\
-    \ = true; b.innerHTML = '<span class=\"spin\"></span>';\n        emit('create', { name: f.name.value, timezone: f.timezone.value,\
+    \  // Time-zone picker. PP.tzField(name, value, id) returns the field's HTML: a hidden input (name = the tz id)\n  //\
+    \ and a search box. Type a country, city or offset (\"France\", \"Riga\", \"GMT+2\"); the full list shows on focus.\n\
+    \  // Wired once on document, so any component can use it. Picking fires 'change' on the hidden input.\n  // Data: country\
+    \ code|name|zones from the tz database (zone.tab + iso3166.tab).\n  var TZ_DATA = \"AF|Afghanistan|Asia/Kabul;AL|Albania|Europe/Tirane;DZ|Algeria|Africa/Algiers;AD|Andorra|Europe/Andorra;AO|Angola|Africa/Luanda;AI|Anguilla|America/Anguilla;AQ|Antarctica|Antarctica/McMurdo,Antarctica/Casey,Antarctica/Davis,Antarctica/DumontDUrville,Antarctica/Mawson,Antarctica/Palmer,Antarctica/Rothera,Antarctica/Syowa,Antarctica/Troll,Antarctica/Vostok;AG|Antigua\
+    \ & Barbuda|America/Antigua;AR|Argentina|America/Argentina/Buenos_Aires,America/Argentina/Cordoba,America/Argentina/Salta,America/Argentina/Jujuy,America/Argentina/Tucuman,America/Argentina/Catamarca,America/Argentina/La_Rioja,America/Argentina/San_Juan,America/Argentina/Mendoza,America/Argentina/San_Luis,America/Argentina/Rio_Gallegos,America/Argentina/Ushuaia;AM|Armenia|Asia/Yerevan;AW|Aruba|America/Aruba;AU|Australia|Australia/Lord_Howe,Antarctica/Macquarie,Australia/Hobart,Australia/Melbourne,Australia/Sydney,Australia/Broken_Hill,Australia/Brisbane,Australia/Lindeman,Australia/Adelaide,Australia/Darwin,Australia/Perth,Australia/Eucla;AT|Austria|Europe/Vienna;AZ|Azerbaijan|Asia/Baku;BS|Bahamas|America/Nassau;BH|Bahrain|Asia/Bahrain;BD|Bangladesh|Asia/Dhaka;BB|Barbados|America/Barbados;BY|Belarus|Europe/Minsk;BE|Belgium|Europe/Brussels;BZ|Belize|America/Belize;BJ|Benin|Africa/Porto-Novo;BM|Bermuda|Atlantic/Bermuda;BT|Bhutan|Asia/Thimphu;BO|Bolivia|America/La_Paz;BA|Bosnia\
+    \ & Herzegovina|Europe/Sarajevo;BW|Botswana|Africa/Gaborone;BR|Brazil|America/Noronha,America/Belem,America/Fortaleza,America/Recife,America/Araguaina,America/Maceio,America/Bahia,America/Sao_Paulo,America/Campo_Grande,America/Cuiaba,America/Santarem,America/Porto_Velho,America/Boa_Vista,America/Manaus,America/Eirunepe,America/Rio_Branco;IO|British\
+    \ Indian Ocean Territory|Indian/Chagos;BN|Brunei|Asia/Brunei;BG|Bulgaria|Europe/Sofia;BF|Burkina Faso|Africa/Ouagadougou;BI|Burundi|Africa/Bujumbura;KH|Cambodia|Asia/Phnom_Penh;CM|Cameroon|Africa/Douala;CA|Canada|America/St_Johns,America/Halifax,America/Glace_Bay,America/Moncton,America/Goose_Bay,America/Blanc-Sablon,America/Toronto,America/Iqaluit,America/Atikokan,America/Winnipeg,America/Resolute,America/Rankin_Inlet,America/Regina,America/Swift_Current,America/Edmonton,America/Cambridge_Bay,America/Inuvik,America/Creston,America/Dawson_Creek,America/Fort_Nelson,America/Whitehorse,America/Dawson,America/Vancouver;CV|Cape\
+    \ Verde|Atlantic/Cape_Verde;BQ|Caribbean NL|America/Kralendijk;KY|Cayman Islands|America/Cayman;CF|Central African Rep.|Africa/Bangui;TD|Chad|Africa/Ndjamena;CL|Chile|America/Santiago,America/Punta_Arenas,Pacific/Easter;CN|China|Asia/Shanghai,Asia/Urumqi;CX|Christmas\
+    \ Island|Indian/Christmas;CC|Cocos (Keeling) Islands|Indian/Cocos;CO|Colombia|America/Bogota;KM|Comoros|Indian/Comoro;CG|Congo\
+    \ (Brazzaville)|Africa/Brazzaville;CD|Congo (Kinshasa)|Africa/Kinshasa,Africa/Lubumbashi;CK|Cook Islands|Pacific/Rarotonga;CR|Costa\
+    \ Rica|America/Costa_Rica;HR|Croatia|Europe/Zagreb;CU|Cuba|America/Havana;CW|Curaçao|America/Curacao;CY|Cyprus|Asia/Nicosia,Asia/Famagusta;CZ|Czechia|Europe/Prague;CI|Côte\
+    \ d'Ivoire|Africa/Abidjan;DK|Denmark|Europe/Copenhagen;DJ|Djibouti|Africa/Djibouti;DM|Dominica|America/Dominica;DO|Dominican\
+    \ Republic|America/Santo_Domingo;TL|East Timor|Asia/Dili;EC|Ecuador|America/Guayaquil,Pacific/Galapagos;EG|Egypt|Africa/Cairo;SV|El\
+    \ Salvador|America/El_Salvador;GQ|Equatorial Guinea|Africa/Malabo;ER|Eritrea|Africa/Asmara;EE|Estonia|Europe/Tallinn;SZ|Eswatini\
+    \ (Swaziland)|Africa/Mbabane;ET|Ethiopia|Africa/Addis_Ababa;FK|Falkland Islands|Atlantic/Stanley;FO|Faroe Islands|Atlantic/Faroe;FJ|Fiji|Pacific/Fiji;FI|Finland|Europe/Helsinki;FR|France|Europe/Paris;GF|French\
+    \ Guiana|America/Cayenne;PF|French Polynesia|Pacific/Tahiti,Pacific/Marquesas,Pacific/Gambier;TF|French S. Terr.|Indian/Kerguelen;GA|Gabon|Africa/Libreville;GM|Gambia|Africa/Banjul;GE|Georgia|Asia/Tbilisi;DE|Germany|Europe/Berlin,Europe/Busingen;GH|Ghana|Africa/Accra;GI|Gibraltar|Europe/Gibraltar;GR|Greece|Europe/Athens;GL|Greenland|America/Nuuk,America/Danmarkshavn,America/Scoresbysund,America/Thule;GD|Grenada|America/Grenada;GP|Guadeloupe|America/Guadeloupe;GU|Guam|Pacific/Guam;GT|Guatemala|America/Guatemala;GG|Guernsey|Europe/Guernsey;GN|Guinea|Africa/Conakry;GW|Guinea-Bissau|Africa/Bissau;GY|Guyana|America/Guyana;HT|Haiti|America/Port-au-Prince;HN|Honduras|America/Tegucigalpa;HK|Hong\
+    \ Kong|Asia/Hong_Kong;HU|Hungary|Europe/Budapest;IS|Iceland|Atlantic/Reykjavik;IN|India|Asia/Kolkata;ID|Indonesia|Asia/Jakarta,Asia/Pontianak,Asia/Makassar,Asia/Jayapura;IR|Iran|Asia/Tehran;IQ|Iraq|Asia/Baghdad;IE|Ireland|Europe/Dublin;IM|Isle\
+    \ of Man|Europe/Isle_of_Man;IL|Israel|Asia/Jerusalem;IT|Italy|Europe/Rome;JM|Jamaica|America/Jamaica;JP|Japan|Asia/Tokyo;JE|Jersey|Europe/Jersey;JO|Jordan|Asia/Amman;KZ|Kazakhstan|Asia/Almaty,Asia/Qyzylorda,Asia/Qostanay,Asia/Aqtobe,Asia/Aqtau,Asia/Atyrau,Asia/Oral;KE|Kenya|Africa/Nairobi;KI|Kiribati|Pacific/Tarawa,Pacific/Kanton,Pacific/Kiritimati;KW|Kuwait|Asia/Kuwait;KG|Kyrgyzstan|Asia/Bishkek;LA|Laos|Asia/Vientiane;LV|Latvia|Europe/Riga;LB|Lebanon|Asia/Beirut;LS|Lesotho|Africa/Maseru;LR|Liberia|Africa/Monrovia;LY|Libya|Africa/Tripoli;LI|Liechtenstein|Europe/Vaduz;LT|Lithuania|Europe/Vilnius;LU|Luxembourg|Europe/Luxembourg;MO|Macau|Asia/Macau;MG|Madagascar|Indian/Antananarivo;MW|Malawi|Africa/Blantyre;MY|Malaysia|Asia/Kuala_Lumpur,Asia/Kuching;MV|Maldives|Indian/Maldives;ML|Mali|Africa/Bamako;MT|Malta|Europe/Malta;MH|Marshall\
+    \ Islands|Pacific/Majuro,Pacific/Kwajalein;MQ|Martinique|America/Martinique;MR|Mauritania|Africa/Nouakchott;MU|Mauritius|Indian/Mauritius;YT|Mayotte|Indian/Mayotte;MX|Mexico|America/Mexico_City,America/Cancun,America/Merida,America/Monterrey,America/Matamoros,America/Chihuahua,America/Ciudad_Juarez,America/Ojinaga,America/Mazatlan,America/Bahia_Banderas,America/Hermosillo,America/Tijuana;FM|Micronesia|Pacific/Chuuk,Pacific/Pohnpei,Pacific/Kosrae;MD|Moldova|Europe/Chisinau;MC|Monaco|Europe/Monaco;MN|Mongolia|Asia/Ulaanbaatar,Asia/Hovd;ME|Montenegro|Europe/Podgorica;MS|Montserrat|America/Montserrat;MA|Morocco|Africa/Casablanca;MZ|Mozambique|Africa/Maputo;MM|Myanmar\
+    \ (Burma)|Asia/Yangon;NA|Namibia|Africa/Windhoek;NR|Nauru|Pacific/Nauru;NP|Nepal|Asia/Kathmandu;NL|Netherlands|Europe/Amsterdam;NC|New\
+    \ Caledonia|Pacific/Noumea;NZ|New Zealand|Pacific/Auckland,Pacific/Chatham;NI|Nicaragua|America/Managua;NE|Niger|Africa/Niamey;NG|Nigeria|Africa/Lagos;NU|Niue|Pacific/Niue;NF|Norfolk\
+    \ Island|Pacific/Norfolk;KP|North Korea|Asia/Pyongyang;MK|North Macedonia|Europe/Skopje;MP|Northern Mariana Islands|Pacific/Saipan;NO|Norway|Europe/Oslo;OM|Oman|Asia/Muscat;PK|Pakistan|Asia/Karachi;PW|Palau|Pacific/Palau;PS|Palestine|Asia/Gaza,Asia/Hebron;PA|Panama|America/Panama;PG|Papua\
+    \ New Guinea|Pacific/Port_Moresby,Pacific/Bougainville;PY|Paraguay|America/Asuncion;PE|Peru|America/Lima;PH|Philippines|Asia/Manila;PN|Pitcairn|Pacific/Pitcairn;PL|Poland|Europe/Warsaw;PT|Portugal|Europe/Lisbon,Atlantic/Madeira,Atlantic/Azores;PR|Puerto\
+    \ Rico|America/Puerto_Rico;QA|Qatar|Asia/Qatar;RO|Romania|Europe/Bucharest;RU|Russia|Europe/Kaliningrad,Europe/Moscow,Europe/Kirov,Europe/Volgograd,Europe/Astrakhan,Europe/Saratov,Europe/Ulyanovsk,Europe/Samara,Asia/Yekaterinburg,Asia/Omsk,Asia/Novosibirsk,Asia/Barnaul,Asia/Tomsk,Asia/Novokuznetsk,Asia/Krasnoyarsk,Asia/Irkutsk,Asia/Chita,Asia/Yakutsk,Asia/Khandyga,Asia/Vladivostok,Asia/Ust-Nera,Asia/Magadan,Asia/Sakhalin,Asia/Srednekolymsk,Asia/Kamchatka,Asia/Anadyr;RW|Rwanda|Africa/Kigali;RE|Réunion|Indian/Reunion;AS|Samoa\
+    \ (American)|Pacific/Pago_Pago;WS|Samoa (western)|Pacific/Apia;SM|San Marino|Europe/San_Marino;ST|Sao Tome & Principe|Africa/Sao_Tome;SA|Saudi\
+    \ Arabia|Asia/Riyadh;SN|Senegal|Africa/Dakar;RS|Serbia|Europe/Belgrade;SC|Seychelles|Indian/Mahe;SL|Sierra Leone|Africa/Freetown;SG|Singapore|Asia/Singapore;SK|Slovakia|Europe/Bratislava;SI|Slovenia|Europe/Ljubljana;SB|Solomon\
+    \ Islands|Pacific/Guadalcanal;SO|Somalia|Africa/Mogadishu;ZA|South Africa|Africa/Johannesburg;GS|South Georgia & the South\
+    \ Sandwich Islands|Atlantic/South_Georgia;KR|South Korea|Asia/Seoul;SS|South Sudan|Africa/Juba;ES|Spain|Europe/Madrid,Africa/Ceuta,Atlantic/Canary;LK|Sri\
+    \ Lanka|Asia/Colombo;BL|St Barthelemy|America/St_Barthelemy;SH|St Helena|Atlantic/St_Helena;KN|St Kitts & Nevis|America/St_Kitts;LC|St\
+    \ Lucia|America/St_Lucia;SX|St Maarten (Dutch)|America/Lower_Princes;MF|St Martin (French)|America/Marigot;PM|St Pierre\
+    \ & Miquelon|America/Miquelon;VC|St Vincent|America/St_Vincent;SD|Sudan|Africa/Khartoum;SR|Suriname|America/Paramaribo;SJ|Svalbard\
+    \ & Jan Mayen|Arctic/Longyearbyen;SE|Sweden|Europe/Stockholm;CH|Switzerland|Europe/Zurich;SY|Syria|Asia/Damascus;TW|Taiwan|Asia/Taipei;TJ|Tajikistan|Asia/Dushanbe;TZ|Tanzania|Africa/Dar_es_Salaam;TH|Thailand|Asia/Bangkok;TG|Togo|Africa/Lome;TK|Tokelau|Pacific/Fakaofo;TO|Tonga|Pacific/Tongatapu;TT|Trinidad\
+    \ & Tobago|America/Port_of_Spain;TN|Tunisia|Africa/Tunis;TM|Turkmenistan|Asia/Ashgabat;TC|Turks & Caicos Is|America/Grand_Turk;TV|Tuvalu|Pacific/Funafuti;TR|Türkiye|Europe/Istanbul;UM|US\
+    \ minor outlying islands|Pacific/Midway,Pacific/Wake;UG|Uganda|Africa/Kampala;UA|Ukraine|Europe/Simferopol,Europe/Kyiv;AE|United\
+    \ Arab Emirates|Asia/Dubai;GB|United Kingdom|Europe/London;US|United States|America/New_York,America/Detroit,America/Kentucky/Louisville,America/Kentucky/Monticello,America/Indiana/Indianapolis,America/Indiana/Vincennes,America/Indiana/Winamac,America/Indiana/Marengo,America/Indiana/Petersburg,America/Indiana/Vevay,America/Chicago,America/Indiana/Tell_City,America/Indiana/Knox,America/Menominee,America/North_Dakota/Center,America/North_Dakota/New_Salem,America/North_Dakota/Beulah,America/Denver,America/Boise,America/Phoenix,America/Los_Angeles,America/Anchorage,America/Juneau,America/Sitka,America/Metlakatla,America/Yakutat,America/Nome,America/Adak,Pacific/Honolulu;UY|Uruguay|America/Montevideo;UZ|Uzbekistan|Asia/Samarkand,Asia/Tashkent;VU|Vanuatu|Pacific/Efate;VA|Vatican\
+    \ City|Europe/Vatican;VE|Venezuela|America/Caracas;VN|Vietnam|Asia/Ho_Chi_Minh;VG|Virgin Islands (UK)|America/Tortola;VI|Virgin\
+    \ Islands (US)|America/St_Thomas;WF|Wallis & Futuna|Pacific/Wallis;EH|Western Sahara|Africa/El_Aaiun;YE|Yemen|Asia/Aden;ZM|Zambia|Africa/Lusaka;ZW|Zimbabwe|Africa/Harare;AX|Åland\
+    \ Islands|Europe/Mariehamn\";\n  var TZ_ALIAS = { 'Asia/Calcutta': 'Asia/Kolkata', 'Asia/Saigon': 'Asia/Ho_Chi_Minh',\
+    \ 'Asia/Katmandu': 'Asia/Kathmandu',\n    'Europe/Kiev': 'Europe/Kyiv', 'Asia/Rangoon': 'Asia/Yangon', 'America/Buenos_Aires':\
+    \ 'America/Argentina/Buenos_Aires',\n    'America/Godthab': 'America/Nuuk', 'Atlantic/Faeroe': 'Atlantic/Faroe', 'Etc/UTC':\
+    \ 'UTC', 'Etc/GMT': 'UTC', 'GMT': 'UTC',\n    'America/Indianapolis': 'America/Indiana/Indianapolis', 'America/Louisville':\
+    \ 'America/Kentucky/Louisville',\n    'Asia/Ulan_Bator': 'Asia/Ulaanbaatar', 'Pacific/Enderbury': 'Pacific/Kanton', 'Europe/Uzhgorod':\
+    \ 'Europe/Kyiv', 'Europe/Zaporozhye': 'Europe/Kyiv' };\n  var TZ_WORDS = { GB: 'uk england scotland wales britain', US:\
+    \ 'usa america', AE: 'uae emirates dubai', NL: 'holland', CZ: 'czech republic',\n    KR: 'korea', CN: 'china beijing',\
+    \ CH: 'swiss', DE: 'germany', TR: 'turkey', CI: 'ivory coast' };\n  var tzRows = null;\n  function fold(s) { return String(s\
+    \ || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }\n  function tzCity(z) {\n    var p = z.split('/'), c\
+    \ = p[p.length - 1].replace(/_/g, ' ');\n    return p.length > 2 && p[1] !== 'Argentina' ? c + ' (' + p[1].replace(/_/g,\
+    \ ' ') + ')' : c;\n  }\n  function tzList() {\n    if (tzRows) return tzRows;\n    tzRows = [{ id: 'UTC', cc: '', country:\
+    \ 'UTC', city: 'Coordinated Universal Time' }];\n    TZ_DATA.split(';').forEach(function (part) {\n      var p = part.split('|');\n\
+    \      p[2].split(',').forEach(function (z) { tzRows.push({ id: z, cc: p[0], country: p[1], city: tzCity(z) }); });\n\
+    \    });\n    tzRows.forEach(function (r) { r.key = ' ' + fold([r.country, r.cc, r.city, r.id.replace(/[_/]/g, ' '), TZ_WORDS[r.cc]\
+    \ || ''].join(' ')); });\n    return tzRows;\n  }\n  function tzFind(id) { var l = tzList(); for (var i = 0; i < l.length;\
+    \ i++) if (l[i].id === id) return l[i]; return null; }\n  function tzClock(r, now) {\n    if (r.fmt === undefined) {\n\
+    \      var o = { timeZone: r.id, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };\n      try { r.fmt = new Intl.DateTimeFormat('en-GB',\
+    \ Object.assign({ timeZoneName: 'shortOffset' }, o)); }\n      catch (e) { try { r.fmt = new Intl.DateTimeFormat('en-GB',\
+    \ o); } catch (e2) { r.fmt = null; } }\n    }\n    r.off = ''; r.time = '';\n    if (!r.fmt) return;\n    var v = {};\n\
+    \    r.fmt.formatToParts(now).forEach(function (p) { v[p.type] = p.value; });\n    r.off = v.timeZoneName ? v.timeZoneName.replace(/^GMT$/,\
+    \ 'GMT+0') : '';\n    r.time = v.hour + ':' + v.minute;\n  }\n  // \"gmt+3\", \"UTC-05:00\", \"+5:30\" → \"+3\", \"-5\"\
+    , \"+5:30\"; anything else → null.\n  function tzOffNorm(s) {\n    var m = String(s).replace(/^(gmt|utc)/i, '').match(/^([+-])0?(\\\
+    d{1,2})(?::?(\\d\\d))?$/);\n    return m ? m[1] + (+m[2]) + (m[3] && m[3] !== '00' ? ':' + m[3] : '') : null;\n  }\n \
+    \ PP.tzCanon = function (z) { return TZ_ALIAS[z] || z || 'UTC'; };\n  PP.tzLabel = function (z) { var r = tzFind(z); return\
+    \ !r ? (z || '') : r.cc ? r.country + ' — ' + r.city : 'UTC'; };\n  PP.tzField = function (name, value, id) {\n    value\
+    \ = PP.tzCanon(value);\n    return '<div class=\"pp-tz\"><input type=\"hidden\" name=\"' + PP.esc(name) + '\" value=\"\
+    ' + PP.esc(value) + '\">' +\n      '<input type=\"text\" class=\"pp-tz-q\"' + (id ? ' id=\"' + PP.esc(id) + '\"' : '')\
+    \ + ' value=\"' + PP.esc(PP.tzLabel(value)) + '\" autocomplete=\"off\" spellcheck=\"false\"' +\n      ' role=\"combobox\"\
+    \ aria-expanded=\"false\" aria-autocomplete=\"list\" placeholder=\"Search a country, city or GMT+2\">' +\n      PP.icon('down')\
+    \ + '<div class=\"pp-tz-list\" role=\"listbox\" hidden></div></div>';\n  };\n  function tzParts(box) { return { box: box,\
+    \ val: box.querySelector('input[type=hidden]'), q: box.querySelector('.pp-tz-q'), list: box.querySelector('.pp-tz-list')\
+    \ }; }\n  function tzActive(t, el) {\n    var old = t.list.querySelector('.pp-tz-o.on');\n    if (old) old.classList.remove('on');\n\
+    \    if (!el) return;\n    el.classList.add('on');\n    var l = t.list, top = el.offsetTop, bot = top + el.offsetHeight;\n\
+    \    if (top < l.scrollTop) l.scrollTop = top - 4;\n    else if (bot > l.scrollTop + l.clientHeight) l.scrollTop = bot\
+    \ - l.clientHeight + 4;\n  }\n  function tzRender(t, query) {\n    var now = new Date(), cur = t.val.value;\n    var terms\
+    \ = fold(query).trim().split(/\\s+/).filter(Boolean);\n    var rows = tzList();\n    rows.forEach(function (r) { tzClock(r,\
+    \ now); });\n    var hits = rows.filter(function (r) {\n      return terms.every(function (w) {\n        var off = /^(gmt|utc)?[+-]\\\
+    d/.test(w) ? tzOffNorm(w) : (w === 'gmt' || w === 'utc') ? null : undefined;\n        if (off) return tzOffNorm(r.off\
+    \ || 'x') === off;\n        return r.key.indexOf(w) >= 0 || fold(r.off).indexOf(w) >= 0;\n      });\n    });\n    if (terms.length)\
+    \ {\n      var w = terms[0];\n      var score = function (r) { var c = fold(r.country), y = fold(r.city); return c.indexOf(w)\
+    \ === 0 ? 0 : y.indexOf(w) === 0 ? 1 : r.key.indexOf(' ' + w) >= 0 ? 2 : 3; };\n      hits = hits.map(function (r, i)\
+    \ { return [score(r), i, r]; }).sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; }).map(function (x) { return\
+    \ x[2]; });\n    }\n    t.list.innerHTML = hits.length ? hits.map(function (r) {\n      return '<div class=\"pp-tz-o'\
+    \ + (r.id === cur ? ' sel' : '') + '\" role=\"option\" aria-selected=\"' + (r.id === cur) + '\" data-tz=\"' + PP.esc(r.id)\
+    \ + '\">' +\n        '<b>' + PP.esc(r.country) + '</b><span class=\"c\">' + PP.esc(r.city) + '</span><span class=\"o\"\
+    >' + PP.esc(r.off) + (r.time ? ' · ' + r.time : '') + '</span></div>';\n    }).join('') : '<div class=\"pp-tz-empty\"\
+    >No time zone matches “' + PP.esc(query) + '”. Try a country or a city.</div>';\n    t.list.hidden = false;\n    t.q.setAttribute('aria-expanded',\
+    \ 'true');\n    tzActive(t, (!terms.length && t.list.querySelector('.sel')) || t.list.querySelector('.pp-tz-o'));\n  }\n\
+    \  // Opening empties the box (the current zone stays visible as the placeholder) so typing starts a fresh search.\n \
+    \ function tzOpen(t) {\n    t.q.placeholder = PP.tzLabel(t.val.value) || 'Search a country, city or GMT+2';\n    t.q.value\
+    \ = '';\n    tzRender(t, '');\n  }\n  function tzClose(t, revert) {\n    t.list.hidden = true; t.list.innerHTML = '';\n\
+    \    t.q.setAttribute('aria-expanded', 'false');\n    if (revert) { t.q.value = PP.tzLabel(t.val.value); t.q.placeholder\
+    \ = 'Search a country, city or GMT+2'; }\n  }\n  function tzPick(t, id) {\n    var changed = t.val.value !== id;\n   \
+    \ t.val.value = id;\n    tzClose(t, true);\n    if (changed) t.val.dispatchEvent(new Event('change', { bubbles: true }));\n\
+    \  }\n  function tzOf(el) { var b = el && el.closest && el.closest('.pp-tz'); return b ? tzParts(b) : null; }\n  document.addEventListener('focusin',\
+    \ function (e) {\n    if (!e.target.matches || !e.target.matches('.pp-tz-q')) return;\n    tzOpen(tzOf(e.target));\n \
+    \ });\n  document.addEventListener('click', function (e) {\n    var t = tzOf(e.target);\n    if (!t) return;\n    var\
+    \ o = e.target.closest('.pp-tz-o');\n    if (o) tzPick(t, o.dataset.tz);\n    else if (e.target === t.q && t.list.hidden)\
+    \ tzOpen(t);\n  });\n  // Keep focus in the search box while clicking or scrolling the list.\n  document.addEventListener('mousedown',\
+    \ function (e) { if (e.target.closest && e.target.closest('.pp-tz-list')) e.preventDefault(); });\n  // Capture phase:\
+    \ the form's own listeners (unsaved-changes bar, Escape closing a modal) must not see the search typing.\n  document.addEventListener('input',\
+    \ function (e) {\n    if (!e.target.matches || !e.target.matches('.pp-tz-q')) return;\n    e.stopPropagation(); tzRender(tzOf(e.target),\
+    \ e.target.value);\n  }, true);\n  document.addEventListener('keydown', function (e) {\n    if (!e.target.matches || !e.target.matches('.pp-tz-q'))\
+    \ return;\n    var t = tzOf(e.target), on = t.list.querySelector('.pp-tz-o.on'), open = !t.list.hidden;\n    if (e.key\
+    \ === 'ArrowDown' || e.key === 'ArrowUp') {\n      e.preventDefault();\n      if (!open) { tzOpen(t); return; }\n    \
+    \  var n = on && (e.key === 'ArrowDown' ? on.nextElementSibling : on.previousElementSibling);\n      if (n && n.classList.contains('pp-tz-o'))\
+    \ tzActive(t, n);\n    } else if (e.key === 'Enter' && open) {\n      e.preventDefault();\n      if (on) tzPick(t, on.dataset.tz);\n\
+    \    } else if (e.key === 'Escape' && open) {\n      e.stopPropagation(); e.preventDefault(); tzClose(t, true);\n    }\n\
+    \  }, true);\n  document.addEventListener('focusout', function (e) {\n    if (e.target.matches && e.target.matches('.pp-tz-q'))\
+    \ tzClose(tzOf(e.target), true);\n  });\n\n  PP.wrapEmit = function (emit) {\n    return function (name, payload) {\n\
+    \      try { return Promise.resolve(emit ? emit(name, JSON.stringify(payload == null ? {} : payload)) : null); }\n   \
+    \   catch (e) { console.error(e); return Promise.reject(e); }\n    };\n  };\n  PP.define = function (name, mountFn) {\
+    \ PP.components[name] = mountFn; };\n  PP.mount = function (name, root, json, emit) {\n    var fn = PP.components[name];\n\
+    \    if (!fn) { console.error('PP component not loaded: ' + name); return null; }\n    if (!root) { console.error('PP\
+    \ mount: no root node for ' + name); return null; }\n    var data = typeof json === 'string' ? JSON.parse(json || '{}')\
+    \ : (json || {});\n    return fn(root, data, PP.wrapEmit(emit));\n  };\n})();\n</script>\n\n<!-- ===== Main component\
+    \ ===== -->\n<style>\n.pp-header { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--pp-bg)\
+    \ 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--pp-line);\
+    \ }\n.pp-header .in { max-width: 1120px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap:\
+    \ 18px; }\n.pp-header .brand { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; color: var(--pp-ink);\
+    \ }\n.pp-header .brand .mark { width: 28px; height: 28px; color: var(--pp-brass); }\n.pp-header .brand .name { font-family:\
+    \ var(--pp-serif); font-size: 1.45rem; font-weight: 600; letter-spacing: .01em; line-height: 1; }\n.pp-header nav { display:\
+    \ flex; gap: 2px; }\n.pp-header nav button { all: unset; cursor: pointer; color: var(--pp-muted); padding: 7px 12px; border-radius:\
+    \ 99px; font-size: .9rem; }\n.pp-header nav button.on, .pp-header nav button:hover { color: var(--pp-ink); background:\
+    \ var(--pp-panel-2); }\n.pp-header .right { margin-left: auto; display: flex; align-items: center; gap: 6px; position:\
+    \ relative; }\n.pp-header .bell { position: relative; }\n.pp-header .bell .n { position: absolute; top: 1px; right: 0;\
+    \ min-width: 17px; height: 17px; padding: 0 4px; border-radius: 99px; background: var(--pp-warn); color: #fff; font: 600\
+    \ .66rem/17px var(--pp-sans); text-align: center; }\n.pp-header .me { all: unset; cursor: pointer; width: 34px; height:\
+    \ 34px; border-radius: 50%; display: grid; place-items: center; background: var(--pp-ink); color: var(--pp-bg); font:\
+    \ 600 .8rem var(--pp-sans); }\n.pp-header .me:focus-visible { outline: 2px solid var(--pp-brass); outline-offset: 2px;\
+    \ }\n.pp-header .menu { position: absolute; right: 0; top: calc(100% + 10px); width: 300px; padding: 8px; z-index: 60;\
+    \ }\n.pp-header .menu.alerts { width: 360px; }\n.pp-header .menu .who { padding: 8px 10px 12px; border-bottom: 1px solid\
+    \ var(--pp-line); margin-bottom: 6px; }\n.pp-header .menu .item { all: unset; box-sizing: border-box; cursor: pointer;\
+    \ display: block; width: 100%; padding: 9px 10px; border-radius: 8px; font-size: .9rem; }\n.pp-header .menu .item:hover\
+    \ { background: var(--pp-panel-2); }\n.pp-header .menu .item .sub { display: block; color: var(--pp-muted); font-size:\
+    \ .8rem; }\n.pp-header .menu .head { padding: 8px 10px; font-weight: 600; font-size: .9rem; }\n.pp-header .menu .none\
+    \ { padding: 8px 10px 12px; color: var(--pp-muted); font-size: .88rem; }\n.pp-header .menu .themes { padding: 6px 10px\
+    \ 10px; }\n.pp-page { min-height: calc(100vh - 140px); }\n.pp-public .pp-page { min-height: 0; }\n.pp-footer { max-width:\
+    \ 1120px; margin: 0 auto; padding: 22px 20px 34px; color: var(--pp-faint); font-size: .78rem; text-align: center; letter-spacing:\
+    \ .04em; }\n@media (max-width: 560px) {\n  .pp-header .in { gap: 8px; padding: 10px 14px; } .pp-header nav { display:\
+    \ none; }\n  .pp-header .menu, .pp-header .menu.alerts { position: fixed; left: 12px; right: 12px; top: 60px; width: auto;\
+    \ }\n}\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.define('header', function (root, data, emit) {\n\
+    \    var esc = PP.esc;\n    var S = { user: null, active: 'dashboard', open: null, alerts: { pending: 0, items: [] } };\n\
+    \n    function initials(u) {\n      var n = String(u.display_name || u.email || '?').trim().split(/\\s+/);\n      return\
+    \ ((n[0] || '?')[0] + (n.length > 1 ? n[n.length - 1][0] : '')).toUpperCase();\n    }\n    function alertsMenu() {\n \
+    \     var a = S.alerts;\n      return '<div class=\"menu alerts card fade-in\" role=\"menu\"><div class=\"head\">Awaiting\
+    \ your approval</div>' +\n        (a.items.length ? a.items.map(function (i) {\n          return '<button class=\"item\"\
+    \ data-action=\"alert\" data-r=\"' + esc(i.restaurant_id) + '\" data-date=\"' + esc(i.date) + '\">' +\n            '<strong>'\
+    \ + esc(i.name) + '</strong> · ' + PP.plural(i.party, 'guest') +\n            '<span class=\"sub\">' + esc(i.restaurant)\
+    \ + ' · ' + esc(PP.fmtShort(i.date)) + ' at ' + esc(i.time) + '</span></button>';\n        }).join('') + (a.pending >\
+    \ a.items.length ? '<div class=\"none\">and ' + (a.pending - a.items.length) + ' more</div>' : '')\n          : '<div\
+    \ class=\"none\">Nothing to approve. New requests show up here when a booking needs a decision.</div>') + '</div>';\n\
+    \    }\n    function userMenu() {\n      var u = S.user, t = PP.theme();\n      return '<div class=\"menu card fade-in\"\
+    \ role=\"menu\"><div class=\"who\"><strong>' + esc(u.display_name) + '</strong><div class=\"muted small\">' + esc(u.email)\
+    \ + '</div></div>' +\n        '<div class=\"themes\"><div class=\"small muted\" style=\"margin-bottom:6px\">Appearance</div><div\
+    \ class=\"seg\">' +\n          ['auto', 'light', 'dark'].map(function (k) { return '<button data-action=\"theme\" data-t=\"\
+    ' + k + '\" class=\"' + (t === k ? 'on' : '') + '\">' + k[0].toUpperCase() + k.slice(1) + '</button>'; }).join('') + '</div></div>'\
+    \ +\n        '<button class=\"item\" data-action=\"nav\" data-page=\"dashboard\">Your restaurants</button>' +\n      \
+    \  '<button class=\"item\" data-action=\"signout\">Sign out</button></div>';\n    }\n    function render() {\n      var\
+    \ u = S.user;\n      document.documentElement.classList.toggle('pp-signed-out', !u);\n      document.title = (S.alerts.pending\
+    \ ? '(' + S.alerts.pending + ') ' : '') + 'PlanPlate';\n      if (!u) { root.innerHTML = ''; return; }\n      root.innerHTML\
+    \ = '<header class=\"pp-header\"><div class=\"in\">' +\n        '<button class=\"brand\" data-action=\"nav\" data-page=\"\
+    dashboard\" aria-label=\"PlanPlate home\">' + PP.mark() + '<span class=\"name\">PlanPlate</span></button>' +\n       \
+    \ '<nav><button data-action=\"nav\" data-page=\"dashboard\" class=\"' + (S.active === 'dashboard' ? 'on' : '') + '\">Restaurants</button></nav>'\
+    \ +\n        '<div class=\"right\">' +\n          '<button class=\"btn ghost icon bell\" data-action=\"alerts\" aria-label=\"\
+    Approvals (' + S.alerts.pending + ')\" aria-expanded=\"' + (S.open === 'alerts') + '\">' + PP.icon('bell') +\n       \
+    \     (S.alerts.pending ? '<span class=\"n\">' + S.alerts.pending + '</span>' : '') + '</button>' +\n          '<button\
+    \ class=\"me\" data-action=\"menu\" aria-label=\"Account menu\" aria-expanded=\"' + (S.open === 'menu') + '\">' + esc(initials(u))\
+    \ + '</button>' +\n          (S.open === 'alerts' ? alertsMenu() : S.open === 'menu' ? userMenu() : '') +\n        '</div></div></header>';\n\
+    \    }\n\n    root.addEventListener('click', function (e) {\n      e.ppHeader = true;\n      var el = e.target.closest('[data-action]');\n\
+    \      if (!el) return;\n      var a = el.dataset.action;\n      if (a === 'alerts' || a === 'menu') { S.open = S.open\
+    \ === a ? null : a; render(); return; }\n      if (a === 'theme') { PP.setTheme(el.dataset.t); render(); return; }\n \
+    \     S.open = null;\n      if (a === 'nav') { S.active = el.dataset.page; render(); emit('nav', { page: el.dataset.page\
+    \ }); }\n      else if (a === 'alert') { render(); emit('open_alert', { restaurant_id: el.dataset.r, date: el.dataset.date\
+    \ }); }\n      else if (a === 'signout') { render(); emit('signout', {}); }\n    });\n    document.addEventListener('click',\
+    \ function (e) { if (!e.ppHeader && S.open) { S.open = null; render(); } });\n    document.addEventListener('keydown',\
+    \ function (e) { if (e.key === 'Escape' && S.open) { S.open = null; render(); } });\n\n    // New requests arrive while\
+    \ the portal is open: check every minute.\n    setInterval(function () {\n      if (!S.user || document.hidden) return;\n\
+    \      emit('poll', {}).then(function (a) { if (a && typeof a.pending === 'number') { S.alerts = a; if (!S.open) render();\
+    \ } }, function () {});\n    }, 60000);\n\n    render();\n    return {\n      setUser: function (json) { var me = json\
+    \ ? JSON.parse(json) : null; S.user = me; if (me && me.alerts) S.alerts = me.alerts; render(); },\n      setActive: function\
+    \ (page) { S.active = page; S.open = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json);\
+    \ render(); }\n    };\n  });\n})();\n</script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n.pp-auth { min-height:\
+    \ calc(100vh - 80px); display: grid; grid-template-columns: 1.1fr 1fr; }\n.pp-auth .side { background: #1d1b18; color:\
+    \ #efe9df; padding: 56px 56px 44px; display: flex; flex-direction: column; justify-content: space-between; position: relative;\
+    \ overflow: hidden; }\n.pp-auth .side .brand { display: flex; align-items: center; gap: 12px; font-family: var(--pp-serif);\
+    \ font-size: 1.7rem; font-weight: 600; }\n.pp-auth .side .brand .mark { width: 34px; height: 34px; color: #c9a56a; }\n\
+    .pp-auth .side h1 { color: inherit; font-size: 3.6rem; max-width: 11ch; line-height: 1.02; margin: 0 0 18px; font-weight:\
+    \ 500; }\n.pp-auth .side h1 em { color: #c9a56a; font-style: italic; }\n.pp-auth .side p { color: #b9b1a4; max-width:\
+    \ 38ch; font-size: 1.02rem; }\n.pp-auth .side ul { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap:\
+    \ 12px; color: #d8d1c4; font-size: .95rem; }\n.pp-auth .side li { display: flex; gap: 12px; align-items: baseline; }\n\
+    .pp-auth .side li::before { content: \"\"; flex: none; width: 18px; height: 1px; background: #c9a56a; transform: translateY(-4px);\
+    \ }\n.pp-auth .side .ring { position: absolute; right: -160px; bottom: -160px; width: 480px; height: 480px; color: rgba(201,165,106,.12);\
+    \ }\n.pp-auth .side .tag { font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: #8e8678; }\n.pp-auth\
+    \ .main { display: grid; place-items: center; padding: 40px 20px; }\n.pp-auth .box { width: min(380px, 100%); }\n.pp-auth\
+    \ .tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--pp-line); margin-bottom: 26px; }\n.pp-auth .tabs button\
+    \ { all: unset; cursor: pointer; padding: 10px 0; font-size: .92rem; color: var(--pp-muted); border-bottom: 2px solid\
+    \ transparent; margin-bottom: -1px; }\n.pp-auth .tabs button.on { color: var(--pp-ink); border-bottom-color: var(--pp-ink);\
+    \ }\n.pp-auth form > div + div { margin-top: 16px; }\n.pp-auth .link { all: unset; cursor: pointer; color: var(--pp-muted);\
+    \ font-size: .84rem; text-decoration: underline; text-decoration-color: var(--pp-line); text-underline-offset: 3px; }\n\
+    .pp-auth .link:hover { color: var(--pp-ink); }\n@media (max-width: 860px) {\n  .pp-auth { grid-template-columns: 1fr;\
+    \ min-height: 0; }\n  .pp-auth .side { padding: 30px 22px; } .pp-auth .side h1 { font-size: 2.3rem; margin-top: 26px;\
+    \ } .pp-auth .side ul, .pp-auth .side .ring, .pp-auth .side .tag { display: none; }\n}\n</style>\n<script>\n(function\
+    \ () {\n  var PP = window.PP;\n  PP.define('auth', function (root, data, emit) {\n    var esc = PP.esc;\n    var S = {\
+    \ mode: 'login', busy: false, msg: null, email: '' };\n\n    function form() {\n      if (S.mode === 'reset') {\n    \
+    \    return '<h2>Reset your password</h2><p class=\"muted small\">We\\'ll email you a link to choose a new one.</p>' +\n\
+    \          '<form data-form=\"reset\"><div><label class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\"\
+    \ name=\"email\" required autocomplete=\"email\" value=\"' + esc(S.email) + '\"></div>' +\n          '<div><button class=\"\
+    btn primary block\" type=\"submit\">Send reset link</button></div></form>' +\n          '<p style=\"margin-top:16px\"\
+    ><button class=\"link\" data-action=\"mode\" data-mode=\"login\">Back to sign in</button></p>';\n      }\n      var signup\
+    \ = S.mode === 'signup';\n      return '<div class=\"tabs\" role=\"tablist\">' +\n          '<button role=\"tab\" data-action=\"\
+    mode\" data-mode=\"login\" class=\"' + (!signup ? 'on' : '') + '\">Sign in</button>' +\n          '<button role=\"tab\"\
+    \ data-action=\"mode\" data-mode=\"signup\" class=\"' + (signup ? 'on' : '') + '\">Create account</button></div>' +\n\
+    \        '<h2>' + (signup ? 'Open your account' : 'Welcome back') + '</h2>' +\n        '<p class=\"muted small\">' + (signup\
+    \ ? 'Set up your restaurants, hours and tables in a few minutes.' : 'Sign in to manage your restaurants and reservations.')\
+    \ + '</p>' +\n        '<form data-form=\"' + S.mode + '\">' +\n          (signup ? '<div><label class=\"f\" for=\"ppN\"\
+    >Your name</label><input type=\"text\" id=\"ppN\" name=\"name\" required autocomplete=\"name\"></div>' : '') +\n     \
+    \     '<div><label class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"\
+    email\" value=\"' + esc(S.email) + '\"></div>' +\n          '<div><label class=\"f\" for=\"ppP\">Password</label><input\
+    \ type=\"password\" id=\"ppP\" name=\"password\" required minlength=\"' + (signup ? 8 : 1) + '\" autocomplete=\"' + (signup\
+    \ ? 'new-password' : 'current-password') + '\">' +\n            (signup ? '<div class=\"hint\">At least 8 characters.</div>'\
+    \ : '<div class=\"hint\" style=\"text-align:right\"><button type=\"button\" class=\"link\" data-action=\"mode\" data-mode=\"\
+    reset\">Forgot your password?</button></div>') + '</div>' +\n          '<div><button class=\"btn primary block\" type=\"\
+    submit\">' + (signup ? 'Create account' : 'Sign in') + '</button></div>' +\n        '</form>';\n    }\n\n    function\
+    \ render() {\n      root.innerHTML = '<div class=\"pp-auth\">' +\n        '<div class=\"side\">' + PP.mark('ring') +\n\
+    \          '<div class=\"brand\">' + PP.mark() + 'PlanPlate</div>' +\n          '<div><h1>Reservations, <em>made simple.</em></h1>'\
+    \ +\n          '<p>One calm place to run bookings for every restaurant you manage: opening hours, tables, approvals and\
+    \ a booking form for your website.</p>' +\n          '<ul><li>Seasonal hours and special days that override them</li><li>Join\
+    \ and split tables hour by hour</li><li>Bookings confirm themselves until you are 80% full</li><li>Guests manage their\
+    \ own reservation from one private link</li></ul></div>' +\n          '<div class=\"tag\">Simple · Smart · Reliable</div></div>'\
+    \ +\n        '<div class=\"main\"><div class=\"box fade-in\">' + form() + '<div data-el=\"msg\"></div></div></div></div>';\n\
+    \      var f = root.querySelector('form');\n      if (f) f.onsubmit = submit;\n      showMsg();\n    }\n    function showMsg()\
+    \ {\n      var box = root.querySelector('[data-el=msg]');\n      if (box) box.innerHTML = S.msg ? '<div class=\"feedback\
+    \ ' + (S.msg.ok ? 'good' : 'bad') + '\">' + esc(S.msg.text) + '</div>' : '';\n    }\n    function setBusy(on) {\n    \
+    \  S.busy = on;\n      root.querySelectorAll('.box button[type=submit]').forEach(function (b) {\n        b.disabled =\
+    \ on;\n        if (on) { b.dataset.label = b.innerHTML; b.innerHTML = '<span class=\"spin\"></span>'; }\n        else\
+    \ if (b.dataset.label) b.innerHTML = b.dataset.label;\n      });\n    }\n    function submit(e) {\n      e.preventDefault();\n\
+    \      if (S.busy) return;\n      var v = {};\n      new FormData(e.target).forEach(function (val, key) { v[key] = String(val);\
+    \ });\n      S.email = v.email || '';\n      S.msg = null; showMsg(); setBusy(true);\n      emit(e.target.dataset.form,\
+    \ v).then(function (res) {\n        setBusy(false);\n        res = res || {};\n        if (res.ok && !res.message) return;\
+    \ // Python navigates away\n        S.msg = res.ok ? { ok: true, text: res.message } : { ok: false, text: res.error ||\
+    \ 'Something went wrong.' };\n        if (res.mode && res.mode !== S.mode) { S.mode = res.mode; render(); } else showMsg();\n\
+    \      }, function (err) { setBusy(false); S.msg = { ok: false, text: PP.err(err) }; showMsg(); });\n    }\n    root.addEventListener('click',\
+    \ function (e) {\n      var el = e.target.closest('[data-action=mode]');\n      if (!el) return;\n      var em = root.querySelector('input[name=email]');\n\
+    \      if (em) S.email = em.value;\n      S.mode = el.dataset.mode; S.msg = null; render();\n      var first = root.querySelector('form\
+    \ input:not([value]), form input[value=\"\"]');\n      if (first) first.focus();\n    });\n    render();\n    return {};\n\
+    \  });\n})();\n</script>\n\n<!-- ===== DashboardPage component ===== -->\n<style>\n.pp-dash .hello { display: flex; align-items:\
+    \ flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }\n.pp-dash .hello h1 { margin: 0; }\n.pp-dash .alert { display:\
+    \ flex; gap: 16px; align-items: center; padding: 16px 20px; margin-bottom: 30px; background: var(--pp-warn-soft); border:\
+    \ 1px solid color-mix(in srgb, var(--pp-warn) 25%, transparent); border-radius: var(--pp-radius); color: var(--pp-ink);\
+    \ flex-wrap: wrap; }\n.pp-dash .alert .ic { width: 22px; height: 22px; color: var(--pp-warn); }\n.pp-dash .alert strong\
+    \ { font-weight: 600; }\n.pp-dash .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));\
+    \ gap: 16px; }\n.pp-dash .rc { display: flex; flex-direction: column; padding: 22px 22px 16px; min-height: 230px; transition:\
+    \ border-color .15s, transform .15s; }\n.pp-dash .rc:hover { border-color: var(--pp-faint); }\n.pp-dash .rc h3 { font-size:\
+    \ 1.55rem; margin-bottom: 2px; overflow-wrap: anywhere; }\n.pp-dash .rc .addr { color: var(--pp-muted); font-size: .84rem;\
+    \ min-height: 1.3em; }\n.pp-dash .rc .today { margin: 14px 0 16px; font-size: .86rem; color: var(--pp-ink); display: flex;\
+    \ gap: 7px; align-items: center; }\n.pp-dash .rc .today .ic { color: var(--pp-brass); }\n.pp-dash .rc .nums { display:\
+    \ grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 0; border-top: 1px solid var(--pp-line); border-bottom:\
+    \ 1px solid var(--pp-line); }\n.pp-dash .rc .nums b { display: block; font: 500 1.6rem/1 var(--pp-serif); }\n.pp-dash\
+    \ .rc .nums span { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-dash\
+    \ .rc .acts { display: flex; gap: 4px; align-items: center; margin-top: auto; padding-top: 12px; }\n.pp-dash .rc .top\
+    \ { display: flex; gap: 10px; align-items: flex-start; }\n.pp-dash .rc .top > div { flex: 1; min-width: 0; }\n.pp-dash\
+    \ .new { display: grid; place-items: center; text-align: center; border-style: dashed; color: var(--pp-muted); min-height:\
+    \ 230px; }\n.pp-dash .new:hover { color: var(--pp-ink); border-color: var(--pp-ink); }\n.pp-dash .new .plus { width: 44px;\
+    \ height: 44px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; margin: 0 auto\
+    \ 10px; }\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.define('dashboard', function (root, data, emit)\
+    \ {\n    var esc = PP.esc;\n    var list = data.restaurants || [], me = data.me || {};\n\n    function greeting() {\n\
+    \      var h = new Date().getHours();\n      return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';\n\
+    \    }\n    function card(r) {\n      return '<div class=\"card rc fade-in\" data-id=\"' + esc(r.id) + '\">' +\n     \
+    \   '<div class=\"top\"><div><h3>' + esc(r.name) + '</h3><div class=\"addr\">' + esc(r.address || '/' + r.slug) + '</div></div>'\
+    \ +\n          (r.pending ? '<span class=\"badge pending\">' + r.pending + ' to approve</span>' : !r.accepting ? '<span\
+    \ class=\"badge cancelled\">Online booking off</span>' : '') +\n          (r.role && r.role !== 'owner' ? '<span class=\"\
+    badge plain\">' + esc(PP.ROLE[r.role]) + '</span>' : '') + '</div>' +\n        '<div class=\"today\">' + PP.icon('clock')\
+    \ + esc(r.today) + '</div>' +\n        '<div class=\"nums\"><div><b>' + r.bookings + '</b><span>Bookings</span></div><div><b>'\
+    \ + r.covers + '</b><span>Guests</span></div><div><b>' + r.seats + '</b><span>Seats</span></div></div>' +\n        '<div\
+    \ class=\"acts\"><button class=\"btn primary sm\" data-action=\"open\" data-page=\"reservations\">Open</button>' +\n \
+    \         (r.role !== 'staff' ? '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"hours\">Hours</button>'\
+    \ +\n          '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"tables\">Tables</button>' : '') + '<span\
+    \ class=\"spacer\"></span>' +\n          '<button class=\"btn ghost icon\" data-action=\"copy\" title=\"Copy booking link\"\
+    \ aria-label=\"Copy booking link\">' + PP.icon('link') + '</button>' +\n          (r.role !== 'staff' ? '<button class=\"\
+    btn ghost icon\" data-action=\"duplicate\" title=\"Duplicate\" aria-label=\"Duplicate restaurant\">' + PP.icon('copy')\
+    \ + '</button>' : '') + '</div></div>';\n    }\n    function render() {\n      var pending = list.reduce(function (n,\
+    \ r) { return n + r.pending; }, 0);\n      var firstName = String(me.display_name || '').split(' ')[0];\n      root.innerHTML\
+    \ = '<div class=\"wrap pp-dash\">' +\n        '<div class=\"hello\"><div><div class=\"eyebrow\">' + esc(new Date().toLocaleDateString(undefined,\
+    \ { weekday: 'long', day: 'numeric', month: 'long' })) + '</div>' +\n          '<h1>' + greeting() + (firstName ? ', '\
+    \ + esc(firstName) : '') + '</h1></div><span class=\"spacer\"></span>' +\n          (list.length ? '<button class=\"btn\
+    \ primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button>' : '') + '</div>' +\n        (pending ?\
+    \ '<div class=\"alert\">' + PP.icon('bell') + '<div><strong>' + PP.plural(pending, 'booking') + ' waiting for your approval.</strong>\
+    \ ' +\n          '<span class=\"muted\">They came in while a restaurant was nearly full, or for a large party.</span></div><span\
+    \ class=\"spacer\"></span>' +\n          list.filter(function (r) { return r.pending; }).map(function (r) {\n        \
+    \    return '<button class=\"btn sm\" data-action=\"open\" data-page=\"reservations\" data-id=\"' + esc(r.id) + '\">'\
+    \ + esc(r.name) + ' · ' + r.pending + '</button>';\n          }).join('') + '</div>' : '') +\n        (list.length ? '<div\
+    \ class=\"section-title\"><h2>Your restaurants</h2><span class=\"muted small\">' + list.length + '</span></div>' +\n \
+    \         '<div class=\"grid\">' + list.map(card).join('') +\n          '<button class=\"card new\" data-action=\"new\"\
+    ><div><div class=\"plus\">' + PP.icon('plus') + '</div>Add a restaurant</div></button></div>'\n          : '<div class=\"\
+    empty\" style=\"padding:70px 20px\"><h2>Add your first restaurant</h2><p>Start with sample opening hours and tables, then\
+    \ make them yours.</p>' +\n            '<button class=\"btn primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button></div>')\
+    \ +\n        '</div>';\n    }\n\n    function newModal() {\n      var tz = 'UTC';\n      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone\
+    \ || 'UTC'; } catch (e) {}\n      var d = PP.modal('<div class=\"eyebrow\">New restaurant</div><h2>What is it called?</h2>'\
+    \ +\n        '<form><div class=\"stack\"><div><label class=\"f\" for=\"nrName\">Name</label><input id=\"nrName\" name=\"\
+    name\" type=\"text\" required maxlength=\"80\" autofocus></div>' +\n        '<div><label class=\"f\" for=\"nrTz\">Time\
+    \ zone</label>' + PP.tzField('timezone', tz, 'nrTz') +\n          '<div class=\"hint\">Booking times are always in the\
+    \ restaurant\\'s local time. Search by country, city or GMT offset.</div></div>' +\n        '<label class=\"check\"><input\
+    \ type=\"checkbox\" name=\"sample\" checked><span>Start with sample opening hours and 9 tables<br><span class=\"muted\
+    \ small\">You can change all of it afterwards.</span></span></label>' +\n        '<div data-el=\"msg\"></div></div>' +\n\
+    \        '<div class=\"foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\"\
+    \ type=\"submit\">Create restaurant</button></div></form>');\n      var f = d.el.querySelector('form');\n      f.onsubmit\
+    \ = function (e) {\n        e.preventDefault();\n        var b = f.querySelector('[type=submit]'); b.disabled = true;\
+    \ b.innerHTML = '<span class=\"spin\"></span>';\n        emit('create', { name: f.name.value, timezone: f.timezone.value,\
     \ sample: f.sample.checked }).then(function (res) {\n          if (res && res.ok) { d.close(); return; }\n          b.disabled\
     \ = false; b.textContent = 'Create restaurant';\n          d.el.querySelector('[data-el=msg]').innerHTML = '<div class=\"\
     feedback bad\">' + esc((res && res.error) || 'Could not create it.') + '</div>';\n        }, function (err) { b.disabled\
@@ -1798,62 +1913,61 @@ native_deps:
     \ '') + '</div>';\n    }\n    function rule(name, title, desc, unit, min, max) {\n      return '<div class=\"rule\"><div><div\
     \ class=\"t\">' + title + '</div><div class=\"d\">' + desc + '</div></div>' +\n        '<div class=\"unit\"><input type=\"\
     number\" name=\"' + name + '\" min=\"' + min + '\" max=\"' + max + '\" value=\"' + D.settings[name] + '\" aria-label=\"\
-    ' + esc(title) + '\"><span>' + unit + '</span></div></div>';\n    }\n    function zones() { try { return Intl.supportedValuesOf('timeZone');\
-    \ } catch (e) { return []; } }\n    function codes() {\n      var s = D.settings, link = PP.bookUrl(s.slug), origin =\
-    \ D.origin || PP.appUrl().replace(/\\/$/, '');\n      var iframe = '<iframe src=\"' + link + '\" title=\"Reserve a table\
-    \ at ' + s.name + '\" style=\"width:100%;max-width:560px;height:820px;border:0\"></iframe>';\n      var script = '<script\
-    \ src=\"' + origin + '/_/api/embed.js?r=' + s.slug + '\"></' + 'script>';\n      var custom = '<a href=\"#\" data-planplate-open>Book\
-    \ a table</a>\\n<script src=\"' + origin + '/_/api/embed.js?r=' + s.slug + '\"></' + 'script>';\n      function block(id,\
-    \ text) { return '<div class=\"code\"><pre data-code=\"' + id + '\">' + esc(text) + '</pre><button type=\"button\" class=\"\
-    btn sm\" data-copy=\"' + id + '\">' + PP.icon('copy') + 'Copy</button></div>'; }\n      return '<div class=\"share\"><h3>Booking\
-    \ link</h3><p class=\"small muted\">Share it anywhere: social media, Google Business Profile, email signatures.</p>' +\
-    \ block('link', link) +\n        '<p style=\"margin-top:10px\"><a class=\"btn sm\" href=\"' + esc(link) + '\" target=\"\
-    _blank\" rel=\"noopener\">' + PP.icon('ext') + 'Open the booking page</a></p>' +\n        '<h3>“Reserve a table” button</h3><p\
-    \ class=\"small muted\">Paste this where the button should appear on your website. It opens the booking form in a window\
-    \ over your page.</p>' + block('script', script) +\n        '<h3>Use your own button or link</h3><p class=\"small muted\"\
-    >Give any element the attribute <code>data-planplate-open</code> and include the script once.</p>' + block('custom', custom)\
-    \ +\n        '<h3>Embed the form in a page</h3>' + block('iframe', iframe) +\n        '<h3>QR codes</h3><p class=\"small\
-    \ muted\">For table cards, the window and the door. The menu code always opens your latest menu, so you never reprint\
-    \ it.</p>' +\n        '<div class=\"qrs\"><div class=\"qr\">' + PP.qrSvg(link, 150) + '<strong>Book a table</strong><button\
-    \ type=\"button\" class=\"btn sm\" data-qr-png=\"' + esc(link) + '\" data-kind=\"booking\" data-caption=\"Reserve a table\"\
-    >' + PP.icon('download') + 'Download PNG</button></div>' +\n          '<div class=\"qr\">' + PP.qrSvg(PP.menuUrl(s.slug),\
-    \ 150) + '<strong>Menu</strong><button type=\"button\" class=\"btn sm\" data-qr-png=\"' + esc(PP.menuUrl(s.slug)) + '\"\
-    \ data-kind=\"menu\" data-caption=\"Menu\">' + PP.icon('download') + 'Download PNG</button></div></div>' +\n        '<h3>Live\
-    \ menu on your website</h3><p class=\"small muted\">Put this where the menu should appear. It always shows the menu as\
-    \ it is in PlanPlate.</p>' +\n          block('menu', '<div data-planplate-menu></div>\\n<script src=\"' + origin + '/_/api/menu.js?r='\
-    \ + s.slug + '\"></' + 'script>') +\n        '<h3>Live opening hours on your website</h3>' +\n          block('hours',\
-    \ '<div data-planplate-hours></div>\\n<script src=\"' + origin + '/_/api/hours.js?r=' + s.slug + '\"></' + 'script>')\
-    \ +\n        '<p class=\"small muted\" style=\"margin-top:10px\">Developers can read the same data as JSON: <code>' +\
-    \ esc(origin) + '/_/api/menu?r=' + esc(s.slug) + '</code> and <code>' + esc(origin) + '/_/api/hours?r=' + esc(s.slug)\
-    \ + '</code></p></div>';\n    }\n    var LANGS = { en: 'English', fr: 'Français', lv: 'Latviešu' };\n    function teamHtml()\
-    \ {\n      var owner = D.role === 'owner';\n      return '<div>' + (D.team || []).map(function (m) {\n        var roleCell\
-    \ = m.role === 'owner' ? '<span class=\"badge plain\">Owner</span>'\n          : owner ? '<select data-role=\"' + esc(m.id)\
-    \ + '\" aria-label=\"Role\"><option value=\"manager\"' + (m.role === 'manager' ? ' selected' : '') + '>Manager</option><option\
-    \ value=\"staff\"' + (m.role === 'staff' ? ' selected' : '') + '>Staff</option></select>'\n          : '<span class=\"\
-    badge plain\">' + esc(PP.ROLE[m.role] || m.role) + '</span>';\n        return '<div class=\"m\"><div class=\"who\"><strong>'\
-    \ + esc(m.name || m.email) + '</strong>' + (m.name ? '<span>' + esc(m.email) + '</span>' : '') + '</div>' +\n        \
-    \  (m.joined ? '' : '<span class=\"badge pending\" title=\"They get access when they sign in with this email\">Invited</span>')\
-    \ + roleCell +\n          (owner && m.id ? '<button class=\"btn ghost icon\" data-remove=\"' + esc(m.id) + '\" aria-label=\"\
-    Remove ' + esc(m.email) + '\">' + PP.icon('x') + '</button>' : '') + '</div>';\n      }).join('') + '</div>' +\n     \
-    \   (owner ? '<form data-el=\"invite\"><input type=\"email\" name=\"email\" required placeholder=\"colleague@restaurant.com\"\
-    \ aria-label=\"Email\"><select name=\"role\" aria-label=\"Role\"><option value=\"staff\">Staff</option><option value=\"\
-    manager\">Manager</option></select>' +\n          '<button class=\"btn primary\" type=\"submit\">' + PP.icon('plus') +\
-    \ 'Invite</button></form><p class=\"hint\">They sign in, or create an account, with that email and the restaurant appears\
-    \ in their list. We email them an invitation.</p>' : '');\n    }\n    function render() {\n      var s = D.settings, owner\
-    \ = D.role === 'owner';\n      root.innerHTML = '<div class=\"wrap pp-set\">' + PP.subnav(D.nav, 'settings') +\n     \
-    \   '<div class=\"layout\"><nav class=\"toc\"><a href=\"#st-details\">Details</a><a href=\"#st-rules\">Booking rules</a><a\
-    \ href=\"#st-approval\">Approvals</a><a href=\"#st-form\">Booking form</a><a href=\"#st-emails\">Emails</a><a href=\"\
-    #st-langs\">Languages</a><a href=\"#st-share\">Share &amp; embed</a><a href=\"#st-team\">Team</a>' + (owner ? '<a href=\"\
-    #st-danger\">Delete</a>' : '') + '</nav>' +\n        '<form data-el=\"form\" novalidate><section class=\"card\" id=\"\
-    st-details\"><h2>Details</h2><p class=\"lead\">Shown to guests on the booking form and their reservation page.</p><div\
+    ' + esc(title) + '\"><span>' + unit + '</span></div></div>';\n    }\n    function codes() {\n      var s = D.settings,\
+    \ link = PP.bookUrl(s.slug), origin = D.origin || PP.appUrl().replace(/\\/$/, '');\n      var iframe = '<iframe src=\"\
+    ' + link + '\" title=\"Reserve a table at ' + s.name + '\" style=\"width:100%;max-width:560px;height:820px;border:0\"\
+    ></iframe>';\n      var script = '<script src=\"' + origin + '/_/api/embed.js?r=' + s.slug + '\"></' + 'script>';\n  \
+    \    var custom = '<a href=\"#\" data-planplate-open>Book a table</a>\\n<script src=\"' + origin + '/_/api/embed.js?r='\
+    \ + s.slug + '\"></' + 'script>';\n      function block(id, text) { return '<div class=\"code\"><pre data-code=\"' + id\
+    \ + '\">' + esc(text) + '</pre><button type=\"button\" class=\"btn sm\" data-copy=\"' + id + '\">' + PP.icon('copy') +\
+    \ 'Copy</button></div>'; }\n      return '<div class=\"share\"><h3>Booking link</h3><p class=\"small muted\">Share it\
+    \ anywhere: social media, Google Business Profile, email signatures.</p>' + block('link', link) +\n        '<p style=\"\
+    margin-top:10px\"><a class=\"btn sm\" href=\"' + esc(link) + '\" target=\"_blank\" rel=\"noopener\">' + PP.icon('ext')\
+    \ + 'Open the booking page</a></p>' +\n        '<h3>“Reserve a table” button</h3><p class=\"small muted\">Paste this where\
+    \ the button should appear on your website. It opens the booking form in a window over your page.</p>' + block('script',\
+    \ script) +\n        '<h3>Use your own button or link</h3><p class=\"small muted\">Give any element the attribute <code>data-planplate-open</code>\
+    \ and include the script once.</p>' + block('custom', custom) +\n        '<h3>Embed the form in a page</h3>' + block('iframe',\
+    \ iframe) +\n        '<h3>QR codes</h3><p class=\"small muted\">For table cards, the window and the door. The menu code\
+    \ always opens your latest menu, so you never reprint it.</p>' +\n        '<div class=\"qrs\"><div class=\"qr\">' + PP.qrSvg(link,\
+    \ 150) + '<strong>Book a table</strong><button type=\"button\" class=\"btn sm\" data-qr-png=\"' + esc(link) + '\" data-kind=\"\
+    booking\" data-caption=\"Reserve a table\">' + PP.icon('download') + 'Download PNG</button></div>' +\n          '<div\
+    \ class=\"qr\">' + PP.qrSvg(PP.menuUrl(s.slug), 150) + '<strong>Menu</strong><button type=\"button\" class=\"btn sm\"\
+    \ data-qr-png=\"' + esc(PP.menuUrl(s.slug)) + '\" data-kind=\"menu\" data-caption=\"Menu\">' + PP.icon('download') + 'Download\
+    \ PNG</button></div></div>' +\n        '<h3>Live menu on your website</h3><p class=\"small muted\">Put this where the\
+    \ menu should appear. It always shows the menu as it is in PlanPlate.</p>' +\n          block('menu', '<div data-planplate-menu></div>\\\
+    n<script src=\"' + origin + '/_/api/menu.js?r=' + s.slug + '\"></' + 'script>') +\n        '<h3>Live opening hours on\
+    \ your website</h3>' +\n          block('hours', '<div data-planplate-hours></div>\\n<script src=\"' + origin + '/_/api/hours.js?r='\
+    \ + s.slug + '\"></' + 'script>') +\n        '<p class=\"small muted\" style=\"margin-top:10px\">Developers can read the\
+    \ same data as JSON: <code>' + esc(origin) + '/_/api/menu?r=' + esc(s.slug) + '</code> and <code>' + esc(origin) + '/_/api/hours?r='\
+    \ + esc(s.slug) + '</code></p></div>';\n    }\n    var LANGS = { en: 'English', fr: 'Français', lv: 'Latviešu' };\n  \
+    \  function teamHtml() {\n      var owner = D.role === 'owner';\n      return '<div>' + (D.team || []).map(function (m)\
+    \ {\n        var roleCell = m.role === 'owner' ? '<span class=\"badge plain\">Owner</span>'\n          : owner ? '<select\
+    \ data-role=\"' + esc(m.id) + '\" aria-label=\"Role\"><option value=\"manager\"' + (m.role === 'manager' ? ' selected'\
+    \ : '') + '>Manager</option><option value=\"staff\"' + (m.role === 'staff' ? ' selected' : '') + '>Staff</option></select>'\n\
+    \          : '<span class=\"badge plain\">' + esc(PP.ROLE[m.role] || m.role) + '</span>';\n        return '<div class=\"\
+    m\"><div class=\"who\"><strong>' + esc(m.name || m.email) + '</strong>' + (m.name ? '<span>' + esc(m.email) + '</span>'\
+    \ : '') + '</div>' +\n          (m.joined ? '' : '<span class=\"badge pending\" title=\"They get access when they sign\
+    \ in with this email\">Invited</span>') + roleCell +\n          (owner && m.id ? '<button class=\"btn ghost icon\" data-remove=\"\
+    ' + esc(m.id) + '\" aria-label=\"Remove ' + esc(m.email) + '\">' + PP.icon('x') + '</button>' : '') + '</div>';\n    \
+    \  }).join('') + '</div>' +\n        (owner ? '<form data-el=\"invite\"><input type=\"email\" name=\"email\" required\
+    \ placeholder=\"colleague@restaurant.com\" aria-label=\"Email\"><select name=\"role\" aria-label=\"Role\"><option value=\"\
+    staff\">Staff</option><option value=\"manager\">Manager</option></select>' +\n          '<button class=\"btn primary\"\
+    \ type=\"submit\">' + PP.icon('plus') + 'Invite</button></form><p class=\"hint\">They sign in, or create an account, with\
+    \ that email and the restaurant appears in their list. We email them an invitation.</p>' : '');\n    }\n    function render()\
+    \ {\n      var s = D.settings, owner = D.role === 'owner';\n      root.innerHTML = '<div class=\"wrap pp-set\">' + PP.subnav(D.nav,\
+    \ 'settings') +\n        '<div class=\"layout\"><nav class=\"toc\"><a href=\"#st-details\">Details</a><a href=\"#st-rules\"\
+    >Booking rules</a><a href=\"#st-approval\">Approvals</a><a href=\"#st-form\">Booking form</a><a href=\"#st-emails\">Emails</a><a\
+    \ href=\"#st-langs\">Languages</a><a href=\"#st-share\">Share &amp; embed</a><a href=\"#st-team\">Team</a>' + (owner ?\
+    \ '<a href=\"#st-danger\">Delete</a>' : '') + '</nav>' +\n        '<form data-el=\"form\" novalidate><section class=\"\
+    card\" id=\"st-details\"><h2>Details</h2><p class=\"lead\">Shown to guests on the booking form and their reservation page.</p><div\
     \ class=\"stack\">' +\n          field('name', 'Restaurant name', 'text', { max: 80, req: true }) +\n          field('description',\
     \ 'Short description', 'textarea', { max: 400, h: 60, ph: 'Seasonal French cooking in the heart of the old town.' }) +\n\
     \          '<div class=\"grid2\">' + field('address', 'Address', 'text', { max: 200 }) + field('phone', 'Phone', 'tel',\
     \ { max: 40 }) + '</div>' +\n          '<div class=\"grid2\">' + field('email', 'Email', 'email', { max: 200 }) + field('website',\
     \ 'Website', 'url', { max: 200, ph: 'https://' }) + '</div>' +\n          '<div class=\"grid2\">' + field('slug', 'Booking\
-    \ link', 'text', { max: 40, hint: esc(PP.appUrl()) + '#book/<b>' + esc(s.slug) + '</b>' }) +\n            field('timezone',\
-    \ 'Time zone', 'text', { list: 'stZones', hint: 'All booking times are in this time zone.' }) + '</div>' +\n         \
-    \ '<datalist id=\"stZones\">' + zones().map(function (z) { return '<option value=\"' + esc(z) + '\">'; }).join('') + '</datalist>'\
+    \ link', 'text', { max: 40, hint: esc(PP.appUrl()) + '#book/<b>' + esc(s.slug) + '</b>' }) +\n            '<div><label\
+    \ class=\"f\" for=\"st_timezone\">Time zone</label>' + PP.tzField('timezone', s.timezone, 'st_timezone') +\n         \
+    \     '<div class=\"hint\">All booking times are in this time zone. Search by country, city or GMT offset.</div></div></div>'\
     \ +\n        '</div></section>' +\n        '<section class=\"card\" id=\"st-rules\"><h2>Booking rules</h2><p class=\"\
     lead\">How guests can book online. Staff bookings in the portal can go outside these.</p>' +\n          '<label class=\"\
     check\" style=\"margin-bottom:8px\"><input type=\"checkbox\" name=\"accepting\"' + (s.accepting ? ' checked' : '') + '><span><strong>Take\
