@@ -624,8 +624,17 @@ native_deps:
     \ paper, warm ink, a brass accent. Serif display type, quiet sans for the interface.\n-->\n<link rel=\"preconnect\" href=\"\
     https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"\
     https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap\"\
-    \ rel=\"stylesheet\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<!-- QR codes for the\
-    \ booking page and the menu (Settings → Share). -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js\"\
+    \ rel=\"stylesheet\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<!-- Browser tab icon:\
+    \ the PlanPlate mark (a plate from above), brass on ink. Anvil's default icon is removed. -->\n<link id=\"pp-favicon\"\
+    \ rel=\"icon\" type=\"image/svg+xml\" href=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0\
+    \ 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%231d1b18'/%3E%3Ccircle cx='16' cy='16' r='11.8' fill='none' stroke='%23c9a56a'\
+    \ stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='7.4' fill='none' stroke='%23c9a56a' stroke-width='1.3'/%3E%3Cpath d='M16\
+    \ 11.6v8.8' stroke='%23c9a56a' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E\">\n<link rel=\"apple-touch-icon\"\
+    \ href=\"_/theme/icon-180.png\">\n<script>\n(function () {\n  function keepOurs() {\n    var ours = document.getElementById('pp-favicon');\n\
+    \    if (!ours) return;\n    document.querySelectorAll('link[rel~=\"icon\"]').forEach(function (l) { if (l !== ours) l.remove();\
+    \ });\n    if (ours !== document.head.lastElementChild) document.head.appendChild(ours);\n  }\n  keepOurs();\n  document.addEventListener('DOMContentLoaded',\
+    \ keepOurs);\n  window.addEventListener('load', keepOurs);\n})();\n</script>\n<!-- QR codes for the booking page and the\
+    \ menu (Settings → Share). -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js\"\
     ></script>\n\n<style>\n:root {\n  --pp-bg: #f6f3ee; --pp-panel: #fffdf9; --pp-panel-2: #f1ede6; --pp-ink: #1d1b18; --pp-muted:\
     \ #6f6a62; --pp-faint: #a19a8f; --pp-line: #e4ded4;\n  --pp-accent: #1d1b18; --pp-accent-ink: #faf8f4; --pp-brass: #9c7a43;\
     \ --pp-brass-soft: #f3ebdc;\n  --pp-good: #3f6b4e; --pp-good-soft: #e5efe7; --pp-warn: #93650f; --pp-warn-soft: #f7ecd6;\
@@ -1065,177 +1074,207 @@ native_deps:
     \ (page) { S.active = page; S.open = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json);\
     \ render(); }\n    };\n  });\n})();\n</script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n/* ---- hero: dark\
     \ story panel + sign-in box ---- */\n.pp-auth { min-height: min(calc(100vh - 80px), 820px); display: grid; grid-template-columns:\
-    \ 1.1fr 1fr; }\n.pp-auth .side { background: #1d1b18; color: #efe9df; padding: 48px 56px 44px; display: flex; flex-direction:\
-    \ column; justify-content: space-between; gap: 40px; position: relative; overflow: hidden; }\n.pp-auth .side > * { position:\
-    \ relative; }\n.pp-auth .side .top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }\n\
-    .pp-auth .side .brand { display: flex; align-items: center; gap: 12px; font-family: var(--pp-serif); font-size: 1.7rem;\
-    \ font-weight: 600; }\n.pp-auth .side .brand .mark { width: 34px; height: 34px; color: #c9a56a; }\n.pp-auth .side .jump\
-    \ { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }\n.pp-auth .side .jump button { all: unset;\
-    \ cursor: pointer; padding: 6px 10px; border-radius: 99px; font-size: .84rem; color: #b9b1a4; }\n.pp-auth .side .jump\
-    \ button:hover { color: #efe9df; background: rgba(239,233,223,.07); }\n.pp-auth .side .jump button:focus-visible, .pp-auth\
-    \ .side .more:focus-visible { outline: 2px solid #c9a56a; outline-offset: 2px; }\n.pp-auth .side h1 { color: inherit;\
-    \ font-size: 3.6rem; max-width: 11ch; line-height: 1.02; margin: 0 0 18px; font-weight: 500; }\n.pp-auth .side h1 em {\
-    \ color: #c9a56a; font-style: italic; }\n.pp-auth .side .eyebrow { color: #c9a56a; }\n.pp-auth .side p { color: #b9b1a4;\
-    \ max-width: 40ch; font-size: 1.02rem; }\n.pp-auth .side .more { all: unset; cursor: pointer; margin-top: 22px; display:\
-    \ inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 99px; border: 1px solid rgba(201,165,106,.5);\
-    \ color: #efe9df; font-size: .9rem; }\n.pp-auth .side .more:hover { border-color: #c9a56a; background: rgba(201,165,106,.08);\
-    \ }\n.pp-auth .side .more .ic { color: #c9a56a; }\n.pp-auth .side .stats { display: grid; grid-template-columns: repeat(3,\
-    \ auto); justify-content: start; gap: 36px; }\n.pp-auth .side .stats b { display: block; font: 500 2rem/1 var(--pp-serif);\
-    \ color: #efe9df; }\n.pp-auth .side .stats span { display: block; margin-top: 6px; font-size: .74rem; letter-spacing:\
-    \ .14em; text-transform: uppercase; color: #8e8678; }\n.pp-auth .side .ring { position: absolute; right: -160px; bottom:\
-    \ -160px; width: 480px; height: 480px; color: rgba(201,165,106,.12); }\n.pp-auth .main { display: grid; place-items: center;\
-    \ padding: 40px 20px; }\n.pp-auth .box { width: min(380px, 100%); scroll-margin-top: 24px; }\n.pp-auth .tabs { display:\
-    \ flex; gap: 22px; border-bottom: 1px solid var(--pp-line); margin-bottom: 26px; }\n.pp-auth .tabs button { all: unset;\
-    \ cursor: pointer; padding: 10px 0; font-size: .92rem; color: var(--pp-muted); border-bottom: 2px solid transparent; margin-bottom:\
-    \ -1px; }\n.pp-auth .tabs button.on { color: var(--pp-ink); border-bottom-color: var(--pp-ink); }\n.pp-auth form > div\
-    \ + div { margin-top: 16px; }\n.pp-auth .link { all: unset; cursor: pointer; color: var(--pp-muted); font-size: .84rem;\
-    \ text-decoration: underline; text-decoration-color: var(--pp-line); text-underline-offset: 3px; }\n.pp-auth .link:hover\
-    \ { color: var(--pp-ink); }\n\n/* ---- landing sections ---- */\n.pp-land .sec { max-width: 1120px; margin: 0 auto; padding:\
-    \ 96px 20px; scroll-margin-top: 0; }\n.pp-land .sec + .sec { border-top: 1px solid var(--pp-line); }\n.pp-land h2 { font-size:\
-    \ 2.7rem; line-height: 1.05; margin-bottom: 16px; }\n.pp-land h2 em { font-style: italic; color: var(--pp-brass); }\n\
-    .pp-land .lede { color: var(--pp-muted); font-size: 1.08rem; max-width: 56ch; margin: 0; }\n.pp-land .head { margin-bottom:\
-    \ 48px; }\n.pp-land h3 { font-size: 1.35rem; margin-bottom: 6px; }\n.pp-land p { line-height: 1.6; }\n.pp-land .ico {\
-    \ width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--pp-brass-soft);\
-    \ color: var(--pp-brass); flex: none; }\n.pp-land .ico .ic { width: 18px; height: 18px; }\n\n.pp-land .steps { display:\
-    \ grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; }\n.pp-land .step { padding: 28px 26px\
-    \ 30px; }\n.pp-land .step .n { font: 500 2.6rem/1 var(--pp-serif); color: var(--pp-brass); margin-bottom: 18px; }\n.pp-land\
-    \ .step p { color: var(--pp-muted); margin: 0; font-size: .94rem; }\n\n.pp-land .why { display: grid; grid-template-columns:\
+    \ 1.1fr 1fr; }\n.pp-auth .side { background: linear-gradient(100deg, rgba(29,27,24,.97) 35%, rgba(29,27,24,.74)), url(_/theme/photo-plate.webp)\
+    \ center / cover, #1d1b18; color: #efe9df; padding: 48px 56px 44px; display: flex; flex-direction: column; justify-content:\
+    \ space-between; gap: 40px; position: relative; overflow: hidden; }\n.pp-auth .side > * { position: relative; }\n.pp-auth\
+    \ .side .top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }\n.pp-auth .side .brand\
+    \ { display: flex; align-items: center; gap: 12px; font-family: var(--pp-serif); font-size: 1.7rem; font-weight: 600;\
+    \ }\n.pp-auth .side .brand .mark { width: 34px; height: 34px; color: #c9a56a; }\n.pp-auth .side .jump { display: flex;\
+    \ gap: 4px; flex-wrap: wrap; justify-content: flex-end; }\n.pp-auth .side .jump button { all: unset; cursor: pointer;\
+    \ padding: 6px 10px; border-radius: 99px; font-size: .84rem; color: #b9b1a4; }\n.pp-auth .side .jump button:hover { color:\
+    \ #efe9df; background: rgba(239,233,223,.07); }\n.pp-auth .side .jump button:focus-visible, .pp-auth .side .more:focus-visible\
+    \ { outline: 2px solid #c9a56a; outline-offset: 2px; }\n.pp-auth .side h1 { color: inherit; font-size: 3.6rem; max-width:\
+    \ 11ch; line-height: 1.02; margin: 0 0 18px; font-weight: 500; }\n.pp-auth .side h1 em { color: #c9a56a; font-style: italic;\
+    \ }\n.pp-auth .side .eyebrow { color: #c9a56a; }\n.pp-auth .side p { color: #b9b1a4; max-width: 40ch; font-size: 1.02rem;\
+    \ }\n.pp-auth .side .more { all: unset; cursor: pointer; margin-top: 22px; display: inline-flex; align-items: center;\
+    \ gap: 8px; padding: 10px 18px; border-radius: 99px; border: 1px solid rgba(201,165,106,.5); color: #efe9df; font-size:\
+    \ .9rem; }\n.pp-auth .side .more:hover { border-color: #c9a56a; background: rgba(201,165,106,.08); }\n.pp-auth .side .more\
+    \ .ic { color: #c9a56a; }\n.pp-auth .side .stats { display: grid; grid-template-columns: repeat(3, auto); justify-content:\
+    \ start; gap: 36px; }\n.pp-auth .side .stats b { display: block; font: 500 2rem/1 var(--pp-serif); color: #efe9df; }\n\
+    .pp-auth .side .stats span { display: block; margin-top: 6px; font-size: .74rem; letter-spacing: .14em; text-transform:\
+    \ uppercase; color: #8e8678; }\n.pp-auth .side .ring { position: absolute; right: -160px; bottom: -160px; width: 480px;\
+    \ height: 480px; color: rgba(201,165,106,.12); }\n.pp-auth .main { display: flex; flex-direction: column; align-items:\
+    \ center; justify-content: center; padding: 40px 20px 128px; position: relative; }\n.pp-auth .cue { all: unset; cursor:\
+    \ pointer; position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); display: flex; flex-direction: column;\
+    \ align-items: center; gap: 10px; color: var(--pp-muted); font-size: .7rem; font-weight: 600; letter-spacing: .18em; text-transform:\
+    \ uppercase; white-space: nowrap; }\n.pp-auth .cue:hover { color: var(--pp-ink); }\n.pp-auth .cue .dot { width: 40px;\
+    \ height: 40px; border-radius: 50%; border: 1px solid var(--pp-line); background: var(--pp-panel); display: grid; place-items:\
+    \ center; color: var(--pp-brass); animation: pp-bob 2.4s ease-in-out infinite; }\n.pp-auth .cue:hover .dot { border-color:\
+    \ var(--pp-brass); }\n.pp-auth .cue:focus-visible .dot { outline: 2px solid var(--pp-brass); outline-offset: 2px; }\n\
+    @keyframes pp-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }\n@media (prefers-reduced-motion:\
+    \ reduce) { .pp-auth .cue .dot { animation: none; } }\n.pp-auth .box { width: min(380px, 100%); scroll-margin-top: 24px;\
+    \ }\n.pp-auth .tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--pp-line); margin-bottom: 26px; }\n.pp-auth\
+    \ .tabs button { all: unset; cursor: pointer; padding: 10px 0; font-size: .92rem; color: var(--pp-muted); border-bottom:\
+    \ 2px solid transparent; margin-bottom: -1px; }\n.pp-auth .tabs button.on { color: var(--pp-ink); border-bottom-color:\
+    \ var(--pp-ink); }\n.pp-auth form > div + div { margin-top: 16px; }\n.pp-auth .link { all: unset; cursor: pointer; color:\
+    \ var(--pp-muted); font-size: .84rem; text-decoration: underline; text-decoration-color: var(--pp-line); text-underline-offset:\
+    \ 3px; }\n.pp-auth .link:hover { color: var(--pp-ink); }\n\n/* ---- landing sections ---- */\n.pp-land .sec { max-width:\
+    \ 1120px; margin: 0 auto; padding: 96px 20px; scroll-margin-top: 0; }\n.pp-land .sec + .sec { border-top: 1px solid var(--pp-line);\
+    \ }\n.pp-land h2 { font-size: 2.7rem; line-height: 1.05; margin-bottom: 16px; }\n.pp-land h2 em { font-style: italic;\
+    \ color: var(--pp-brass); }\n.pp-land .lede { color: var(--pp-muted); font-size: 1.08rem; max-width: 56ch; margin: 0;\
+    \ }\n.pp-land .head { margin-bottom: 48px; }\n.pp-land h3 { font-size: 1.35rem; margin-bottom: 6px; }\n.pp-land p { line-height:\
+    \ 1.6; }\n.pp-land .ico { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background:\
+    \ var(--pp-brass-soft); color: var(--pp-brass); flex: none; }\n.pp-land .ico .ic { width: 18px; height: 18px; }\n\n.pp-land\
+    \ .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; }\n.pp-land .step { padding:\
+    \ 0; overflow: hidden; }\n.pp-land .step .shot { aspect-ratio: 16 / 10; background: var(--pp-panel-2); border-bottom:\
+    \ 1px solid var(--pp-line); }\n.pp-land .step .shot img { width: 100%; height: 100%; object-fit: cover; }\n.pp-land .step\
+    \ .txt { padding: 22px 26px 28px; }\n.pp-land .step .n { font: 500 2rem/1 var(--pp-serif); color: var(--pp-brass); margin-bottom:\
+    \ 12px; }\n/* screenshots come in a light and a dark version, following the theme */\n.pp-land img { display: block; }\n\
+    .pp-land img.dk { display: none; }\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) .pp-land\
+    \ img.lt { display: none; }\n  :root:not([data-theme=\"light\"]) .pp-land img.dk { display: block; }\n}\n:root[data-theme=\"\
+    dark\"] .pp-land img.lt { display: none; }\n:root[data-theme=\"dark\"] .pp-land img.dk { display: block; }\n.pp-land .step\
+    \ p { color: var(--pp-muted); margin: 0; font-size: .94rem; }\n\n.pp-land .why { display: grid; grid-template-columns:\
     \ 1fr 1.15fr; gap: 64px; align-items: start; }\n.pp-land .why .points { display: grid; gap: 28px; }\n.pp-land .point {\
-    \ display: flex; gap: 18px; }\n.pp-land .point p { color: var(--pp-muted); margin: 0; font-size: .94rem; }\n.pp-land .quote\
-    \ { margin-top: 32px; padding-left: 18px; border-left: 2px solid var(--pp-brass); font: italic 500 1.3rem/1.35 var(--pp-serif);\
-    \ color: var(--pp-ink); max-width: 34ch; }\n\n.pp-land .feats { display: grid; grid-template-columns: repeat(3, 1fr);\
-    \ gap: 1px; background: var(--pp-line); border: 1px solid var(--pp-line); border-radius: var(--pp-radius); overflow: hidden;\
-    \ }\n.pp-land .feat { background: var(--pp-panel); padding: 28px 26px; }\n.pp-land .feat .ico { margin-bottom: 16px; }\n\
-    .pp-land .feat h3 { font-size: 1.22rem; }\n.pp-land .feat p { color: var(--pp-muted); margin: 0; font-size: .9rem; }\n\
-    \n.pp-land .guests { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }\n.pp-land .ticks\
-    \ { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }\n.pp-land .ticks li { display: flex; gap:\
-    \ 12px; align-items: flex-start; font-size: .95rem; }\n.pp-land .ticks .ic { color: var(--pp-good); margin-top: 3px; }\n\
-    \n/* a still picture of the guest booking window */\n.pp-land .mock { padding: 26px; max-width: 420px; justify-self: center;\
-    \ width: 100%; box-sizing: border-box; pointer-events: none; user-select: none; }\n.pp-land .mock .mtop { display: flex;\
-    \ align-items: center; gap: 10px; padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px solid var(--pp-line);\
-    \ }\n.pp-land .mock .mtop .mark { width: 26px; height: 26px; color: var(--pp-brass); }\n.pp-land .mock .mtop b { font:\
-    \ 600 1.25rem/1 var(--pp-serif); }\n.pp-land .mock .mtop .x { margin-left: auto; color: var(--pp-faint); }\n.pp-land .mock\
-    \ .lbl { font-size: .74rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-faint);\
-    \ margin: 16px 0 8px; }\n.pp-land .mock .days { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }\n.pp-land\
-    \ .mock .day { border: 1px solid var(--pp-line); border-radius: 10px; padding: 8px 0; text-align: center; font-size: .72rem;\
-    \ color: var(--pp-muted); }\n.pp-land .mock .day b { display: block; font: 500 1.2rem/1.1 var(--pp-serif); color: var(--pp-ink);\
-    \ }\n.pp-land .mock .day.on { background: var(--pp-accent); border-color: var(--pp-accent); color: var(--pp-accent-ink);\
-    \ }\n.pp-land .mock .day.on b { color: inherit; }\n.pp-land .mock .day.shut { opacity: .4; }\n.pp-land .mock .chip.walk\
-    \ { opacity: .5; font-size: .78rem; }\n.pp-land .mock .ok { margin-top: 18px; padding: 10px 12px; border-radius: 10px;\
-    \ background: var(--pp-good-soft); color: var(--pp-good); font-size: .84rem; display: flex; gap: 8px; align-items: center;\
-    \ }\n.pp-land .mock .btn { margin-top: 14px; }\n\n.pp-land .cta { background: #1d1b18; color: #efe9df; }\n.pp-land .cta\
-    \ .sec { text-align: center; padding: 88px 20px; }\n.pp-land .cta h2 { color: inherit; }\n.pp-land .cta h2 em { color:\
-    \ #c9a56a; }\n.pp-land .cta p { color: #b9b1a4; max-width: 52ch; margin: 0 auto 30px; }\n.pp-land .cta .acts { display:\
-    \ flex; gap: 10px; justify-content: center; flex-wrap: wrap; }\n.pp-land .cta .btn.light { background: #efe9df; border-color:\
-    \ #efe9df; color: #1d1b18; }\n.pp-land .cta .btn.line { background: transparent; border-color: rgba(239,233,223,.3); color:\
-    \ #efe9df; }\n.pp-land .cta .btn.line:hover { border-color: #efe9df; }\nhtml[data-theme=dark] .pp-land .cta, html[data-theme=dark]\
-    \ .pp-auth .side { box-shadow: inset 0 0 0 1px var(--pp-line); }\n\n@media (max-width: 960px) {\n  .pp-auth .side .jump\
-    \ { display: none; }\n  .pp-land .steps, .pp-land .feats { grid-template-columns: 1fr 1fr; }\n  .pp-land .why, .pp-land\
-    \ .guests { grid-template-columns: 1fr; gap: 40px; }\n}\n@media (max-width: 860px) {\n  .pp-auth { grid-template-columns:\
-    \ 1fr; min-height: 0; }\n  .pp-auth .side { padding: 28px 22px 32px; gap: 28px; }\n  .pp-auth .side h1 { font-size: 2.4rem;\
-    \ }\n  .pp-auth .side .ring { display: none; }\n  .pp-auth .side .stats { gap: 22px; }\n  .pp-auth .side .stats b { font-size:\
-    \ 1.6rem; }\n  .pp-auth .side .stats span { font-size: .66rem; letter-spacing: .1em; }\n}\n@media (max-width: 640px) {\n\
-    \  .pp-land .sec { padding: 60px 16px; }\n  .pp-land .cta .sec { padding: 60px 16px; }\n  .pp-land h2 { font-size: 2.1rem;\
-    \ }\n  .pp-land .head { margin-bottom: 32px; }\n  .pp-land .steps, .pp-land .feats { grid-template-columns: 1fr; }\n \
-    \ .pp-land .feat { padding: 24px 20px; }\n  .pp-land .mock { padding: 20px; }\n}\n</style>\n<script>\n(function () {\n\
-    \  var PP = window.PP;\n\n  var STEPS = [\n    ['Describe your restaurant', 'Opening hours and seasons, holidays and closures,\
-    \ your tables and how they join, and how full you can get before bookings need a look.'],\n    ['Add the Reserve button',\
-    \ 'Paste one line of code into your website. Guests book in a window that opens over your page, sized for phones.'],\n\
-    \    ['Show your team', 'Staff learn the day view in about five minutes: accept, decline, seat a walk-in, take a booking\
-    \ by phone.']\n  ];\n  var WHY = [\n    ['clock', 'Ready in about 30 minutes', 'No developer needed. Enter your details\
-    \ and the booking button is ready for your site.'],\n    ['phone', 'Run it from your phone', 'Every screen works on a\
-    \ phone or tablet, at the host stand or at home.'],\n    ['users', 'Staff trained in under 10 minutes', 'A handful of\
-    \ buttons covers a full service. Nothing to configure for them.'],\n    ['link', 'Help with the setup', 'We help you put\
-    \ the booking button on your website, free of charge.']\n  ];\n  var FEATS = [\n    ['grid', 'Every location, one login',\
-    \ 'Run all your restaurants from one account, each with its own hours, tables and team.'],\n    ['users', 'Roles for your\
-    \ team', 'Owners, managers and staff each see what they need. Staff handle bookings; managers set things up.'],\n    ['phone',\
-    \ 'Walk-ins and phone bookings', 'Add a guest at the door or on the phone in a few taps, from a tablet or phone.'],\n\
-    \    ['check', 'Bookings confirm themselves', 'Online bookings are accepted on the spot while there is room. You decide\
-    \ how full is full.'],\n    ['table', 'Room kept for walk-ins', 'Past 80% full, new bookings wait for your approval, or\
-    \ the time shows as walk-in only.'],\n    ['bell', 'Alerts within a minute', 'When a booking needs a decision, your team\
-    \ sees it in the app and gets an email.'],\n    ['calendar', 'Hours that change with you', 'Seasonal hours, holidays and\
-    \ one-off closures, each taking over from the usual week.'],\n    ['join', 'Join and split tables', 'Push tables together\
-    \ for larger parties at the hours you choose, and split them again after.'],\n    ['ext', 'One Reserve button', 'A single\
-    \ line of code adds a button that opens a phone-friendly booking window on your site.'],\n    ['globe', 'English, French\
-    \ and Latvian', 'The booking form, the guest page and every email speak your guest\\'s language. More on request.'],\n\
-    \    ['mail', 'Guest emails in your words', 'Confirmed, waiting and declined emails go out by themselves, with a message\
-    \ you write.'],\n    ['qr', 'Live hours, menu and QR codes', 'Change hours or prices once and your website follows. The\
-    \ menu QR code never changes.']\n  ];\n  var TICKS = [\n    'Only shows times when you are open and have a table',\n \
-    \   'Confirms on the spot, or tells the guest you will reply shortly',\n    'Sends a private link to change or cancel,\
-    \ and a calendar entry',\n    'Speaks English, French or Latvian'\n  ];\n\n  PP.define('auth', function (root, data, emit)\
-    \ {\n    var esc = PP.esc;\n    var S = { mode: 'login', busy: false, msg: null, email: '' };\n\n    function form() {\n\
-    \      if (S.mode === 'reset') {\n        return '<h2>Reset your password</h2><p class=\"muted small\">We\\'ll email you\
-    \ a link to choose a new one.</p>' +\n          '<form data-form=\"reset\"><div><label class=\"f\" for=\"ppE\">Email</label><input\
+    \ display: flex; gap: 18px; }\n.pp-land .point p { color: var(--pp-muted); margin: 0; font-size: .94rem; }\n.pp-land .photo\
+    \ { position: relative; margin: 32px 0 0; border-radius: var(--pp-radius); overflow: hidden; aspect-ratio: 4 / 3; background:\
+    \ var(--pp-panel-2); }\n.pp-land .photo img { width: 100%; height: 100%; object-fit: cover; }\n.pp-land .photo figcaption\
+    \ { position: absolute; left: 0; right: 0; bottom: 0; padding: 70px 24px 20px; background: linear-gradient(rgba(20,18,16,0),\
+    \ rgba(20,18,16,.8)); color: #f4efe6; font: italic 500 1.35rem/1.3 var(--pp-serif); }\n\n.pp-land .feats { display: grid;\
+    \ grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--pp-line); border: 1px solid var(--pp-line); border-radius:\
+    \ var(--pp-radius); overflow: hidden; }\n.pp-land .feat { background: var(--pp-panel); padding: 28px 26px; }\n.pp-land\
+    \ .feat .ico { margin-bottom: 16px; }\n.pp-land .feat h3 { font-size: 1.22rem; }\n.pp-land .feat p { color: var(--pp-muted);\
+    \ margin: 0; font-size: .9rem; }\n\n.pp-land .guests { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items:\
+    \ center; }\n.pp-land .ticks { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }\n.pp-land .ticks\
+    \ li { display: flex; gap: 12px; align-items: flex-start; font-size: .95rem; }\n.pp-land .ticks .ic { color: var(--pp-good);\
+    \ margin-top: 3px; }\n\n/* a still picture of the guest booking window */\n.pp-land .stage { position: relative; border-radius:\
+    \ var(--pp-radius); padding: 64px 40px; background: url(_/theme/photo-table.webp) center / cover, var(--pp-panel-2); display:\
+    \ grid; place-items: center; }\n.pp-land .stage::before { content: \"\"; position: absolute; inset: 0; border-radius:\
+    \ inherit; background: rgba(29,27,24,.2); }\n.pp-land .stage .mock { position: relative; box-shadow: 0 30px 70px rgba(0,0,0,.3);\
+    \ }\n.pp-land .mock { padding: 26px; max-width: 420px; justify-self: center; width: 100%; box-sizing: border-box; pointer-events:\
+    \ none; user-select: none; }\n.pp-land .mock .mtop { display: flex; align-items: center; gap: 10px; padding-bottom: 16px;\
+    \ margin-bottom: 18px; border-bottom: 1px solid var(--pp-line); }\n.pp-land .mock .mtop .mark { width: 26px; height: 26px;\
+    \ color: var(--pp-brass); }\n.pp-land .mock .mtop b { font: 600 1.25rem/1 var(--pp-serif); }\n.pp-land .mock .mtop .x\
+    \ { margin-left: auto; color: var(--pp-faint); }\n.pp-land .mock .lbl { font-size: .74rem; font-weight: 600; letter-spacing:\
+    \ .1em; text-transform: uppercase; color: var(--pp-faint); margin: 16px 0 8px; }\n.pp-land .mock .days { display: grid;\
+    \ grid-template-columns: repeat(5, 1fr); gap: 6px; }\n.pp-land .mock .day { border: 1px solid var(--pp-line); border-radius:\
+    \ 10px; padding: 8px 0; text-align: center; font-size: .72rem; color: var(--pp-muted); }\n.pp-land .mock .day b { display:\
+    \ block; font: 500 1.2rem/1.1 var(--pp-serif); color: var(--pp-ink); }\n.pp-land .mock .day.on { background: var(--pp-accent);\
+    \ border-color: var(--pp-accent); color: var(--pp-accent-ink); }\n.pp-land .mock .day.on b { color: inherit; }\n.pp-land\
+    \ .mock .day.shut { opacity: .4; }\n.pp-land .mock .chip.walk { opacity: .5; font-size: .78rem; }\n.pp-land .mock .ok\
+    \ { margin-top: 18px; padding: 10px 12px; border-radius: 10px; background: var(--pp-good-soft); color: var(--pp-good);\
+    \ font-size: .84rem; display: flex; gap: 8px; align-items: center; }\n.pp-land .mock .btn { margin-top: 14px; }\n\n.pp-land\
+    \ .cta { background: linear-gradient(rgba(22,20,18,.84), rgba(22,20,18,.9)), url(_/theme/photo-evening.webp) center /\
+    \ cover, #1d1b18; color: #efe9df; }\n.pp-land .cta .sec { text-align: center; padding: 88px 20px; }\n.pp-land .cta h2\
+    \ { color: inherit; }\n.pp-land .cta h2 em { color: #c9a56a; }\n.pp-land .cta p { color: #b9b1a4; max-width: 52ch; margin:\
+    \ 0 auto 30px; }\n.pp-land .cta .acts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }\n.pp-land\
+    \ .cta .btn.light { background: #efe9df; border-color: #efe9df; color: #1d1b18; }\n.pp-land .cta .btn.line { background:\
+    \ transparent; border-color: rgba(239,233,223,.3); color: #efe9df; }\n.pp-land .cta .btn.line:hover { border-color: #efe9df;\
+    \ }\nhtml[data-theme=dark] .pp-land .cta, html[data-theme=dark] .pp-auth .side { box-shadow: inset 0 0 0 1px var(--pp-line);\
+    \ }\n\n@media (max-width: 960px) {\n  .pp-auth .side .jump { display: none; }\n  .pp-land .steps, .pp-land .feats { grid-template-columns:\
+    \ 1fr 1fr; }\n  .pp-land .why, .pp-land .guests { grid-template-columns: 1fr; gap: 40px; }\n}\n@media (max-width: 860px)\
+    \ {\n  .pp-auth { grid-template-columns: minmax(0, 1fr); min-height: 0; }\n  .pp-auth .side { padding: 28px 22px 32px;\
+    \ gap: 28px; }\n  .pp-auth .side h1 { font-size: 2.4rem; }\n  .pp-auth .side .ring { display: none; }\n  .pp-auth .side\
+    \ .stats { gap: 22px; }\n  .pp-auth .side .stats b { font-size: 1.6rem; }\n  .pp-auth .side .stats span { font-size: .66rem;\
+    \ letter-spacing: .1em; }\n}\n@media (max-width: 640px) {\n  .pp-land .sec { padding: 60px 16px; }\n  .pp-land .cta .sec\
+    \ { padding: 60px 16px; }\n  .pp-land h2 { font-size: 2.1rem; }\n  .pp-land .head { margin-bottom: 32px; }\n  .pp-land\
+    \ .steps, .pp-land .feats { grid-template-columns: 1fr; }\n  .pp-land .feat { padding: 24px 20px; }\n  .pp-land .mock\
+    \ { padding: 20px; }\n  .pp-land .stage { padding: 32px 14px; }\n  .pp-land .photo figcaption { font-size: 1.15rem; padding:\
+    \ 50px 18px 16px; }\n  .pp-auth .main { padding-bottom: 116px; }\n}\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n\
+    \n  var STEPS = [  // [title, text, picture (_/theme/step-<name>-l|d.webp), picture description]\n    ['Describe your\
+    \ restaurant', 'Opening hours and seasons, holidays and closures, your tables and how they join, and how full you can\
+    \ get before bookings need a look.',\n      'tables', 'The floor plan editor with tables for two, four and six'],\n  \
+    \  ['Add the Reserve button', 'Paste one line of code into your website. Guests book in a window that opens over your\
+    \ page, sized for phones.',\n      'book', 'The booking form on a phone'],\n    ['Show your team', 'Staff learn the day\
+    \ view in about five minutes: accept, decline, seat a walk-in, take a booking by phone.',\n      'day', 'The day view,\
+    \ with each table\\'s bookings on a timeline']\n  ];\n  var WHY = [\n    ['clock', 'Ready in about 30 minutes', 'No developer\
+    \ needed. Enter your details and the booking button is ready for your site.'],\n    ['phone', 'Run it from your phone',\
+    \ 'Every screen works on a phone or tablet, at the host stand or at home.'],\n    ['users', 'Staff trained in under 10\
+    \ minutes', 'A handful of buttons covers a full service. Nothing to configure for them.'],\n    ['link', 'Help with the\
+    \ setup', 'We help you put the booking button on your website, free of charge.']\n  ];\n  var FEATS = [\n    ['grid',\
+    \ 'Every location, one login', 'Run all your restaurants from one account, each with its own hours, tables and team.'],\n\
+    \    ['users', 'Roles for your team', 'Owners, managers and staff each see what they need. Staff handle bookings; managers\
+    \ set things up.'],\n    ['phone', 'Walk-ins and phone bookings', 'Add a guest at the door or on the phone in a few taps,\
+    \ from a tablet or phone.'],\n    ['check', 'Bookings confirm themselves', 'Online bookings are accepted on the spot while\
+    \ there is room. You decide how full is full.'],\n    ['table', 'Room kept for walk-ins', 'Past 80% full, new bookings\
+    \ wait for your approval, or the time shows as walk-in only.'],\n    ['bell', 'Alerts within a minute', 'When a booking\
+    \ needs a decision, your team sees it in the app and gets an email.'],\n    ['calendar', 'Hours that change with you',\
+    \ 'Seasonal hours, holidays and one-off closures, each taking over from the usual week.'],\n    ['join', 'Join and split\
+    \ tables', 'Push tables together for larger parties at the hours you choose, and split them again after.'],\n    ['ext',\
+    \ 'One Reserve button', 'A single line of code adds a button that opens a phone-friendly booking window on your site.'],\n\
+    \    ['globe', 'English, French and Latvian', 'The booking form, the guest page and every email speak your guest\\'s language.\
+    \ More on request.'],\n    ['mail', 'Guest emails in your words', 'Confirmed, waiting and declined emails go out by themselves,\
+    \ with a message you write.'],\n    ['qr', 'Live hours, menu and QR codes', 'Change hours or prices once and your website\
+    \ follows. The menu QR code never changes.']\n  ];\n  var TICKS = [\n    'Only shows times when you are open and have\
+    \ a table',\n    'Confirms on the spot, or tells the guest you will reply shortly',\n    'Sends a private link to change\
+    \ or cancel, and a calendar entry',\n    'Speaks English, French or Latvian'\n  ];\n\n  PP.define('auth', function (root,\
+    \ data, emit) {\n    var esc = PP.esc;\n    var S = { mode: 'login', busy: false, msg: null, email: '' };\n\n    function\
+    \ form() {\n      if (S.mode === 'reset') {\n        return '<h2>Reset your password</h2><p class=\"muted small\">We\\\
+    'll email you a link to choose a new one.</p>' +\n          '<form data-form=\"reset\"><div><label class=\"f\" for=\"\
+    ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"email\" value=\"' + esc(S.email)\
+    \ + '\"></div>' +\n          '<div><button class=\"btn primary block\" type=\"submit\">Send reset link</button></div></form>'\
+    \ +\n          '<p style=\"margin-top:16px\"><button class=\"link\" data-action=\"mode\" data-mode=\"login\">Back to sign\
+    \ in</button></p>';\n      }\n      var signup = S.mode === 'signup';\n      return '<div class=\"tabs\" role=\"tablist\"\
+    >' +\n          '<button role=\"tab\" data-action=\"mode\" data-mode=\"login\" class=\"' + (!signup ? 'on' : '') + '\"\
+    >Sign in</button>' +\n          '<button role=\"tab\" data-action=\"mode\" data-mode=\"signup\" class=\"' + (signup ?\
+    \ 'on' : '') + '\">Create account</button></div>' +\n        '<h2>' + (signup ? 'Open your account' : 'Welcome back')\
+    \ + '</h2>' +\n        '<p class=\"muted small\">' + (signup ? 'Set up your restaurants, hours and tables in about 30\
+    \ minutes.' : 'Sign in to manage your restaurants and reservations.') + '</p>' +\n        '<form data-form=\"' + S.mode\
+    \ + '\">' +\n          (signup ? '<div><label class=\"f\" for=\"ppN\">Your name</label><input type=\"text\" id=\"ppN\"\
+    \ name=\"name\" required autocomplete=\"name\"></div>' : '') +\n          '<div><label class=\"f\" for=\"ppE\">Email</label><input\
     \ type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"email\" value=\"' + esc(S.email) + '\"></div>' +\n\
-    \          '<div><button class=\"btn primary block\" type=\"submit\">Send reset link</button></div></form>' +\n      \
-    \    '<p style=\"margin-top:16px\"><button class=\"link\" data-action=\"mode\" data-mode=\"login\">Back to sign in</button></p>';\n\
-    \      }\n      var signup = S.mode === 'signup';\n      return '<div class=\"tabs\" role=\"tablist\">' +\n          '<button\
-    \ role=\"tab\" data-action=\"mode\" data-mode=\"login\" class=\"' + (!signup ? 'on' : '') + '\">Sign in</button>' +\n\
-    \          '<button role=\"tab\" data-action=\"mode\" data-mode=\"signup\" class=\"' + (signup ? 'on' : '') + '\">Create\
-    \ account</button></div>' +\n        '<h2>' + (signup ? 'Open your account' : 'Welcome back') + '</h2>' +\n        '<p\
-    \ class=\"muted small\">' + (signup ? 'Set up your restaurants, hours and tables in about 30 minutes.' : 'Sign in to manage\
-    \ your restaurants and reservations.') + '</p>' +\n        '<form data-form=\"' + S.mode + '\">' +\n          (signup\
-    \ ? '<div><label class=\"f\" for=\"ppN\">Your name</label><input type=\"text\" id=\"ppN\" name=\"name\" required autocomplete=\"\
-    name\"></div>' : '') +\n          '<div><label class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"\
-    email\" required autocomplete=\"email\" value=\"' + esc(S.email) + '\"></div>' +\n          '<div><label class=\"f\" for=\"\
-    ppP\">Password</label><input type=\"password\" id=\"ppP\" name=\"password\" required minlength=\"' + (signup ? 8 : 1)\
-    \ + '\" autocomplete=\"' + (signup ? 'new-password' : 'current-password') + '\">' +\n            (signup ? '<div class=\"\
-    hint\">At least 8 characters.</div>' : '<div class=\"hint\" style=\"text-align:right\"><button type=\"button\" class=\"\
-    link\" data-action=\"mode\" data-mode=\"reset\">Forgot your password?</button></div>') + '</div>' +\n          '<div><button\
-    \ class=\"btn primary block\" type=\"submit\">' + (signup ? 'Create account' : 'Sign in') + '</button></div>' +\n    \
-    \    '</form>';\n    }\n\n    function hero() {\n      return '<section class=\"pp-auth\">' +\n        '<div class=\"\
-    side\">' + PP.mark('ring') +\n          '<div class=\"top\"><div class=\"brand\">' + PP.mark() + 'PlanPlate</div>' +\n\
-    \            '<nav class=\"jump\" aria-label=\"On this page\">' +\n              '<button data-jump=\"how\">Set it up</button><button\
-    \ data-jump=\"why\">Why PlanPlate</button>' +\n              '<button data-jump=\"features\">Features</button><button\
-    \ data-jump=\"guests\">For guests</button></nav></div>' +\n          '<div><div class=\"eyebrow\">Simple · Smart · Reliable</div>'\
-    \ +\n            '<h1>Reservations, <em>made simple.</em></h1>' +\n            '<p>One calm place to run bookings for\
-    \ every restaurant you manage. PlanPlate keeps up with busy evenings, walk-ins and changing hours, so your team can look\
-    \ after the guests in front of them.</p>' +\n            '<button class=\"more\" data-jump=\"how\">See how it works '\
-    \ + PP.icon('down') + '</button></div>' +\n          '<div class=\"stats\"><div><b>30 min</b><span>to set up</span></div><div><b>5\
-    \ min</b><span>staff training</span></div><div><b>3</b><span>languages</span></div></div>' +\n        '</div>' +\n   \
-    \     '<div class=\"main\"><div class=\"box fade-in\" data-el=\"box\"></div></div></section>';\n    }\n\n    function\
-    \ sections() {\n      var steps = STEPS.map(function (s, i) {\n        return '<div class=\"card step\"><div class=\"\
-    n\">0' + (i + 1) + '</div><h3>' + esc(s[0]) + '</h3><p>' + esc(s[1]) + '</p></div>';\n      }).join('');\n      var why\
-    \ = WHY.map(function (w) {\n        return '<div class=\"point\"><span class=\"ico\">' + PP.icon(w[0]) + '</span><div><h3>'\
-    \ + esc(w[1]) + '</h3><p>' + esc(w[2]) + '</p></div></div>';\n      }).join('');\n      var feats = FEATS.map(function\
-    \ (f) {\n        return '<div class=\"feat\"><span class=\"ico\">' + PP.icon(f[0]) + '</span><h3>' + esc(f[1]) + '</h3><p>'\
-    \ + esc(f[2]) + '</p></div>';\n      }).join('');\n      var ticks = TICKS.map(function (t) { return '<li>' + PP.icon('check')\
-    \ + '<span>' + esc(t) + '</span></li>'; }).join('');\n      var times = ['18:00', '18:30', '19:00', '19:30', '20:00'].map(function\
-    \ (t) {\n        return '<span class=\"chip' + (t === '19:00' ? ' on' : '') + '\">' + t + '</span>';\n      }).join('')\
-    \ + '<span class=\"chip walk\">20:30 · Walk-in</span>';\n      var days = [['Thu', 12], ['Fri', 13], ['Sat', 14], ['Sun',\
-    \ 15], ['Mon', 16]].map(function (d, i) {\n        return '<div class=\"day' + (i === 1 ? ' on' : '') + (i === 4 ? ' shut'\
-    \ : '') + '\">' + d[0] + '<b>' + d[1] + '</b></div>';\n      }).join('');\n      var mock = '<div class=\"card mock\"\
-    \ aria-hidden=\"true\">' +\n        '<div class=\"mtop\">' + PP.mark() + '<b>Your restaurant</b><span class=\"x\">' +\
-    \ PP.icon('x') + '</span></div>' +\n        '<div class=\"lbl\">Guests</div><div class=\"chips\"><span class=\"chip\"\
-    >1</span><span class=\"chip on\">2</span><span class=\"chip\">3</span><span class=\"chip\">4</span><span class=\"chip\"\
-    >5</span><span class=\"chip\">6+</span></div>' +\n        '<div class=\"lbl\">Day</div><div class=\"days\">' + days +\
-    \ '</div>' +\n        '<div class=\"lbl\">Time</div><div class=\"chips\">' + times + '</div>' +\n        '<div class=\"\
-    ok\">' + PP.icon('check') + 'Table for 2 on Friday at 19:00 is available</div>' +\n        '<span class=\"btn primary\
-    \ block\">Reserve</span></div>';\n\n      return '<div class=\"pp-land\">' +\n        '<section class=\"sec\" id=\"pp-how\"\
-    ><div class=\"head\"><div class=\"eyebrow\">Set it up</div>' +\n          '<h2>Ready in <em>30 minutes.</em></h2>' +\n\
-    \          '<p class=\"lede\">An online portal that keeps up with changing hours, confirms bookings on its own and makes\
-    \ room for walk-ins when you are busy. Three steps and you are taking reservations.</p></div>' +\n          '<div class=\"\
-    steps\">' + steps + '</div></section>' +\n        '<section class=\"sec\" id=\"pp-why\"><div class=\"why\"><div><div class=\"\
-    eyebrow\">Why PlanPlate?</div>' +\n          '<h2>Built for <em>independent</em> restaurants.</h2>' +\n          '<p class=\"\
-    lede\">Fast to set up, easy to run, and nothing you will never use. PlanPlate does reservations well and stays out of\
-    \ the way of service.</p>' +\n          '<div class=\"quote\">Five buttons. One calm screen. A full house.</div></div>'\
-    \ +\n          '<div class=\"points\">' + why + '</div></div></section>' +\n        '<section class=\"sec\" id=\"pp-features\"\
-    ><div class=\"head\"><div class=\"eyebrow\">Core features</div>' +\n          '<h2>Everything a busy dining room <em>needs.</em></h2>'\
-    \ +\n          '<p class=\"lede\">From one restaurant to many, the same simple tools for hours, tables, bookings and your\
-    \ guests.</p></div>' +\n          '<div class=\"feats\">' + feats + '</div></section>' +\n        '<section class=\"sec\"\
-    \ id=\"pp-guests\"><div class=\"guests\"><div><div class=\"eyebrow\">For your guests</div>' +\n          '<h2>What your\
-    \ guests <em>see.</em></h2>' +\n          '<p class=\"lede\">Not a long form. A focused booking window on your own website\
-    \ that checks real availability and answers straight away.</p>' +\n          '<ul class=\"ticks\">' + ticks + '</ul></div>'\
-    \ + mock + '</div></section>' +\n        '<div class=\"cta\"><section class=\"sec\"><div class=\"eyebrow\">Get started</div>'\
-    \ +\n          '<h2>Take your first booking <em>tonight.</em></h2>' +\n          '<p>Create an account, add your restaurant\
-    \ and paste the Reserve button on your site. Your team will be ready before the first guest arrives.</p>' +\n        \
-    \  '<div class=\"acts\"><button class=\"btn light\" data-action=\"mode\" data-mode=\"signup\">Create account</button>'\
-    \ +\n          '<button class=\"btn line\" data-action=\"mode\" data-mode=\"login\">Sign in</button></div></section></div>'\
-    \ +\n        '</div>';\n    }\n\n    function renderBox() {\n      var box = root.querySelector('[data-el=box]');\n  \
-    \    box.innerHTML = form() + '<div data-el=\"msg\"></div>';\n      var f = box.querySelector('form');\n      if (f) f.onsubmit\
-    \ = submit;\n      showMsg();\n    }\n    function showMsg() {\n      var box = root.querySelector('[data-el=msg]');\n\
-    \      if (box) box.innerHTML = S.msg ? '<div class=\"feedback ' + (S.msg.ok ? 'good' : 'bad') + '\">' + esc(S.msg.text)\
-    \ + '</div>' : '';\n    }\n    function setBusy(on) {\n      S.busy = on;\n      root.querySelectorAll('.box button[type=submit]').forEach(function\
+    \          '<div><label class=\"f\" for=\"ppP\">Password</label><input type=\"password\" id=\"ppP\" name=\"password\"\
+    \ required minlength=\"' + (signup ? 8 : 1) + '\" autocomplete=\"' + (signup ? 'new-password' : 'current-password') +\
+    \ '\">' +\n            (signup ? '<div class=\"hint\">At least 8 characters.</div>' : '<div class=\"hint\" style=\"text-align:right\"\
+    ><button type=\"button\" class=\"link\" data-action=\"mode\" data-mode=\"reset\">Forgot your password?</button></div>')\
+    \ + '</div>' +\n          '<div><button class=\"btn primary block\" type=\"submit\">' + (signup ? 'Create account' : 'Sign\
+    \ in') + '</button></div>' +\n        '</form>';\n    }\n\n    function hero() {\n      return '<section class=\"pp-auth\"\
+    >' +\n        '<div class=\"side\">' + PP.mark('ring') +\n          '<div class=\"top\"><div class=\"brand\">' + PP.mark()\
+    \ + 'PlanPlate</div>' +\n            '<nav class=\"jump\" aria-label=\"On this page\">' +\n              '<button data-jump=\"\
+    how\">Set it up</button><button data-jump=\"why\">Why PlanPlate</button>' +\n              '<button data-jump=\"features\"\
+    >Features</button><button data-jump=\"guests\">For guests</button></nav></div>' +\n          '<div><div class=\"eyebrow\"\
+    >Simple · Smart · Reliable</div>' +\n            '<h1>Reservations, <em>made simple.</em></h1>' +\n            '<p>One\
+    \ calm place to run bookings for every restaurant you manage. PlanPlate keeps up with busy evenings, walk-ins and changing\
+    \ hours, so your team can look after the guests in front of them.</p>' +\n            '<button class=\"more\" data-jump=\"\
+    how\">See how it works ' + PP.icon('down') + '</button></div>' +\n          '<div class=\"stats\"><div><b>30 min</b><span>to\
+    \ set up</span></div><div><b>5 min</b><span>staff training</span></div><div><b>3</b><span>languages</span></div></div>'\
+    \ +\n        '</div>' +\n        '<div class=\"main\"><div class=\"box fade-in\" data-el=\"box\"></div>' +\n         \
+    \ '<button class=\"cue\" data-jump=\"how\">Discover PlanPlate<span class=\"dot\">' + PP.icon('down') + '</span></button></div></section>';\n\
+    \    }\n\n    function sections() {\n      var steps = STEPS.map(function (s, i) {\n        var img = function (t) { return\
+    \ '<img class=\"' + t + '\" src=\"_/theme/step-' + s[2] + '-' + t[0] + '.webp\" alt=\"' + esc(s[3]) + '\" loading=\"lazy\"\
+    \ width=\"960\" height=\"600\">'; };\n        return '<div class=\"card step\"><div class=\"shot\">' + img('lt') + img('dk')\
+    \ + '</div>' +\n          '<div class=\"txt\"><div class=\"n\">0' + (i + 1) + '</div><h3>' + esc(s[0]) + '</h3><p>' +\
+    \ esc(s[1]) + '</p></div></div>';\n      }).join('');\n      var why = WHY.map(function (w) {\n        return '<div class=\"\
+    point\"><span class=\"ico\">' + PP.icon(w[0]) + '</span><div><h3>' + esc(w[1]) + '</h3><p>' + esc(w[2]) + '</p></div></div>';\n\
+    \      }).join('');\n      var feats = FEATS.map(function (f) {\n        return '<div class=\"feat\"><span class=\"ico\"\
+    >' + PP.icon(f[0]) + '</span><h3>' + esc(f[1]) + '</h3><p>' + esc(f[2]) + '</p></div>';\n      }).join('');\n      var\
+    \ ticks = TICKS.map(function (t) { return '<li>' + PP.icon('check') + '<span>' + esc(t) + '</span></li>'; }).join('');\n\
+    \      var times = ['18:00', '18:30', '19:00', '19:30', '20:00'].map(function (t) {\n        return '<span class=\"chip'\
+    \ + (t === '19:00' ? ' on' : '') + '\">' + t + '</span>';\n      }).join('') + '<span class=\"chip walk\">20:30 · Walk-in</span>';\n\
+    \      var days = [['Thu', 12], ['Fri', 13], ['Sat', 14], ['Sun', 15], ['Mon', 16]].map(function (d, i) {\n        return\
+    \ '<div class=\"day' + (i === 1 ? ' on' : '') + (i === 4 ? ' shut' : '') + '\">' + d[0] + '<b>' + d[1] + '</b></div>';\n\
+    \      }).join('');\n      var mock = '<div class=\"card mock\" aria-hidden=\"true\">' +\n        '<div class=\"mtop\"\
+    >' + PP.mark() + '<b>Your restaurant</b><span class=\"x\">' + PP.icon('x') + '</span></div>' +\n        '<div class=\"\
+    lbl\">Guests</div><div class=\"chips\"><span class=\"chip\">1</span><span class=\"chip on\">2</span><span class=\"chip\"\
+    >3</span><span class=\"chip\">4</span><span class=\"chip\">5</span><span class=\"chip\">6+</span></div>' +\n        '<div\
+    \ class=\"lbl\">Day</div><div class=\"days\">' + days + '</div>' +\n        '<div class=\"lbl\">Time</div><div class=\"\
+    chips\">' + times + '</div>' +\n        '<div class=\"ok\">' + PP.icon('check') + 'Table for 2 on Friday at 19:00 is available</div>'\
+    \ +\n        '<span class=\"btn primary block\">Reserve</span></div>';\n\n      return '<div class=\"pp-land\">' +\n \
+    \       '<section class=\"sec\" id=\"pp-how\"><div class=\"head\"><div class=\"eyebrow\">Set it up</div>' +\n        \
+    \  '<h2>Ready in <em>30 minutes.</em></h2>' +\n          '<p class=\"lede\">An online portal that keeps up with changing\
+    \ hours, confirms bookings on its own and makes room for walk-ins when you are busy. Three steps and you are taking reservations.</p></div>'\
+    \ +\n          '<div class=\"steps\">' + steps + '</div></section>' +\n        '<section class=\"sec\" id=\"pp-why\"><div\
+    \ class=\"why\"><div><div class=\"eyebrow\">Why PlanPlate?</div>' +\n          '<h2>Built for <em>independent</em> restaurants.</h2>'\
+    \ +\n          '<p class=\"lede\">Fast to set up, easy to run, and nothing you will never use. PlanPlate does reservations\
+    \ well and stays out of the way of service.</p>' +\n          '<figure class=\"photo\"><img src=\"_/theme/photo-room.webp\"\
+    \ alt=\"A bright dining room laid for service\" loading=\"lazy\">' +\n            '<figcaption>Five buttons. One calm\
+    \ screen. A full house.</figcaption></figure></div>' +\n          '<div class=\"points\">' + why + '</div></div></section>'\
+    \ +\n        '<section class=\"sec\" id=\"pp-features\"><div class=\"head\"><div class=\"eyebrow\">Core features</div>'\
+    \ +\n          '<h2>Everything a busy dining room <em>needs.</em></h2>' +\n          '<p class=\"lede\">From one restaurant\
+    \ to many, the same simple tools for hours, tables, bookings and your guests.</p></div>' +\n          '<div class=\"feats\"\
+    >' + feats + '</div></section>' +\n        '<section class=\"sec\" id=\"pp-guests\"><div class=\"guests\"><div><div class=\"\
+    eyebrow\">For your guests</div>' +\n          '<h2>What your guests <em>see.</em></h2>' +\n          '<p class=\"lede\"\
+    >Not a long form. A focused booking window on your own website that checks real availability and answers straight away.</p>'\
+    \ +\n          '<ul class=\"ticks\">' + ticks + '</ul></div><div class=\"stage\">' + mock + '</div></div></section>' +\n\
+    \        '<div class=\"cta\"><section class=\"sec\"><div class=\"eyebrow\">Get started</div>' +\n          '<h2>Take your\
+    \ first booking <em>tonight.</em></h2>' +\n          '<p>Create an account, add your restaurant and paste the Reserve\
+    \ button on your site. Your team will be ready before the first guest arrives.</p>' +\n          '<div class=\"acts\"\
+    ><button class=\"btn light\" data-action=\"mode\" data-mode=\"signup\">Create account</button>' +\n          '<button\
+    \ class=\"btn line\" data-action=\"mode\" data-mode=\"login\">Sign in</button></div></section></div>' +\n        '</div>';\n\
+    \    }\n\n    function renderBox() {\n      var box = root.querySelector('[data-el=box]');\n      box.innerHTML = form()\
+    \ + '<div data-el=\"msg\"></div>';\n      var f = box.querySelector('form');\n      if (f) f.onsubmit = submit;\n    \
+    \  showMsg();\n    }\n    function showMsg() {\n      var box = root.querySelector('[data-el=msg]');\n      if (box) box.innerHTML\
+    \ = S.msg ? '<div class=\"feedback ' + (S.msg.ok ? 'good' : 'bad') + '\">' + esc(S.msg.text) + '</div>' : '';\n    }\n\
+    \    function setBusy(on) {\n      S.busy = on;\n      root.querySelectorAll('.box button[type=submit]').forEach(function\
     \ (b) {\n        b.disabled = on;\n        if (on) { b.dataset.label = b.innerHTML; b.innerHTML = '<span class=\"spin\"\
     ></span>'; }\n        else if (b.dataset.label) b.innerHTML = b.dataset.label;\n      });\n    }\n    function submit(e)\
     \ {\n      e.preventDefault();\n      if (S.busy) return;\n      var v = {};\n      new FormData(e.target).forEach(function\
