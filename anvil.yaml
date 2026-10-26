@@ -806,29 +806,33 @@ native_deps:
     \    moon: '<path d=\"M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z\"/>',\n    grid: '<rect x=\"3\" y=\"3\" width=\"7\"\
     \ height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/><rect\
     \ x=\"14\" y=\"14\" width=\"7\" height=\"7\"/>',\n    download: '<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7\
-    \ 10l5 5 5-5M12 15V3\"/>'\n  };\n  PP.icon = function (name, cls) { return '<svg class=\"ic ' + (cls || '') + '\" viewBox=\"\
-    0 0 24 24\" ' + P + ' aria-hidden=\"true\">' + (ICONS[name] || '') + '</svg>'; };\n  // The PlanPlate mark: a plate seen\
-    \ from above.\n  PP.mark = function (cls) {\n    return '<svg class=\"' + (cls || 'mark') + '\" viewBox=\"0 0 32 32\"\
-    \ aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\"><circle cx=\"16\" cy=\"16\" r=\"14\" stroke-width=\"1.4\"\
-    /><circle cx=\"16\" cy=\"16\" r=\"9\" stroke-width=\"1\"/><path d=\"M16 10.5v11\" stroke-width=\"1.4\" stroke-linecap=\"\
-    round\"/></svg>';\n  };\n\n  PP.toast = function (msg, isErr) {\n    var box = document.getElementById('pp-toasts');\n\
-    \    if (!box) { box = document.createElement('div'); box.id = 'pp-toasts'; document.body.appendChild(box); }\n    var\
-    \ t = document.createElement('div');\n    t.className = 't' + (isErr ? ' err' : '');\n    t.setAttribute('role', 'status');\n\
-    \    t.textContent = msg;\n    box.appendChild(t);\n    setTimeout(function () { t.remove(); }, isErr ? 7000 : 3200);\n\
-    \  };\n  PP.copy = function (text, label) {\n    function done() { PP.toast((label || 'Copied') + ' to the clipboard');\
-    \ }\n    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);\n\
-    \    else fallback();\n    function fallback() {\n      var ta = document.createElement('textarea'); ta.value = text;\
-    \ document.body.appendChild(ta); ta.select();\n      try { document.execCommand('copy'); done(); } catch (e) { PP.toast('Copy\
-    \ failed: select the text and copy it', true); }\n      ta.remove();\n    }\n  };\n  PP.err = function (e) { return (e\
-    \ && (e.message || e.toString())) || 'Something went wrong.'; };\n\n  // A modal dialog. html goes inside the box; returns\
-    \ {el, close}. Escape and clicking outside close it.\n  PP.modal = function (html, opts) {\n    opts = opts || {};\n \
-    \   var prev = document.activeElement;\n    var m = document.createElement('div');\n    m.className = 'pp pp-modal';\n\
-    \    m.innerHTML = '<div class=\"box card fade-in' + (opts.wide ? ' wide' : '') + '\" role=\"dialog\" aria-modal=\"true\"\
-    >' +\n      '<button class=\"btn ghost icon x\" data-close aria-label=\"Close\">' + PP.icon('x') + '</button>' + html\
-    \ + '</div>';\n    function close() { m.remove(); document.removeEventListener('keydown', key); if (opts.onclose) opts.onclose();\
-    \ if (prev && prev.focus) prev.focus(); }\n    function key(e) { if (e.key === 'Escape') close(); }\n    m.addEventListener('mousedown',\
-    \ function (e) { if (e.target === m) close(); });\n    m.addEventListener('click', function (e) { if (e.target.closest('[data-close]'))\
-    \ close(); });\n    document.addEventListener('keydown', key);\n    document.body.appendChild(m);\n    var f = m.querySelector('[autofocus],\
+    \ 10l5 5 5-5M12 15V3\"/>',\n    globe: '<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3a14 14 0 0 1 0 18M12\
+    \ 3a14 14 0 0 0 0 18\"/>',\n    mail: '<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"/><path d=\"m3 7 9 6 9-6\"\
+    />',\n    qr: '<rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"\
+    \ rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><path d=\"M14 14h3v3h-3zM20 14v.01M14 20h.01M17\
+    \ 20h4v-3\"/>'\n  };\n  PP.icon = function (name, cls) { return '<svg class=\"ic ' + (cls || '') + '\" viewBox=\"0 0 24\
+    \ 24\" ' + P + ' aria-hidden=\"true\">' + (ICONS[name] || '') + '</svg>'; };\n  // The PlanPlate mark: a plate seen from\
+    \ above.\n  PP.mark = function (cls) {\n    return '<svg class=\"' + (cls || 'mark') + '\" viewBox=\"0 0 32 32\" aria-hidden=\"\
+    true\" fill=\"none\" stroke=\"currentColor\"><circle cx=\"16\" cy=\"16\" r=\"14\" stroke-width=\"1.4\"/><circle cx=\"\
+    16\" cy=\"16\" r=\"9\" stroke-width=\"1\"/><path d=\"M16 10.5v11\" stroke-width=\"1.4\" stroke-linecap=\"round\"/></svg>';\n\
+    \  };\n\n  PP.toast = function (msg, isErr) {\n    var box = document.getElementById('pp-toasts');\n    if (!box) { box\
+    \ = document.createElement('div'); box.id = 'pp-toasts'; document.body.appendChild(box); }\n    var t = document.createElement('div');\n\
+    \    t.className = 't' + (isErr ? ' err' : '');\n    t.setAttribute('role', 'status');\n    t.textContent = msg;\n   \
+    \ box.appendChild(t);\n    setTimeout(function () { t.remove(); }, isErr ? 7000 : 3200);\n  };\n  PP.copy = function (text,\
+    \ label) {\n    function done() { PP.toast((label || 'Copied') + ' to the clipboard'); }\n    if (navigator.clipboard\
+    \ && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);\n    else fallback();\n\
+    \    function fallback() {\n      var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);\
+    \ ta.select();\n      try { document.execCommand('copy'); done(); } catch (e) { PP.toast('Copy failed: select the text\
+    \ and copy it', true); }\n      ta.remove();\n    }\n  };\n  PP.err = function (e) { return (e && (e.message || e.toString()))\
+    \ || 'Something went wrong.'; };\n\n  // A modal dialog. html goes inside the box; returns {el, close}. Escape and clicking\
+    \ outside close it.\n  PP.modal = function (html, opts) {\n    opts = opts || {};\n    var prev = document.activeElement;\n\
+    \    var m = document.createElement('div');\n    m.className = 'pp pp-modal';\n    m.innerHTML = '<div class=\"box card\
+    \ fade-in' + (opts.wide ? ' wide' : '') + '\" role=\"dialog\" aria-modal=\"true\">' +\n      '<button class=\"btn ghost\
+    \ icon x\" data-close aria-label=\"Close\">' + PP.icon('x') + '</button>' + html + '</div>';\n    function close() { m.remove();\
+    \ document.removeEventListener('keydown', key); if (opts.onclose) opts.onclose(); if (prev && prev.focus) prev.focus();\
+    \ }\n    function key(e) { if (e.key === 'Escape') close(); }\n    m.addEventListener('mousedown', function (e) { if (e.target\
+    \ === m) close(); });\n    m.addEventListener('click', function (e) { if (e.target.closest('[data-close]')) close(); });\n\
+    \    document.addEventListener('keydown', key);\n    document.body.appendChild(m);\n    var f = m.querySelector('[autofocus],\
     \ input, select, textarea, .btn.primary');\n    if (f) f.focus();\n    return { el: m, close: close };\n  };\n  PP.confirm\
     \ = function (title, text, okLabel, danger, keepLabel) {\n    return new Promise(function (resolve) {\n      var answered\
     \ = false;\n      var d = PP.modal('<h3>' + PP.esc(title) + '</h3><p class=\"muted\">' + PP.esc(text) + '</p>' +\n   \
@@ -1059,188 +1063,314 @@ native_deps:
     \ } }, function () {});\n    }, 60000);\n\n    render();\n    return {\n      setUser: function (json) { var me = json\
     \ ? JSON.parse(json) : null; S.user = me; if (me && me.alerts) S.alerts = me.alerts; render(); },\n      setActive: function\
     \ (page) { S.active = page; S.open = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json);\
-    \ render(); }\n    };\n  });\n})();\n</script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n.pp-auth { min-height:\
-    \ calc(100vh - 80px); display: grid; grid-template-columns: 1.1fr 1fr; }\n.pp-auth .side { background: #1d1b18; color:\
-    \ #efe9df; padding: 56px 56px 44px; display: flex; flex-direction: column; justify-content: space-between; position: relative;\
-    \ overflow: hidden; }\n.pp-auth .side .brand { display: flex; align-items: center; gap: 12px; font-family: var(--pp-serif);\
-    \ font-size: 1.7rem; font-weight: 600; }\n.pp-auth .side .brand .mark { width: 34px; height: 34px; color: #c9a56a; }\n\
-    .pp-auth .side h1 { color: inherit; font-size: 3.6rem; max-width: 11ch; line-height: 1.02; margin: 0 0 18px; font-weight:\
-    \ 500; }\n.pp-auth .side h1 em { color: #c9a56a; font-style: italic; }\n.pp-auth .side p { color: #b9b1a4; max-width:\
-    \ 38ch; font-size: 1.02rem; }\n.pp-auth .side ul { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap:\
-    \ 12px; color: #d8d1c4; font-size: .95rem; }\n.pp-auth .side li { display: flex; gap: 12px; align-items: baseline; }\n\
-    .pp-auth .side li::before { content: \"\"; flex: none; width: 18px; height: 1px; background: #c9a56a; transform: translateY(-4px);\
-    \ }\n.pp-auth .side .ring { position: absolute; right: -160px; bottom: -160px; width: 480px; height: 480px; color: rgba(201,165,106,.12);\
-    \ }\n.pp-auth .side .tag { font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: #8e8678; }\n.pp-auth\
-    \ .main { display: grid; place-items: center; padding: 40px 20px; }\n.pp-auth .box { width: min(380px, 100%); }\n.pp-auth\
-    \ .tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--pp-line); margin-bottom: 26px; }\n.pp-auth .tabs button\
-    \ { all: unset; cursor: pointer; padding: 10px 0; font-size: .92rem; color: var(--pp-muted); border-bottom: 2px solid\
-    \ transparent; margin-bottom: -1px; }\n.pp-auth .tabs button.on { color: var(--pp-ink); border-bottom-color: var(--pp-ink);\
-    \ }\n.pp-auth form > div + div { margin-top: 16px; }\n.pp-auth .link { all: unset; cursor: pointer; color: var(--pp-muted);\
-    \ font-size: .84rem; text-decoration: underline; text-decoration-color: var(--pp-line); text-underline-offset: 3px; }\n\
-    .pp-auth .link:hover { color: var(--pp-ink); }\n@media (max-width: 860px) {\n  .pp-auth { grid-template-columns: 1fr;\
-    \ min-height: 0; }\n  .pp-auth .side { padding: 30px 22px; } .pp-auth .side h1 { font-size: 2.3rem; margin-top: 26px;\
-    \ } .pp-auth .side ul, .pp-auth .side .ring, .pp-auth .side .tag { display: none; }\n}\n</style>\n<script>\n(function\
-    \ () {\n  var PP = window.PP;\n  PP.define('auth', function (root, data, emit) {\n    var esc = PP.esc;\n    var S = {\
-    \ mode: 'login', busy: false, msg: null, email: '' };\n\n    function form() {\n      if (S.mode === 'reset') {\n    \
-    \    return '<h2>Reset your password</h2><p class=\"muted small\">We\\'ll email you a link to choose a new one.</p>' +\n\
-    \          '<form data-form=\"reset\"><div><label class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\"\
-    \ name=\"email\" required autocomplete=\"email\" value=\"' + esc(S.email) + '\"></div>' +\n          '<div><button class=\"\
-    btn primary block\" type=\"submit\">Send reset link</button></div></form>' +\n          '<p style=\"margin-top:16px\"\
-    ><button class=\"link\" data-action=\"mode\" data-mode=\"login\">Back to sign in</button></p>';\n      }\n      var signup\
-    \ = S.mode === 'signup';\n      return '<div class=\"tabs\" role=\"tablist\">' +\n          '<button role=\"tab\" data-action=\"\
-    mode\" data-mode=\"login\" class=\"' + (!signup ? 'on' : '') + '\">Sign in</button>' +\n          '<button role=\"tab\"\
-    \ data-action=\"mode\" data-mode=\"signup\" class=\"' + (signup ? 'on' : '') + '\">Create account</button></div>' +\n\
-    \        '<h2>' + (signup ? 'Open your account' : 'Welcome back') + '</h2>' +\n        '<p class=\"muted small\">' + (signup\
-    \ ? 'Set up your restaurants, hours and tables in a few minutes.' : 'Sign in to manage your restaurants and reservations.')\
-    \ + '</p>' +\n        '<form data-form=\"' + S.mode + '\">' +\n          (signup ? '<div><label class=\"f\" for=\"ppN\"\
-    >Your name</label><input type=\"text\" id=\"ppN\" name=\"name\" required autocomplete=\"name\"></div>' : '') +\n     \
-    \     '<div><label class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"\
-    email\" value=\"' + esc(S.email) + '\"></div>' +\n          '<div><label class=\"f\" for=\"ppP\">Password</label><input\
-    \ type=\"password\" id=\"ppP\" name=\"password\" required minlength=\"' + (signup ? 8 : 1) + '\" autocomplete=\"' + (signup\
-    \ ? 'new-password' : 'current-password') + '\">' +\n            (signup ? '<div class=\"hint\">At least 8 characters.</div>'\
-    \ : '<div class=\"hint\" style=\"text-align:right\"><button type=\"button\" class=\"link\" data-action=\"mode\" data-mode=\"\
-    reset\">Forgot your password?</button></div>') + '</div>' +\n          '<div><button class=\"btn primary block\" type=\"\
-    submit\">' + (signup ? 'Create account' : 'Sign in') + '</button></div>' +\n        '</form>';\n    }\n\n    function\
-    \ render() {\n      root.innerHTML = '<div class=\"pp-auth\">' +\n        '<div class=\"side\">' + PP.mark('ring') +\n\
-    \          '<div class=\"brand\">' + PP.mark() + 'PlanPlate</div>' +\n          '<div><h1>Reservations, <em>made simple.</em></h1>'\
-    \ +\n          '<p>One calm place to run bookings for every restaurant you manage: opening hours, tables, approvals and\
-    \ a booking form for your website.</p>' +\n          '<ul><li>Seasonal hours and special days that override them</li><li>Join\
-    \ and split tables hour by hour</li><li>Bookings confirm themselves until you are 80% full</li><li>Guests manage their\
-    \ own reservation from one private link</li></ul></div>' +\n          '<div class=\"tag\">Simple · Smart · Reliable</div></div>'\
-    \ +\n        '<div class=\"main\"><div class=\"box fade-in\">' + form() + '<div data-el=\"msg\"></div></div></div></div>';\n\
-    \      var f = root.querySelector('form');\n      if (f) f.onsubmit = submit;\n      showMsg();\n    }\n    function showMsg()\
-    \ {\n      var box = root.querySelector('[data-el=msg]');\n      if (box) box.innerHTML = S.msg ? '<div class=\"feedback\
-    \ ' + (S.msg.ok ? 'good' : 'bad') + '\">' + esc(S.msg.text) + '</div>' : '';\n    }\n    function setBusy(on) {\n    \
-    \  S.busy = on;\n      root.querySelectorAll('.box button[type=submit]').forEach(function (b) {\n        b.disabled =\
-    \ on;\n        if (on) { b.dataset.label = b.innerHTML; b.innerHTML = '<span class=\"spin\"></span>'; }\n        else\
-    \ if (b.dataset.label) b.innerHTML = b.dataset.label;\n      });\n    }\n    function submit(e) {\n      e.preventDefault();\n\
-    \      if (S.busy) return;\n      var v = {};\n      new FormData(e.target).forEach(function (val, key) { v[key] = String(val);\
-    \ });\n      S.email = v.email || '';\n      S.msg = null; showMsg(); setBusy(true);\n      emit(e.target.dataset.form,\
-    \ v).then(function (res) {\n        setBusy(false);\n        res = res || {};\n        if (res.ok && !res.message) return;\
-    \ // Python navigates away\n        S.msg = res.ok ? { ok: true, text: res.message } : { ok: false, text: res.error ||\
-    \ 'Something went wrong.' };\n        if (res.mode && res.mode !== S.mode) { S.mode = res.mode; render(); } else showMsg();\n\
-    \      }, function (err) { setBusy(false); S.msg = { ok: false, text: PP.err(err) }; showMsg(); });\n    }\n    root.addEventListener('click',\
-    \ function (e) {\n      var el = e.target.closest('[data-action=mode]');\n      if (!el) return;\n      var em = root.querySelector('input[name=email]');\n\
-    \      if (em) S.email = em.value;\n      S.mode = el.dataset.mode; S.msg = null; render();\n      var first = root.querySelector('form\
-    \ input:not([value]), form input[value=\"\"]');\n      if (first) first.focus();\n    });\n    render();\n    return {};\n\
-    \  });\n})();\n</script>\n\n<!-- ===== DashboardPage component ===== -->\n<style>\n.pp-dash .hello { display: flex; align-items:\
-    \ flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }\n.pp-dash .hello h1 { margin: 0; }\n.pp-dash .alert { display:\
-    \ flex; gap: 16px; align-items: center; padding: 16px 20px; margin-bottom: 30px; background: var(--pp-warn-soft); border:\
-    \ 1px solid color-mix(in srgb, var(--pp-warn) 25%, transparent); border-radius: var(--pp-radius); color: var(--pp-ink);\
-    \ flex-wrap: wrap; }\n.pp-dash .alert .ic { width: 22px; height: 22px; color: var(--pp-warn); }\n.pp-dash .alert strong\
-    \ { font-weight: 600; }\n.pp-dash .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));\
-    \ gap: 16px; }\n.pp-dash .rc { display: flex; flex-direction: column; padding: 22px 22px 16px; min-height: 230px; transition:\
-    \ border-color .15s, transform .15s; }\n.pp-dash .rc:hover { border-color: var(--pp-faint); }\n.pp-dash .rc h3 { font-size:\
-    \ 1.55rem; margin-bottom: 2px; overflow-wrap: anywhere; }\n.pp-dash .rc .addr { color: var(--pp-muted); font-size: .84rem;\
-    \ min-height: 1.3em; }\n.pp-dash .rc .today { margin: 14px 0 16px; font-size: .86rem; color: var(--pp-ink); display: flex;\
-    \ gap: 7px; align-items: center; }\n.pp-dash .rc .today .ic { color: var(--pp-brass); }\n.pp-dash .rc .nums { display:\
-    \ grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 0; border-top: 1px solid var(--pp-line); border-bottom:\
-    \ 1px solid var(--pp-line); }\n.pp-dash .rc .nums b { display: block; font: 500 1.6rem/1 var(--pp-serif); }\n.pp-dash\
-    \ .rc .nums span { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-dash\
-    \ .rc .acts { display: flex; gap: 4px; align-items: center; margin-top: auto; padding-top: 12px; }\n.pp-dash .rc .top\
-    \ { display: flex; gap: 10px; align-items: flex-start; }\n.pp-dash .rc .top > div { flex: 1; min-width: 0; }\n.pp-dash\
-    \ .new { display: grid; place-items: center; text-align: center; border-style: dashed; color: var(--pp-muted); min-height:\
-    \ 230px; }\n.pp-dash .new:hover { color: var(--pp-ink); border-color: var(--pp-ink); }\n.pp-dash .new .plus { width: 44px;\
-    \ height: 44px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; margin: 0 auto\
-    \ 10px; }\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.define('dashboard', function (root, data, emit)\
-    \ {\n    var esc = PP.esc;\n    var list = data.restaurants || [], me = data.me || {};\n\n    function greeting() {\n\
-    \      var h = new Date().getHours();\n      return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';\n\
-    \    }\n    function card(r) {\n      return '<div class=\"card rc fade-in\" data-id=\"' + esc(r.id) + '\">' +\n     \
-    \   '<div class=\"top\"><div><h3>' + esc(r.name) + '</h3><div class=\"addr\">' + esc(r.address || '/' + r.slug) + '</div></div>'\
-    \ +\n          (r.pending ? '<span class=\"badge pending\">' + r.pending + ' to approve</span>' : !r.accepting ? '<span\
-    \ class=\"badge cancelled\">Online booking off</span>' : '') +\n          (r.role && r.role !== 'owner' ? '<span class=\"\
-    badge plain\">' + esc(PP.ROLE[r.role]) + '</span>' : '') + '</div>' +\n        '<div class=\"today\">' + PP.icon('clock')\
-    \ + esc(r.today) + '</div>' +\n        '<div class=\"nums\"><div><b>' + r.bookings + '</b><span>Bookings</span></div><div><b>'\
-    \ + r.covers + '</b><span>Guests</span></div><div><b>' + r.seats + '</b><span>Seats</span></div></div>' +\n        '<div\
-    \ class=\"acts\"><button class=\"btn primary sm\" data-action=\"open\" data-page=\"reservations\">Open</button>' +\n \
-    \         (r.role !== 'staff' ? '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"hours\">Hours</button>'\
-    \ +\n          '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"tables\">Tables</button>' : '') + '<span\
-    \ class=\"spacer\"></span>' +\n          '<button class=\"btn ghost icon\" data-action=\"copy\" title=\"Copy booking link\"\
-    \ aria-label=\"Copy booking link\">' + PP.icon('link') + '</button>' +\n          (r.role !== 'staff' ? '<button class=\"\
-    btn ghost icon\" data-action=\"duplicate\" title=\"Duplicate\" aria-label=\"Duplicate restaurant\">' + PP.icon('copy')\
-    \ + '</button>' : '') + '</div></div>';\n    }\n    function render() {\n      var pending = list.reduce(function (n,\
-    \ r) { return n + r.pending; }, 0);\n      var firstName = String(me.display_name || '').split(' ')[0];\n      root.innerHTML\
-    \ = '<div class=\"wrap pp-dash\">' +\n        '<div class=\"hello\"><div><div class=\"eyebrow\">' + esc(new Date().toLocaleDateString(undefined,\
-    \ { weekday: 'long', day: 'numeric', month: 'long' })) + '</div>' +\n          '<h1>' + greeting() + (firstName ? ', '\
-    \ + esc(firstName) : '') + '</h1></div><span class=\"spacer\"></span>' +\n          (list.length ? '<button class=\"btn\
-    \ primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button>' : '') + '</div>' +\n        (pending ?\
-    \ '<div class=\"alert\">' + PP.icon('bell') + '<div><strong>' + PP.plural(pending, 'booking') + ' waiting for your approval.</strong>\
-    \ ' +\n          '<span class=\"muted\">They came in while a restaurant was nearly full, or for a large party.</span></div><span\
-    \ class=\"spacer\"></span>' +\n          list.filter(function (r) { return r.pending; }).map(function (r) {\n        \
-    \    return '<button class=\"btn sm\" data-action=\"open\" data-page=\"reservations\" data-id=\"' + esc(r.id) + '\">'\
-    \ + esc(r.name) + ' · ' + r.pending + '</button>';\n          }).join('') + '</div>' : '') +\n        (list.length ? '<div\
-    \ class=\"section-title\"><h2>Your restaurants</h2><span class=\"muted small\">' + list.length + '</span></div>' +\n \
-    \         '<div class=\"grid\">' + list.map(card).join('') +\n          '<button class=\"card new\" data-action=\"new\"\
-    ><div><div class=\"plus\">' + PP.icon('plus') + '</div>Add a restaurant</div></button></div>'\n          : '<div class=\"\
-    empty\" style=\"padding:70px 20px\"><h2>Add your first restaurant</h2><p>Start with sample opening hours and tables, then\
-    \ make them yours.</p>' +\n            '<button class=\"btn primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button></div>')\
-    \ +\n        '</div>';\n    }\n\n    function newModal() {\n      var tz = 'UTC';\n      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone\
-    \ || 'UTC'; } catch (e) {}\n      var d = PP.modal('<div class=\"eyebrow\">New restaurant</div><h2>What is it called?</h2>'\
-    \ +\n        '<form><div class=\"stack\"><div><label class=\"f\" for=\"nrName\">Name</label><input id=\"nrName\" name=\"\
-    name\" type=\"text\" required maxlength=\"80\" autofocus></div>' +\n        '<div><label class=\"f\" for=\"nrTz\">Time\
-    \ zone</label>' + PP.tzField('timezone', tz, 'nrTz') +\n          '<div class=\"hint\">Booking times are always in the\
-    \ restaurant\\'s local time. Search by country, city or GMT offset.</div></div>' +\n        '<label class=\"check\"><input\
-    \ type=\"checkbox\" name=\"sample\" checked><span>Start with sample opening hours and 9 tables<br><span class=\"muted\
-    \ small\">You can change all of it afterwards.</span></span></label>' +\n        '<div data-el=\"msg\"></div></div>' +\n\
-    \        '<div class=\"foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\"\
-    \ type=\"submit\">Create restaurant</button></div></form>');\n      var f = d.el.querySelector('form');\n      f.onsubmit\
-    \ = function (e) {\n        e.preventDefault();\n        var b = f.querySelector('[type=submit]'); b.disabled = true;\
-    \ b.innerHTML = '<span class=\"spin\"></span>';\n        emit('create', { name: f.name.value, timezone: f.timezone.value,\
-    \ sample: f.sample.checked }).then(function (res) {\n          if (res && res.ok) { d.close(); return; }\n          b.disabled\
-    \ = false; b.textContent = 'Create restaurant';\n          d.el.querySelector('[data-el=msg]').innerHTML = '<div class=\"\
-    feedback bad\">' + esc((res && res.error) || 'Could not create it.') + '</div>';\n        }, function (err) { b.disabled\
-    \ = false; b.textContent = 'Create restaurant'; PP.toast(PP.err(err), true); });\n      };\n    }\n    function dupModal(r)\
-    \ {\n      var d = PP.modal('<div class=\"eyebrow\">Duplicate</div><h2>Copy ' + esc(r.name) + '</h2>' +\n        '<p class=\"\
-    muted small\">The copy gets the same settings, opening hours, special days, tables and joins. Reservations stay with the\
-    \ original.</p>' +\n        '<form><label class=\"f\" for=\"dpName\">Name of the new restaurant</label><input id=\"dpName\"\
-    \ name=\"name\" type=\"text\" required maxlength=\"80\" value=\"' + esc(r.name + ' (copy)') + '\">' +\n        '<div data-el=\"\
-    msg\"></div><div class=\"foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\"\
-    \ type=\"submit\">Duplicate</button></div></form>');\n      var f = d.el.querySelector('form');\n      f.name.select();\n\
-    \      f.onsubmit = function (e) {\n        e.preventDefault();\n        var b = f.querySelector('[type=submit]'); b.disabled\
-    \ = true; b.innerHTML = '<span class=\"spin\"></span>';\n        emit('duplicate', { id: r.id, name: f.name.value }).then(function\
-    \ (res) {\n          if (res && res.ok) { d.close(); return; }\n          b.disabled = false; b.textContent = 'Duplicate';\n\
-    \          d.el.querySelector('[data-el=msg]').innerHTML = '<div class=\"feedback bad\">' + esc((res && res.error) ||\
-    \ 'Could not copy it.') + '</div>';\n        });\n      };\n    }\n\n    root.addEventListener('click', function (e) {\n\
-    \      var el = e.target.closest('[data-action]');\n      if (!el) return;\n      var host = el.closest('[data-id]');\n\
-    \      var r = host && list.filter(function (x) { return x.id === host.dataset.id; })[0];\n      var a = el.dataset.action;\n\
-    \      if (a === 'new') newModal();\n      else if (a === 'open' && r) emit('open', { id: r.id, page: el.dataset.page\
-    \ || 'reservations' });\n      else if (a === 'duplicate' && r) dupModal(r);\n      else if (a === 'copy' && r) PP.copy(PP.bookUrl(r.slug),\
-    \ 'Booking link');\n    });\n    render();\n    return {};\n  });\n})();\n</script>\n\n<!-- ===== ReservationsPage component\
-    \ ===== -->\n<style>\n.pp-res .approvals { margin-bottom: 30px; }\n.pp-res .approvals h2 { display: flex; align-items:\
-    \ center; gap: 10px; }\n.pp-res .approvals h2 .ic { width: 20px; height: 20px; color: var(--pp-warn); }\n.pp-res .ap-grid\
-    \ { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }\n.pp-res .ap { padding:\
-    \ 18px 20px; border-left: 3px solid var(--pp-warn); }\n.pp-res .ap .when { font-size: .84rem; color: var(--pp-muted);\
-    \ margin-bottom: 4px; }\n.pp-res .ap h3 { margin: 0 0 6px; }\n.pp-res .ap .why { font-size: .86rem; margin: 8px 0 12px;\
-    \ }\n.pp-res .ap .meter { display: grid; gap: 5px; margin-bottom: 12px; font-size: .8rem; color: var(--pp-muted); }\n\
-    .pp-res .ap .meter .bar { position: relative; height: 8px; }\n.pp-res .ap .meter .bar .with { position: absolute; left:\
-    \ 0; top: 0; bottom: 0; background: color-mix(in srgb, var(--pp-warn) 45%, transparent); border-radius: 99px; }\n.pp-res\
-    \ .ap .meter .bar .without { position: absolute; left: 0; top: 0; bottom: 0; background: var(--pp-ink); border-radius:\
-    \ 99px; }\n.pp-res .ap .meter .bar .thr { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--pp-bad);\
-    \ }\n.pp-res .ap .facts { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .82rem; color: var(--pp-muted); margin-bottom:\
-    \ 14px; }\n.pp-res .ap .facts span { display: inline-flex; gap: 5px; align-items: center; }\n.pp-res .ap .acts { display:\
-    \ flex; gap: 6px; flex-wrap: wrap; }\n\n.pp-res .daybar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;\
-    \ margin-bottom: 8px; }\n.pp-res .daybar h2 { margin: 0 6px; min-width: 0; }\n.pp-res .daybar input[type=date] { width:\
-    \ auto; min-height: 36px; padding: 5px 10px; border-radius: 99px; font-size: .85rem; }\n.pp-res .daymeta { display: flex;\
-    \ flex-wrap: wrap; gap: 6px 18px; color: var(--pp-muted); font-size: .86rem; margin-bottom: 18px; }\n.pp-res .daymeta\
-    \ span { display: inline-flex; gap: 6px; align-items: center; }\n.pp-res .daymeta b { color: var(--pp-ink); font-weight:\
-    \ 600; }\n.pp-res .tools { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\n\n.pp-res\
-    \ .tl { --lab: 104px; overflow-x: auto; border: 1px solid var(--pp-line); border-radius: var(--pp-radius); background:\
-    \ var(--pp-panel); }\n.pp-res .tl-in { position: relative; }\n.pp-res .tl-row { display: flex; border-top: 1px solid var(--pp-line);\
-    \ min-height: 46px; }\n.pp-res .tl-row:first-child { border-top: 0; }\n.pp-res .tl .lab { position: sticky; left: 0; z-index:\
-    \ 3; width: var(--lab); flex: none; padding: 12px 12px; background: var(--pp-panel); border-right: 1px solid var(--pp-line);\
-    \ font-size: .86rem; font-weight: 500; display: flex; align-items: center; gap: 6px; }\n.pp-res .tl .lab span { color:\
-    \ var(--pp-faint); font-weight: 400; font-size: .76rem; }\n.pp-res .tl .lane { position: relative; flex: 1; cursor: copy;\
-    \ background-image: linear-gradient(to right, var(--pp-line) 1px, transparent 1px); background-size: calc(100% / var(--hours))\
-    \ 100%; }\n.pp-res .tl .head .lane { cursor: default; background: none; height: 34px; }\n.pp-res .tl .head .lab { color:\
-    \ var(--pp-muted); font-weight: 400; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; }\n.pp-res .tl\
-    \ .tick { position: absolute; top: 9px; font-size: .74rem; color: var(--pp-muted); transform: translateX(4px); font-variant-numeric:\
-    \ tabular-nums; }\n.pp-res .tl .closed { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(135deg,\
-    \ transparent 0 6px, color-mix(in srgb, var(--pp-line) 60%, transparent) 6px 7px); pointer-events: none; }\n.pp-res .tl\
-    \ .occ .lane { cursor: default; height: 40px; }\n.pp-res .tl .occ .col { position: absolute; bottom: 4px; background:\
-    \ color-mix(in srgb, var(--pp-ink) 22%, transparent); border-radius: 2px 2px 0 0; }\n.pp-res .tl .occ .col.hot { background:\
-    \ var(--pp-warn); }\n.pp-res .tl .blk { all: unset; box-sizing: border-box; position: absolute; top: 5px; bottom: 5px;\
-    \ border-radius: 7px; padding: 4px 8px; font-size: .76rem; line-height: 1.25; overflow: hidden; white-space: nowrap; text-overflow:\
-    \ ellipsis; cursor: pointer; background: var(--pp-ink); color: var(--pp-bg); z-index: 2; box-shadow: 0 0 0 2px var(--pp-panel);\
+    \ render(); }\n    };\n  });\n})();\n</script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n/* ---- hero: dark\
+    \ story panel + sign-in box ---- */\n.pp-auth { min-height: min(calc(100vh - 80px), 820px); display: grid; grid-template-columns:\
+    \ 1.1fr 1fr; }\n.pp-auth .side { background: #1d1b18; color: #efe9df; padding: 48px 56px 44px; display: flex; flex-direction:\
+    \ column; justify-content: space-between; gap: 40px; position: relative; overflow: hidden; }\n.pp-auth .side > * { position:\
+    \ relative; }\n.pp-auth .side .top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }\n\
+    .pp-auth .side .brand { display: flex; align-items: center; gap: 12px; font-family: var(--pp-serif); font-size: 1.7rem;\
+    \ font-weight: 600; }\n.pp-auth .side .brand .mark { width: 34px; height: 34px; color: #c9a56a; }\n.pp-auth .side .jump\
+    \ { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }\n.pp-auth .side .jump button { all: unset;\
+    \ cursor: pointer; padding: 6px 10px; border-radius: 99px; font-size: .84rem; color: #b9b1a4; }\n.pp-auth .side .jump\
+    \ button:hover { color: #efe9df; background: rgba(239,233,223,.07); }\n.pp-auth .side .jump button:focus-visible, .pp-auth\
+    \ .side .more:focus-visible { outline: 2px solid #c9a56a; outline-offset: 2px; }\n.pp-auth .side h1 { color: inherit;\
+    \ font-size: 3.6rem; max-width: 11ch; line-height: 1.02; margin: 0 0 18px; font-weight: 500; }\n.pp-auth .side h1 em {\
+    \ color: #c9a56a; font-style: italic; }\n.pp-auth .side .eyebrow { color: #c9a56a; }\n.pp-auth .side p { color: #b9b1a4;\
+    \ max-width: 40ch; font-size: 1.02rem; }\n.pp-auth .side .more { all: unset; cursor: pointer; margin-top: 22px; display:\
+    \ inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 99px; border: 1px solid rgba(201,165,106,.5);\
+    \ color: #efe9df; font-size: .9rem; }\n.pp-auth .side .more:hover { border-color: #c9a56a; background: rgba(201,165,106,.08);\
+    \ }\n.pp-auth .side .more .ic { color: #c9a56a; }\n.pp-auth .side .stats { display: grid; grid-template-columns: repeat(3,\
+    \ auto); justify-content: start; gap: 36px; }\n.pp-auth .side .stats b { display: block; font: 500 2rem/1 var(--pp-serif);\
+    \ color: #efe9df; }\n.pp-auth .side .stats span { display: block; margin-top: 6px; font-size: .74rem; letter-spacing:\
+    \ .14em; text-transform: uppercase; color: #8e8678; }\n.pp-auth .side .ring { position: absolute; right: -160px; bottom:\
+    \ -160px; width: 480px; height: 480px; color: rgba(201,165,106,.12); }\n.pp-auth .main { display: grid; place-items: center;\
+    \ padding: 40px 20px; }\n.pp-auth .box { width: min(380px, 100%); scroll-margin-top: 24px; }\n.pp-auth .tabs { display:\
+    \ flex; gap: 22px; border-bottom: 1px solid var(--pp-line); margin-bottom: 26px; }\n.pp-auth .tabs button { all: unset;\
+    \ cursor: pointer; padding: 10px 0; font-size: .92rem; color: var(--pp-muted); border-bottom: 2px solid transparent; margin-bottom:\
+    \ -1px; }\n.pp-auth .tabs button.on { color: var(--pp-ink); border-bottom-color: var(--pp-ink); }\n.pp-auth form > div\
+    \ + div { margin-top: 16px; }\n.pp-auth .link { all: unset; cursor: pointer; color: var(--pp-muted); font-size: .84rem;\
+    \ text-decoration: underline; text-decoration-color: var(--pp-line); text-underline-offset: 3px; }\n.pp-auth .link:hover\
+    \ { color: var(--pp-ink); }\n\n/* ---- landing sections ---- */\n.pp-land .sec { max-width: 1120px; margin: 0 auto; padding:\
+    \ 96px 20px; scroll-margin-top: 0; }\n.pp-land .sec + .sec { border-top: 1px solid var(--pp-line); }\n.pp-land h2 { font-size:\
+    \ 2.7rem; line-height: 1.05; margin-bottom: 16px; }\n.pp-land h2 em { font-style: italic; color: var(--pp-brass); }\n\
+    .pp-land .lede { color: var(--pp-muted); font-size: 1.08rem; max-width: 56ch; margin: 0; }\n.pp-land .head { margin-bottom:\
+    \ 48px; }\n.pp-land h3 { font-size: 1.35rem; margin-bottom: 6px; }\n.pp-land p { line-height: 1.6; }\n.pp-land .ico {\
+    \ width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--pp-brass-soft);\
+    \ color: var(--pp-brass); flex: none; }\n.pp-land .ico .ic { width: 18px; height: 18px; }\n\n.pp-land .steps { display:\
+    \ grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; }\n.pp-land .step { padding: 28px 26px\
+    \ 30px; }\n.pp-land .step .n { font: 500 2.6rem/1 var(--pp-serif); color: var(--pp-brass); margin-bottom: 18px; }\n.pp-land\
+    \ .step p { color: var(--pp-muted); margin: 0; font-size: .94rem; }\n\n.pp-land .why { display: grid; grid-template-columns:\
+    \ 1fr 1.15fr; gap: 64px; align-items: start; }\n.pp-land .why .points { display: grid; gap: 28px; }\n.pp-land .point {\
+    \ display: flex; gap: 18px; }\n.pp-land .point p { color: var(--pp-muted); margin: 0; font-size: .94rem; }\n.pp-land .quote\
+    \ { margin-top: 32px; padding-left: 18px; border-left: 2px solid var(--pp-brass); font: italic 500 1.3rem/1.35 var(--pp-serif);\
+    \ color: var(--pp-ink); max-width: 34ch; }\n\n.pp-land .feats { display: grid; grid-template-columns: repeat(3, 1fr);\
+    \ gap: 1px; background: var(--pp-line); border: 1px solid var(--pp-line); border-radius: var(--pp-radius); overflow: hidden;\
+    \ }\n.pp-land .feat { background: var(--pp-panel); padding: 28px 26px; }\n.pp-land .feat .ico { margin-bottom: 16px; }\n\
+    .pp-land .feat h3 { font-size: 1.22rem; }\n.pp-land .feat p { color: var(--pp-muted); margin: 0; font-size: .9rem; }\n\
+    \n.pp-land .guests { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }\n.pp-land .ticks\
+    \ { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }\n.pp-land .ticks li { display: flex; gap:\
+    \ 12px; align-items: flex-start; font-size: .95rem; }\n.pp-land .ticks .ic { color: var(--pp-good); margin-top: 3px; }\n\
+    \n/* a still picture of the guest booking window */\n.pp-land .mock { padding: 26px; max-width: 420px; justify-self: center;\
+    \ width: 100%; box-sizing: border-box; pointer-events: none; user-select: none; }\n.pp-land .mock .mtop { display: flex;\
+    \ align-items: center; gap: 10px; padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px solid var(--pp-line);\
+    \ }\n.pp-land .mock .mtop .mark { width: 26px; height: 26px; color: var(--pp-brass); }\n.pp-land .mock .mtop b { font:\
+    \ 600 1.25rem/1 var(--pp-serif); }\n.pp-land .mock .mtop .x { margin-left: auto; color: var(--pp-faint); }\n.pp-land .mock\
+    \ .lbl { font-size: .74rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-faint);\
+    \ margin: 16px 0 8px; }\n.pp-land .mock .days { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }\n.pp-land\
+    \ .mock .day { border: 1px solid var(--pp-line); border-radius: 10px; padding: 8px 0; text-align: center; font-size: .72rem;\
+    \ color: var(--pp-muted); }\n.pp-land .mock .day b { display: block; font: 500 1.2rem/1.1 var(--pp-serif); color: var(--pp-ink);\
+    \ }\n.pp-land .mock .day.on { background: var(--pp-accent); border-color: var(--pp-accent); color: var(--pp-accent-ink);\
+    \ }\n.pp-land .mock .day.on b { color: inherit; }\n.pp-land .mock .day.shut { opacity: .4; }\n.pp-land .mock .chip.walk\
+    \ { opacity: .5; font-size: .78rem; }\n.pp-land .mock .ok { margin-top: 18px; padding: 10px 12px; border-radius: 10px;\
+    \ background: var(--pp-good-soft); color: var(--pp-good); font-size: .84rem; display: flex; gap: 8px; align-items: center;\
+    \ }\n.pp-land .mock .btn { margin-top: 14px; }\n\n.pp-land .cta { background: #1d1b18; color: #efe9df; }\n.pp-land .cta\
+    \ .sec { text-align: center; padding: 88px 20px; }\n.pp-land .cta h2 { color: inherit; }\n.pp-land .cta h2 em { color:\
+    \ #c9a56a; }\n.pp-land .cta p { color: #b9b1a4; max-width: 52ch; margin: 0 auto 30px; }\n.pp-land .cta .acts { display:\
+    \ flex; gap: 10px; justify-content: center; flex-wrap: wrap; }\n.pp-land .cta .btn.light { background: #efe9df; border-color:\
+    \ #efe9df; color: #1d1b18; }\n.pp-land .cta .btn.line { background: transparent; border-color: rgba(239,233,223,.3); color:\
+    \ #efe9df; }\n.pp-land .cta .btn.line:hover { border-color: #efe9df; }\nhtml[data-theme=dark] .pp-land .cta, html[data-theme=dark]\
+    \ .pp-auth .side { box-shadow: inset 0 0 0 1px var(--pp-line); }\n\n@media (max-width: 960px) {\n  .pp-auth .side .jump\
+    \ { display: none; }\n  .pp-land .steps, .pp-land .feats { grid-template-columns: 1fr 1fr; }\n  .pp-land .why, .pp-land\
+    \ .guests { grid-template-columns: 1fr; gap: 40px; }\n}\n@media (max-width: 860px) {\n  .pp-auth { grid-template-columns:\
+    \ 1fr; min-height: 0; }\n  .pp-auth .side { padding: 28px 22px 32px; gap: 28px; }\n  .pp-auth .side h1 { font-size: 2.4rem;\
+    \ }\n  .pp-auth .side .ring { display: none; }\n  .pp-auth .side .stats { gap: 22px; }\n  .pp-auth .side .stats b { font-size:\
+    \ 1.6rem; }\n  .pp-auth .side .stats span { font-size: .66rem; letter-spacing: .1em; }\n}\n@media (max-width: 640px) {\n\
+    \  .pp-land .sec { padding: 60px 16px; }\n  .pp-land .cta .sec { padding: 60px 16px; }\n  .pp-land h2 { font-size: 2.1rem;\
+    \ }\n  .pp-land .head { margin-bottom: 32px; }\n  .pp-land .steps, .pp-land .feats { grid-template-columns: 1fr; }\n \
+    \ .pp-land .feat { padding: 24px 20px; }\n  .pp-land .mock { padding: 20px; }\n}\n</style>\n<script>\n(function () {\n\
+    \  var PP = window.PP;\n\n  var STEPS = [\n    ['Describe your restaurant', 'Opening hours and seasons, holidays and closures,\
+    \ your tables and how they join, and how full you can get before bookings need a look.'],\n    ['Add the Reserve button',\
+    \ 'Paste one line of code into your website. Guests book in a window that opens over your page, sized for phones.'],\n\
+    \    ['Show your team', 'Staff learn the day view in about five minutes: accept, decline, seat a walk-in, take a booking\
+    \ by phone.']\n  ];\n  var WHY = [\n    ['clock', 'Ready in about 30 minutes', 'No developer needed. Enter your details\
+    \ and the booking button is ready for your site.'],\n    ['phone', 'Run it from your phone', 'Every screen works on a\
+    \ phone or tablet, at the host stand or at home.'],\n    ['users', 'Staff trained in under 10 minutes', 'A handful of\
+    \ buttons covers a full service. Nothing to configure for them.'],\n    ['link', 'Help with the setup', 'We help you put\
+    \ the booking button on your website, free of charge.']\n  ];\n  var FEATS = [\n    ['grid', 'Every location, one login',\
+    \ 'Run all your restaurants from one account, each with its own hours, tables and team.'],\n    ['users', 'Roles for your\
+    \ team', 'Owners, managers and staff each see what they need. Staff handle bookings; managers set things up.'],\n    ['phone',\
+    \ 'Walk-ins and phone bookings', 'Add a guest at the door or on the phone in a few taps, from a tablet or phone.'],\n\
+    \    ['check', 'Bookings confirm themselves', 'Online bookings are accepted on the spot while there is room. You decide\
+    \ how full is full.'],\n    ['table', 'Room kept for walk-ins', 'Past 80% full, new bookings wait for your approval, or\
+    \ the time shows as walk-in only.'],\n    ['bell', 'Alerts within a minute', 'When a booking needs a decision, your team\
+    \ sees it in the app and gets an email.'],\n    ['calendar', 'Hours that change with you', 'Seasonal hours, holidays and\
+    \ one-off closures, each taking over from the usual week.'],\n    ['join', 'Join and split tables', 'Push tables together\
+    \ for larger parties at the hours you choose, and split them again after.'],\n    ['ext', 'One Reserve button', 'A single\
+    \ line of code adds a button that opens a phone-friendly booking window on your site.'],\n    ['globe', 'English, French\
+    \ and Latvian', 'The booking form, the guest page and every email speak your guest\\'s language. More on request.'],\n\
+    \    ['mail', 'Guest emails in your words', 'Confirmed, waiting and declined emails go out by themselves, with a message\
+    \ you write.'],\n    ['qr', 'Live hours, menu and QR codes', 'Change hours or prices once and your website follows. The\
+    \ menu QR code never changes.']\n  ];\n  var TICKS = [\n    'Only shows times when you are open and have a table',\n \
+    \   'Confirms on the spot, or tells the guest you will reply shortly',\n    'Sends a private link to change or cancel,\
+    \ and a calendar entry',\n    'Speaks English, French or Latvian'\n  ];\n\n  PP.define('auth', function (root, data, emit)\
+    \ {\n    var esc = PP.esc;\n    var S = { mode: 'login', busy: false, msg: null, email: '' };\n\n    function form() {\n\
+    \      if (S.mode === 'reset') {\n        return '<h2>Reset your password</h2><p class=\"muted small\">We\\'ll email you\
+    \ a link to choose a new one.</p>' +\n          '<form data-form=\"reset\"><div><label class=\"f\" for=\"ppE\">Email</label><input\
+    \ type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"email\" value=\"' + esc(S.email) + '\"></div>' +\n\
+    \          '<div><button class=\"btn primary block\" type=\"submit\">Send reset link</button></div></form>' +\n      \
+    \    '<p style=\"margin-top:16px\"><button class=\"link\" data-action=\"mode\" data-mode=\"login\">Back to sign in</button></p>';\n\
+    \      }\n      var signup = S.mode === 'signup';\n      return '<div class=\"tabs\" role=\"tablist\">' +\n          '<button\
+    \ role=\"tab\" data-action=\"mode\" data-mode=\"login\" class=\"' + (!signup ? 'on' : '') + '\">Sign in</button>' +\n\
+    \          '<button role=\"tab\" data-action=\"mode\" data-mode=\"signup\" class=\"' + (signup ? 'on' : '') + '\">Create\
+    \ account</button></div>' +\n        '<h2>' + (signup ? 'Open your account' : 'Welcome back') + '</h2>' +\n        '<p\
+    \ class=\"muted small\">' + (signup ? 'Set up your restaurants, hours and tables in about 30 minutes.' : 'Sign in to manage\
+    \ your restaurants and reservations.') + '</p>' +\n        '<form data-form=\"' + S.mode + '\">' +\n          (signup\
+    \ ? '<div><label class=\"f\" for=\"ppN\">Your name</label><input type=\"text\" id=\"ppN\" name=\"name\" required autocomplete=\"\
+    name\"></div>' : '') +\n          '<div><label class=\"f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"\
+    email\" required autocomplete=\"email\" value=\"' + esc(S.email) + '\"></div>' +\n          '<div><label class=\"f\" for=\"\
+    ppP\">Password</label><input type=\"password\" id=\"ppP\" name=\"password\" required minlength=\"' + (signup ? 8 : 1)\
+    \ + '\" autocomplete=\"' + (signup ? 'new-password' : 'current-password') + '\">' +\n            (signup ? '<div class=\"\
+    hint\">At least 8 characters.</div>' : '<div class=\"hint\" style=\"text-align:right\"><button type=\"button\" class=\"\
+    link\" data-action=\"mode\" data-mode=\"reset\">Forgot your password?</button></div>') + '</div>' +\n          '<div><button\
+    \ class=\"btn primary block\" type=\"submit\">' + (signup ? 'Create account' : 'Sign in') + '</button></div>' +\n    \
+    \    '</form>';\n    }\n\n    function hero() {\n      return '<section class=\"pp-auth\">' +\n        '<div class=\"\
+    side\">' + PP.mark('ring') +\n          '<div class=\"top\"><div class=\"brand\">' + PP.mark() + 'PlanPlate</div>' +\n\
+    \            '<nav class=\"jump\" aria-label=\"On this page\">' +\n              '<button data-jump=\"how\">Set it up</button><button\
+    \ data-jump=\"why\">Why PlanPlate</button>' +\n              '<button data-jump=\"features\">Features</button><button\
+    \ data-jump=\"guests\">For guests</button></nav></div>' +\n          '<div><div class=\"eyebrow\">Simple · Smart · Reliable</div>'\
+    \ +\n            '<h1>Reservations, <em>made simple.</em></h1>' +\n            '<p>One calm place to run bookings for\
+    \ every restaurant you manage. PlanPlate keeps up with busy evenings, walk-ins and changing hours, so your team can look\
+    \ after the guests in front of them.</p>' +\n            '<button class=\"more\" data-jump=\"how\">See how it works '\
+    \ + PP.icon('down') + '</button></div>' +\n          '<div class=\"stats\"><div><b>30 min</b><span>to set up</span></div><div><b>5\
+    \ min</b><span>staff training</span></div><div><b>3</b><span>languages</span></div></div>' +\n        '</div>' +\n   \
+    \     '<div class=\"main\"><div class=\"box fade-in\" data-el=\"box\"></div></div></section>';\n    }\n\n    function\
+    \ sections() {\n      var steps = STEPS.map(function (s, i) {\n        return '<div class=\"card step\"><div class=\"\
+    n\">0' + (i + 1) + '</div><h3>' + esc(s[0]) + '</h3><p>' + esc(s[1]) + '</p></div>';\n      }).join('');\n      var why\
+    \ = WHY.map(function (w) {\n        return '<div class=\"point\"><span class=\"ico\">' + PP.icon(w[0]) + '</span><div><h3>'\
+    \ + esc(w[1]) + '</h3><p>' + esc(w[2]) + '</p></div></div>';\n      }).join('');\n      var feats = FEATS.map(function\
+    \ (f) {\n        return '<div class=\"feat\"><span class=\"ico\">' + PP.icon(f[0]) + '</span><h3>' + esc(f[1]) + '</h3><p>'\
+    \ + esc(f[2]) + '</p></div>';\n      }).join('');\n      var ticks = TICKS.map(function (t) { return '<li>' + PP.icon('check')\
+    \ + '<span>' + esc(t) + '</span></li>'; }).join('');\n      var times = ['18:00', '18:30', '19:00', '19:30', '20:00'].map(function\
+    \ (t) {\n        return '<span class=\"chip' + (t === '19:00' ? ' on' : '') + '\">' + t + '</span>';\n      }).join('')\
+    \ + '<span class=\"chip walk\">20:30 · Walk-in</span>';\n      var days = [['Thu', 12], ['Fri', 13], ['Sat', 14], ['Sun',\
+    \ 15], ['Mon', 16]].map(function (d, i) {\n        return '<div class=\"day' + (i === 1 ? ' on' : '') + (i === 4 ? ' shut'\
+    \ : '') + '\">' + d[0] + '<b>' + d[1] + '</b></div>';\n      }).join('');\n      var mock = '<div class=\"card mock\"\
+    \ aria-hidden=\"true\">' +\n        '<div class=\"mtop\">' + PP.mark() + '<b>Your restaurant</b><span class=\"x\">' +\
+    \ PP.icon('x') + '</span></div>' +\n        '<div class=\"lbl\">Guests</div><div class=\"chips\"><span class=\"chip\"\
+    >1</span><span class=\"chip on\">2</span><span class=\"chip\">3</span><span class=\"chip\">4</span><span class=\"chip\"\
+    >5</span><span class=\"chip\">6+</span></div>' +\n        '<div class=\"lbl\">Day</div><div class=\"days\">' + days +\
+    \ '</div>' +\n        '<div class=\"lbl\">Time</div><div class=\"chips\">' + times + '</div>' +\n        '<div class=\"\
+    ok\">' + PP.icon('check') + 'Table for 2 on Friday at 19:00 is available</div>' +\n        '<span class=\"btn primary\
+    \ block\">Reserve</span></div>';\n\n      return '<div class=\"pp-land\">' +\n        '<section class=\"sec\" id=\"pp-how\"\
+    ><div class=\"head\"><div class=\"eyebrow\">Set it up</div>' +\n          '<h2>Ready in <em>30 minutes.</em></h2>' +\n\
+    \          '<p class=\"lede\">An online portal that keeps up with changing hours, confirms bookings on its own and makes\
+    \ room for walk-ins when you are busy. Three steps and you are taking reservations.</p></div>' +\n          '<div class=\"\
+    steps\">' + steps + '</div></section>' +\n        '<section class=\"sec\" id=\"pp-why\"><div class=\"why\"><div><div class=\"\
+    eyebrow\">Why PlanPlate?</div>' +\n          '<h2>Built for <em>independent</em> restaurants.</h2>' +\n          '<p class=\"\
+    lede\">Fast to set up, easy to run, and nothing you will never use. PlanPlate does reservations well and stays out of\
+    \ the way of service.</p>' +\n          '<div class=\"quote\">Five buttons. One calm screen. A full house.</div></div>'\
+    \ +\n          '<div class=\"points\">' + why + '</div></div></section>' +\n        '<section class=\"sec\" id=\"pp-features\"\
+    ><div class=\"head\"><div class=\"eyebrow\">Core features</div>' +\n          '<h2>Everything a busy dining room <em>needs.</em></h2>'\
+    \ +\n          '<p class=\"lede\">From one restaurant to many, the same simple tools for hours, tables, bookings and your\
+    \ guests.</p></div>' +\n          '<div class=\"feats\">' + feats + '</div></section>' +\n        '<section class=\"sec\"\
+    \ id=\"pp-guests\"><div class=\"guests\"><div><div class=\"eyebrow\">For your guests</div>' +\n          '<h2>What your\
+    \ guests <em>see.</em></h2>' +\n          '<p class=\"lede\">Not a long form. A focused booking window on your own website\
+    \ that checks real availability and answers straight away.</p>' +\n          '<ul class=\"ticks\">' + ticks + '</ul></div>'\
+    \ + mock + '</div></section>' +\n        '<div class=\"cta\"><section class=\"sec\"><div class=\"eyebrow\">Get started</div>'\
+    \ +\n          '<h2>Take your first booking <em>tonight.</em></h2>' +\n          '<p>Create an account, add your restaurant\
+    \ and paste the Reserve button on your site. Your team will be ready before the first guest arrives.</p>' +\n        \
+    \  '<div class=\"acts\"><button class=\"btn light\" data-action=\"mode\" data-mode=\"signup\">Create account</button>'\
+    \ +\n          '<button class=\"btn line\" data-action=\"mode\" data-mode=\"login\">Sign in</button></div></section></div>'\
+    \ +\n        '</div>';\n    }\n\n    function renderBox() {\n      var box = root.querySelector('[data-el=box]');\n  \
+    \    box.innerHTML = form() + '<div data-el=\"msg\"></div>';\n      var f = box.querySelector('form');\n      if (f) f.onsubmit\
+    \ = submit;\n      showMsg();\n    }\n    function showMsg() {\n      var box = root.querySelector('[data-el=msg]');\n\
+    \      if (box) box.innerHTML = S.msg ? '<div class=\"feedback ' + (S.msg.ok ? 'good' : 'bad') + '\">' + esc(S.msg.text)\
+    \ + '</div>' : '';\n    }\n    function setBusy(on) {\n      S.busy = on;\n      root.querySelectorAll('.box button[type=submit]').forEach(function\
+    \ (b) {\n        b.disabled = on;\n        if (on) { b.dataset.label = b.innerHTML; b.innerHTML = '<span class=\"spin\"\
+    ></span>'; }\n        else if (b.dataset.label) b.innerHTML = b.dataset.label;\n      });\n    }\n    function submit(e)\
+    \ {\n      e.preventDefault();\n      if (S.busy) return;\n      var v = {};\n      new FormData(e.target).forEach(function\
+    \ (val, key) { v[key] = String(val); });\n      S.email = v.email || '';\n      S.msg = null; showMsg(); setBusy(true);\n\
+    \      emit(e.target.dataset.form, v).then(function (res) {\n        setBusy(false);\n        res = res || {};\n     \
+    \   if (res.ok && !res.message) return; // Python navigates away\n        S.msg = res.ok ? { ok: true, text: res.message\
+    \ } : { ok: false, text: res.error || 'Something went wrong.' };\n        if (res.mode && res.mode !== S.mode) { S.mode\
+    \ = res.mode; renderBox(); } else showMsg();\n      }, function (err) { setBusy(false); S.msg = { ok: false, text: PP.err(err)\
+    \ }; showMsg(); });\n    }\n    // Section links scroll in place (no URL hash: the hash is the app's router).\n    function\
+    \ jump(id) {\n      var el = root.querySelector('#pp-' + id);\n      if (el) el.scrollIntoView({ behavior: 'smooth', block:\
+    \ 'start' });\n    }\n    root.addEventListener('click', function (e) {\n      var j = e.target.closest('[data-jump]');\n\
+    \      if (j) { jump(j.dataset.jump); return; }\n      var el = e.target.closest('[data-action=mode]');\n      if (!el)\
+    \ return;\n      var em = root.querySelector('input[name=email]');\n      if (em) S.email = em.value;\n      var fromPage\
+    \ = !el.closest('.box');\n      S.mode = el.dataset.mode; S.msg = null; renderBox();\n      var box = root.querySelector('[data-el=box]');\n\
+    \      if (fromPage) box.scrollIntoView({ behavior: 'smooth', block: 'center' });\n      var first = box.querySelector('form\
+    \ input:not([value]), form input[value=\"\"]');\n      if (first) first.focus({ preventScroll: fromPage });\n    });\n\
+    \    root.innerHTML = hero() + sections();\n    renderBox();\n    return {};\n  });\n})();\n</script>\n\n<!-- ===== DashboardPage\
+    \ component ===== -->\n<style>\n.pp-dash .hello { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom:\
+    \ 30px; }\n.pp-dash .hello h1 { margin: 0; }\n.pp-dash .alert { display: flex; gap: 16px; align-items: center; padding:\
+    \ 16px 20px; margin-bottom: 30px; background: var(--pp-warn-soft); border: 1px solid color-mix(in srgb, var(--pp-warn)\
+    \ 25%, transparent); border-radius: var(--pp-radius); color: var(--pp-ink); flex-wrap: wrap; }\n.pp-dash .alert .ic {\
+    \ width: 22px; height: 22px; color: var(--pp-warn); }\n.pp-dash .alert strong { font-weight: 600; }\n.pp-dash .grid {\
+    \ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }\n.pp-dash .rc { display: flex;\
+    \ flex-direction: column; padding: 22px 22px 16px; min-height: 230px; transition: border-color .15s, transform .15s; }\n\
+    .pp-dash .rc:hover { border-color: var(--pp-faint); }\n.pp-dash .rc h3 { font-size: 1.55rem; margin-bottom: 2px; overflow-wrap:\
+    \ anywhere; }\n.pp-dash .rc .addr { color: var(--pp-muted); font-size: .84rem; min-height: 1.3em; }\n.pp-dash .rc .today\
+    \ { margin: 14px 0 16px; font-size: .86rem; color: var(--pp-ink); display: flex; gap: 7px; align-items: center; }\n.pp-dash\
+    \ .rc .today .ic { color: var(--pp-brass); }\n.pp-dash .rc .nums { display: grid; grid-template-columns: repeat(3, 1fr);\
+    \ gap: 8px; padding: 14px 0; border-top: 1px solid var(--pp-line); border-bottom: 1px solid var(--pp-line); }\n.pp-dash\
+    \ .rc .nums b { display: block; font: 500 1.6rem/1 var(--pp-serif); }\n.pp-dash .rc .nums span { font-size: .72rem; letter-spacing:\
+    \ .1em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-dash .rc .acts { display: flex; gap: 4px; align-items:\
+    \ center; margin-top: auto; padding-top: 12px; }\n.pp-dash .rc .top { display: flex; gap: 10px; align-items: flex-start;\
+    \ }\n.pp-dash .rc .top > div { flex: 1; min-width: 0; }\n.pp-dash .new { display: grid; place-items: center; text-align:\
+    \ center; border-style: dashed; color: var(--pp-muted); min-height: 230px; }\n.pp-dash .new:hover { color: var(--pp-ink);\
+    \ border-color: var(--pp-ink); }\n.pp-dash .new .plus { width: 44px; height: 44px; border-radius: 50%; border: 1px solid\
+    \ currentColor; display: grid; place-items: center; margin: 0 auto 10px; }\n</style>\n<script>\n(function () {\n  var\
+    \ PP = window.PP;\n  PP.define('dashboard', function (root, data, emit) {\n    var esc = PP.esc;\n    var list = data.restaurants\
+    \ || [], me = data.me || {};\n\n    function greeting() {\n      var h = new Date().getHours();\n      return h < 12 ?\
+    \ 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';\n    }\n    function card(r) {\n      return '<div class=\"\
+    card rc fade-in\" data-id=\"' + esc(r.id) + '\">' +\n        '<div class=\"top\"><div><h3>' + esc(r.name) + '</h3><div\
+    \ class=\"addr\">' + esc(r.address || '/' + r.slug) + '</div></div>' +\n          (r.pending ? '<span class=\"badge pending\"\
+    >' + r.pending + ' to approve</span>' : !r.accepting ? '<span class=\"badge cancelled\">Online booking off</span>' : '')\
+    \ +\n          (r.role && r.role !== 'owner' ? '<span class=\"badge plain\">' + esc(PP.ROLE[r.role]) + '</span>' : '')\
+    \ + '</div>' +\n        '<div class=\"today\">' + PP.icon('clock') + esc(r.today) + '</div>' +\n        '<div class=\"\
+    nums\"><div><b>' + r.bookings + '</b><span>Bookings</span></div><div><b>' + r.covers + '</b><span>Guests</span></div><div><b>'\
+    \ + r.seats + '</b><span>Seats</span></div></div>' +\n        '<div class=\"acts\"><button class=\"btn primary sm\" data-action=\"\
+    open\" data-page=\"reservations\">Open</button>' +\n          (r.role !== 'staff' ? '<button class=\"btn ghost sm\" data-action=\"\
+    open\" data-page=\"hours\">Hours</button>' +\n          '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"\
+    tables\">Tables</button>' : '') + '<span class=\"spacer\"></span>' +\n          '<button class=\"btn ghost icon\" data-action=\"\
+    copy\" title=\"Copy booking link\" aria-label=\"Copy booking link\">' + PP.icon('link') + '</button>' +\n          (r.role\
+    \ !== 'staff' ? '<button class=\"btn ghost icon\" data-action=\"duplicate\" title=\"Duplicate\" aria-label=\"Duplicate\
+    \ restaurant\">' + PP.icon('copy') + '</button>' : '') + '</div></div>';\n    }\n    function render() {\n      var pending\
+    \ = list.reduce(function (n, r) { return n + r.pending; }, 0);\n      var firstName = String(me.display_name || '').split('\
+    \ ')[0];\n      root.innerHTML = '<div class=\"wrap pp-dash\">' +\n        '<div class=\"hello\"><div><div class=\"eyebrow\"\
+    >' + esc(new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })) + '</div>' +\n\
+    \          '<h1>' + greeting() + (firstName ? ', ' + esc(firstName) : '') + '</h1></div><span class=\"spacer\"></span>'\
+    \ +\n          (list.length ? '<button class=\"btn primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button>'\
+    \ : '') + '</div>' +\n        (pending ? '<div class=\"alert\">' + PP.icon('bell') + '<div><strong>' + PP.plural(pending,\
+    \ 'booking') + ' waiting for your approval.</strong> ' +\n          '<span class=\"muted\">They came in while a restaurant\
+    \ was nearly full, or for a large party.</span></div><span class=\"spacer\"></span>' +\n          list.filter(function\
+    \ (r) { return r.pending; }).map(function (r) {\n            return '<button class=\"btn sm\" data-action=\"open\" data-page=\"\
+    reservations\" data-id=\"' + esc(r.id) + '\">' + esc(r.name) + ' · ' + r.pending + '</button>';\n          }).join('')\
+    \ + '</div>' : '') +\n        (list.length ? '<div class=\"section-title\"><h2>Your restaurants</h2><span class=\"muted\
+    \ small\">' + list.length + '</span></div>' +\n          '<div class=\"grid\">' + list.map(card).join('') +\n        \
+    \  '<button class=\"card new\" data-action=\"new\"><div><div class=\"plus\">' + PP.icon('plus') + '</div>Add a restaurant</div></button></div>'\n\
+    \          : '<div class=\"empty\" style=\"padding:70px 20px\"><h2>Add your first restaurant</h2><p>Start with sample\
+    \ opening hours and tables, then make them yours.</p>' +\n            '<button class=\"btn primary\" data-action=\"new\"\
+    >' + PP.icon('plus') + 'New restaurant</button></div>') +\n        '</div>';\n    }\n\n    function newModal() {\n   \
+    \   var tz = 'UTC';\n      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch (e) {}\n    \
+    \  var d = PP.modal('<div class=\"eyebrow\">New restaurant</div><h2>What is it called?</h2>' +\n        '<form><div class=\"\
+    stack\"><div><label class=\"f\" for=\"nrName\">Name</label><input id=\"nrName\" name=\"name\" type=\"text\" required maxlength=\"\
+    80\" autofocus></div>' +\n        '<div><label class=\"f\" for=\"nrTz\">Time zone</label>' + PP.tzField('timezone', tz,\
+    \ 'nrTz') +\n          '<div class=\"hint\">Booking times are always in the restaurant\\'s local time. Search by country,\
+    \ city or GMT offset.</div></div>' +\n        '<label class=\"check\"><input type=\"checkbox\" name=\"sample\" checked><span>Start\
+    \ with sample opening hours and 9 tables<br><span class=\"muted small\">You can change all of it afterwards.</span></span></label>'\
+    \ +\n        '<div data-el=\"msg\"></div></div>' +\n        '<div class=\"foot\"><button type=\"button\" class=\"btn\"\
+    \ data-close>Cancel</button><button class=\"btn primary\" type=\"submit\">Create restaurant</button></div></form>');\n\
+    \      var f = d.el.querySelector('form');\n      f.onsubmit = function (e) {\n        e.preventDefault();\n        var\
+    \ b = f.querySelector('[type=submit]'); b.disabled = true; b.innerHTML = '<span class=\"spin\"></span>';\n        emit('create',\
+    \ { name: f.name.value, timezone: f.timezone.value, sample: f.sample.checked }).then(function (res) {\n          if (res\
+    \ && res.ok) { d.close(); return; }\n          b.disabled = false; b.textContent = 'Create restaurant';\n          d.el.querySelector('[data-el=msg]').innerHTML\
+    \ = '<div class=\"feedback bad\">' + esc((res && res.error) || 'Could not create it.') + '</div>';\n        }, function\
+    \ (err) { b.disabled = false; b.textContent = 'Create restaurant'; PP.toast(PP.err(err), true); });\n      };\n    }\n\
+    \    function dupModal(r) {\n      var d = PP.modal('<div class=\"eyebrow\">Duplicate</div><h2>Copy ' + esc(r.name) +\
+    \ '</h2>' +\n        '<p class=\"muted small\">The copy gets the same settings, opening hours, special days, tables and\
+    \ joins. Reservations stay with the original.</p>' +\n        '<form><label class=\"f\" for=\"dpName\">Name of the new\
+    \ restaurant</label><input id=\"dpName\" name=\"name\" type=\"text\" required maxlength=\"80\" value=\"' + esc(r.name\
+    \ + ' (copy)') + '\">' +\n        '<div data-el=\"msg\"></div><div class=\"foot\"><button type=\"button\" class=\"btn\"\
+    \ data-close>Cancel</button><button class=\"btn primary\" type=\"submit\">Duplicate</button></div></form>');\n      var\
+    \ f = d.el.querySelector('form');\n      f.name.select();\n      f.onsubmit = function (e) {\n        e.preventDefault();\n\
+    \        var b = f.querySelector('[type=submit]'); b.disabled = true; b.innerHTML = '<span class=\"spin\"></span>';\n\
+    \        emit('duplicate', { id: r.id, name: f.name.value }).then(function (res) {\n          if (res && res.ok) { d.close();\
+    \ return; }\n          b.disabled = false; b.textContent = 'Duplicate';\n          d.el.querySelector('[data-el=msg]').innerHTML\
+    \ = '<div class=\"feedback bad\">' + esc((res && res.error) || 'Could not copy it.') + '</div>';\n        });\n      };\n\
+    \    }\n\n    root.addEventListener('click', function (e) {\n      var el = e.target.closest('[data-action]');\n     \
+    \ if (!el) return;\n      var host = el.closest('[data-id]');\n      var r = host && list.filter(function (x) { return\
+    \ x.id === host.dataset.id; })[0];\n      var a = el.dataset.action;\n      if (a === 'new') newModal();\n      else if\
+    \ (a === 'open' && r) emit('open', { id: r.id, page: el.dataset.page || 'reservations' });\n      else if (a === 'duplicate'\
+    \ && r) dupModal(r);\n      else if (a === 'copy' && r) PP.copy(PP.bookUrl(r.slug), 'Booking link');\n    });\n    render();\n\
+    \    return {};\n  });\n})();\n</script>\n\n<!-- ===== ReservationsPage component ===== -->\n<style>\n.pp-res .approvals\
+    \ { margin-bottom: 30px; }\n.pp-res .approvals h2 { display: flex; align-items: center; gap: 10px; }\n.pp-res .approvals\
+    \ h2 .ic { width: 20px; height: 20px; color: var(--pp-warn); }\n.pp-res .ap-grid { display: grid; grid-template-columns:\
+    \ repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }\n.pp-res .ap { padding: 18px 20px; border-left: 3px solid var(--pp-warn);\
+    \ }\n.pp-res .ap .when { font-size: .84rem; color: var(--pp-muted); margin-bottom: 4px; }\n.pp-res .ap h3 { margin: 0\
+    \ 0 6px; }\n.pp-res .ap .why { font-size: .86rem; margin: 8px 0 12px; }\n.pp-res .ap .meter { display: grid; gap: 5px;\
+    \ margin-bottom: 12px; font-size: .8rem; color: var(--pp-muted); }\n.pp-res .ap .meter .bar { position: relative; height:\
+    \ 8px; }\n.pp-res .ap .meter .bar .with { position: absolute; left: 0; top: 0; bottom: 0; background: color-mix(in srgb,\
+    \ var(--pp-warn) 45%, transparent); border-radius: 99px; }\n.pp-res .ap .meter .bar .without { position: absolute; left:\
+    \ 0; top: 0; bottom: 0; background: var(--pp-ink); border-radius: 99px; }\n.pp-res .ap .meter .bar .thr { position: absolute;\
+    \ top: -3px; bottom: -3px; width: 2px; background: var(--pp-bad); }\n.pp-res .ap .facts { display: flex; flex-wrap: wrap;\
+    \ gap: 6px 14px; font-size: .82rem; color: var(--pp-muted); margin-bottom: 14px; }\n.pp-res .ap .facts span { display:\
+    \ inline-flex; gap: 5px; align-items: center; }\n.pp-res .ap .acts { display: flex; gap: 6px; flex-wrap: wrap; }\n\n.pp-res\
+    \ .daybar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }\n.pp-res .daybar h2\
+    \ { margin: 0 6px; min-width: 0; }\n.pp-res .daybar input[type=date] { width: auto; min-height: 36px; padding: 5px 10px;\
+    \ border-radius: 99px; font-size: .85rem; }\n.pp-res .daymeta { display: flex; flex-wrap: wrap; gap: 6px 18px; color:\
+    \ var(--pp-muted); font-size: .86rem; margin-bottom: 18px; }\n.pp-res .daymeta span { display: inline-flex; gap: 6px;\
+    \ align-items: center; }\n.pp-res .daymeta b { color: var(--pp-ink); font-weight: 600; }\n.pp-res .tools { display: flex;\
+    \ gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\n\n.pp-res .tl { --lab: 104px; overflow-x: auto;\
+    \ border: 1px solid var(--pp-line); border-radius: var(--pp-radius); background: var(--pp-panel); }\n.pp-res .tl-in {\
+    \ position: relative; }\n.pp-res .tl-row { display: flex; border-top: 1px solid var(--pp-line); min-height: 46px; }\n\
+    .pp-res .tl-row:first-child { border-top: 0; }\n.pp-res .tl .lab { position: sticky; left: 0; z-index: 3; width: var(--lab);\
+    \ flex: none; padding: 12px 12px; background: var(--pp-panel); border-right: 1px solid var(--pp-line); font-size: .86rem;\
+    \ font-weight: 500; display: flex; align-items: center; gap: 6px; }\n.pp-res .tl .lab span { color: var(--pp-faint); font-weight:\
+    \ 400; font-size: .76rem; }\n.pp-res .tl .lane { position: relative; flex: 1; cursor: copy; background-image: linear-gradient(to\
+    \ right, var(--pp-line) 1px, transparent 1px); background-size: calc(100% / var(--hours)) 100%; }\n.pp-res .tl .head .lane\
+    \ { cursor: default; background: none; height: 34px; }\n.pp-res .tl .head .lab { color: var(--pp-muted); font-weight:\
+    \ 400; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; }\n.pp-res .tl .tick { position: absolute;\
+    \ top: 9px; font-size: .74rem; color: var(--pp-muted); transform: translateX(4px); font-variant-numeric: tabular-nums;\
+    \ }\n.pp-res .tl .closed { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(135deg, transparent\
+    \ 0 6px, color-mix(in srgb, var(--pp-line) 60%, transparent) 6px 7px); pointer-events: none; }\n.pp-res .tl .occ .lane\
+    \ { cursor: default; height: 40px; }\n.pp-res .tl .occ .col { position: absolute; bottom: 4px; background: color-mix(in\
+    \ srgb, var(--pp-ink) 22%, transparent); border-radius: 2px 2px 0 0; }\n.pp-res .tl .occ .col.hot { background: var(--pp-warn);\
+    \ }\n.pp-res .tl .blk { all: unset; box-sizing: border-box; position: absolute; top: 5px; bottom: 5px; border-radius:\
+    \ 7px; padding: 4px 8px; font-size: .76rem; line-height: 1.25; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;\
+    \ cursor: pointer; background: var(--pp-ink); color: var(--pp-bg); z-index: 2; box-shadow: 0 0 0 2px var(--pp-panel);\
     \ }\n.pp-res .tl .blk.pending { background: repeating-linear-gradient(135deg, var(--pp-warn-soft) 0 8px, color-mix(in\
     \ srgb, var(--pp-warn) 18%, var(--pp-panel)) 8px 16px); color: var(--pp-warn); border: 1px solid var(--pp-warn); }\n.pp-res\
     \ .tl .blk:hover { filter: brightness(1.15); }\n.pp-res .tl .blk:focus-visible { outline: 2px solid var(--pp-brass); }\n\
