@@ -637,7 +637,7 @@ metadata:
   title: PlanPlate 2.0
 name: PlanPlate
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=c5abea8f6d\"></script>\n\n<!--\n  PLANPLATE — SHARED THEME + CORE HELPERS\n\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=6e003f0225\"></script>\n\n<!--\n  PLANPLATE — SHARED THEME + CORE HELPERS\n\
     \  Goes into: Anvil → Native Libraries (tools/sync_to_anvil.py does this).\n  Fonts, colour tokens (light + dark), base\
     \ styles every component uses, and window.PP.\n  Look: ivory paper, warm ink, a brass accent. Serif display type, quiet\
     \ sans for the interface.\n-->\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\"\
