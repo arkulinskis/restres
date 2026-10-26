@@ -13,7 +13,7 @@ import anvil.server
 import anvil.users
 import anvil.js
 
-from .. import pp_ui
+from .. import pp_ui, legal
 from ..AuthPage import AuthPage
 from ..DashboardPage import DashboardPage
 from ..ReservationsPage import ReservationsPage
@@ -92,6 +92,7 @@ class Main(MainTemplate):
         self.me = anvil.server.call("get_me")
         self.header.setUser(json.dumps(self.me))
         self.go("dashboard")
+        legal.refresh_soon()  # Privacy & Terms: records the sign-up tick, or reminds people to review
 
     def refresh_alerts(self, alerts=None):
         alerts = alerts or anvil.server.call("get_alerts")
@@ -101,6 +102,7 @@ class Main(MainTemplate):
     def sign_out(self):
         anvil.users.logout()
         self.me = None
+        legal.signed_out()
         self.header.setUser(None)
         self.go("auth")
 

@@ -612,6 +612,24 @@ db_schema:
       client_hidden: false
       name: display_name
       type: string
+    - admin_ui:
+        order: 8
+        width: 200
+      client_hidden: false
+      name: legal_version
+      type: string
+    - admin_ui:
+        order: 9
+        width: 200
+      client_hidden: false
+      name: legal_accepted_at
+      type: datetime
+    - admin_ui:
+        order: 10
+        width: 200
+      client_hidden: false
+      name: legal_source
+      type: string
     indexes: []
     server: full
     title: Users
@@ -619,11 +637,11 @@ metadata:
   title: PlanPlate 2.0
 name: PlanPlate
 native_deps:
-  head_html: "<!--\n  PLANPLATE — SHARED THEME + CORE HELPERS\n  Goes into: Anvil → Native Libraries (tools/sync_to_anvil.py\
-    \ does this).\n  Fonts, colour tokens (light + dark), base styles every component uses, and window.PP.\n  Look: ivory\
-    \ paper, warm ink, a brass accent. Serif display type, quiet sans for the interface.\n-->\n<link rel=\"preconnect\" href=\"\
-    https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"\
-    https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap\"\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=c5abea8f6d\"></script>\n\n<!--\n  PLANPLATE — SHARED THEME + CORE HELPERS\n\
+    \  Goes into: Anvil → Native Libraries (tools/sync_to_anvil.py does this).\n  Fonts, colour tokens (light + dark), base\
+    \ styles every component uses, and window.PP.\n  Look: ivory paper, warm ink, a brass accent. Serif display type, quiet\
+    \ sans for the interface.\n-->\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\"\
+    \ href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap\"\
     \ rel=\"stylesheet\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<!-- Browser tab icon:\
     \ the PlanPlate mark (a plate from above), brass on ink. Anvil's default icon is removed. -->\n<link id=\"pp-favicon\"\
     \ rel=\"icon\" type=\"image/svg+xml\" href=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0\
@@ -1027,8 +1045,9 @@ native_deps:
     \ { background: var(--pp-panel-2); }\n.pp-header .menu .item .sub { display: block; color: var(--pp-muted); font-size:\
     \ .8rem; }\n.pp-header .menu .head { padding: 8px 10px; font-weight: 600; font-size: .9rem; }\n.pp-header .menu .none\
     \ { padding: 8px 10px 12px; color: var(--pp-muted); font-size: .88rem; }\n.pp-header .menu .themes { padding: 6px 10px\
-    \ 10px; }\n.pp-page { min-height: calc(100vh - 140px); }\n.pp-public .pp-page { min-height: 0; }\n.pp-footer { max-width:\
-    \ 1120px; margin: 0 auto; padding: 22px 20px 34px; color: var(--pp-faint); font-size: .78rem; text-align: center; letter-spacing:\
+    \ 10px; }\n.pp-page { min-height: calc(100vh - 140px); }\n.pp-public .pp-page { min-height: 0; }\n.pp-footer a { color:\
+    \ inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }\n.pp-footer { max-width: 1120px;\
+    \ margin: 0 auto; padding: 22px 20px 34px; color: var(--pp-faint); font-size: .78rem; text-align: center; letter-spacing:\
     \ .04em; }\n@media (max-width: 560px) {\n  .pp-header .in { gap: 8px; padding: 10px 14px; } .pp-header nav { display:\
     \ none; }\n  .pp-header .menu, .pp-header .menu.alerts { position: fixed; left: 12px; right: 12px; top: 60px; width: auto;\
     \ }\n}\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.define('header', function (root, data, emit) {\n\
@@ -1048,33 +1067,34 @@ native_deps:
     \ class=\"seg\">' +\n          ['auto', 'light', 'dark'].map(function (k) { return '<button data-action=\"theme\" data-t=\"\
     ' + k + '\" class=\"' + (t === k ? 'on' : '') + '\">' + k[0].toUpperCase() + k.slice(1) + '</button>'; }).join('') + '</div></div>'\
     \ +\n        '<button class=\"item\" data-action=\"nav\" data-page=\"dashboard\">Your restaurants</button>' +\n      \
-    \  '<button class=\"item\" data-action=\"signout\">Sign out</button></div>';\n    }\n    function render() {\n      var\
-    \ u = S.user;\n      document.documentElement.classList.toggle('pp-signed-out', !u);\n      document.title = (S.alerts.pending\
-    \ ? '(' + S.alerts.pending + ') ' : '') + 'PlanPlate';\n      if (!u) { root.innerHTML = ''; return; }\n      root.innerHTML\
-    \ = '<header class=\"pp-header\"><div class=\"in\">' +\n        '<button class=\"brand\" data-action=\"nav\" data-page=\"\
-    dashboard\" aria-label=\"PlanPlate home\">' + PP.mark() + '<span class=\"name\">PlanPlate</span></button>' +\n       \
-    \ '<nav><button data-action=\"nav\" data-page=\"dashboard\" class=\"' + (S.active === 'dashboard' ? 'on' : '') + '\">Restaurants</button></nav>'\
-    \ +\n        '<div class=\"right\">' +\n          '<button class=\"btn ghost icon bell\" data-action=\"alerts\" aria-label=\"\
-    Approvals (' + S.alerts.pending + ')\" aria-expanded=\"' + (S.open === 'alerts') + '\">' + PP.icon('bell') +\n       \
-    \     (S.alerts.pending ? '<span class=\"n\">' + S.alerts.pending + '</span>' : '') + '</button>' +\n          '<button\
-    \ class=\"me\" data-action=\"menu\" aria-label=\"Account menu\" aria-expanded=\"' + (S.open === 'menu') + '\">' + esc(initials(u))\
-    \ + '</button>' +\n          (S.open === 'alerts' ? alertsMenu() : S.open === 'menu' ? userMenu() : '') +\n        '</div></div></header>';\n\
-    \    }\n\n    root.addEventListener('click', function (e) {\n      e.ppHeader = true;\n      var el = e.target.closest('[data-action]');\n\
-    \      if (!el) return;\n      var a = el.dataset.action;\n      if (a === 'alerts' || a === 'menu') { S.open = S.open\
-    \ === a ? null : a; render(); return; }\n      if (a === 'theme') { PP.setTheme(el.dataset.t); render(); return; }\n \
-    \     S.open = null;\n      if (a === 'nav') { S.active = el.dataset.page; render(); emit('nav', { page: el.dataset.page\
-    \ }); }\n      else if (a === 'alert') { render(); emit('open_alert', { restaurant_id: el.dataset.r, date: el.dataset.date\
-    \ }); }\n      else if (a === 'signout') { render(); emit('signout', {}); }\n    });\n    document.addEventListener('click',\
-    \ function (e) { if (!e.ppHeader && S.open) { S.open = null; render(); } });\n    document.addEventListener('keydown',\
-    \ function (e) { if (e.key === 'Escape' && S.open) { S.open = null; render(); } });\n\n    // New requests arrive while\
-    \ the portal is open: check every minute.\n    setInterval(function () {\n      if (!S.user || document.hidden) return;\n\
-    \      emit('poll', {}).then(function (a) { if (a && typeof a.pending === 'number') { S.alerts = a; if (!S.open) render();\
-    \ } }, function () {});\n    }, 60000);\n\n    render();\n    return {\n      setUser: function (json) { var me = json\
-    \ ? JSON.parse(json) : null; S.user = me; if (me && me.alerts) S.alerts = me.alerts; render(); },\n      setActive: function\
-    \ (page) { S.active = page; S.open = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json);\
-    \ render(); }\n    };\n  });\n})();\n</script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n/* ---- hero: dark\
-    \ story panel + sign-in box ---- */\n.pp-auth { min-height: min(calc(100vh - 80px), 820px); display: grid; grid-template-columns:\
-    \ 1.1fr 1fr; }\n.pp-auth .side { background: linear-gradient(100deg, rgba(29,27,24,.97) 35%, rgba(29,27,24,.74)), url(_/theme/photo-plate.webp)\
+    \  '<button class=\"item\" data-lk-open=\"overview\">Privacy &amp; Terms</button>' +\n        '<button class=\"item\"\
+    \ data-action=\"signout\">Sign out</button></div>';\n    }\n    function render() {\n      var u = S.user;\n      document.documentElement.classList.toggle('pp-signed-out',\
+    \ !u);\n      document.title = (S.alerts.pending ? '(' + S.alerts.pending + ') ' : '') + 'PlanPlate';\n      if (!u) {\
+    \ root.innerHTML = ''; return; }\n      root.innerHTML = '<header class=\"pp-header\"><div class=\"in\">' +\n        '<button\
+    \ class=\"brand\" data-action=\"nav\" data-page=\"dashboard\" aria-label=\"PlanPlate home\">' + PP.mark() + '<span class=\"\
+    name\">PlanPlate</span></button>' +\n        '<nav><button data-action=\"nav\" data-page=\"dashboard\" class=\"' + (S.active\
+    \ === 'dashboard' ? 'on' : '') + '\">Restaurants</button></nav>' +\n        '<div class=\"right\">' +\n          '<button\
+    \ class=\"btn ghost icon bell\" data-action=\"alerts\" aria-label=\"Approvals (' + S.alerts.pending + ')\" aria-expanded=\"\
+    ' + (S.open === 'alerts') + '\">' + PP.icon('bell') +\n            (S.alerts.pending ? '<span class=\"n\">' + S.alerts.pending\
+    \ + '</span>' : '') + '</button>' +\n          '<button class=\"me\" data-action=\"menu\" aria-label=\"Account menu\"\
+    \ aria-expanded=\"' + (S.open === 'menu') + '\">' + esc(initials(u)) + '</button>' +\n          (S.open === 'alerts' ?\
+    \ alertsMenu() : S.open === 'menu' ? userMenu() : '') +\n        '</div></div></header>';\n    }\n\n    root.addEventListener('click',\
+    \ function (e) {\n      e.ppHeader = true;\n      var el = e.target.closest('[data-action]');\n      if (!el) return;\n\
+    \      var a = el.dataset.action;\n      if (a === 'alerts' || a === 'menu') { S.open = S.open === a ? null : a; render();\
+    \ return; }\n      if (a === 'theme') { PP.setTheme(el.dataset.t); render(); return; }\n      S.open = null;\n      if\
+    \ (a === 'nav') { S.active = el.dataset.page; render(); emit('nav', { page: el.dataset.page }); }\n      else if (a ===\
+    \ 'alert') { render(); emit('open_alert', { restaurant_id: el.dataset.r, date: el.dataset.date }); }\n      else if (a\
+    \ === 'signout') { render(); emit('signout', {}); }\n    });\n    document.addEventListener('click', function (e) { if\
+    \ (!e.ppHeader && S.open) { S.open = null; render(); } });\n    document.addEventListener('keydown', function (e) { if\
+    \ (e.key === 'Escape' && S.open) { S.open = null; render(); } });\n\n    // New requests arrive while the portal is open:\
+    \ check every minute.\n    setInterval(function () {\n      if (!S.user || document.hidden) return;\n      emit('poll',\
+    \ {}).then(function (a) { if (a && typeof a.pending === 'number') { S.alerts = a; if (!S.open) render(); } }, function\
+    \ () {});\n    }, 60000);\n\n    render();\n    return {\n      setUser: function (json) { var me = json ? JSON.parse(json)\
+    \ : null; S.user = me; if (me && me.alerts) S.alerts = me.alerts; render(); },\n      setActive: function (page) { S.active\
+    \ = page; S.open = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json); render(); }\n \
+    \   };\n  });\n})();\n</script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n/* ---- hero: dark story panel +\
+    \ sign-in box ---- */\n.pp-auth { min-height: min(calc(100vh - 80px), 820px); display: grid; grid-template-columns: 1.1fr\
+    \ 1fr; }\n.pp-auth .side { background: linear-gradient(100deg, rgba(29,27,24,.97) 35%, rgba(29,27,24,.74)), url(_/theme/photo-plate.webp)\
     \ center / cover, #1d1b18; color: #efe9df; padding: 48px 56px 44px; display: flex; flex-direction: column; justify-content:\
     \ space-between; gap: 40px; position: relative; overflow: hidden; }\n.pp-auth .side > * { position: relative; }\n.pp-auth\
     \ .side .top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }\n.pp-auth .side .brand\
@@ -1216,25 +1236,26 @@ native_deps:
     \ required minlength=\"' + (signup ? 8 : 1) + '\" autocomplete=\"' + (signup ? 'new-password' : 'current-password') +\
     \ '\">' +\n            (signup ? '<div class=\"hint\">At least 8 characters.</div>' : '<div class=\"hint\" style=\"text-align:right\"\
     ><button type=\"button\" class=\"link\" data-action=\"mode\" data-mode=\"reset\">Forgot your password?</button></div>')\
-    \ + '</div>' +\n          '<div><button class=\"btn primary block\" type=\"submit\">' + (signup ? 'Create account' : 'Sign\
-    \ in') + '</button></div>' +\n        '</form>';\n    }\n\n    function hero() {\n      return '<section class=\"pp-auth\"\
-    >' +\n        '<div class=\"side\">' + PP.mark('ring') +\n          '<div class=\"top\"><div class=\"brand\">' + PP.mark()\
-    \ + 'PlanPlate</div>' +\n            '<nav class=\"jump\" aria-label=\"On this page\">' +\n              '<button data-jump=\"\
-    how\">Set it up</button><button data-jump=\"why\">Why PlanPlate</button>' +\n              '<button data-jump=\"features\"\
-    >Features</button><button data-jump=\"guests\">For guests</button></nav></div>' +\n          '<div><div class=\"eyebrow\"\
-    >Simple · Smart · Reliable</div>' +\n            '<h1>Reservations, <em>made simple.</em></h1>' +\n            '<p>One\
-    \ calm place to run bookings for every restaurant you manage. PlanPlate keeps up with busy evenings, walk-ins and changing\
-    \ hours, so your team can look after the guests in front of them.</p>' +\n            '<button class=\"more\" data-jump=\"\
-    how\">See how it works ' + PP.icon('down') + '</button></div>' +\n          '<div class=\"stats\"><div><b>30 min</b><span>to\
-    \ set up</span></div><div><b>5 min</b><span>staff training</span></div><div><b>3</b><span>languages</span></div></div>'\
-    \ +\n        '</div>' +\n        '<div class=\"main\"><div class=\"box fade-in\" data-el=\"box\"></div>' +\n         \
-    \ '<button class=\"cue\" data-jump=\"how\">Discover PlanPlate<span class=\"dot\">' + PP.icon('down') + '</span></button></div></section>';\n\
-    \    }\n\n    function sections() {\n      var steps = STEPS.map(function (s, i) {\n        var img = function (t) { return\
-    \ '<img class=\"' + t + '\" src=\"_/theme/step-' + s[2] + '-' + t[0] + '.webp\" alt=\"' + esc(s[3]) + '\" loading=\"lazy\"\
-    \ width=\"960\" height=\"600\">'; };\n        return '<div class=\"card step\"><div class=\"shot\">' + img('lt') + img('dk')\
-    \ + '</div>' +\n          '<div class=\"txt\"><div class=\"n\">0' + (i + 1) + '</div><h3>' + esc(s[0]) + '</h3><p>' +\
-    \ esc(s[1]) + '</p></div></div>';\n      }).join('');\n      var why = WHY.map(function (w) {\n        return '<div class=\"\
-    point\"><span class=\"ico\">' + PP.icon(w[0]) + '</span><div><h3>' + esc(w[1]) + '</h3><p>' + esc(w[2]) + '</p></div></div>';\n\
+    \ + '</div>' +\n          (signup && window.LegalKit ? '<div>' + LegalKit.consentField() + '</div>' : '') +\n        \
+    \  '<div><button class=\"btn primary block\" type=\"submit\">' + (signup ? 'Create account' : 'Sign in') + '</button></div>'\
+    \ +\n        '</form>';\n    }\n\n    function hero() {\n      return '<section class=\"pp-auth\">' +\n        '<div class=\"\
+    side\">' + PP.mark('ring') +\n          '<div class=\"top\"><div class=\"brand\">' + PP.mark() + 'PlanPlate</div>' +\n\
+    \            '<nav class=\"jump\" aria-label=\"On this page\">' +\n              '<button data-jump=\"how\">Set it up</button><button\
+    \ data-jump=\"why\">Why PlanPlate</button>' +\n              '<button data-jump=\"features\">Features</button><button\
+    \ data-jump=\"guests\">For guests</button></nav></div>' +\n          '<div><div class=\"eyebrow\">Simple · Smart · Reliable</div>'\
+    \ +\n            '<h1>Reservations, <em>made simple.</em></h1>' +\n            '<p>One calm place to run bookings for\
+    \ every restaurant you manage. PlanPlate keeps up with busy evenings, walk-ins and changing hours, so your team can look\
+    \ after the guests in front of them.</p>' +\n            '<button class=\"more\" data-jump=\"how\">See how it works '\
+    \ + PP.icon('down') + '</button></div>' +\n          '<div class=\"stats\"><div><b>30 min</b><span>to set up</span></div><div><b>5\
+    \ min</b><span>staff training</span></div><div><b>3</b><span>languages</span></div></div>' +\n        '</div>' +\n   \
+    \     '<div class=\"main\"><div class=\"box fade-in\" data-el=\"box\"></div>' +\n          '<button class=\"cue\" data-jump=\"\
+    how\">Discover PlanPlate<span class=\"dot\">' + PP.icon('down') + '</span></button></div></section>';\n    }\n\n    function\
+    \ sections() {\n      var steps = STEPS.map(function (s, i) {\n        var img = function (t) { return '<img class=\"\
+    ' + t + '\" src=\"_/theme/step-' + s[2] + '-' + t[0] + '.webp\" alt=\"' + esc(s[3]) + '\" loading=\"lazy\" width=\"960\"\
+    \ height=\"600\">'; };\n        return '<div class=\"card step\"><div class=\"shot\">' + img('lt') + img('dk') + '</div>'\
+    \ +\n          '<div class=\"txt\"><div class=\"n\">0' + (i + 1) + '</div><h3>' + esc(s[0]) + '</h3><p>' + esc(s[1]) +\
+    \ '</p></div></div>';\n      }).join('');\n      var why = WHY.map(function (w) {\n        return '<div class=\"point\"\
+    ><span class=\"ico\">' + PP.icon(w[0]) + '</span><div><h3>' + esc(w[1]) + '</h3><p>' + esc(w[2]) + '</p></div></div>';\n\
     \      }).join('');\n      var feats = FEATS.map(function (f) {\n        return '<div class=\"feat\"><span class=\"ico\"\
     >' + PP.icon(f[0]) + '</span><h3>' + esc(f[1]) + '</h3><p>' + esc(f[2]) + '</p></div>';\n      }).join('');\n      var\
     \ ticks = TICKS.map(function (t) { return '<li>' + PP.icon('check') + '<span>' + esc(t) + '</span></li>'; }).join('');\n\
@@ -1277,10 +1298,11 @@ native_deps:
     \    function setBusy(on) {\n      S.busy = on;\n      root.querySelectorAll('.box button[type=submit]').forEach(function\
     \ (b) {\n        b.disabled = on;\n        if (on) { b.dataset.label = b.innerHTML; b.innerHTML = '<span class=\"spin\"\
     ></span>'; }\n        else if (b.dataset.label) b.innerHTML = b.dataset.label;\n      });\n    }\n    function submit(e)\
-    \ {\n      e.preventDefault();\n      if (S.busy) return;\n      var v = {};\n      new FormData(e.target).forEach(function\
-    \ (val, key) { v[key] = String(val); });\n      S.email = v.email || '';\n      S.msg = null; showMsg(); setBusy(true);\n\
-    \      emit(e.target.dataset.form, v).then(function (res) {\n        setBusy(false);\n        res = res || {};\n     \
-    \   if (res.ok && !res.message) return; // Python navigates away\n        S.msg = res.ok ? { ok: true, text: res.message\
+    \ {\n      e.preventDefault();\n      if (S.busy) return;\n      if (e.target.dataset.form === 'signup' && window.LegalKit\
+    \ && !LegalKit.consentChecked(e.target)) return;\n      var v = {};\n      new FormData(e.target).forEach(function (val,\
+    \ key) { v[key] = String(val); });\n      S.email = v.email || '';\n      S.msg = null; showMsg(); setBusy(true);\n  \
+    \    emit(e.target.dataset.form, v).then(function (res) {\n        setBusy(false);\n        res = res || {};\n       \
+    \ if (res.ok && !res.message) return; // Python navigates away\n        S.msg = res.ok ? { ok: true, text: res.message\
     \ } : { ok: false, text: res.error || 'Something went wrong.' };\n        if (res.mode && res.mode !== S.mode) { S.mode\
     \ = res.mode; renderBox(); } else showMsg();\n      }, function (err) { setBusy(false); S.msg = { ok: false, text: PP.err(err)\
     \ }; showMsg(); });\n    }\n    // Section links scroll in place (no URL hash: the hash is the app's router).\n    function\
