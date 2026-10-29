@@ -1666,7 +1666,7 @@ native_deps:
     \ } }\n\n.pp-pe .days { display: grid; gap: 2px; }\n.pp-pe .dayrow { display: grid; grid-template-columns: 120px 1fr;\
     \ gap: 10px; align-items: start; padding: 9px 0; border-bottom: 1px solid var(--pp-line); }\n.pp-pe .dayrow:last-child\
     \ { border-bottom: 0; }\n.pp-pe .dayrow .ivs { display: grid; gap: 6px; }\n.pp-pe .iv { display: flex; gap: 6px; align-items:\
-    \ center; }\n.pp-pe .iv input { width: 112px; min-height: 36px; padding: 6px 8px; }\n.pp-pe .closed-note { color: var(--pp-faint);\
+    \ center; }\n.pp-pe .iv input { width: 140px; min-height: 36px; padding: 6px 8px; }\n.pp-pe .closed-note { color: var(--pp-faint);\
     \ font-size: .85rem; padding-top: 7px; }\n@media (max-width: 520px) { .pp-pe .dayrow { grid-template-columns: 1fr; } .pp-pe\
     \ .iv input { width: 100%; flex: 1; } }\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  var COLORS = ['#7d8b6a',\
     \ '#3d5a80', '#9c7a43', '#8a5a6a', '#5b7f86', '#a0714f', '#6b6f8a'];\n  var SPECIAL = '#b5523b';\n  PP.define('hours',\
@@ -1747,57 +1747,63 @@ native_deps:
     \ t = iv.querySelectorAll('input'); return [t[0].value, t[1].value]; });\n      }\n      function redraw(row, iv) { row.outerHTML\
     \ = dayRow(+row.dataset.day, iv); }\n      d.el.addEventListener('click', function (e) {\n        var row = e.target.closest('.dayrow');\n\
     \        if (e.target.closest('[data-add]') && row) {\n          var cur = rowIvs(row), last = cur[cur.length - 1];\n\
-    \          cur.push(last ? [last[1] < '22:00' ? '18:00' : last[1], '22:00'] : ['12:00', '22:00']);\n          redraw(row,\
-    \ cur);\n        } else if (e.target.closest('[data-rm]') && row) {\n          e.target.closest('.iv').remove();\n   \
-    \       if (!row.querySelector('.iv')) redraw(row, []);\n        } else if (e.target.closest('[data-copy-mon]')) {\n \
-    \         var mon = rowIvs(d.el.querySelector('.dayrow[data-day=\"0\"]'));\n          d.el.querySelectorAll('.dayrow').forEach(function\
-    \ (r) { if (r.dataset.day !== '0') redraw(r, mon.slice()); });\n        }\n      });\n      d.el.addEventListener('change',\
-    \ function (e) {\n        if (!e.target.matches('[data-open]')) return;\n        var row = e.target.closest('.dayrow');\n\
-    \        redraw(row, e.target.checked ? [['12:00', '22:00']] : []);\n      });\n      f.onsubmit = function (e) {\n  \
-    \      e.preventDefault();\n        var week = {};\n        d.el.querySelectorAll('.dayrow').forEach(function (r) { week[r.dataset.day]\
-    \ = rowIvs(r); });\n        var bad = Object.keys(week).some(function (k) { return week[k].some(function (iv) { return\
-    \ iv[1] !== '00:00' && iv[1] <= iv[0]; }); });\n        if (bad) { d.el.querySelector('[data-el=msg]').innerHTML = '<div\
-    \ class=\"feedback bad\">Each closing time must be after its opening time.</div>'; return; }\n        busy(d, true);\n\
-    \        emit('save_period', { id: isNew ? null : p.id, name: f.name.value, start: f.start.value || null, end: f.end.value\
-    \ || null, week: week })\n          .then(function (res) { busy(d, false); apply(res, d, 'Hours saved'); }, function (err)\
-    \ { busy(d, false); PP.toast(PP.err(err), true); });\n      };\n    }\n\n    // ---------- special day editor\n    function\
-    \ specialEditor(s, date) {\n      var isNew = !s;\n      s = s || { date: date || D.today, label: '', closed: true, hours:\
-    \ [['12:00', '22:00']] };\n      var hours = s.hours && s.hours.length ? s.hours : [['12:00', '22:00']];\n      var d\
-    \ = PP.modal('<div class=\"pp-pe\"><div class=\"eyebrow\">' + (isNew ? 'Special day' : 'Edit special day') + '</div><h2>'\
-    \ + esc(PP.fmtDate(s.date)) + '</h2>' +\n        '<form><div class=\"stack\"><div class=\"grid2\"><div><label class=\"\
-    f\">Date</label><input type=\"date\" name=\"date\" required value=\"' + esc(s.date) + '\"></div>' +\n          (isNew\
-    \ ? '<div><label class=\"f\">Until <span class=\"faint\">(optional)</span></label><input type=\"date\" name=\"to\"></div>'\
-    \ : '<div></div>') + '</div>' +\n        '<div><label class=\"f\">Label</label><input type=\"text\" name=\"label\" maxlength=\"\
-    60\" placeholder=\"e.g. Christmas, Private event\" value=\"' + esc(s.label) + '\"></div>' +\n        '<div class=\"seg\"\
-    \ role=\"radiogroup\"><button type=\"button\" data-mode=\"closed\" class=\"' + (s.closed ? 'on' : '') + '\">Closed</button><button\
-    \ type=\"button\" data-mode=\"open\" class=\"' + (s.closed ? '' : 'on') + '\">Special hours</button></div>' +\n      \
-    \  '<div data-el=\"ivs\" class=\"ivs\"' + (s.closed ? ' hidden' : '') + ' style=\"display:grid;gap:6px\">' + hours.map(ivRow).join('')\
-    \ +\n          '<div><button type=\"button\" class=\"btn ghost sm\" data-add>' + PP.icon('plus') + 'Add hours</button></div></div>'\
-    \ +\n        '<div data-el=\"msg\"></div></div><div class=\"foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button\
-    \ class=\"btn primary\" type=\"submit\">Save</button></div></form></div>');\n      var f = d.el.querySelector('form'),\
-    \ closed = !!s.closed, box = d.el.querySelector('[data-el=ivs]');\n      d.el.addEventListener('click', function (e) {\n\
-    \        var m = e.target.closest('[data-mode]');\n        if (m) { closed = m.dataset.mode === 'closed'; d.el.querySelectorAll('[data-mode]').forEach(function\
-    \ (b) { b.classList.toggle('on', b === m); }); box.hidden = closed; }\n        if (e.target.closest('[data-add]')) { var\
-    \ wrap = document.createElement('div'); wrap.innerHTML = ivRow(['18:00', '22:00']); box.insertBefore(wrap.firstChild,\
-    \ box.lastElementChild); }\n        if (e.target.closest('[data-rm]') && box.querySelectorAll('.iv').length > 1) e.target.closest('.iv').remove();\n\
-    \      });\n      f.onsubmit = function (e) {\n        e.preventDefault();\n        var iv = Array.prototype.map.call(box.querySelectorAll('.iv'),\
-    \ function (x) { var t = x.querySelectorAll('input'); return [t[0].value, t[1].value]; });\n        busy(d, true);\n \
-    \       emit('save_special', { id: isNew ? null : s.id, date: f.date.value, to: f.to ? f.to.value || null : null, label:\
-    \ f.label.value, closed: closed, hours: iv })\n          .then(function (res) { busy(d, false); apply(res, d, 'Special\
-    \ day saved'); }, function (err) { busy(d, false); PP.toast(PP.err(err), true); });\n      };\n    }\n\n    root.addEventListener('click',\
-    \ function (e) {\n      if (PP.subnavClick(e, D.nav, emit)) return;\n      var el = e.target.closest('[data-action]');\n\
-    \      if (!el) return;\n      var a = el.dataset.action, host = el.closest('[data-id]'), id = host && host.dataset.id;\n\
-    \      if (a === 'new-period') periodEditor(null);\n      else if (a === 'edit-period') periodEditor(D.periods.filter(function\
-    \ (p) { return p.id === id; })[0]);\n      else if (a === 'del-period') {\n        var p = D.periods.filter(function (x)\
-    \ { return x.id === id; })[0];\n        PP.confirm('Delete “' + p.name + '”?', 'Dates it covered fall back to your other\
-    \ periods, or are closed if none apply.', 'Delete period', true)\n          .then(function (yes) { if (yes) emit('delete_period',\
-    \ { id: id }).then(function (res) { apply(res, null, 'Period deleted'); }); });\n      } else if (a === 'new-special')\
-    \ specialEditor(null);\n      else if (a === 'edit-special') specialEditor(D.specials.filter(function (s) { return s.id\
-    \ === id; })[0]);\n      else if (a === 'del-special') emit('delete_special', { id: id }).then(function (res) { apply(res,\
-    \ null, 'Special day removed'); });\n      else if (a === 'month') {\n        var m = PP.parseDate(D.month + '-01'); m.setMonth(m.getMonth()\
-    \ + +el.dataset.n);\n        emit('month', { month: PP.isoDate(m).slice(0, 7) }).then(function (res) { apply(res); });\n\
-    \      } else if (a === 'day') {\n        var hit = D.specials.filter(function (s) { return s.date === el.dataset.date;\
-    \ })[0];\n        specialEditor(hit || null, el.dataset.date);\n      }\n    });\n    root.addEventListener('change',\
+    \          if (!last) cur.push(['12:00', '22:00']);\n          else if (last[0] < '15:00' && (last[1] > '18:00' || last[1]\
+    \ === '00:00')) { cur.push(['18:00', last[1]]); last[1] = '15:00'; }  // one long day → lunch + dinner\n          else\
+    \ {  // a later shift: an hour after the last one closes, three hours long (00:00 = midnight)\n            var s0 = last[1]\
+    \ === '00:00' ? 1380 : Math.min(PP.toMin(last[1]) + 60, 1380), e0 = Math.min(s0 + 180, 1440);\n            cur.push([PP.hm(s0),\
+    \ e0 >= 1440 ? '00:00' : PP.hm(e0)]);\n          }\n          redraw(row, cur);\n        } else if (e.target.closest('[data-rm]')\
+    \ && row) {\n          e.target.closest('.iv').remove();\n          if (!row.querySelector('.iv')) redraw(row, []);\n\
+    \        } else if (e.target.closest('[data-copy-mon]')) {\n          var mon = rowIvs(d.el.querySelector('.dayrow[data-day=\"\
+    0\"]'));\n          d.el.querySelectorAll('.dayrow').forEach(function (r) { if (r.dataset.day !== '0') redraw(r, mon.slice());\
+    \ });\n        }\n      });\n      d.el.addEventListener('change', function (e) {\n        if (!e.target.matches('[data-open]'))\
+    \ return;\n        var row = e.target.closest('.dayrow');\n        redraw(row, e.target.checked ? [['12:00', '22:00']]\
+    \ : []);\n      });\n      f.onsubmit = function (e) {\n        e.preventDefault();\n        var week = {};\n        d.el.querySelectorAll('.dayrow').forEach(function\
+    \ (r) { week[r.dataset.day] = rowIvs(r); });\n        var bad = Object.keys(week).some(function (k) { return week[k].some(function\
+    \ (iv) { return iv[1] !== '00:00' && iv[1] <= iv[0]; }); });\n        if (bad) { d.el.querySelector('[data-el=msg]').innerHTML\
+    \ = '<div class=\"feedback bad\">Each closing time must be after its opening time.</div>'; return; }\n        busy(d,\
+    \ true);\n        emit('save_period', { id: isNew ? null : p.id, name: f.name.value, start: f.start.value || null, end:\
+    \ f.end.value || null, week: week })\n          .then(function (res) { busy(d, false); apply(res, d, 'Hours saved'); },\
+    \ function (err) { busy(d, false); PP.toast(PP.err(err), true); });\n      };\n    }\n\n    // ---------- special day\
+    \ editor\n    function specialEditor(s, date) {\n      var isNew = !s;\n      s = s || { date: date || D.today, label:\
+    \ '', closed: true, hours: [['12:00', '22:00']] };\n      var hours = s.hours && s.hours.length ? s.hours : [['12:00',\
+    \ '22:00']];\n      var d = PP.modal('<div class=\"pp-pe\"><div class=\"eyebrow\">' + (isNew ? 'Special day' : 'Edit special\
+    \ day') + '</div><h2>' + esc(PP.fmtDate(s.date)) + '</h2>' +\n        '<form><div class=\"stack\"><div class=\"grid2\"\
+    ><div><label class=\"f\">Date</label><input type=\"date\" name=\"date\" required value=\"' + esc(s.date) + '\"></div>'\
+    \ +\n          (isNew ? '<div><label class=\"f\">Until <span class=\"faint\">(optional)</span></label><input type=\"date\"\
+    \ name=\"to\"></div>' : '<div></div>') + '</div>' +\n        '<div><label class=\"f\">Label</label><input type=\"text\"\
+    \ name=\"label\" maxlength=\"60\" placeholder=\"e.g. Christmas, Private event\" value=\"' + esc(s.label) + '\"></div>'\
+    \ +\n        '<div class=\"seg\" role=\"radiogroup\"><button type=\"button\" data-mode=\"closed\" class=\"' + (s.closed\
+    \ ? 'on' : '') + '\">Closed</button><button type=\"button\" data-mode=\"open\" class=\"' + (s.closed ? '' : 'on') + '\"\
+    >Special hours</button></div>' +\n        '<div data-el=\"ivs\" class=\"ivs\"' + (s.closed ? ' hidden' : '') + ' style=\"\
+    display:grid;gap:6px\">' + hours.map(ivRow).join('') +\n          '<div><button type=\"button\" class=\"btn ghost sm\"\
+    \ data-add>' + PP.icon('plus') + 'Add hours</button></div></div>' +\n        '<div data-el=\"msg\"></div></div><div class=\"\
+    foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\" type=\"submit\">Save</button></div></form></div>');\n\
+    \      var f = d.el.querySelector('form'), closed = !!s.closed, box = d.el.querySelector('[data-el=ivs]');\n      d.el.addEventListener('click',\
+    \ function (e) {\n        var m = e.target.closest('[data-mode]');\n        if (m) { closed = m.dataset.mode === 'closed';\
+    \ d.el.querySelectorAll('[data-mode]').forEach(function (b) { b.classList.toggle('on', b === m); }); box.hidden = closed;\
+    \ }\n        if (e.target.closest('[data-add]')) { var wrap = document.createElement('div'); wrap.innerHTML = ivRow(['18:00',\
+    \ '22:00']); box.insertBefore(wrap.firstChild, box.lastElementChild); }\n        if (e.target.closest('[data-rm]') &&\
+    \ box.querySelectorAll('.iv').length > 1) e.target.closest('.iv').remove();\n      });\n      f.onsubmit = function (e)\
+    \ {\n        e.preventDefault();\n        var iv = Array.prototype.map.call(box.querySelectorAll('.iv'), function (x)\
+    \ { var t = x.querySelectorAll('input'); return [t[0].value, t[1].value]; });\n        if (!closed && iv.some(function\
+    \ (x) { return x[1] !== '00:00' && x[1] <= x[0]; })) {\n          d.el.querySelector('[data-el=msg]').innerHTML = '<div\
+    \ class=\"feedback bad\">Each closing time must be after its opening time (use 00:00 for midnight).</div>'; return;\n\
+    \        }\n        busy(d, true);\n        emit('save_special', { id: isNew ? null : s.id, date: f.date.value, to: f.to\
+    \ ? f.to.value || null : null, label: f.label.value, closed: closed, hours: iv })\n          .then(function (res) { busy(d,\
+    \ false); apply(res, d, 'Special day saved'); }, function (err) { busy(d, false); PP.toast(PP.err(err), true); });\n \
+    \     };\n    }\n\n    root.addEventListener('click', function (e) {\n      if (PP.subnavClick(e, D.nav, emit)) return;\n\
+    \      var el = e.target.closest('[data-action]');\n      if (!el) return;\n      var a = el.dataset.action, host = el.closest('[data-id]'),\
+    \ id = host && host.dataset.id;\n      if (a === 'new-period') periodEditor(null);\n      else if (a === 'edit-period')\
+    \ periodEditor(D.periods.filter(function (p) { return p.id === id; })[0]);\n      else if (a === 'del-period') {\n   \
+    \     var p = D.periods.filter(function (x) { return x.id === id; })[0];\n        PP.confirm('Delete “' + p.name + '”?',\
+    \ 'Dates it covered fall back to your other periods, or are closed if none apply.', 'Delete period', true)\n         \
+    \ .then(function (yes) { if (yes) emit('delete_period', { id: id }).then(function (res) { apply(res, null, 'Period deleted');\
+    \ }); });\n      } else if (a === 'new-special') specialEditor(null);\n      else if (a === 'edit-special') specialEditor(D.specials.filter(function\
+    \ (s) { return s.id === id; })[0]);\n      else if (a === 'del-special') emit('delete_special', { id: id }).then(function\
+    \ (res) { apply(res, null, 'Special day removed'); });\n      else if (a === 'month') {\n        var m = PP.parseDate(D.month\
+    \ + '-01'); m.setMonth(m.getMonth() + +el.dataset.n);\n        emit('month', { month: PP.isoDate(m).slice(0, 7) }).then(function\
+    \ (res) { apply(res); });\n      } else if (a === 'day') {\n        var hit = D.specials.filter(function (s) { return\
+    \ s.date === el.dataset.date; })[0];\n        specialEditor(hit || null, el.dataset.date);\n      }\n    });\n    root.addEventListener('change',\
     \ function (e) { PP.subnavChange(e, 'hours', emit); });\n    render();\n    return {};\n  });\n})();\n</script>\n\n<!--\
     \ ===== TablesPage component ===== -->\n<style>\n.pp-tables .when { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items:\
     \ center; margin-bottom: 14px; }\n.pp-tables .when .lbl { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;\
@@ -1823,9 +1829,10 @@ native_deps:
     \ -14px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: .62rem; background: var(--pp-brass); color: #fff;\
     \ padding: 1px 6px; border-radius: 99px; white-space: nowrap; letter-spacing: .04em; }\n.pp-tables .floor .hint-empty\
     \ { position: absolute; inset: 0; display: grid; place-items: center; color: var(--pp-muted); }\n.pp-tables .side { padding:\
-    \ 20px; }\n.pp-tables .side h3 { margin-bottom: 4px; }\n.pp-tables .side .stack > * + * { margin-top: 12px; }\n.pp-tables\
-    \ .summary { font-size: .86rem; color: var(--pp-muted); margin-bottom: 10px; }\n.pp-tables .summary b { color: var(--pp-ink);\
-    \ }\n.pp-tables .jc { padding: 16px 18px; margin-bottom: 10px; }\n.pp-tables .jc .hd { display: flex; align-items: center;\
+    \ 20px; }\n.pp-tables .side h3 { margin-bottom: 4px; }\n.pp-tables .side .addmore { margin-top: 14px; padding-top: 12px;\
+    \ border-top: 1px solid var(--pp-line); }\n.pp-tables .side .stack > * + * { margin-top: 12px; }\n.pp-tables .summary\
+    \ { font-size: .86rem; color: var(--pp-muted); margin-bottom: 10px; }\n.pp-tables .summary b { color: var(--pp-ink); }\n\
+    .pp-tables .jc { padding: 16px 18px; margin-bottom: 10px; }\n.pp-tables .jc .hd { display: flex; align-items: center;\
     \ gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }\n.pp-tables .jc .chips .chip { min-width: 44px; padding: 5px 6px;\
     \ font-size: .76rem; }\n.pp-tables .jc .days .chip { min-width: 40px; }\n.pp-tables .mini-label { font-size: .72rem; letter-spacing:\
     \ .12em; text-transform: uppercase; color: var(--pp-muted); margin: 10px 0 6px; }\n@media (max-width: 900px) { .pp-tables\
@@ -1863,89 +1870,90 @@ native_deps:
     \ + (sz[0] + 18) + 'px;height:' + (sz[1] + 18) + 'px\">' +\n            chairs(t, sz[0], sz[1]) + tag + '<div class=\"\
     top\" style=\"width:' + sz[0] + 'px;height:' + sz[1] + 'px\"><div><b>' + esc(t.name) + '</b><span>' + t.seats + '</span></div></div></div>';\n\
     \        }).join('') + '</div>';\n    }\n    function hourChips(hours, on, attr) {\n      return hours.map(function (h)\
-    \ { return '<button class=\"chip' + (on.indexOf(h) >= 0 ? ' on' : '') + '\" ' + attr + '=\"' + h + '\">' + String(h).padStart(2,\
-    \ '0') + ':00</button>'; }).join('');\n    }\n    function dayChips(on, attr) {\n      return PP.DAYS3.map(function (d,\
-    \ i) { return '<button class=\"chip' + (!on.length || on.indexOf(i) >= 0 ? ' on' : '') + '\" ' + attr + '=\"' + i + '\"\
-    >' + d + '</button>'; }).join('');\n    }\n    function side() {\n      if (S.mode === 'join') {\n        var picks =\
-    \ S.picks.map(tableById).filter(Boolean);\n        var seats = picks.reduce(function (n, t) { return n + t.seats; }, 0);\n\
-    \        return '<div class=\"card side fade-in\"><div class=\"eyebrow\">Join tables</div><h3>' + (picks.length ? esc(picks.map(function\
-    \ (t) { return t.name; }).join(' + ')) : 'Pick tables') + '</h3>' +\n          '<p class=\"small muted\">Click two or\
-    \ more tables on the plan. Joined tables are booked as one table during the hours you choose.</p>' +\n          (picks.length\
-    \ >= 2 ? '<form data-el=\"joinform\"><div class=\"stack\"><div><label class=\"f\">Seats when joined</label><input type=\"\
-    number\" name=\"seats\" min=\"1\" max=\"200\" value=\"' + seats + '\"><div class=\"hint\">Pushing tables together can\
-    \ lose or add a seat or two.</div></div>' +\n            '<div><div class=\"mini-label\">Hours</div><div class=\"chips\"\
-    \ data-el=\"jh\">' + hourChips(D.open_hours, D.open_hours, 'data-jh') + '</div></div>' +\n            '<div><div class=\"\
-    mini-label\">Days</div><div class=\"chips\" data-el=\"jd\">' + dayChips([], 'data-jd') + '</div></div>' +\n          \
-    \  '<div data-el=\"msg\"></div><button class=\"btn primary block\" type=\"submit\">' + PP.icon('join') + 'Join tables</button></div></form>'\
-    \ : '') +\n          '<button class=\"btn ghost block\" data-action=\"mode\" data-m=\"arrange\" style=\"margin-top:10px\"\
-    >Done</button></div>';\n      }\n      var t = S.sel && tableById(S.sel);\n      if (!t) {\n        var aj = activeJoins();\n\
-    \        var units = D.tables.filter(function (x) { return x.active && !aj.of[x.id]; }).length + aj.list.length;\n   \
-    \     return '<div class=\"card side\"><div class=\"eyebrow\">Floor plan</div><h3>' + PP.plural(D.tables.length, 'table')\
-    \ + ' · ' + D.seats + ' seats</h3>' +\n          '<p class=\"small muted\">Drag tables to arrange the room. Click one\
-    \ to edit it. On ' + PP.DAYS[S.day] + ' at ' + String(S.hour).padStart(2, '0') + ':00 guests can book <b>' + units + '</b>\
-    \ separate tables.</p>' +\n          '<div class=\"stack\"><button class=\"btn primary block\" data-action=\"add\">' +\
-    \ PP.icon('plus') + 'Add a table</button>' +\n          '<button class=\"btn block\" data-action=\"mode\" data-m=\"join\"\
-    ' + (D.tables.length < 2 ? ' disabled' : '') + '>' + PP.icon('join') + 'Join tables</button></div></div>';\n      }\n\
-    \      var j = activeJoins().of[t.id];\n      return '<div class=\"card side fade-in\"><div class=\"row\" style=\"margin-bottom:6px\"\
-    ><div class=\"eyebrow\" style=\"margin:0\">Table</div><span class=\"spacer\"></span><button type=\"button\" class=\"btn\
-    \ ghost icon\" data-action=\"deselect\" aria-label=\"Close\">' + PP.icon('x') + '</button></div><form data-el=\"tform\"\
-    ><div class=\"stack\">' +\n        '<div class=\"grid2\"><div><label class=\"f\">Name</label><input type=\"text\" name=\"\
-    name\" maxlength=\"20\" required value=\"' + esc(t.name) + '\"></div>' +\n          '<div><label class=\"f\">Seats</label><input\
-    \ type=\"number\" name=\"seats\" min=\"1\" max=\"60\" required value=\"' + t.seats + '\"></div></div>' +\n        '<div\
-    \ class=\"grid2\"><div><label class=\"f\">Shape</label><select name=\"shape\">' + [['square', 'Square'], ['round', 'Round'],\
-    \ ['long', 'Long']].map(function (s) {\n            return '<option value=\"' + s[0] + '\"' + (t.shape === s[0] ? ' selected'\
-    \ : '') + '>' + s[1] + '</option>'; }).join('') + '</select></div>' +\n          '<div><label class=\"f\">Smallest party</label><input\
-    \ type=\"number\" name=\"min_party\" min=\"1\" max=\"60\" value=\"' + t.min_party + '\"></div></div>' +\n        '<div><label\
-    \ class=\"f\">Area</label><input type=\"text\" name=\"area\" maxlength=\"40\" placeholder=\"e.g. Terrace\" value=\"' +\
-    \ esc(t.area) + '\"></div>' +\n        '<label class=\"check\"><input type=\"checkbox\" name=\"active\"' + (t.active ?\
-    \ ' checked' : '') + '><span>Available for bookings</span></label>' +\n        (j ? '<div class=\"feedback info\" style=\"\
-    margin:0\">Joined with ' + esc(j.tables.filter(function (i) { return i !== t.id; }).map(function (i) { var x = tableById(i);\
-    \ return x ? x.name : ''; }).join(', ')) +\n          ' on ' + PP.DAYS[S.day] + ' at ' + String(S.hour).padStart(2, '0')\
-    \ + ':00.<div class=\"row\" style=\"margin-top:8px\"><button type=\"button\" class=\"btn sm\" data-action=\"split-hour\"\
-    \ data-j=\"' + esc(j.id) + '\">' + PP.icon('split') + 'Split at this hour</button>' +\n          '<button type=\"button\"\
-    \ class=\"btn sm ghost\" data-action=\"split-all\" data-j=\"' + esc(j.id) + '\">Split all day</button></div></div>' :\
-    \ '') +\n        '<div data-el=\"msg\"></div><div class=\"row\"><button class=\"btn primary\" type=\"submit\">Save</button><button\
-    \ type=\"button\" class=\"btn ghost\" data-action=\"join-from\">' + PP.icon('join') + 'Join with…</button><span class=\"\
-    spacer\"></span>' +\n        '<button type=\"button\" class=\"btn ghost icon danger\" data-action=\"delete\" aria-label=\"\
-    Delete table\">' + PP.icon('trash') + '</button></div></div></form></div>';\n    }\n    function joinsList() {\n     \
-    \ if (!D.joins.length) return '<div class=\"empty\" style=\"padding:26px\">No joined tables. Use <b>Join tables</b> to\
-    \ push tables together at busy times, or to keep a large table split into smaller ones at quiet times.</div>';\n     \
-    \ return D.joins.map(function (j) {\n        var names = j.tables.map(function (i) { var t = tableById(i); return t ?\
-    \ t.name : '?'; }).join(' + ');\n        var hours = D.open_hours.slice();\n        j.hours.forEach(function (h) { if\
-    \ (hours.indexOf(h) < 0) hours.push(h); });\n        hours.sort(function (a, b) { return a - b; });\n        return '<div\
-    \ class=\"card jc\" data-j=\"' + esc(j.id) + '\"><div class=\"hd\"><h3 style=\"margin:0\">' + esc(j.label || names) +\
-    \ '</h3><span class=\"badge plain\">' + j.seats + ' seats</span><span class=\"spacer\"></span>' +\n          '<button\
-    \ class=\"btn ghost sm danger\" data-action=\"del-join\">' + PP.icon('split') + 'Split for good</button></div>' +\n  \
-    \        '<div class=\"mini-label\">Joined at these hours (click to split or join an hour)</div><div class=\"chips\">'\
-    \ + hourChips(hours, j.hours, 'data-toggle-h') + '</div>' +\n          '<div class=\"mini-label\">On these days</div><div\
-    \ class=\"chips days\">' + dayChips(j.days, 'data-toggle-d') + '</div></div>';\n      }).join('');\n    }\n    function\
-    \ render() {\n      var keepScroll = root.querySelector('.hours') ? root.querySelector('.hours').scrollLeft : null;\n\
-    \      root.innerHTML = '<div class=\"wrap pp-tables\">' + PP.subnav(D.nav, 'tables') +\n        '<div class=\"when\"\
-    ><div><div class=\"lbl\">Layout on</div><div class=\"seg\" style=\"margin-top:6px\">' + PP.DAYS3.map(function (d, i) {\n\
-    \            return '<button data-action=\"day\" data-d=\"' + i + '\" class=\"' + (S.day === i ? 'on' : '') + '\">' +\
-    \ d + '</button>'; }).join('') + '</div></div>' +\n          '<div style=\"min-width:0;flex:1\"><div class=\"lbl\">At</div><div\
-    \ class=\"hours\" style=\"margin-top:6px\">' + hourChips(D.open_hours, [S.hour], 'data-hour') + '</div></div></div>' +\n\
-    \        '<div class=\"layout\"><div>' + floor() + '</div><div>' + side() + '</div></div>' +\n        '<div class=\"section-title\"\
-    ><h2>Joined tables</h2><span class=\"muted small\">Tables pushed together are booked as one</span></div>' + joinsList()\
-    \ + '</div>';\n      if (keepScroll != null) root.querySelector('.hours').scrollLeft = keepScroll;\n      scale();\n \
-    \     var tf = root.querySelector('[data-el=tform]'); if (tf) tf.onsubmit = saveTable;\n      var jf = root.querySelector('[data-el=joinform]');\
-    \ if (jf) jf.onsubmit = createJoin;\n    }\n\n    // Table sizes are in pixels at a 760px-wide floor; smaller floors (phones)\
-    \ shrink them to match.\n    function scale() {\n      var fl = root.querySelector('[data-el=floor]');\n      if (fl)\
-    \ fl.style.setProperty('--s', Math.max(0.62, Math.min(1, fl.clientWidth / 760)).toFixed(3));\n    }\n    window.addEventListener('resize',\
-    \ scale);\n\n    function apply(res, okMsg) {\n      if (res && res.ok === false) { var box = root.querySelector('[data-el=msg]');\
-    \ if (box) box.innerHTML = '<div class=\"feedback bad\">' + esc(res.error) + '</div>'; else PP.toast(res.error, true);\
-    \ return false; }\n      if (res) D = res;\n      if (S.sel && !tableById(S.sel)) S.sel = null;\n      render();\n   \
-    \   if (okMsg) PP.toast(okMsg);\n      return true;\n    }\n    function saveTable(e) {\n      e.preventDefault();\n \
-    \     var f = e.target;\n      emit('save_table', { id: S.sel, name: f.name.value, seats: f.seats.value, shape: f.shape.value,\
-    \ min_party: f.min_party.value, area: f.area.value, active: f.active.checked })\n        .then(function (res) { apply(res,\
-    \ 'Table saved'); });\n    }\n    function createJoin(e) {\n      e.preventDefault();\n      var f = e.target;\n     \
-    \ var hours = Array.prototype.map.call(f.querySelectorAll('[data-jh].on'), function (b) { return +b.dataset.jh; });\n\
-    \      var days = Array.prototype.map.call(f.querySelectorAll('[data-jd].on'), function (b) { return +b.dataset.jd; });\n\
-    \      emit('save_join', { tables: S.picks, seats: f.seats.value, hours: hours, days: days }).then(function (res) {\n\
-    \        if (apply(res, 'Tables joined')) { S.mode = 'arrange'; S.picks = []; render(); }\n      });\n    }\n    function\
-    \ saveJoin(j, changes) { return emit('save_join', Object.assign({}, j, changes)).then(function (res) { apply(res); });\
-    \ }\n\n    // ---------- dragging\n    var drag = null;\n    root.addEventListener('pointerdown', function (e) {\n   \
-    \   var el = e.target.closest('.tb');\n      if (!el || e.button > 0) return;\n      var fl = root.querySelector('[data-el=floor]').getBoundingClientRect();\n\
+    \ { return '<button type=\"button\" class=\"chip' + (on.indexOf(h) >= 0 ? ' on' : '') + '\" ' + attr + '=\"' + h + '\"\
+    >' + String(h).padStart(2, '0') + ':00</button>'; }).join('');\n    }\n    function dayChips(on, attr) {\n      return\
+    \ PP.DAYS3.map(function (d, i) { return '<button type=\"button\" class=\"chip' + (!on.length || on.indexOf(i) >= 0 ? '\
+    \ on' : '') + '\" ' + attr + '=\"' + i + '\">' + d + '</button>'; }).join('');\n    }\n    function side() {\n      if\
+    \ (S.mode === 'join') {\n        var picks = S.picks.map(tableById).filter(Boolean);\n        var seats = picks.reduce(function\
+    \ (n, t) { return n + t.seats; }, 0);\n        return '<div class=\"card side fade-in\"><div class=\"eyebrow\">Join tables</div><h3>'\
+    \ + (picks.length ? esc(picks.map(function (t) { return t.name; }).join(' + ')) : 'Pick tables') + '</h3>' +\n       \
+    \   '<p class=\"small muted\">Click two or more tables on the plan. Joined tables are booked as one table during the hours\
+    \ you choose.</p>' +\n          (picks.length >= 2 ? '<form data-el=\"joinform\"><div class=\"stack\"><div><label class=\"\
+    f\">Seats when joined</label><input type=\"number\" name=\"seats\" min=\"1\" max=\"200\" value=\"' + seats + '\"><div\
+    \ class=\"hint\">Pushing tables together can lose or add a seat or two.</div></div>' +\n            '<div><div class=\"\
+    mini-label\">Hours</div><div class=\"chips\" data-el=\"jh\">' + hourChips(D.open_hours, D.open_hours, 'data-jh') + '</div></div>'\
+    \ +\n            '<div><div class=\"mini-label\">Days</div><div class=\"chips\" data-el=\"jd\">' + dayChips([], 'data-jd')\
+    \ + '</div></div>' +\n            '<div data-el=\"msg\"></div><button class=\"btn primary block\" type=\"submit\">' +\
+    \ PP.icon('join') + 'Join tables</button></div></form>' : '') +\n          '<button class=\"btn ghost block\" data-action=\"\
+    mode\" data-m=\"arrange\" style=\"margin-top:10px\">Done</button></div>';\n      }\n      var t = S.sel && tableById(S.sel);\n\
+    \      if (!t) {\n        var aj = activeJoins();\n        var units = D.tables.filter(function (x) { return x.active\
+    \ && !aj.of[x.id]; }).length + aj.list.length;\n        return '<div class=\"card side\"><div class=\"eyebrow\">Floor\
+    \ plan</div><h3>' + PP.plural(D.tables.length, 'table') + ' · ' + D.seats + ' seats</h3>' +\n          '<p class=\"small\
+    \ muted\">Drag tables to arrange the room. Click one to edit it. On ' + PP.DAYS[S.day] + ' at ' + String(S.hour).padStart(2,\
+    \ '0') + ':00 guests can book <b>' + units + '</b> separate tables.</p>' +\n          '<div class=\"stack\"><button class=\"\
+    btn primary block\" data-action=\"add\">' + PP.icon('plus') + 'Add a table</button>' +\n          '<button class=\"btn\
+    \ block\" data-action=\"mode\" data-m=\"join\"' + (D.tables.length < 2 ? ' disabled' : '') + '>' + PP.icon('join') + 'Join\
+    \ tables</button></div></div>';\n      }\n      var j = activeJoins().of[t.id];\n      return '<div class=\"card side\
+    \ fade-in\"><div class=\"row\" style=\"margin-bottom:6px\"><div class=\"eyebrow\" style=\"margin:0\">Table</div><span\
+    \ class=\"spacer\"></span><button type=\"button\" class=\"btn ghost icon\" data-action=\"deselect\" aria-label=\"Close\"\
+    >' + PP.icon('x') + '</button></div><form data-el=\"tform\"><div class=\"stack\">' +\n        '<div class=\"grid2\"><div><label\
+    \ class=\"f\">Name</label><input type=\"text\" name=\"name\" maxlength=\"20\" required value=\"' + esc(t.name) + '\"></div>'\
+    \ +\n          '<div><label class=\"f\">Seats</label><input type=\"number\" name=\"seats\" min=\"1\" max=\"60\" required\
+    \ value=\"' + t.seats + '\"></div></div>' +\n        '<div class=\"grid2\"><div><label class=\"f\">Shape</label><select\
+    \ name=\"shape\">' + [['square', 'Square'], ['round', 'Round'], ['long', 'Long']].map(function (s) {\n            return\
+    \ '<option value=\"' + s[0] + '\"' + (t.shape === s[0] ? ' selected' : '') + '>' + s[1] + '</option>'; }).join('') + '</select></div>'\
+    \ +\n          '<div><label class=\"f\">Smallest party</label><input type=\"number\" name=\"min_party\" min=\"1\" max=\"\
+    60\" value=\"' + t.min_party + '\"></div></div>' +\n        '<div><label class=\"f\">Area</label><input type=\"text\"\
+    \ name=\"area\" maxlength=\"40\" placeholder=\"e.g. Terrace\" value=\"' + esc(t.area) + '\"></div>' +\n        '<label\
+    \ class=\"check\"><input type=\"checkbox\" name=\"active\"' + (t.active ? ' checked' : '') + '><span>Available for bookings</span></label>'\
+    \ +\n        (j ? '<div class=\"feedback info\" style=\"margin:0\">Joined with ' + esc(j.tables.filter(function (i) {\
+    \ return i !== t.id; }).map(function (i) { var x = tableById(i); return x ? x.name : ''; }).join(', ')) +\n          '\
+    \ on ' + PP.DAYS[S.day] + ' at ' + String(S.hour).padStart(2, '0') + ':00.<div class=\"row\" style=\"margin-top:8px\"\
+    ><button type=\"button\" class=\"btn sm\" data-action=\"split-hour\" data-j=\"' + esc(j.id) + '\">' + PP.icon('split')\
+    \ + 'Split at this hour</button>' +\n          '<button type=\"button\" class=\"btn sm ghost\" data-action=\"split-all\"\
+    \ data-j=\"' + esc(j.id) + '\">Split all day</button></div></div>' : '') +\n        '<div data-el=\"msg\"></div><div class=\"\
+    row\"><button class=\"btn primary\" type=\"submit\">Save</button><button type=\"button\" class=\"btn ghost\" data-action=\"\
+    join-from\">' + PP.icon('join') + 'Join with…</button><span class=\"spacer\"></span>' +\n        '<button type=\"button\"\
+    \ class=\"btn ghost icon danger\" data-action=\"delete\" aria-label=\"Delete table\">' + PP.icon('trash') + '</button></div></div></form>'\
+    \ +\n        '<div class=\"addmore\"><button type=\"button\" class=\"btn ghost sm\" data-action=\"add\">' + PP.icon('plus')\
+    \ + 'Add another table</button></div></div>';\n    }\n    function joinsList() {\n      if (!D.joins.length) return '<div\
+    \ class=\"empty\" style=\"padding:26px\">No joined tables. Use <b>Join tables</b> to push tables together at busy times,\
+    \ or to keep a large table split into smaller ones at quiet times.</div>';\n      return D.joins.map(function (j) {\n\
+    \        var names = j.tables.map(function (i) { var t = tableById(i); return t ? t.name : '?'; }).join(' + ');\n    \
+    \    var hours = D.open_hours.slice();\n        j.hours.forEach(function (h) { if (hours.indexOf(h) < 0) hours.push(h);\
+    \ });\n        hours.sort(function (a, b) { return a - b; });\n        return '<div class=\"card jc\" data-j=\"' + esc(j.id)\
+    \ + '\"><div class=\"hd\"><h3 style=\"margin:0\">' + esc(j.label || names) + '</h3><span class=\"badge plain\">' + j.seats\
+    \ + ' seats</span><span class=\"spacer\"></span>' +\n          '<button class=\"btn ghost sm danger\" data-action=\"del-join\"\
+    >' + PP.icon('split') + 'Split for good</button></div>' +\n          '<div class=\"mini-label\">Joined at these hours\
+    \ (click to split or join an hour)</div><div class=\"chips\">' + hourChips(hours, j.hours, 'data-toggle-h') + '</div>'\
+    \ +\n          '<div class=\"mini-label\">On these days</div><div class=\"chips days\">' + dayChips(j.days, 'data-toggle-d')\
+    \ + '</div></div>';\n      }).join('');\n    }\n    function render() {\n      var keepScroll = root.querySelector('.hours')\
+    \ ? root.querySelector('.hours').scrollLeft : null;\n      root.innerHTML = '<div class=\"wrap pp-tables\">' + PP.subnav(D.nav,\
+    \ 'tables') +\n        '<div class=\"when\"><div><div class=\"lbl\">Layout on</div><div class=\"seg\" style=\"margin-top:6px\"\
+    >' + PP.DAYS3.map(function (d, i) {\n            return '<button data-action=\"day\" data-d=\"' + i + '\" class=\"' +\
+    \ (S.day === i ? 'on' : '') + '\">' + d + '</button>'; }).join('') + '</div></div>' +\n          '<div style=\"min-width:0;flex:1\"\
+    ><div class=\"lbl\">At</div><div class=\"hours\" style=\"margin-top:6px\">' + hourChips(D.open_hours, [S.hour], 'data-hour')\
+    \ + '</div></div></div>' +\n        '<div class=\"layout\"><div>' + floor() + '</div><div>' + side() + '</div></div>'\
+    \ +\n        '<div class=\"section-title\"><h2>Joined tables</h2><span class=\"muted small\">Tables pushed together are\
+    \ booked as one</span></div>' + joinsList() + '</div>';\n      if (keepScroll != null) root.querySelector('.hours').scrollLeft\
+    \ = keepScroll;\n      scale();\n      var tf = root.querySelector('[data-el=tform]'); if (tf) tf.onsubmit = saveTable;\n\
+    \      var jf = root.querySelector('[data-el=joinform]'); if (jf) jf.onsubmit = createJoin;\n    }\n\n    // Table sizes\
+    \ are in pixels at a 760px-wide floor; smaller floors (phones) shrink them to match.\n    function scale() {\n      var\
+    \ fl = root.querySelector('[data-el=floor]');\n      if (fl) fl.style.setProperty('--s', Math.max(0.62, Math.min(1, fl.clientWidth\
+    \ / 760)).toFixed(3));\n    }\n    window.addEventListener('resize', scale);\n\n    function apply(res, okMsg) {\n   \
+    \   if (res && res.ok === false) { var box = root.querySelector('[data-el=msg]'); if (box) box.innerHTML = '<div class=\"\
+    feedback bad\">' + esc(res.error) + '</div>'; else PP.toast(res.error, true); return false; }\n      if (res) D = res;\n\
+    \      if (S.sel && !tableById(S.sel)) S.sel = null;\n      render();\n      if (okMsg) PP.toast(okMsg);\n      return\
+    \ true;\n    }\n    function saveTable(e) {\n      e.preventDefault();\n      var f = e.target;\n      emit('save_table',\
+    \ { id: S.sel, name: f.name.value, seats: f.seats.value, shape: f.shape.value, min_party: f.min_party.value, area: f.area.value,\
+    \ active: f.active.checked })\n        .then(function (res) { apply(res, 'Table saved'); });\n    }\n    function createJoin(e)\
+    \ {\n      e.preventDefault();\n      var f = e.target;\n      var hours = Array.prototype.map.call(f.querySelectorAll('[data-jh].on'),\
+    \ function (b) { return +b.dataset.jh; });\n      var days = Array.prototype.map.call(f.querySelectorAll('[data-jd].on'),\
+    \ function (b) { return +b.dataset.jd; });\n      emit('save_join', { tables: S.picks, seats: f.seats.value, hours: hours,\
+    \ days: days }).then(function (res) {\n        if (apply(res, 'Tables joined')) { S.mode = 'arrange'; S.picks = []; render();\
+    \ }\n      });\n    }\n    function saveJoin(j, changes) { return emit('save_join', Object.assign({}, j, changes)).then(function\
+    \ (res) { apply(res); }); }\n\n    // ---------- dragging\n    var drag = null;\n    root.addEventListener('pointerdown',\
+    \ function (e) {\n      var el = e.target.closest('.tb');\n      if (!el || e.button > 0) return;\n      var fl = root.querySelector('[data-el=floor]').getBoundingClientRect();\n\
     \      drag = { el: el, id: el.dataset.t, x0: e.clientX, y0: e.clientY, fl: fl, moved: false };\n      el.setPointerCapture(e.pointerId);\n\
     \    });\n    root.addEventListener('pointermove', function (e) {\n      if (!drag) return;\n      if (!drag.moved &&\
     \ Math.abs(e.clientX - drag.x0) + Math.abs(e.clientY - drag.y0) < 4) return;\n      drag.moved = true;\n      drag.el.classList.add('dragging');\n\
@@ -1976,87 +1984,87 @@ native_deps:
     \ (a === 'mode') { S.mode = el.dataset.m; S.picks = []; S.sel = null; render(); }\n      else if (a === 'deselect') {\
     \ S.sel = null; render(); }\n      else if (a === 'join-from') { S.mode = 'join'; S.picks = [S.sel]; S.sel = null; render();\
     \ }\n      else if (a === 'add') emit('save_table', { name: '', seats: 4 }).then(function (res) { if (apply(res, 'Table\
-    \ added')) { S.sel = D.tables[D.tables.length - 1].id; render(); } });\n      else if (a === 'delete') {\n        var\
-    \ t = tableById(S.sel);\n        PP.confirm('Delete ' + t.name + '?', 'It is removed from the floor plan and from any\
-    \ joins. Existing bookings keep their record.', 'Delete table', true)\n          .then(function (y) { if (y) emit('delete_table',\
-    \ { id: t.id }).then(function (res) { S.sel = null; apply(res, 'Table deleted'); }); });\n      } else if (a === 'split-hour'\
-    \ || a === 'split-all') {\n        var jo = D.joins.filter(function (x) { return x.id === el.dataset.j; })[0];\n     \
-    \   saveJoin(jo, { hours: a === 'split-all' ? [] : jo.hours.filter(function (x) { return x !== S.hour; }) });\n      }\
-    \ else if (a === 'del-join') {\n        var jd = el.closest('[data-j]').dataset.j;\n        PP.confirm('Split these tables\
-    \ for good?', 'They will always be booked separately.', 'Split them', true).then(function (y) { if (y) emit('delete_join',\
-    \ { id: jd }).then(function (res) { apply(res, 'Tables split'); }); });\n      }\n    });\n    root.addEventListener('change',\
-    \ function (e) { PP.subnavChange(e, 'tables', emit); });\n    render();\n    return {};\n  });\n})();\n</script>\n\n<!--\
-    \ ===== MenuEditPage component ===== -->\n<style>\n.pp-menued .intro { color: var(--pp-muted); font-size: .92rem; max-width:\
-    \ 68ch; margin-bottom: 22px; }\n.pp-menued .sec { margin-bottom: 18px; overflow: hidden; }\n.pp-menued .sec .hd { display:\
-    \ flex; align-items: center; gap: 8px; padding: 18px 20px 14px; border-bottom: 1px solid var(--pp-line); flex-wrap: wrap;\
-    \ }\n.pp-menued .sec .hd h3 { margin: 0; }\n.pp-menued .sec .hd .d { width: 100%; color: var(--pp-muted); font-size: .85rem;\
-    \ }\n.pp-menued .it { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 14px; align-items: center;\
-    \ padding: 13px 20px; border-bottom: 1px solid var(--pp-line); }\n.pp-menued .it:last-child { border-bottom: 0; }\n.pp-menued\
-    \ .it .n { font-weight: 500; }\n.pp-menued .it .n .badge { margin-left: 6px; }\n.pp-menued .it .ds { color: var(--pp-muted);\
-    \ font-size: .84rem; }\n.pp-menued .it .pr { font-family: var(--pp-serif); font-size: 1.15rem; white-space: nowrap; }\n\
-    .pp-menued .it.off .n, .pp-menued .it.off .pr { color: var(--pp-faint); text-decoration: line-through; }\n.pp-menued .it\
-    \ .acts { display: flex; gap: 2px; }\n.pp-menued .add-dish { padding: 10px 14px; }\n@media (max-width: 620px) { .pp-menued\
-    \ .it { grid-template-columns: minmax(0, 1fr) auto; } .pp-menued .it .acts { grid-column: 1 / -1; } }\n</style>\n<script>\n\
-    (function () {\n  var PP = window.PP;\n  PP.define('menuedit', function (root, data, emit) {\n    var esc = PP.esc, D\
-    \ = data;\n\n    function item(i, s, k, n) {\n      return '<div class=\"it' + (i.available ? '' : ' off') + '\" data-i=\"\
-    ' + esc(i.id) + '\" data-s=\"' + esc(s.id) + '\"><div><div class=\"n\">' + esc(i.name) +\n          i.tags.map(function\
-    \ (t) { return '<span class=\"badge plain\" title=\"' + esc(D.tags[t]) + '\">' + esc(t) + '</span>'; }).join('') +\n \
-    \         (i.available ? '' : '<span class=\"badge cancelled\">Sold out</span>') + '</div>' + (i.description ? '<div class=\"\
-    ds\">' + esc(i.description) + '</div>' : '') + '</div>' +\n        '<div class=\"pr\">' + esc(i.price) + '</div>' +\n\
-    \        '<div class=\"acts\"><button class=\"btn ghost sm\" data-action=\"toggle\">' + (i.available ? 'Mark sold out'\
-    \ : 'Back on') + '</button>' +\n          '<button class=\"btn ghost icon\" data-action=\"up\" data-kind=\"item\"' + (k\
-    \ ? '' : ' disabled') + ' aria-label=\"Move up\">' + PP.icon('left', 'rot') + '</button>' +\n          '<button class=\"\
-    btn ghost icon\" data-action=\"down\" data-kind=\"item\"' + (k < n - 1 ? '' : ' disabled') + ' aria-label=\"Move down\"\
-    >' + PP.icon('right', 'rot') + '</button>' +\n          '<button class=\"btn ghost icon\" data-action=\"edit-item\" aria-label=\"\
-    Edit\">' + PP.icon('edit') + '</button></div></div>';\n    }\n    function section(s, k) {\n      return '<div class=\"\
-    card sec fade-in\" data-s=\"' + esc(s.id) + '\"><div class=\"hd\"><h3>' + esc(s.title) + '</h3><span class=\"spacer\"\
-    ></span>' +\n          '<button class=\"btn ghost icon\" data-action=\"up\" data-kind=\"section\"' + (k ? '' : ' disabled')\
-    \ + ' aria-label=\"Move section up\">' + PP.icon('left', 'rot') + '</button>' +\n          '<button class=\"btn ghost\
-    \ icon\" data-action=\"down\" data-kind=\"section\"' + (k < D.sections.length - 1 ? '' : ' disabled') + ' aria-label=\"\
-    Move section down\">' + PP.icon('right', 'rot') + '</button>' +\n          '<button class=\"btn ghost icon\" data-action=\"\
-    edit-section\" aria-label=\"Edit section\">' + PP.icon('edit') + '</button>' +\n          '<button class=\"btn ghost icon\"\
-    \ data-action=\"del-section\" aria-label=\"Delete section\">' + PP.icon('trash') + '</button>' +\n          (s.description\
-    \ ? '<div class=\"d\">' + esc(s.description) + '</div>' : '') + '</div>' +\n        s.items.map(function (i, j) { return\
-    \ item(i, s, j, s.items.length); }).join('') +\n        '<div class=\"add-dish\"><button class=\"btn ghost sm\" data-action=\"\
-    new-item\">' + PP.icon('plus') + 'Add a dish</button></div></div>';\n    }\n    function render() {\n      root.innerHTML\
-    \ = '<div class=\"wrap pp-menued\">' + PP.subnav(D.nav, 'menu') +\n        '<div class=\"row\" style=\"margin-bottom:8px\"\
-    ><h2 style=\"margin:0\">Menu</h2><span class=\"spacer\"></span>' +\n          '<a class=\"btn sm\" target=\"_blank\" rel=\"\
-    noopener\" href=\"' + esc(PP.menuUrl(D.slug)) + '\">' + PP.icon('ext') + 'View menu</a>' +\n          '<button class=\"\
-    btn primary sm\" data-action=\"new-section\">' + PP.icon('plus') + 'Add a section</button></div>' +\n        '<p class=\"\
-    intro\">Guests see this menu at its own page, which the menu QR code opens (Settings &amp; sharing). Changes show there,\
-    \ and on your website, straight away, so the QR code never needs reprinting. Sold-out dishes are hidden from guests.</p>'\
-    \ +\n        (D.sections.length ? D.sections.map(section).join('') : '<div class=\"empty\"><h3>Start your menu</h3><p>Add\
-    \ a section such as Starters, then its dishes.</p><button class=\"btn primary\" data-action=\"new-section\">' + PP.icon('plus')\
-    \ + 'Add a section</button></div>') +\n        '</div>';\n    }\n    function apply(res, d, msg) {\n      if (res && res.ok\
-    \ === false) {\n        var box = d && d.el.querySelector('[data-el=msg]');\n        if (box) box.innerHTML = '<div class=\"\
-    feedback bad\">' + esc(res.error) + '</div>'; else PP.toast(res.error, true);\n        return;\n      }\n      if (res)\
-    \ { D = res; render(); }\n      if (d) d.close();\n      if (msg) PP.toast(msg);\n    }\n    function sectionEditor(s)\
-    \ {\n      s = s || { title: '', description: '' };\n      var d = PP.modal('<div class=\"eyebrow\">' + (s.id ? 'Edit\
-    \ section' : 'New section') + '</div><h2>' + (s.id ? esc(s.title) : 'Add a section') + '</h2>' +\n        '<form class=\"\
-    stack\"><div><label class=\"f\">Title</label><input type=\"text\" name=\"title\" maxlength=\"80\" required placeholder=\"\
-    e.g. Starters\" value=\"' + esc(s.title) + '\"></div>' +\n        '<div><label class=\"f\">Note <span class=\"faint\"\
-    >(optional)</span></label><input type=\"text\" name=\"description\" maxlength=\"300\" placeholder=\"e.g. Served until\
-    \ 22:00\" value=\"' + esc(s.description) + '\"></div>' +\n        '<div data-el=\"msg\"></div><div class=\"foot\"><button\
-    \ type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\" type=\"submit\">Save</button></div></form>');\n\
-    \      d.el.querySelector('form').onsubmit = function (e) {\n        e.preventDefault();\n        emit('save_section',\
-    \ { id: s.id || null, title: e.target.title.value, description: e.target.description.value }).then(function (res) { apply(res,\
-    \ d, 'Section saved'); });\n      };\n    }\n    function itemEditor(i, sid) {\n      i = i || { name: '', description:\
-    \ '', price: '', tags: [], available: true };\n      var d = PP.modal('<div class=\"eyebrow\">' + (i.id ? 'Edit dish'\
-    \ : 'New dish') + '</div><h2>' + (i.id ? esc(i.name) : 'Add a dish') + '</h2>' +\n        '<form class=\"stack\"><div\
-    \ class=\"grid2\" style=\"grid-template-columns:2fr 1fr\"><div><label class=\"f\">Name</label><input type=\"text\" name=\"\
-    name\" maxlength=\"120\" required value=\"' + esc(i.name) + '\"></div>' +\n          '<div><label class=\"f\">Price</label><input\
-    \ type=\"text\" name=\"price\" maxlength=\"30\" placeholder=\"€18\" value=\"' + esc(i.price) + '\"></div></div>' +\n \
-    \       '<div><label class=\"f\">Description <span class=\"faint\">(optional)</span></label><textarea name=\"description\"\
-    \ maxlength=\"500\" style=\"min-height:70px\">' + esc(i.description) + '</textarea></div>' +\n        '<div><label class=\"\
-    f\">Section</label><select name=\"section\">' + D.sections.map(function (s) { return '<option value=\"' + esc(s.id) +\
-    \ '\"' + (s.id === sid ? ' selected' : '') + '>' + esc(s.title) + '</option>'; }).join('') + '</select></div>' +\n   \
-    \     '<div><label class=\"f\">Labels</label><div class=\"chips\">' + Object.keys(D.tags).map(function (t) {\n       \
-    \   return '<button type=\"button\" class=\"chip' + (i.tags.indexOf(t) >= 0 ? ' on' : '') + '\" data-tag=\"' + t + '\"\
-    \ title=\"' + esc(D.tags[t]) + '\">' + esc(t) + ' · ' + esc(D.tags[t]) + '</button>'; }).join('') + '</div></div>' +\n\
-    \        '<label class=\"check\"><input type=\"checkbox\" name=\"available\"' + (i.available ? ' checked' : '') + '><span>Available\
-    \ today</span></label>' +\n        '<div data-el=\"msg\"></div><div class=\"foot\">' + (i.id ? '<button type=\"button\"\
-    \ class=\"btn danger\" data-del>Delete dish</button><span class=\"spacer\"></span>' : '') +\n          '<button type=\"\
-    button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\" type=\"submit\">Save</button></div></form>',\
+    \ added')) { S.sel = res.new_id || D.tables[D.tables.length - 1].id; render(); } });\n      else if (a === 'delete') {\n\
+    \        var t = tableById(S.sel);\n        PP.confirm('Delete ' + t.name + '?', 'It is removed from the floor plan and\
+    \ from any joins. Existing bookings keep their record.', 'Delete table', true)\n          .then(function (y) { if (y)\
+    \ emit('delete_table', { id: t.id }).then(function (res) { S.sel = null; apply(res, 'Table deleted'); }); });\n      }\
+    \ else if (a === 'split-hour' || a === 'split-all') {\n        var jo = D.joins.filter(function (x) { return x.id ===\
+    \ el.dataset.j; })[0];\n        saveJoin(jo, { hours: a === 'split-all' ? [] : jo.hours.filter(function (x) { return x\
+    \ !== S.hour; }) });\n      } else if (a === 'del-join') {\n        var jd = el.closest('[data-j]').dataset.j;\n     \
+    \   PP.confirm('Split these tables for good?', 'They will always be booked separately.', 'Split them', true).then(function\
+    \ (y) { if (y) emit('delete_join', { id: jd }).then(function (res) { apply(res, 'Tables split'); }); });\n      }\n  \
+    \  });\n    root.addEventListener('change', function (e) { PP.subnavChange(e, 'tables', emit); });\n    render();\n  \
+    \  return {};\n  });\n})();\n</script>\n\n<!-- ===== MenuEditPage component ===== -->\n<style>\n.pp-menued .intro { color:\
+    \ var(--pp-muted); font-size: .92rem; max-width: 68ch; margin-bottom: 22px; }\n.pp-menued .sec { margin-bottom: 18px;\
+    \ overflow: hidden; }\n.pp-menued .sec .hd { display: flex; align-items: center; gap: 8px; padding: 18px 20px 14px; border-bottom:\
+    \ 1px solid var(--pp-line); flex-wrap: wrap; }\n.pp-menued .sec .hd h3 { margin: 0; }\n.pp-menued .sec .hd .d { width:\
+    \ 100%; color: var(--pp-muted); font-size: .85rem; }\n.pp-menued .it { display: grid; grid-template-columns: minmax(0,\
+    \ 1fr) auto auto; gap: 4px 14px; align-items: center; padding: 13px 20px; border-bottom: 1px solid var(--pp-line); }\n\
+    .pp-menued .it:last-child { border-bottom: 0; }\n.pp-menued .it .n { font-weight: 500; }\n.pp-menued .it .n .badge { margin-left:\
+    \ 6px; }\n.pp-menued .it .ds { color: var(--pp-muted); font-size: .84rem; }\n.pp-menued .it .pr { font-family: var(--pp-serif);\
+    \ font-size: 1.15rem; white-space: nowrap; }\n.pp-menued .it.off .n, .pp-menued .it.off .pr { color: var(--pp-faint);\
+    \ text-decoration: line-through; }\n.pp-menued .it .acts { display: flex; gap: 2px; }\n.pp-menued .add-dish { padding:\
+    \ 10px 14px; }\n@media (max-width: 620px) { .pp-menued .it { grid-template-columns: minmax(0, 1fr) auto; } .pp-menued\
+    \ .it .acts { grid-column: 1 / -1; } }\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.define('menuedit',\
+    \ function (root, data, emit) {\n    var esc = PP.esc, D = data;\n\n    function item(i, s, k, n) {\n      return '<div\
+    \ class=\"it' + (i.available ? '' : ' off') + '\" data-i=\"' + esc(i.id) + '\" data-s=\"' + esc(s.id) + '\"><div><div\
+    \ class=\"n\">' + esc(i.name) +\n          i.tags.map(function (t) { return '<span class=\"badge plain\" title=\"' + esc(D.tags[t])\
+    \ + '\">' + esc(t) + '</span>'; }).join('') +\n          (i.available ? '' : '<span class=\"badge cancelled\">Sold out</span>')\
+    \ + '</div>' + (i.description ? '<div class=\"ds\">' + esc(i.description) + '</div>' : '') + '</div>' +\n        '<div\
+    \ class=\"pr\">' + esc(i.price) + '</div>' +\n        '<div class=\"acts\"><button class=\"btn ghost sm\" data-action=\"\
+    toggle\">' + (i.available ? 'Mark sold out' : 'Back on') + '</button>' +\n          '<button class=\"btn ghost icon\"\
+    \ data-action=\"up\" data-kind=\"item\"' + (k ? '' : ' disabled') + ' aria-label=\"Move up\">' + PP.icon('left', 'rot')\
+    \ + '</button>' +\n          '<button class=\"btn ghost icon\" data-action=\"down\" data-kind=\"item\"' + (k < n - 1 ?\
+    \ '' : ' disabled') + ' aria-label=\"Move down\">' + PP.icon('right', 'rot') + '</button>' +\n          '<button class=\"\
+    btn ghost icon\" data-action=\"edit-item\" aria-label=\"Edit\">' + PP.icon('edit') + '</button></div></div>';\n    }\n\
+    \    function section(s, k) {\n      return '<div class=\"card sec fade-in\" data-s=\"' + esc(s.id) + '\"><div class=\"\
+    hd\"><h3>' + esc(s.title) + '</h3><span class=\"spacer\"></span>' +\n          '<button class=\"btn ghost icon\" data-action=\"\
+    up\" data-kind=\"section\"' + (k ? '' : ' disabled') + ' aria-label=\"Move section up\">' + PP.icon('left', 'rot') + '</button>'\
+    \ +\n          '<button class=\"btn ghost icon\" data-action=\"down\" data-kind=\"section\"' + (k < D.sections.length\
+    \ - 1 ? '' : ' disabled') + ' aria-label=\"Move section down\">' + PP.icon('right', 'rot') + '</button>' +\n         \
+    \ '<button class=\"btn ghost icon\" data-action=\"edit-section\" aria-label=\"Edit section\">' + PP.icon('edit') + '</button>'\
+    \ +\n          '<button class=\"btn ghost icon\" data-action=\"del-section\" aria-label=\"Delete section\">' + PP.icon('trash')\
+    \ + '</button>' +\n          (s.description ? '<div class=\"d\">' + esc(s.description) + '</div>' : '') + '</div>' +\n\
+    \        s.items.map(function (i, j) { return item(i, s, j, s.items.length); }).join('') +\n        '<div class=\"add-dish\"\
+    ><button class=\"btn ghost sm\" data-action=\"new-item\">' + PP.icon('plus') + 'Add a dish</button></div></div>';\n  \
+    \  }\n    function render() {\n      root.innerHTML = '<div class=\"wrap pp-menued\">' + PP.subnav(D.nav, 'menu') +\n\
+    \        '<div class=\"row\" style=\"margin-bottom:8px\"><h2 style=\"margin:0\">Menu</h2><span class=\"spacer\"></span>'\
+    \ +\n          '<a class=\"btn sm\" target=\"_blank\" rel=\"noopener\" href=\"' + esc(PP.menuUrl(D.slug)) + '\">' + PP.icon('ext')\
+    \ + 'View menu</a>' +\n          '<button class=\"btn primary sm\" data-action=\"new-section\">' + PP.icon('plus') + 'Add\
+    \ a section</button></div>' +\n        '<p class=\"intro\">Guests see this menu at its own page, which the menu QR code\
+    \ opens (Settings &amp; sharing). Changes show there, and on your website, straight away, so the QR code never needs reprinting.\
+    \ Sold-out dishes are hidden from guests.</p>' +\n        (D.sections.length ? D.sections.map(section).join('') : '<div\
+    \ class=\"empty\"><h3>Start your menu</h3><p>Add a section such as Starters, then its dishes.</p><button class=\"btn primary\"\
+    \ data-action=\"new-section\">' + PP.icon('plus') + 'Add a section</button></div>') +\n        '</div>';\n    }\n    function\
+    \ apply(res, d, msg) {\n      if (res && res.ok === false) {\n        var box = d && d.el.querySelector('[data-el=msg]');\n\
+    \        if (box) box.innerHTML = '<div class=\"feedback bad\">' + esc(res.error) + '</div>'; else PP.toast(res.error,\
+    \ true);\n        return;\n      }\n      if (res) { D = res; render(); }\n      if (d) d.close();\n      if (msg) PP.toast(msg);\n\
+    \    }\n    function sectionEditor(s) {\n      s = s || { title: '', description: '' };\n      var d = PP.modal('<div\
+    \ class=\"eyebrow\">' + (s.id ? 'Edit section' : 'New section') + '</div><h2>' + (s.id ? esc(s.title) : 'Add a section')\
+    \ + '</h2>' +\n        '<form class=\"stack\"><div><label class=\"f\">Title</label><input type=\"text\" name=\"title\"\
+    \ maxlength=\"80\" required placeholder=\"e.g. Starters\" value=\"' + esc(s.title) + '\"></div>' +\n        '<div><label\
+    \ class=\"f\">Note <span class=\"faint\">(optional)</span></label><input type=\"text\" name=\"description\" maxlength=\"\
+    300\" placeholder=\"e.g. Served until 22:00\" value=\"' + esc(s.description) + '\"></div>' +\n        '<div data-el=\"\
+    msg\"></div><div class=\"foot\"><button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\"\
+    \ type=\"submit\">Save</button></div></form>');\n      d.el.querySelector('form').onsubmit = function (e) {\n        e.preventDefault();\n\
+    \        emit('save_section', { id: s.id || null, title: e.target.title.value, description: e.target.description.value\
+    \ }).then(function (res) { apply(res, d, 'Section saved'); });\n      };\n    }\n    function itemEditor(i, sid) {\n \
+    \     i = i || { name: '', description: '', price: '', tags: [], available: true };\n      var d = PP.modal('<div class=\"\
+    eyebrow\">' + (i.id ? 'Edit dish' : 'New dish') + '</div><h2>' + (i.id ? esc(i.name) : 'Add a dish') + '</h2>' +\n   \
+    \     '<form class=\"stack\"><div class=\"grid2\" style=\"grid-template-columns:2fr 1fr\"><div><label class=\"f\">Name</label><input\
+    \ type=\"text\" name=\"name\" maxlength=\"120\" required value=\"' + esc(i.name) + '\"></div>' +\n          '<div><label\
+    \ class=\"f\">Price</label><input type=\"text\" name=\"price\" maxlength=\"30\" placeholder=\"€18\" value=\"' + esc(i.price)\
+    \ + '\"></div></div>' +\n        '<div><label class=\"f\">Description <span class=\"faint\">(optional)</span></label><textarea\
+    \ name=\"description\" maxlength=\"500\" style=\"min-height:70px\">' + esc(i.description) + '</textarea></div>' +\n  \
+    \      '<div><label class=\"f\">Section</label><select name=\"section\">' + D.sections.map(function (s) { return '<option\
+    \ value=\"' + esc(s.id) + '\"' + (s.id === sid ? ' selected' : '') + '>' + esc(s.title) + '</option>'; }).join('') + '</select></div>'\
+    \ +\n        '<div><label class=\"f\">Labels</label><div class=\"chips\">' + Object.keys(D.tags).map(function (t) {\n\
+    \          return '<button type=\"button\" class=\"chip' + (i.tags.indexOf(t) >= 0 ? ' on' : '') + '\" data-tag=\"' +\
+    \ t + '\" title=\"' + esc(D.tags[t]) + '\">' + esc(t) + ' · ' + esc(D.tags[t]) + '</button>'; }).join('') + '</div></div>'\
+    \ +\n        '<label class=\"check\"><input type=\"checkbox\" name=\"available\"' + (i.available ? ' checked' : '') +\
+    \ '><span>Available today</span></label>' +\n        '<div data-el=\"msg\"></div><div class=\"foot\">' + (i.id ? '<button\
+    \ type=\"button\" class=\"btn danger\" data-del>Delete dish</button><span class=\"spacer\"></span>' : '') +\n        \
+    \  '<button type=\"button\" class=\"btn\" data-close>Cancel</button><button class=\"btn primary\" type=\"submit\">Save</button></div></form>',\
     \ { wide: true });\n      d.el.addEventListener('click', function (e) { var t = e.target.closest('[data-tag]'); if (t)\
     \ t.classList.toggle('on'); });\n      var del = d.el.querySelector('[data-del]');\n      if (del) del.onclick = function\
     \ () { emit('delete_item', { id: i.id }).then(function (res) { apply(res, d, 'Dish deleted'); }); };\n      d.el.querySelector('form').onsubmit\

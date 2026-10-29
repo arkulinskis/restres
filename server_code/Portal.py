@@ -438,6 +438,18 @@ def get_tables(rid):
     return _tables_reply(_rest(rid, "manager"))
 
 
+def _free_spot(existing):
+    """Where a new table goes on the floor plan (x, y in %, the table's centre): the first spot on a roomy grid
+    that no table is near, so new tables don't land on top of each other (or on one the manager moved there)."""
+    taken = [(float(t["x"] or 0), float(t["y"] or 0)) for t in existing]
+    for y in (14, 38, 62, 86):
+        for x in (12, 30, 48, 66, 84):
+            if all(abs(x - tx) >= 14 or abs(y - ty) >= 18 for tx, ty in taken):
+                return float(x), float(y)
+    n = len(existing)  # the room is full: stagger near the middle so the new table is easy to spot and drag
+    return float(40 + (n * 3) % 20), float(40 + (n * 5) % 20)
+
+
 @anvil.server.callable(require_user=True)
 def save_table(rid, data):
     r = _rest(rid, "manager")
@@ -445,7 +457,10 @@ def save_table(rid, data):
     existing = list(app_tables.dining_tables.search(restaurant=r))
     fields = {}
     if "name" in data or not data.get("id"):
-        name = str(data.get("name") or "").strip()[:20] or "T%d" % (len(existing) + 1)
+        name = str(data.get("name") or "").strip()[:20]
+        if not name:  # the first free T<n> (counting tables would repeat a name after a delete)
+            names = set(t["name"].lower() for t in existing)
+            name = next("T%d" % n for n in range(1, len(existing) + 2) if ("t%d" % n) not in names)
         if any(t["name"].lower() == name.lower() and t.get_id() != data.get("id") for t in existing):
             return {"ok": False, "error": "There is already a table called %s." % name}
         fields["name"] = name
@@ -469,9 +484,11 @@ def save_table(rid, data):
     else:
         fields.setdefault("shape", "square")
         fields.setdefault("min_party", 1)
-        fields.setdefault("x", 10 + (len(existing) * 13) % 80)
-        fields.setdefault("y", 12 + ((len(existing) * 13) // 80) * 22 % 80)
-        app_tables.dining_tables.add_row(restaurant=r, position=len(existing), active=True, area=fields.pop("area", ""), **fields)
+        if "x" not in fields or "y" not in fields:
+            fields["x"], fields["y"] = _free_spot(existing)
+        last = max([int(t["position"] or 0) for t in existing] or [-1])  # after a delete, len() would repeat a position
+        row = app_tables.dining_tables.add_row(restaurant=r, position=last + 1, active=True, area=fields.pop("area", ""), **fields)
+        return dict(_tables_reply(r), new_id=row.get_id())
     return _tables_reply(r)
 
 
@@ -504,8 +521,12 @@ def save_positions(rid, positions):
 @anvil.server.callable(require_user=True)
 def save_join(rid, data):
     """Join two or more tables into one bookable table for some hours of the day, on some weekdays."""
-    r = _rest(rid, "manager")
-    data = dict(data or {})
+    return _save_join(_rest(rid, "manager"), dict(data or {}))
+
+
+@tables.in_transaction
+def _save_join(r, data):
+    # in a transaction, so two quick saves can't both pass the overlap check below
     ctx = B.Ctx(r)
     ids = [i for i in dict.fromkeys(data.get("tables") or []) if i in {t.get_id() for t in ctx.all_tables}]
     if len(ids) < 2:

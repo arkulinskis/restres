@@ -24,9 +24,13 @@ def _days(ctx):
     """Every date guests can pick, each marked open or closed."""
     earliest, last = B.booking_window(ctx)
     d, out = earliest.date(), []
+    soon = earliest.hour * 60 + earliest.minute
     while d <= last:
         iv, src = B.day_hours(ctx, d)
-        out.append({"date": d.isoformat(), "open": bool(iv)})
+        is_open = bool(iv)
+        if is_open and d == earliest.date():  # the first day counts only while a start time is still bookable
+            is_open = any(t >= soon for t in B.start_times(ctx, d))
+        out.append({"date": d.isoformat(), "open": is_open})
         d += timedelta(days=1)
     return out
 
