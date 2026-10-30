@@ -8,12 +8,13 @@ from anvil.js import window
 APP_NAME = "PlanPlate"
 
 
-def mount(form, name, data, on_event=None):
+def mount(form, name, data, on_event=None, rid=None):
     """Draw component `name` inside `form` and route its events to on_event(event, payload).
 
     Data goes to JS as a JSON string, so pass only JSON-friendly values (the server already turns
     dates into ISO strings). Whatever on_event returns (a dict, or None) resolves the component's
     Promise. Returns the component's JS API object.
+    With `rid` (a restaurant id), the photo events (media_*, from PP.upload / PP.mediaPicker) are answered here.
     """
     selector = '[data-pp-root="%s"]' % name
     node = anvil.js.get_dom_node(form)
@@ -22,6 +23,8 @@ def mount(form, name, data, on_event=None):
 
     def emit(event, payload_json):
         payload = json.loads(payload_json) if payload_json else {}
+        if rid and event.startswith("media_"):
+            return media_event(rid, event, payload)
         if event == "go":  # every portal page can navigate (sub-nav tabs, restaurant switcher)
             from anvil import get_open_form
             get_open_form().go(payload.get("page", "dashboard"), restaurant_id=payload.get("restaurant_id"))
@@ -60,3 +63,29 @@ def browser_timezone():
 
 def set_title(text):
     window.document.title = text
+
+
+def media_event(rid, event, p):
+    """Uploads and the photo list for PP.upload / PP.mediaPicker (see native_libraries.html)."""
+    if event == "media_ticket":
+        return call("media_ticket", rid, p.get("kind") or "image")
+    if event == "media_register":
+        return call("register_upload", rid, p.get("info"), p.get("meta"))
+    if event == "media_upload":
+        return call("upload_photo", rid, p)
+    if event == "media_video":
+        media = anvil.js.to_media(window.PP._file)  # the File the browser picked, sent as Anvil Media (not JSON)
+        window.PP._file = None
+        return call("upload_video", rid, media, p)
+    if event == "media_list":
+        try:
+            return anvil.server.call_s("get_media", rid)
+        except Exception:
+            return {"ok": False, "photos": []}
+    return None
+
+
+def download(media):
+    """Save a file the server made (e.g. the website .zip) on the user's device."""
+    import anvil.media
+    anvil.media.download(media)

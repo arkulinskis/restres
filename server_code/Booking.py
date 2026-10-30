@@ -185,6 +185,7 @@ class Ctx(object):
         self.by_id = {t.get_id(): t for t in self.tables}
         self.joins = sorted(app_tables.table_joins.search(restaurant=r), key=_created_key)
         self.total_seats = sum(int(t["seats"] or 0) for t in self.tables)
+        self.events = sorted(app_tables.events.search(restaurant=r), key=lambda e: (e["date"], int(e["start_min"] or 0)))
         self._res = {}
 
     def reservations(self, d):
@@ -230,11 +231,52 @@ def is_open_at(ctx, d, t):
     return any(o <= t < c for o, c in day_hours(ctx, d)[0])
 
 
+# ---------------------------------------------------------------- events
+def events_on(ctx, d):
+    return [e for e in ctx.events if e["date"] == d]
+
+
+def setup_at(ctx, d, t):
+    """The event whose own room set-up applies at minute t of date d, or None (the everyday layout applies)."""
+    for e in events_on(ctx, d):
+        if e["layout"] is not None and int(e["start_min"] or 0) <= t < int(e["end_min"] or 0):
+            return e
+    return None
+
+
+def blocked(ctx, d, t, dur):
+    """True if a private event closes online booking for any part of [t, t+dur) on date d."""
+    return any(e["blocks"] and int(e["start_min"] or 0) < t + dur and t < int(e["end_min"] or 0) for e in events_on(ctx, d))
+
+
+def _event_units(ctx, ev):
+    removed = set(ev["removed"] or [])
+    used, units = set(), []
+    for g in ev["groups"] or []:
+        ids = [i for i in (g.get("tables") or []) if i in ctx.by_id and i not in removed and i not in used]
+        if len(ids) < 2:
+            continue
+        used |= set(ids)
+        rows = [ctx.by_id[i] for i in ids]
+        units.append({"ids": ids, "join_id": None, "seats": int(g.get("seats") or sum(int(x["seats"] or 0) for x in rows)),
+                      "min": max(1, min(int(x["min_party"] or 1) for x in rows)),
+                      "label": g.get("label") or " + ".join(x["name"] for x in rows)})
+    for tb in ctx.tables:
+        if tb.get_id() not in used and tb.get_id() not in removed:
+            units.append({"ids": [tb.get_id()], "join_id": None, "seats": int(tb["seats"] or 0),
+                          "min": int(tb["min_party"] or 1), "label": tb["name"]})
+    return units
+
+
 # ---------------------------------------------------------------- table layout
 def units_at(ctx, d, t):
     """The bookable units at minute t of date d: each active join, then every table not in one.
     A join is active when its hours include the hour of t and its days include d's weekday
-    (no days = every day). A table can only be in one active join; the older join wins."""
+    (no days = every day). A table can only be in one active join; the older join wins.
+    During an event with its own room set-up, that set-up's groups and removed tables apply instead."""
+    ev = setup_at(ctx, d, int(t))
+    if ev is not None:
+        return _event_units(ctx, ev)
     hour, wd = min(int(t) // 60, 23), d.weekday()
     used, units = set(), []
     for j in ctx.joins:
@@ -309,14 +351,16 @@ def booking_window(ctx):
 
 
 def start_times(ctx, d):
-    """Every start time (minutes) the form offers on date d, ignoring tables."""
+    """Every start time (minutes) the form offers on date d, ignoring tables. Times that would overlap a
+    private event (one that closes online booking) are left out."""
     r = ctx.r
-    step, last = setting(r, "slot_min"), setting(r, "last_booking_min")
+    step, last, dur = setting(r, "slot_min"), setting(r, "last_booking_min"), setting(r, "duration_min")
     out = []
     for o, c in day_hours(ctx, d)[0]:
         t = o
         while t <= c - last:
-            out.append(t)
+            if not blocked(ctx, d, t, dur):
+                out.append(t)
             t += step
     return out
 

@@ -218,7 +218,8 @@ def delete_restaurant(rid, confirm_name):
     if str(confirm_name or "").strip() != r["name"]:
         return {"ok": False, "error": "Type the restaurant's name exactly to confirm."}
     for table in (app_tables.reservations, app_tables.periods, app_tables.special_days, app_tables.dining_tables, app_tables.table_joins,
-                  app_tables.members, app_tables.menu_items, app_tables.menu_sections):
+                  app_tables.members, app_tables.menu_items, app_tables.menu_sections, app_tables.specials, app_tables.posts,
+                  app_tables.events, app_tables.sites, app_tables.photos):
         for row in list(table.search(restaurant=r)):
             row.delete()
     r.delete()
@@ -620,6 +621,9 @@ def get_day(rid, day=None):
         "summary": {"bookings": len(live), "covers": sum(int(x["party"] or 0) for x in live), "peak": peak,
                     "pending_today": len([x for x in live if x["status"] == "pending"])},
         "curve": curve, "pending": pending,
+        "events": [{"id": e.get_id(), "title": e["title"] or "", "start": B.hm(int(e["start_min"] or 0)), "end": B.hm(int(e["end_min"] or 0)),
+                    "kind": e["kind"] or "public", "blocks": bool(e["blocks"]), "guests": int(e["guests"] or 0),
+                    "setup": e["layout"] is not None} for e in B.events_on(ctx, d)],
         "settings": {"duration_min": B.setting(r, "duration_min"), "slot_min": step, "auto_threshold": B.setting(r, "auto_threshold")},
     }
 

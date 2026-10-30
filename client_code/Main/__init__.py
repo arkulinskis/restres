@@ -16,6 +16,10 @@ import anvil.js
 from .. import pp_ui, legal
 from ..AuthPage import AuthPage
 from ..DashboardPage import DashboardPage
+from ..TodayPage import TodayPage
+from ..EventsPage import EventsPage
+from ..GalleryPage import GalleryPage
+from ..SitePage import SitePage
 from ..ReservationsPage import ReservationsPage
 from ..HoursPage import HoursPage
 from ..TablesPage import TablesPage
@@ -28,12 +32,18 @@ from ..ManagePage import ManagePage
 PAGES = {
     "auth": AuthPage,
     "dashboard": DashboardPage,
+    "today": TodayPage,
     "reservations": ReservationsPage,
     "hours": HoursPage,
     "tables": TablesPage,
+    "events": EventsPage,
     "menu": MenuEditPage,
+    "gallery": GalleryPage,
+    "website": SitePage,
     "settings": SettingsPage,
 }
+
+RESTAURANT_PAGES = ("today", "reservations", "hours", "tables", "events", "menu", "gallery", "website", "settings")
 
 
 def _route():
@@ -81,7 +91,7 @@ class Main(MainTemplate):
         if page != "auth" and not anvil.users.get_user():
             page, kwargs = "auth", {}
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
-        if page in ("reservations", "hours", "tables", "menu", "settings") and not kwargs.get("restaurant_id"):
+        if page in RESTAURANT_PAGES and not kwargs.get("restaurant_id"):
             page, kwargs = "dashboard", {}
         self.clear()
         self.add_component(PAGES[page](**kwargs))

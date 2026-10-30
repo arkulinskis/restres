@@ -18,7 +18,7 @@ class DashboardPage(DashboardPageTemplate):
 
     def _on_event(self, event, p):
         if event == "open":
-            get_open_form().go(p.get("page", "reservations"), restaurant_id=p["id"])
+            get_open_form().go(p.get("page", "today"), restaurant_id=p["id"])
         elif event == "create":
             res = pp_ui.call("create_restaurant", p.get("name"), p.get("timezone") or pp_ui.browser_timezone(), bool(p.get("sample")))
             if res.get("ok"):
