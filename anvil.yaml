@@ -1503,24 +1503,27 @@ native_deps:
     \   var fn = PP.components[name];\n    if (!fn) { console.error('PP component not loaded: ' + name); return null; }\n\
     \    if (!root) { console.error('PP mount: no root node for ' + name); return null; }\n    var data = typeof json ===\
     \ 'string' ? JSON.parse(json || '{}') : (json || {});\n    return fn(root, data, PP.wrapEmit(emit));\n  };\n})();\n</script>\n\
-    \n<!-- ===== Main component ===== -->\n<style>\n.pp-header { position: sticky; top: 0; z-index: 50; background: color-mix(in\
-    \ srgb, var(--pp-bg) 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom:\
-    \ 1px solid var(--pp-line); }\n.pp-header .in { max-width: 1120px; margin: 0 auto; padding: 12px 20px; display: flex;\
-    \ align-items: center; gap: 18px; }\n.pp-header .brand { all: unset; cursor: pointer; display: flex; align-items: center;\
-    \ gap: 10px; color: var(--pp-ink); }\n.pp-header .brand .mark { width: 28px; height: 28px; color: var(--pp-brass); }\n\
-    .pp-header .brand .name { font-family: var(--pp-serif); font-size: 1.45rem; font-weight: 600; letter-spacing: .01em; line-height:\
-    \ 1; }\n.pp-header nav { display: flex; gap: 2px; }\n.pp-header nav button { all: unset; cursor: pointer; color: var(--pp-muted);\
-    \ padding: 7px 12px; border-radius: 99px; font-size: .9rem; }\n.pp-header nav button.on, .pp-header nav button:hover {\
-    \ color: var(--pp-ink); background: var(--pp-panel-2); }\n.pp-header .right { margin-left: auto; display: flex; align-items:\
-    \ center; gap: 6px; position: relative; }\n.pp-header .bell { position: relative; }\n.pp-header .bell .n { position: absolute;\
-    \ top: 1px; right: 0; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 99px; background: var(--pp-warn);\
-    \ color: #fff; font: 600 .66rem/17px var(--pp-sans); text-align: center; }\n.pp-header .me { all: unset; cursor: pointer;\
-    \ width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--pp-ink); color:\
-    \ var(--pp-bg); font: 600 .8rem var(--pp-sans); }\n.pp-header .me:focus-visible { outline: 2px solid var(--pp-brass);\
-    \ outline-offset: 2px; }\n.pp-header .menu { position: absolute; right: 0; top: calc(100% + 10px); width: 300px; padding:\
-    \ 8px; z-index: 60; }\n.pp-header .menu.alerts { width: 360px; }\n.pp-header .menu .who { padding: 8px 10px 12px; border-bottom:\
-    \ 1px solid var(--pp-line); margin-bottom: 6px; }\n.pp-header .menu .item { all: unset; box-sizing: border-box; cursor:\
-    \ pointer; display: block; width: 100%; padding: 9px 10px; border-radius: 8px; font-size: .9rem; }\n.pp-header .menu .item:hover\
+    \n<!-- Prepsto feedback panel: the footer's \"Suggest an idea\" link (data-prepsto-open) slides it in. No floating button,\
+    \ no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->\n<script src=\"https://prepsto.com/_/theme/widget.js\"\
+    \ data-prepsto=\"3jhqeaj\" data-button=\"false\" data-label=\"Suggest an idea\" async></script>\n\n<!-- ===== Main component\
+    \ ===== -->\n<style>\n.pp-header { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--pp-bg)\
+    \ 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--pp-line);\
+    \ }\n.pp-header .in { max-width: 1120px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap:\
+    \ 18px; }\n.pp-header .brand { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; color: var(--pp-ink);\
+    \ }\n.pp-header .brand .mark { width: 28px; height: 28px; color: var(--pp-brass); }\n.pp-header .brand .name { font-family:\
+    \ var(--pp-serif); font-size: 1.45rem; font-weight: 600; letter-spacing: .01em; line-height: 1; }\n.pp-header nav { display:\
+    \ flex; gap: 2px; }\n.pp-header nav button { all: unset; cursor: pointer; color: var(--pp-muted); padding: 7px 12px; border-radius:\
+    \ 99px; font-size: .9rem; }\n.pp-header nav button.on, .pp-header nav button:hover { color: var(--pp-ink); background:\
+    \ var(--pp-panel-2); }\n.pp-header .right { margin-left: auto; display: flex; align-items: center; gap: 6px; position:\
+    \ relative; }\n.pp-header .bell { position: relative; }\n.pp-header .bell .n { position: absolute; top: 1px; right: 0;\
+    \ min-width: 17px; height: 17px; padding: 0 4px; border-radius: 99px; background: var(--pp-warn); color: #fff; font: 600\
+    \ .66rem/17px var(--pp-sans); text-align: center; }\n.pp-header .me { all: unset; cursor: pointer; width: 34px; height:\
+    \ 34px; border-radius: 50%; display: grid; place-items: center; background: var(--pp-ink); color: var(--pp-bg); font:\
+    \ 600 .8rem var(--pp-sans); }\n.pp-header .me:focus-visible { outline: 2px solid var(--pp-brass); outline-offset: 2px;\
+    \ }\n.pp-header .menu { position: absolute; right: 0; top: calc(100% + 10px); width: 300px; padding: 8px; z-index: 60;\
+    \ }\n.pp-header .menu.alerts { width: 360px; }\n.pp-header .menu .who { padding: 8px 10px 12px; border-bottom: 1px solid\
+    \ var(--pp-line); margin-bottom: 6px; }\n.pp-header .menu .item { all: unset; box-sizing: border-box; cursor: pointer;\
+    \ display: block; width: 100%; padding: 9px 10px; border-radius: 8px; font-size: .9rem; }\n.pp-header .menu .item:hover\
     \ { background: var(--pp-panel-2); }\n.pp-header .menu .item .sub { display: block; color: var(--pp-muted); font-size:\
     \ .8rem; }\n.pp-header .menu .head { padding: 8px 10px; font-weight: 600; font-size: .9rem; }\n.pp-header .menu .none\
     \ { padding: 8px 10px 12px; color: var(--pp-muted); font-size: .88rem; }\n.pp-header .menu .themes { padding: 6px 10px\
