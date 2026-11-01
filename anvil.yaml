@@ -999,7 +999,7 @@ metadata:
   title: 'PlanPlate: restaurant reservations, floor plans and websites'
 name: PlanPlate
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=86525c60a2\"></script>\n\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/restres.json\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=624baf9244\"></script>\n\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/restres.json\
     \ and run seo.py, not here) -->\n<link rel=\"canonical\" href=\"https://planplate-test.anvil.app/\">\n<meta name=\"robots\"\
     \ content=\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\">\n<meta name=\"keywords\" content=\"\
     restaurant reservation system, online table booking, restaurant booking widget, restaurant floor plan software, table\
