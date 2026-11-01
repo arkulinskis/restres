@@ -994,14 +994,51 @@ db_schema:
     server: full
     title: Users
 metadata:
-  title: PlanPlate 2.0
+  description: 'Run bookings for all your restaurants: opening hours, a drag-and-drop floor plan, automatic approvals, menus,
+    specials, events and a booking form for your website.'
+  title: 'PlanPlate: restaurant reservations, floor plans and websites'
 name: PlanPlate
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=86525c60a2\"></script>\n\n<!--\n  PLANPLATE — SHARED THEME + CORE HELPERS\n\
-    \  Goes into: Anvil → Native Libraries (tools/sync_to_anvil.py does this).\n  Fonts, colour tokens (light + dark), base\
-    \ styles every component uses, and window.PP.\n  Look: ivory paper, warm ink, a brass accent. Serif display type, quiet\
-    \ sans for the interface.\n-->\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\"\
-    \ href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap\"\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=86525c60a2\"></script>\n\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/restres.json\
+    \ and run seo.py, not here) -->\n<link rel=\"canonical\" href=\"https://planplate-test.anvil.app/\">\n<meta name=\"robots\"\
+    \ content=\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\">\n<meta name=\"keywords\" content=\"\
+    restaurant reservation system, online table booking, restaurant booking widget, restaurant floor plan software, table\
+    \ management, restaurant website builder, multi-location restaurant software, restaurant menu QR code, waitlist and approvals\"\
+    >\n<meta name=\"author\" content=\"Arkvital\">\n<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:site_name\"\
+    \ content=\"PlanPlate\">\n<meta property=\"og:title\" content=\"PlanPlate: restaurant reservations, floor plans and websites\"\
+    >\n<meta property=\"og:description\" content=\"Run bookings for all your restaurants: opening hours, a drag-and-drop floor\
+    \ plan, automatic approvals, menus, specials, events and a booking form for your website.\">\n<meta property=\"og:locale\"\
+    \ content=\"en_CA\">\n<meta property=\"og:url\" content=\"https://planplate-test.anvil.app/\">\n<meta property=\"og:image\"\
+    \ content=\"https://planplate-test.anvil.app/_/theme/og-image.png\">\n<meta property=\"og:image:width\" content=\"1200\"\
+    ><meta property=\"og:image:height\" content=\"630\">\n<meta property=\"og:image:alt\" content=\"PlanPlate: Reservations,\
+    \ floor plans, menus and a website for every restaurant you run\">\n<meta name=\"twitter:card\" content=\"summary_large_image\"\
+    >\n<meta name=\"twitter:title\" content=\"PlanPlate: restaurant reservations, floor plans and websites\">\n<meta name=\"\
+    twitter:description\" content=\"Run bookings for all your restaurants: opening hours, a drag-and-drop floor plan, automatic\
+    \ approvals, menus, specials, events and a booking form for your website.\">\n<meta name=\"twitter:image\" content=\"\
+    https://planplate-test.anvil.app/_/theme/og-image.png\">\n<link rel=\"alternate\" type=\"text/plain\" title=\"PlanPlate\
+    \ for AI assistants\" href=\"https://planplate-test.anvil.app/llms.txt\">\n<script type=\"application/ld+json\">{\"@context\"\
+    : \"https://schema.org\", \"@graph\": [{\"@type\": \"WebApplication\", \"@id\": \"https://planplate-test.anvil.app/#app\"\
+    , \"name\": \"PlanPlate\", \"url\": \"https://planplate-test.anvil.app/\", \"description\": \"Run bookings for all your\
+    \ restaurants: opening hours, a drag-and-drop floor plan, automatic approvals, menus, specials, events and a booking form\
+    \ for your website.\", \"image\": \"https://planplate-test.anvil.app/_/theme/og-image.png\", \"inLanguage\": \"en\", \"\
+    publisher\": {\"@id\": \"https://arkvital.com/#org\"}, \"keywords\": \"restaurant reservation system, online table booking,\
+    \ restaurant booking widget, restaurant floor plan software, table management, restaurant website builder, multi-location\
+    \ restaurant software, restaurant menu QR code, waitlist and approvals\", \"applicationCategory\": \"BusinessApplication\"\
+    , \"operatingSystem\": \"Any (web browser)\", \"browserRequirements\": \"Requires JavaScript and a modern web browser\"\
+    , \"featureList\": [\"Opening periods and special days with a month calendar\", \"Drag-and-drop floor plan; join and split\
+    \ tables by hour and weekday\", \"Automatic confirmation until the restaurant is 80% booked, approvals for the rest\"\
+    , \"Booking link, button, iframe and QR codes for your website\", \"Menus, specials, photo of the day, events and a photo\
+    \ gallery\", \"Guest emails: confirmations, requests, declines and cancellations\", \"Team roles for owners, managers\
+    \ and staff\"], \"audience\": {\"@type\": \"Audience\", \"audienceType\": \"Restaurant owners and managers, from one restaurant\
+    \ to about ten\"}}, {\"@type\": \"WebSite\", \"@id\": \"https://planplate-test.anvil.app/#site\", \"url\": \"https://planplate-test.anvil.app/\"\
+    , \"name\": \"PlanPlate\", \"publisher\": {\"@id\": \"https://arkvital.com/#org\"}}, {\"@type\": \"Organization\", \"\
+    @id\": \"https://arkvital.com/#org\", \"name\": \"Arkvital\", \"url\": \"https://arkvital.com\", \"email\": \"arkvital@outlook.com\"\
+    , \"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"Montreal\", \"addressRegion\": \"QC\", \"addressCountry\"\
+    : \"CA\"}}]}</script>\n<!-- seo:end -->\n<!--\n  PLANPLATE — SHARED THEME + CORE HELPERS\n  Goes into: Anvil → Native\
+    \ Libraries (tools/sync_to_anvil.py does this).\n  Fonts, colour tokens (light + dark), base styles every component uses,\
+    \ and window.PP.\n  Look: ivory paper, warm ink, a brass accent. Serif display type, quiet sans for the interface.\n-->\n\
+    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\"\
+    \ crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap\"\
     \ rel=\"stylesheet\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<!-- Browser tab icon:\
     \ the PlanPlate mark (a plate from above), brass on ink. Anvil's default icon is removed. -->\n<link id=\"pp-favicon\"\
     \ rel=\"icon\" type=\"image/svg+xml\" href=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0\
