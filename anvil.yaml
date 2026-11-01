@@ -997,7 +997,7 @@ metadata:
   title: PlanPlate 2.0
 name: PlanPlate
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=a1cf44dd0d\"></script>\n\n<!--\n  PLANPLATE — SHARED THEME + CORE HELPERS\n\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=86525c60a2\"></script>\n\n<!--\n  PLANPLATE — SHARED THEME + CORE HELPERS\n\
     \  Goes into: Anvil → Native Libraries (tools/sync_to_anvil.py does this).\n  Fonts, colour tokens (light + dark), base\
     \ styles every component uses, and window.PP.\n  Look: ivory paper, warm ink, a brass accent. Serif display type, quiet\
     \ sans for the interface.\n-->\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\"\
@@ -1503,80 +1503,80 @@ native_deps:
     \   var fn = PP.components[name];\n    if (!fn) { console.error('PP component not loaded: ' + name); return null; }\n\
     \    if (!root) { console.error('PP mount: no root node for ' + name); return null; }\n    var data = typeof json ===\
     \ 'string' ? JSON.parse(json || '{}') : (json || {});\n    return fn(root, data, PP.wrapEmit(emit));\n  };\n})();\n</script>\n\
-    \n<!-- Prepsto feedback panel: the footer's \"Suggest an idea\" link (data-prepsto-open) slides it in. No floating button,\
-    \ no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->\n<script src=\"https://prepsto.com/_/theme/widget.js\"\
-    \ data-prepsto=\"3jhqeaj\" data-button=\"false\" data-label=\"Suggest an idea\" async></script>\n\n<!-- ===== Main component\
-    \ ===== -->\n<style>\n.pp-header { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--pp-bg)\
-    \ 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--pp-line);\
-    \ }\n.pp-header .in { max-width: 1120px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap:\
-    \ 18px; }\n.pp-header .brand { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; color: var(--pp-ink);\
-    \ }\n.pp-header .brand .mark { width: 28px; height: 28px; color: var(--pp-brass); }\n.pp-header .brand .name { font-family:\
-    \ var(--pp-serif); font-size: 1.45rem; font-weight: 600; letter-spacing: .01em; line-height: 1; }\n.pp-header nav { display:\
-    \ flex; gap: 2px; }\n.pp-header nav button { all: unset; cursor: pointer; color: var(--pp-muted); padding: 7px 12px; border-radius:\
-    \ 99px; font-size: .9rem; }\n.pp-header nav button.on, .pp-header nav button:hover { color: var(--pp-ink); background:\
-    \ var(--pp-panel-2); }\n.pp-header .right { margin-left: auto; display: flex; align-items: center; gap: 6px; position:\
-    \ relative; }\n.pp-header .bell { position: relative; }\n.pp-header .bell .n { position: absolute; top: 1px; right: 0;\
-    \ min-width: 17px; height: 17px; padding: 0 4px; border-radius: 99px; background: var(--pp-warn); color: #fff; font: 600\
-    \ .66rem/17px var(--pp-sans); text-align: center; }\n.pp-header .me { all: unset; cursor: pointer; width: 34px; height:\
-    \ 34px; border-radius: 50%; display: grid; place-items: center; background: var(--pp-ink); color: var(--pp-bg); font:\
-    \ 600 .8rem var(--pp-sans); }\n.pp-header .me:focus-visible { outline: 2px solid var(--pp-brass); outline-offset: 2px;\
-    \ }\n.pp-header .menu { position: absolute; right: 0; top: calc(100% + 10px); width: 300px; padding: 8px; z-index: 60;\
-    \ }\n.pp-header .menu.alerts { width: 360px; }\n.pp-header .menu .who { padding: 8px 10px 12px; border-bottom: 1px solid\
-    \ var(--pp-line); margin-bottom: 6px; }\n.pp-header .menu .item { all: unset; box-sizing: border-box; cursor: pointer;\
-    \ display: block; width: 100%; padding: 9px 10px; border-radius: 8px; font-size: .9rem; }\n.pp-header .menu .item:hover\
-    \ { background: var(--pp-panel-2); }\n.pp-header .menu .item .sub { display: block; color: var(--pp-muted); font-size:\
-    \ .8rem; }\n.pp-header .menu .head { padding: 8px 10px; font-weight: 600; font-size: .9rem; }\n.pp-header .menu .none\
-    \ { padding: 8px 10px 12px; color: var(--pp-muted); font-size: .88rem; }\n.pp-header .menu .themes { padding: 6px 10px\
-    \ 10px; }\n.pp-page { min-height: calc(100vh - 140px); }\n.pp-public .pp-page { min-height: 0; }\n.pp-footer a { color:\
-    \ inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }\n.pp-footer { max-width: 1120px;\
-    \ margin: 0 auto; padding: 22px 20px 34px; color: var(--pp-faint); font-size: .78rem; text-align: center; letter-spacing:\
-    \ .04em; }\n@media (max-width: 560px) {\n  .pp-header .in { gap: 8px; padding: 10px 14px; } .pp-header nav { display:\
-    \ none; }\n  .pp-header .menu, .pp-header .menu.alerts { position: fixed; left: 12px; right: 12px; top: 60px; width: auto;\
-    \ }\n}\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.define('header', function (root, data, emit) {\n\
-    \    var esc = PP.esc;\n    var S = { user: null, active: 'dashboard', open: null, alerts: { pending: 0, items: [] } };\n\
-    \n    function initials(u) {\n      var n = String(u.display_name || u.email || '?').trim().split(/\\s+/);\n      return\
-    \ ((n[0] || '?')[0] + (n.length > 1 ? n[n.length - 1][0] : '')).toUpperCase();\n    }\n    function alertsMenu() {\n \
-    \     var a = S.alerts;\n      return '<div class=\"menu alerts card fade-in\" role=\"menu\"><div class=\"head\">Awaiting\
-    \ your approval</div>' +\n        (a.items.length ? a.items.map(function (i) {\n          return '<button class=\"item\"\
-    \ data-action=\"alert\" data-r=\"' + esc(i.restaurant_id) + '\" data-date=\"' + esc(i.date) + '\">' +\n            '<strong>'\
-    \ + esc(i.name) + '</strong> · ' + PP.plural(i.party, 'guest') +\n            '<span class=\"sub\">' + esc(i.restaurant)\
-    \ + ' · ' + esc(PP.fmtShort(i.date)) + ' at ' + esc(i.time) + '</span></button>';\n        }).join('') + (a.pending >\
-    \ a.items.length ? '<div class=\"none\">and ' + (a.pending - a.items.length) + ' more</div>' : '')\n          : '<div\
-    \ class=\"none\">Nothing to approve. New requests show up here when a booking needs a decision.</div>') + '</div>';\n\
-    \    }\n    function userMenu() {\n      var u = S.user, t = PP.theme();\n      return '<div class=\"menu card fade-in\"\
-    \ role=\"menu\"><div class=\"who\"><strong>' + esc(u.display_name) + '</strong><div class=\"muted small\">' + esc(u.email)\
-    \ + '</div></div>' +\n        '<div class=\"themes\"><div class=\"small muted\" style=\"margin-bottom:6px\">Appearance</div><div\
-    \ class=\"seg\">' +\n          ['auto', 'light', 'dark'].map(function (k) { return '<button data-action=\"theme\" data-t=\"\
-    ' + k + '\" class=\"' + (t === k ? 'on' : '') + '\">' + k[0].toUpperCase() + k.slice(1) + '</button>'; }).join('') + '</div></div>'\
-    \ +\n        '<button class=\"item\" data-action=\"nav\" data-page=\"dashboard\">Your restaurants</button>' +\n      \
-    \  '<button class=\"item\" data-lk-open=\"overview\">Privacy &amp; Terms</button>' +\n        '<button class=\"item\"\
-    \ data-action=\"signout\">Sign out</button></div>';\n    }\n    function render() {\n      var u = S.user;\n      document.documentElement.classList.toggle('pp-signed-out',\
-    \ !u);\n      document.title = (S.alerts.pending ? '(' + S.alerts.pending + ') ' : '') + 'PlanPlate';\n      if (!u) {\
-    \ root.innerHTML = ''; return; }\n      root.innerHTML = '<header class=\"pp-header\"><div class=\"in\">' +\n        '<button\
-    \ class=\"brand\" data-action=\"nav\" data-page=\"dashboard\" aria-label=\"PlanPlate home\">' + PP.mark() + '<span class=\"\
-    name\">PlanPlate</span></button>' +\n        '<nav><button data-action=\"nav\" data-page=\"dashboard\" class=\"' + (S.active\
-    \ === 'dashboard' ? 'on' : '') + '\">Restaurants</button></nav>' +\n        '<div class=\"right\">' +\n          '<button\
-    \ class=\"btn ghost icon bell\" data-action=\"alerts\" aria-label=\"Approvals (' + S.alerts.pending + ')\" aria-expanded=\"\
-    ' + (S.open === 'alerts') + '\">' + PP.icon('bell') +\n            (S.alerts.pending ? '<span class=\"n\">' + S.alerts.pending\
-    \ + '</span>' : '') + '</button>' +\n          '<button class=\"me\" data-action=\"menu\" aria-label=\"Account menu\"\
-    \ aria-expanded=\"' + (S.open === 'menu') + '\">' + esc(initials(u)) + '</button>' +\n          (S.open === 'alerts' ?\
-    \ alertsMenu() : S.open === 'menu' ? userMenu() : '') +\n        '</div></div></header>';\n    }\n\n    root.addEventListener('click',\
-    \ function (e) {\n      e.ppHeader = true;\n      var el = e.target.closest('[data-action]');\n      if (!el) return;\n\
-    \      var a = el.dataset.action;\n      if (a === 'alerts' || a === 'menu') { S.open = S.open === a ? null : a; render();\
-    \ return; }\n      if (a === 'theme') { PP.setTheme(el.dataset.t); render(); return; }\n      S.open = null;\n      if\
-    \ (a === 'nav') { S.active = el.dataset.page; render(); emit('nav', { page: el.dataset.page }); }\n      else if (a ===\
-    \ 'alert') { render(); emit('open_alert', { restaurant_id: el.dataset.r, date: el.dataset.date }); }\n      else if (a\
-    \ === 'signout') { render(); emit('signout', {}); }\n    });\n    document.addEventListener('click', function (e) { if\
-    \ (!e.ppHeader && S.open) { S.open = null; render(); } });\n    document.addEventListener('keydown', function (e) { if\
-    \ (e.key === 'Escape' && S.open) { S.open = null; render(); } });\n\n    // New requests arrive while the portal is open:\
-    \ check every minute.\n    setInterval(function () {\n      if (!S.user || document.hidden) return;\n      emit('poll',\
-    \ {}).then(function (a) { if (a && typeof a.pending === 'number') { S.alerts = a; if (!S.open) render(); } }, function\
-    \ () {});\n    }, 60000);\n\n    render();\n    return {\n      setUser: function (json) { var me = json ? JSON.parse(json)\
-    \ : null; S.user = me; if (me && me.alerts) S.alerts = me.alerts; render(); },\n      setActive: function (page) { S.active\
-    \ = page; S.open = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json); render(); }\n \
-    \   };\n  });\n})();\n</script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n/* ---- hero: dark story panel +\
-    \ sign-in box ---- */\n.pp-auth { min-height: min(calc(100vh - 80px), 820px); display: grid; grid-template-columns: 1.1fr\
-    \ 1fr; }\n.pp-auth .side { background: linear-gradient(100deg, rgba(29,27,24,.97) 35%, rgba(29,27,24,.74)), url(_/theme/photo-plate.webp)\
+    \n<!-- Prepsto feedback panel: every \"Submit feedback\" link and button slides it in (it is the only feedback channel).\
+    \ No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->\n<script src=\"\
+    https://prepsto.com/_/theme/widget.js\" data-prepsto=\"3jhqeaj\" data-button=\"false\" data-label=\"Submit feedback\"\
+    \ async></script>\n\n<!-- ===== Main component ===== -->\n<style>\n.pp-header { position: sticky; top: 0; z-index: 50;\
+    \ background: color-mix(in srgb, var(--pp-bg) 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter:\
+    \ blur(12px); border-bottom: 1px solid var(--pp-line); }\n.pp-header .in { max-width: 1120px; margin: 0 auto; padding:\
+    \ 12px 20px; display: flex; align-items: center; gap: 18px; }\n.pp-header .brand { all: unset; cursor: pointer; display:\
+    \ flex; align-items: center; gap: 10px; color: var(--pp-ink); }\n.pp-header .brand .mark { width: 28px; height: 28px;\
+    \ color: var(--pp-brass); }\n.pp-header .brand .name { font-family: var(--pp-serif); font-size: 1.45rem; font-weight:\
+    \ 600; letter-spacing: .01em; line-height: 1; }\n.pp-header nav { display: flex; gap: 2px; }\n.pp-header nav button {\
+    \ all: unset; cursor: pointer; color: var(--pp-muted); padding: 7px 12px; border-radius: 99px; font-size: .9rem; }\n.pp-header\
+    \ nav button.on, .pp-header nav button:hover { color: var(--pp-ink); background: var(--pp-panel-2); }\n.pp-header .right\
+    \ { margin-left: auto; display: flex; align-items: center; gap: 6px; position: relative; }\n.pp-header .bell { position:\
+    \ relative; }\n.pp-header .bell .n { position: absolute; top: 1px; right: 0; min-width: 17px; height: 17px; padding: 0\
+    \ 4px; border-radius: 99px; background: var(--pp-warn); color: #fff; font: 600 .66rem/17px var(--pp-sans); text-align:\
+    \ center; }\n.pp-header .me { all: unset; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; display: grid;\
+    \ place-items: center; background: var(--pp-ink); color: var(--pp-bg); font: 600 .8rem var(--pp-sans); }\n.pp-header .me:focus-visible\
+    \ { outline: 2px solid var(--pp-brass); outline-offset: 2px; }\n.pp-header .menu { position: absolute; right: 0; top:\
+    \ calc(100% + 10px); width: 300px; padding: 8px; z-index: 60; }\n.pp-header .menu.alerts { width: 360px; }\n.pp-header\
+    \ .menu .who { padding: 8px 10px 12px; border-bottom: 1px solid var(--pp-line); margin-bottom: 6px; }\n.pp-header .menu\
+    \ .item { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 9px 10px; border-radius:\
+    \ 8px; font-size: .9rem; }\n.pp-header .menu .item:hover { background: var(--pp-panel-2); }\n.pp-header .menu .item .sub\
+    \ { display: block; color: var(--pp-muted); font-size: .8rem; }\n.pp-header .menu .head { padding: 8px 10px; font-weight:\
+    \ 600; font-size: .9rem; }\n.pp-header .menu .none { padding: 8px 10px 12px; color: var(--pp-muted); font-size: .88rem;\
+    \ }\n.pp-header .menu .themes { padding: 6px 10px 10px; }\n.pp-page { min-height: calc(100vh - 140px); }\n.pp-public .pp-page\
+    \ { min-height: 0; }\n.pp-footer a { color: inherit; cursor: pointer; text-decoration: underline; text-underline-offset:\
+    \ 3px; }\n.pp-footer { max-width: 1120px; margin: 0 auto; padding: 22px 20px 34px; color: var(--pp-faint); font-size:\
+    \ .78rem; text-align: center; letter-spacing: .04em; }\n@media (max-width: 560px) {\n  .pp-header .in { gap: 8px; padding:\
+    \ 10px 14px; } .pp-header nav { display: none; }\n  .pp-header .menu, .pp-header .menu.alerts { position: fixed; left:\
+    \ 12px; right: 12px; top: 60px; width: auto; }\n}\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.define('header',\
+    \ function (root, data, emit) {\n    var esc = PP.esc;\n    var S = { user: null, active: 'dashboard', open: null, alerts:\
+    \ { pending: 0, items: [] } };\n\n    function initials(u) {\n      var n = String(u.display_name || u.email || '?').trim().split(/\\\
+    s+/);\n      return ((n[0] || '?')[0] + (n.length > 1 ? n[n.length - 1][0] : '')).toUpperCase();\n    }\n    function\
+    \ alertsMenu() {\n      var a = S.alerts;\n      return '<div class=\"menu alerts card fade-in\" role=\"menu\"><div class=\"\
+    head\">Awaiting your approval</div>' +\n        (a.items.length ? a.items.map(function (i) {\n          return '<button\
+    \ class=\"item\" data-action=\"alert\" data-r=\"' + esc(i.restaurant_id) + '\" data-date=\"' + esc(i.date) + '\">' +\n\
+    \            '<strong>' + esc(i.name) + '</strong> · ' + PP.plural(i.party, 'guest') +\n            '<span class=\"sub\"\
+    >' + esc(i.restaurant) + ' · ' + esc(PP.fmtShort(i.date)) + ' at ' + esc(i.time) + '</span></button>';\n        }).join('')\
+    \ + (a.pending > a.items.length ? '<div class=\"none\">and ' + (a.pending - a.items.length) + ' more</div>' : '')\n  \
+    \        : '<div class=\"none\">Nothing to approve. New requests show up here when a booking needs a decision.</div>')\
+    \ + '</div>';\n    }\n    function userMenu() {\n      var u = S.user, t = PP.theme();\n      return '<div class=\"menu\
+    \ card fade-in\" role=\"menu\"><div class=\"who\"><strong>' + esc(u.display_name) + '</strong><div class=\"muted small\"\
+    >' + esc(u.email) + '</div></div>' +\n        '<div class=\"themes\"><div class=\"small muted\" style=\"margin-bottom:6px\"\
+    >Appearance</div><div class=\"seg\">' +\n          ['auto', 'light', 'dark'].map(function (k) { return '<button data-action=\"\
+    theme\" data-t=\"' + k + '\" class=\"' + (t === k ? 'on' : '') + '\">' + k[0].toUpperCase() + k.slice(1) + '</button>';\
+    \ }).join('') + '</div></div>' +\n        '<button class=\"item\" data-action=\"nav\" data-page=\"dashboard\">Your restaurants</button>'\
+    \ +\n        '<button class=\"item\" data-lk-open=\"overview\">Privacy &amp; Terms</button>' +\n        '<button class=\"\
+    item\" data-action=\"signout\">Sign out</button></div>';\n    }\n    function render() {\n      var u = S.user;\n    \
+    \  document.documentElement.classList.toggle('pp-signed-out', !u);\n      document.title = (S.alerts.pending ? '(' + S.alerts.pending\
+    \ + ') ' : '') + 'PlanPlate';\n      if (!u) { root.innerHTML = ''; return; }\n      root.innerHTML = '<header class=\"\
+    pp-header\"><div class=\"in\">' +\n        '<button class=\"brand\" data-action=\"nav\" data-page=\"dashboard\" aria-label=\"\
+    PlanPlate home\">' + PP.mark() + '<span class=\"name\">PlanPlate</span></button>' +\n        '<nav><button data-action=\"\
+    nav\" data-page=\"dashboard\" class=\"' + (S.active === 'dashboard' ? 'on' : '') + '\">Restaurants</button></nav>' +\n\
+    \        '<div class=\"right\">' +\n          '<button class=\"btn ghost icon bell\" data-action=\"alerts\" aria-label=\"\
+    Approvals (' + S.alerts.pending + ')\" aria-expanded=\"' + (S.open === 'alerts') + '\">' + PP.icon('bell') +\n       \
+    \     (S.alerts.pending ? '<span class=\"n\">' + S.alerts.pending + '</span>' : '') + '</button>' +\n          '<button\
+    \ class=\"me\" data-action=\"menu\" aria-label=\"Account menu\" aria-expanded=\"' + (S.open === 'menu') + '\">' + esc(initials(u))\
+    \ + '</button>' +\n          (S.open === 'alerts' ? alertsMenu() : S.open === 'menu' ? userMenu() : '') +\n        '</div></div></header>';\n\
+    \    }\n\n    root.addEventListener('click', function (e) {\n      e.ppHeader = true;\n      var el = e.target.closest('[data-action]');\n\
+    \      if (!el) return;\n      var a = el.dataset.action;\n      if (a === 'alerts' || a === 'menu') { S.open = S.open\
+    \ === a ? null : a; render(); return; }\n      if (a === 'theme') { PP.setTheme(el.dataset.t); render(); return; }\n \
+    \     S.open = null;\n      if (a === 'nav') { S.active = el.dataset.page; render(); emit('nav', { page: el.dataset.page\
+    \ }); }\n      else if (a === 'alert') { render(); emit('open_alert', { restaurant_id: el.dataset.r, date: el.dataset.date\
+    \ }); }\n      else if (a === 'signout') { render(); emit('signout', {}); }\n    });\n    document.addEventListener('click',\
+    \ function (e) { if (!e.ppHeader && S.open) { S.open = null; render(); } });\n    document.addEventListener('keydown',\
+    \ function (e) { if (e.key === 'Escape' && S.open) { S.open = null; render(); } });\n\n    // New requests arrive while\
+    \ the portal is open: check every minute.\n    setInterval(function () {\n      if (!S.user || document.hidden) return;\n\
+    \      emit('poll', {}).then(function (a) { if (a && typeof a.pending === 'number') { S.alerts = a; if (!S.open) render();\
+    \ } }, function () {});\n    }, 60000);\n\n    render();\n    return {\n      setUser: function (json) { var me = json\
+    \ ? JSON.parse(json) : null; S.user = me; if (me && me.alerts) S.alerts = me.alerts; render(); },\n      setActive: function\
+    \ (page) { S.active = page; S.open = null; render(); },\n      setAlerts: function (json) { S.alerts = JSON.parse(json);\
+    \ render(); }\n    };\n  });\n})();\n</script>\n\n<!-- ===== AuthPage component ===== -->\n<style>\n/* ---- hero: dark\
+    \ story panel + sign-in box ---- */\n.pp-auth { min-height: min(calc(100vh - 80px), 820px); display: grid; grid-template-columns:\
+    \ 1.1fr 1fr; }\n.pp-auth .side { background: linear-gradient(100deg, rgba(29,27,24,.97) 35%, rgba(29,27,24,.74)), url(_/theme/photo-plate.webp)\
     \ center / cover, #1d1b18; color: #efe9df; padding: 48px 56px 44px; display: flex; flex-direction: column; justify-content:\
     \ space-between; gap: 40px; position: relative; overflow: hidden; }\n.pp-auth .side > * { position: relative; }\n.pp-auth\
     \ .side .top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }\n.pp-auth .side .brand\
