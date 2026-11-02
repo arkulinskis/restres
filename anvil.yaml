@@ -999,7 +999,7 @@ metadata:
   title: 'PlanPlate: restaurant reservations, floor plans and websites'
 name: PlanPlate
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=624baf9244\"></script>\n\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/restres.json\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=88503e0438\"></script>\n\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/restres.json\
     \ and run seo.py, not here) -->\n<link rel=\"canonical\" href=\"https://planplate-test.anvil.app/\">\n<meta name=\"robots\"\
     \ content=\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\">\n<meta name=\"keywords\" content=\"\
     restaurant reservation system, online table booking, restaurant booking widget, restaurant floor plan software, table\
@@ -1647,56 +1647,58 @@ native_deps:
     \ 2px solid transparent; margin-bottom: -1px; }\n.pp-auth .tabs button.on { color: var(--pp-ink); border-bottom-color:\
     \ var(--pp-ink); }\n.pp-auth form > div + div { margin-top: 16px; }\n.pp-auth .link { all: unset; cursor: pointer; color:\
     \ var(--pp-muted); font-size: .84rem; text-decoration: underline; text-decoration-color: var(--pp-line); text-underline-offset:\
-    \ 3px; }\n.pp-auth .link:hover { color: var(--pp-ink); }\n\n/* ---- landing sections ---- */\n.pp-land .sec { max-width:\
-    \ 1120px; margin: 0 auto; padding: 96px 20px; scroll-margin-top: 0; }\n.pp-land .sec + .sec { border-top: 1px solid var(--pp-line);\
-    \ }\n.pp-land h2 { font-size: 2.7rem; line-height: 1.05; margin-bottom: 16px; }\n.pp-land h2 em { font-style: italic;\
-    \ color: var(--pp-brass); }\n.pp-land .lede { color: var(--pp-muted); font-size: 1.08rem; max-width: 56ch; margin: 0;\
-    \ }\n.pp-land .head { margin-bottom: 48px; }\n.pp-land h3 { font-size: 1.35rem; margin-bottom: 6px; }\n.pp-land p { line-height:\
-    \ 1.6; }\n.pp-land .ico { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background:\
-    \ var(--pp-brass-soft); color: var(--pp-brass); flex: none; }\n.pp-land .ico .ic { width: 18px; height: 18px; }\n\n.pp-land\
-    \ .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; }\n.pp-land .step { padding:\
-    \ 0; overflow: hidden; }\n.pp-land .step .shot { aspect-ratio: 16 / 10; background: var(--pp-panel-2); border-bottom:\
-    \ 1px solid var(--pp-line); }\n.pp-land .step .shot img { width: 100%; height: 100%; object-fit: cover; }\n.pp-land .step\
-    \ .txt { padding: 22px 26px 28px; }\n.pp-land .step .n { font: 500 2rem/1 var(--pp-serif); color: var(--pp-brass); margin-bottom:\
-    \ 12px; }\n/* screenshots come in a light and a dark version, following the theme */\n.pp-land img { display: block; }\n\
-    .pp-land img.dk { display: none; }\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) .pp-land\
-    \ img.lt { display: none; }\n  :root:not([data-theme=\"light\"]) .pp-land img.dk { display: block; }\n}\n:root[data-theme=\"\
-    dark\"] .pp-land img.lt { display: none; }\n:root[data-theme=\"dark\"] .pp-land img.dk { display: block; }\n.pp-land .step\
-    \ p { color: var(--pp-muted); margin: 0; font-size: .94rem; }\n\n.pp-land .why { display: grid; grid-template-columns:\
-    \ 1fr 1.15fr; gap: 64px; align-items: start; }\n.pp-land .why .points { display: grid; gap: 28px; }\n.pp-land .point {\
-    \ display: flex; gap: 18px; }\n.pp-land .point p { color: var(--pp-muted); margin: 0; font-size: .94rem; }\n.pp-land .photo\
-    \ { position: relative; margin: 32px 0 0; border-radius: var(--pp-radius); overflow: hidden; aspect-ratio: 4 / 3; background:\
-    \ var(--pp-panel-2); }\n.pp-land .photo img { width: 100%; height: 100%; object-fit: cover; }\n.pp-land .photo figcaption\
-    \ { position: absolute; left: 0; right: 0; bottom: 0; padding: 70px 24px 20px; background: linear-gradient(rgba(20,18,16,0),\
-    \ rgba(20,18,16,.8)); color: #f4efe6; font: italic 500 1.35rem/1.3 var(--pp-serif); }\n\n.pp-land .feats { display: grid;\
-    \ grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--pp-line); border: 1px solid var(--pp-line); border-radius:\
-    \ var(--pp-radius); overflow: hidden; }\n.pp-land .feat { background: var(--pp-panel); padding: 28px 26px; }\n.pp-land\
-    \ .feat .ico { margin-bottom: 16px; }\n.pp-land .feat h3 { font-size: 1.22rem; }\n.pp-land .feat p { color: var(--pp-muted);\
-    \ margin: 0; font-size: .9rem; }\n\n.pp-land .guests { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items:\
-    \ center; }\n.pp-land .ticks { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }\n.pp-land .ticks\
-    \ li { display: flex; gap: 12px; align-items: flex-start; font-size: .95rem; }\n.pp-land .ticks .ic { color: var(--pp-good);\
-    \ margin-top: 3px; }\n\n/* a still picture of the guest booking window */\n.pp-land .stage { position: relative; border-radius:\
-    \ var(--pp-radius); padding: 64px 40px; background: url(_/theme/photo-table.webp) center / cover, var(--pp-panel-2); display:\
-    \ grid; place-items: center; }\n.pp-land .stage::before { content: \"\"; position: absolute; inset: 0; border-radius:\
-    \ inherit; background: rgba(29,27,24,.2); }\n.pp-land .stage .mock { position: relative; box-shadow: 0 30px 70px rgba(0,0,0,.3);\
-    \ }\n.pp-land .mock { padding: 26px; max-width: 420px; justify-self: center; width: 100%; box-sizing: border-box; pointer-events:\
-    \ none; user-select: none; }\n.pp-land .mock .mtop { display: flex; align-items: center; gap: 10px; padding-bottom: 16px;\
-    \ margin-bottom: 18px; border-bottom: 1px solid var(--pp-line); }\n.pp-land .mock .mtop .mark { width: 26px; height: 26px;\
-    \ color: var(--pp-brass); }\n.pp-land .mock .mtop b { font: 600 1.25rem/1 var(--pp-serif); }\n.pp-land .mock .mtop .x\
-    \ { margin-left: auto; color: var(--pp-faint); }\n.pp-land .mock .lbl { font-size: .74rem; font-weight: 600; letter-spacing:\
-    \ .1em; text-transform: uppercase; color: var(--pp-faint); margin: 16px 0 8px; }\n.pp-land .mock .days { display: grid;\
-    \ grid-template-columns: repeat(5, 1fr); gap: 6px; }\n.pp-land .mock .day { border: 1px solid var(--pp-line); border-radius:\
-    \ 10px; padding: 8px 0; text-align: center; font-size: .72rem; color: var(--pp-muted); }\n.pp-land .mock .day b { display:\
-    \ block; font: 500 1.2rem/1.1 var(--pp-serif); color: var(--pp-ink); }\n.pp-land .mock .day.on { background: var(--pp-accent);\
-    \ border-color: var(--pp-accent); color: var(--pp-accent-ink); }\n.pp-land .mock .day.on b { color: inherit; }\n.pp-land\
-    \ .mock .day.shut { opacity: .4; }\n.pp-land .mock .chip.walk { opacity: .5; font-size: .78rem; }\n.pp-land .mock .ok\
-    \ { margin-top: 18px; padding: 10px 12px; border-radius: 10px; background: var(--pp-good-soft); color: var(--pp-good);\
-    \ font-size: .84rem; display: flex; gap: 8px; align-items: center; }\n.pp-land .mock .btn { margin-top: 14px; }\n\n.pp-land\
-    \ .cta { background: linear-gradient(rgba(22,20,18,.84), rgba(22,20,18,.9)), url(_/theme/photo-evening.webp) center /\
-    \ cover, #1d1b18; color: #efe9df; }\n.pp-land .cta .sec { text-align: center; padding: 88px 20px; }\n.pp-land .cta h2\
-    \ { color: inherit; }\n.pp-land .cta h2 em { color: #c9a56a; }\n.pp-land .cta p { color: #b9b1a4; max-width: 52ch; margin:\
-    \ 0 auto 30px; }\n.pp-land .cta .acts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }\n.pp-land\
-    \ .cta .btn.light { background: #efe9df; border-color: #efe9df; color: #1d1b18; }\n.pp-land .cta .btn.line { background:\
+    \ 3px; }\n.pp-auth .link:hover { color: var(--pp-ink); }\n.pp-auth .or { display: flex; align-items: center; gap: 12px;\
+    \ margin: 16px 0 12px; color: var(--pp-muted); font-size: .84rem; }\n.pp-auth .or::before, .pp-auth .or::after { content:\
+    \ \"\"; flex: 1; height: 1px; background: var(--pp-line); }\n.pp-auth .google svg { flex: none; }\n\n/* ---- landing sections\
+    \ ---- */\n.pp-land .sec { max-width: 1120px; margin: 0 auto; padding: 96px 20px; scroll-margin-top: 0; }\n.pp-land .sec\
+    \ + .sec { border-top: 1px solid var(--pp-line); }\n.pp-land h2 { font-size: 2.7rem; line-height: 1.05; margin-bottom:\
+    \ 16px; }\n.pp-land h2 em { font-style: italic; color: var(--pp-brass); }\n.pp-land .lede { color: var(--pp-muted); font-size:\
+    \ 1.08rem; max-width: 56ch; margin: 0; }\n.pp-land .head { margin-bottom: 48px; }\n.pp-land h3 { font-size: 1.35rem; margin-bottom:\
+    \ 6px; }\n.pp-land p { line-height: 1.6; }\n.pp-land .ico { width: 40px; height: 40px; border-radius: 50%; display: grid;\
+    \ place-items: center; background: var(--pp-brass-soft); color: var(--pp-brass); flex: none; }\n.pp-land .ico .ic { width:\
+    \ 18px; height: 18px; }\n\n.pp-land .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset:\
+    \ step; }\n.pp-land .step { padding: 0; overflow: hidden; }\n.pp-land .step .shot { aspect-ratio: 16 / 10; background:\
+    \ var(--pp-panel-2); border-bottom: 1px solid var(--pp-line); }\n.pp-land .step .shot img { width: 100%; height: 100%;\
+    \ object-fit: cover; }\n.pp-land .step .txt { padding: 22px 26px 28px; }\n.pp-land .step .n { font: 500 2rem/1 var(--pp-serif);\
+    \ color: var(--pp-brass); margin-bottom: 12px; }\n/* screenshots come in a light and a dark version, following the theme\
+    \ */\n.pp-land img { display: block; }\n.pp-land img.dk { display: none; }\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"\
+    light\"]) .pp-land img.lt { display: none; }\n  :root:not([data-theme=\"light\"]) .pp-land img.dk { display: block; }\n\
+    }\n:root[data-theme=\"dark\"] .pp-land img.lt { display: none; }\n:root[data-theme=\"dark\"] .pp-land img.dk { display:\
+    \ block; }\n.pp-land .step p { color: var(--pp-muted); margin: 0; font-size: .94rem; }\n\n.pp-land .why { display: grid;\
+    \ grid-template-columns: 1fr 1.15fr; gap: 64px; align-items: start; }\n.pp-land .why .points { display: grid; gap: 28px;\
+    \ }\n.pp-land .point { display: flex; gap: 18px; }\n.pp-land .point p { color: var(--pp-muted); margin: 0; font-size:\
+    \ .94rem; }\n.pp-land .photo { position: relative; margin: 32px 0 0; border-radius: var(--pp-radius); overflow: hidden;\
+    \ aspect-ratio: 4 / 3; background: var(--pp-panel-2); }\n.pp-land .photo img { width: 100%; height: 100%; object-fit:\
+    \ cover; }\n.pp-land .photo figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 70px 24px 20px; background:\
+    \ linear-gradient(rgba(20,18,16,0), rgba(20,18,16,.8)); color: #f4efe6; font: italic 500 1.35rem/1.3 var(--pp-serif);\
+    \ }\n\n.pp-land .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--pp-line); border:\
+    \ 1px solid var(--pp-line); border-radius: var(--pp-radius); overflow: hidden; }\n.pp-land .feat { background: var(--pp-panel);\
+    \ padding: 28px 26px; }\n.pp-land .feat .ico { margin-bottom: 16px; }\n.pp-land .feat h3 { font-size: 1.22rem; }\n.pp-land\
+    \ .feat p { color: var(--pp-muted); margin: 0; font-size: .9rem; }\n\n.pp-land .guests { display: grid; grid-template-columns:\
+    \ 1fr 1fr; gap: 64px; align-items: center; }\n.pp-land .ticks { list-style: none; padding: 0; margin: 28px 0 0; display:\
+    \ grid; gap: 14px; }\n.pp-land .ticks li { display: flex; gap: 12px; align-items: flex-start; font-size: .95rem; }\n.pp-land\
+    \ .ticks .ic { color: var(--pp-good); margin-top: 3px; }\n\n/* a still picture of the guest booking window */\n.pp-land\
+    \ .stage { position: relative; border-radius: var(--pp-radius); padding: 64px 40px; background: url(_/theme/photo-table.webp)\
+    \ center / cover, var(--pp-panel-2); display: grid; place-items: center; }\n.pp-land .stage::before { content: \"\"; position:\
+    \ absolute; inset: 0; border-radius: inherit; background: rgba(29,27,24,.2); }\n.pp-land .stage .mock { position: relative;\
+    \ box-shadow: 0 30px 70px rgba(0,0,0,.3); }\n.pp-land .mock { padding: 26px; max-width: 420px; justify-self: center; width:\
+    \ 100%; box-sizing: border-box; pointer-events: none; user-select: none; }\n.pp-land .mock .mtop { display: flex; align-items:\
+    \ center; gap: 10px; padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px solid var(--pp-line); }\n.pp-land .mock\
+    \ .mtop .mark { width: 26px; height: 26px; color: var(--pp-brass); }\n.pp-land .mock .mtop b { font: 600 1.25rem/1 var(--pp-serif);\
+    \ }\n.pp-land .mock .mtop .x { margin-left: auto; color: var(--pp-faint); }\n.pp-land .mock .lbl { font-size: .74rem;\
+    \ font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-faint); margin: 16px 0 8px; }\n.pp-land\
+    \ .mock .days { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }\n.pp-land .mock .day { border: 1px solid\
+    \ var(--pp-line); border-radius: 10px; padding: 8px 0; text-align: center; font-size: .72rem; color: var(--pp-muted);\
+    \ }\n.pp-land .mock .day b { display: block; font: 500 1.2rem/1.1 var(--pp-serif); color: var(--pp-ink); }\n.pp-land .mock\
+    \ .day.on { background: var(--pp-accent); border-color: var(--pp-accent); color: var(--pp-accent-ink); }\n.pp-land .mock\
+    \ .day.on b { color: inherit; }\n.pp-land .mock .day.shut { opacity: .4; }\n.pp-land .mock .chip.walk { opacity: .5; font-size:\
+    \ .78rem; }\n.pp-land .mock .ok { margin-top: 18px; padding: 10px 12px; border-radius: 10px; background: var(--pp-good-soft);\
+    \ color: var(--pp-good); font-size: .84rem; display: flex; gap: 8px; align-items: center; }\n.pp-land .mock .btn { margin-top:\
+    \ 14px; }\n\n.pp-land .cta { background: linear-gradient(rgba(22,20,18,.84), rgba(22,20,18,.9)), url(_/theme/photo-evening.webp)\
+    \ center / cover, #1d1b18; color: #efe9df; }\n.pp-land .cta .sec { text-align: center; padding: 88px 20px; }\n.pp-land\
+    \ .cta h2 { color: inherit; }\n.pp-land .cta h2 em { color: #c9a56a; }\n.pp-land .cta p { color: #b9b1a4; max-width: 52ch;\
+    \ margin: 0 auto 30px; }\n.pp-land .cta .acts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }\n\
+    .pp-land .cta .btn.light { background: #efe9df; border-color: #efe9df; color: #1d1b18; }\n.pp-land .cta .btn.line { background:\
     \ transparent; border-color: rgba(239,233,223,.3); color: #efe9df; }\n.pp-land .cta .btn.line:hover { border-color: #efe9df;\
     \ }\nhtml[data-theme=dark] .pp-land .cta, html[data-theme=dark] .pp-auth .side { box-shadow: inset 0 0 0 1px var(--pp-line);\
     \ }\n\n@media (max-width: 960px) {\n  .pp-auth .side .jump { display: none; }\n  .pp-land .steps, .pp-land .feats { grid-template-columns:\
@@ -1736,11 +1738,17 @@ native_deps:
     \ follows. The menu QR code never changes.']\n  ];\n  var TICKS = [\n    'Only shows times when you are open and have\
     \ a table',\n    'Confirms on the spot, or tells the guest you will reply shortly',\n    'Sends a private link to change\
     \ or cancel, and a calendar entry',\n    'Speaks English, French or Latvian'\n  ];\n\n  PP.define('auth', function (root,\
-    \ data, emit) {\n    var esc = PP.esc;\n    var S = { mode: 'login', busy: false, msg: null, email: '' };\n\n    function\
-    \ form() {\n      if (S.mode === 'reset') {\n        return '<h2>Reset your password</h2><p class=\"muted small\">We\\\
-    'll email you a link to choose a new one.</p>' +\n          '<form data-form=\"reset\"><div><label class=\"f\" for=\"\
-    ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"email\" value=\"' + esc(S.email)\
-    \ + '\"></div>' +\n          '<div><button class=\"btn primary block\" type=\"submit\">Send reset link</button></div></form>'\
+    \ data, emit) {\n    var esc = PP.esc;\n    var S = { mode: 'login', busy: false, msg: null, email: '' };\n\n    var GOOGLE_G\
+    \ = '<svg viewBox=\"0 0 48 48\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path fill=\"#EA4335\" d=\"M24 9.5c3.54\
+    \ 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24\
+    \ 9.5z\"/>' +\n    '<path fill=\"#4285F4\" d=\"M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78\
+    \ 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z\"/>' +\n    '<path fill=\"#FBBC05\" d=\"M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92\
+    \ 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z\"/>' +\n    '<path fill=\"#34A853\" d=\"M24 48c6.48 0 11.93-2.13\
+    \ 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z\"\
+    /></svg>';\n    function form() {\n      if (S.mode === 'reset') {\n        return '<h2>Reset your password</h2><p class=\"\
+    muted small\">We\\'ll email you a link to choose a new one.</p>' +\n          '<form data-form=\"reset\"><div><label class=\"\
+    f\" for=\"ppE\">Email</label><input type=\"email\" id=\"ppE\" name=\"email\" required autocomplete=\"email\" value=\"\
+    ' + esc(S.email) + '\"></div>' +\n          '<div><button class=\"btn primary block\" type=\"submit\">Send reset link</button></div></form>'\
     \ +\n          '<p style=\"margin-top:16px\"><button class=\"link\" data-action=\"mode\" data-mode=\"login\">Back to sign\
     \ in</button></p>';\n      }\n      var signup = S.mode === 'signup';\n      return '<div class=\"tabs\" role=\"tablist\"\
     >' +\n          '<button role=\"tab\" data-action=\"mode\" data-mode=\"login\" class=\"' + (!signup ? 'on' : '') + '\"\
@@ -1757,24 +1765,25 @@ native_deps:
     ><button type=\"button\" class=\"link\" data-action=\"mode\" data-mode=\"reset\">Forgot your password?</button></div>')\
     \ + '</div>' +\n          (signup && window.LegalKit ? '<div>' + LegalKit.consentField() + '</div>' : '') +\n        \
     \  '<div><button class=\"btn primary block\" type=\"submit\">' + (signup ? 'Create account' : 'Sign in') + '</button></div>'\
-    \ +\n        '</form>';\n    }\n\n    function hero() {\n      return '<section class=\"pp-auth\">' +\n        '<div class=\"\
-    side\">' + PP.mark('ring') +\n          '<div class=\"top\"><div class=\"brand\">' + PP.mark() + 'PlanPlate</div>' +\n\
-    \            '<nav class=\"jump\" aria-label=\"On this page\">' +\n              '<button data-jump=\"how\">Set it up</button><button\
-    \ data-jump=\"why\">Why PlanPlate</button>' +\n              '<button data-jump=\"features\">Features</button><button\
-    \ data-jump=\"guests\">For guests</button></nav></div>' +\n          '<div><div class=\"eyebrow\">Simple · Smart · Reliable</div>'\
-    \ +\n            '<h1>Reservations, <em>made simple.</em></h1>' +\n            '<p>One calm place to run bookings for\
-    \ every restaurant you manage. PlanPlate keeps up with busy evenings, walk-ins and changing hours, so your team can look\
-    \ after the guests in front of them.</p>' +\n            '<button class=\"more\" data-jump=\"how\">See how it works '\
-    \ + PP.icon('down') + '</button></div>' +\n          '<div class=\"stats\"><div><b>30 min</b><span>to set up</span></div><div><b>5\
-    \ min</b><span>staff training</span></div><div><b>3</b><span>languages</span></div></div>' +\n        '</div>' +\n   \
-    \     '<div class=\"main\"><div class=\"box fade-in\" data-el=\"box\"></div>' +\n          '<button class=\"cue\" data-jump=\"\
-    how\">Discover PlanPlate<span class=\"dot\">' + PP.icon('down') + '</span></button></div></section>';\n    }\n\n    function\
-    \ sections() {\n      var steps = STEPS.map(function (s, i) {\n        var img = function (t) { return '<img class=\"\
-    ' + t + '\" src=\"_/theme/step-' + s[2] + '-' + t[0] + '.webp\" alt=\"' + esc(s[3]) + '\" loading=\"lazy\" width=\"960\"\
-    \ height=\"600\">'; };\n        return '<div class=\"card step\"><div class=\"shot\">' + img('lt') + img('dk') + '</div>'\
-    \ +\n          '<div class=\"txt\"><div class=\"n\">0' + (i + 1) + '</div><h3>' + esc(s[0]) + '</h3><p>' + esc(s[1]) +\
-    \ '</p></div></div>';\n      }).join('');\n      var why = WHY.map(function (w) {\n        return '<div class=\"point\"\
-    ><span class=\"ico\">' + PP.icon(w[0]) + '</span><div><h3>' + esc(w[1]) + '</h3><p>' + esc(w[2]) + '</p></div></div>';\n\
+    \ +\n        '</form>' +\n        '<div class=\"or\">or</div><button type=\"button\" class=\"btn block google\" data-action=\"\
+    google\">' + GOOGLE_G + 'Continue with Google</button>';\n    }\n\n    function hero() {\n      return '<section class=\"\
+    pp-auth\">' +\n        '<div class=\"side\">' + PP.mark('ring') +\n          '<div class=\"top\"><div class=\"brand\"\
+    >' + PP.mark() + 'PlanPlate</div>' +\n            '<nav class=\"jump\" aria-label=\"On this page\">' +\n             \
+    \ '<button data-jump=\"how\">Set it up</button><button data-jump=\"why\">Why PlanPlate</button>' +\n              '<button\
+    \ data-jump=\"features\">Features</button><button data-jump=\"guests\">For guests</button></nav></div>' +\n          '<div><div\
+    \ class=\"eyebrow\">Simple · Smart · Reliable</div>' +\n            '<h1>Reservations, <em>made simple.</em></h1>' +\n\
+    \            '<p>One calm place to run bookings for every restaurant you manage. PlanPlate keeps up with busy evenings,\
+    \ walk-ins and changing hours, so your team can look after the guests in front of them.</p>' +\n            '<button class=\"\
+    more\" data-jump=\"how\">See how it works ' + PP.icon('down') + '</button></div>' +\n          '<div class=\"stats\"><div><b>30\
+    \ min</b><span>to set up</span></div><div><b>5 min</b><span>staff training</span></div><div><b>3</b><span>languages</span></div></div>'\
+    \ +\n        '</div>' +\n        '<div class=\"main\"><div class=\"box fade-in\" data-el=\"box\"></div>' +\n         \
+    \ '<button class=\"cue\" data-jump=\"how\">Discover PlanPlate<span class=\"dot\">' + PP.icon('down') + '</span></button></div></section>';\n\
+    \    }\n\n    function sections() {\n      var steps = STEPS.map(function (s, i) {\n        var img = function (t) { return\
+    \ '<img class=\"' + t + '\" src=\"_/theme/step-' + s[2] + '-' + t[0] + '.webp\" alt=\"' + esc(s[3]) + '\" loading=\"lazy\"\
+    \ width=\"960\" height=\"600\">'; };\n        return '<div class=\"card step\"><div class=\"shot\">' + img('lt') + img('dk')\
+    \ + '</div>' +\n          '<div class=\"txt\"><div class=\"n\">0' + (i + 1) + '</div><h3>' + esc(s[0]) + '</h3><p>' +\
+    \ esc(s[1]) + '</p></div></div>';\n      }).join('');\n      var why = WHY.map(function (w) {\n        return '<div class=\"\
+    point\"><span class=\"ico\">' + PP.icon(w[0]) + '</span><div><h3>' + esc(w[1]) + '</h3><p>' + esc(w[2]) + '</p></div></div>';\n\
     \      }).join('');\n      var feats = FEATS.map(function (f) {\n        return '<div class=\"feat\"><span class=\"ico\"\
     >' + PP.icon(f[0]) + '</span><h3>' + esc(f[1]) + '</h3><p>' + esc(f[2]) + '</p></div>';\n      }).join('');\n      var\
     \ ticks = TICKS.map(function (t) { return '<li>' + PP.icon('check') + '<span>' + esc(t) + '</span></li>'; }).join('');\n\
@@ -1826,65 +1835,72 @@ native_deps:
     \ = res.mode; renderBox(); } else showMsg();\n      }, function (err) { setBusy(false); S.msg = { ok: false, text: PP.err(err)\
     \ }; showMsg(); });\n    }\n    // Section links scroll in place (no URL hash: the hash is the app's router).\n    function\
     \ jump(id) {\n      var el = root.querySelector('#pp-' + id);\n      if (el) el.scrollIntoView({ behavior: 'smooth', block:\
-    \ 'start' });\n    }\n    root.addEventListener('click', function (e) {\n      var j = e.target.closest('[data-jump]');\n\
-    \      if (j) { jump(j.dataset.jump); return; }\n      var el = e.target.closest('[data-action=mode]');\n      if (!el)\
-    \ return;\n      var em = root.querySelector('input[name=email]');\n      if (em) S.email = em.value;\n      var fromPage\
-    \ = !el.closest('.box');\n      S.mode = el.dataset.mode; S.msg = null; renderBox();\n      var box = root.querySelector('[data-el=box]');\n\
-    \      if (fromPage) box.scrollIntoView({ behavior: 'smooth', block: 'center' });\n      var first = box.querySelector('form\
-    \ input:not([value]), form input[value=\"\"]');\n      if (first) first.focus({ preventScroll: fromPage });\n    });\n\
-    \    root.innerHTML = hero() + sections();\n    renderBox();\n    return {};\n  });\n})();\n</script>\n\n<!-- ===== DashboardPage\
-    \ component ===== -->\n<style>\n.pp-dash .hello { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom:\
-    \ 30px; }\n.pp-dash .hello h1 { margin: 0; }\n.pp-dash .alert { display: flex; gap: 16px; align-items: center; padding:\
-    \ 16px 20px; margin-bottom: 30px; background: var(--pp-warn-soft); border: 1px solid color-mix(in srgb, var(--pp-warn)\
-    \ 25%, transparent); border-radius: var(--pp-radius); color: var(--pp-ink); flex-wrap: wrap; }\n.pp-dash .alert .ic {\
-    \ width: 22px; height: 22px; color: var(--pp-warn); }\n.pp-dash .alert strong { font-weight: 600; }\n.pp-dash .grid {\
-    \ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }\n.pp-dash .rc { display: flex;\
-    \ flex-direction: column; padding: 22px 22px 16px; min-height: 230px; transition: border-color .15s, transform .15s; }\n\
-    .pp-dash .rc:hover { border-color: var(--pp-faint); }\n.pp-dash .rc h3 { font-size: 1.55rem; margin-bottom: 2px; overflow-wrap:\
-    \ anywhere; }\n.pp-dash .rc .addr { color: var(--pp-muted); font-size: .84rem; min-height: 1.3em; }\n.pp-dash .rc .today\
-    \ { margin: 14px 0 16px; font-size: .86rem; color: var(--pp-ink); display: flex; gap: 7px; align-items: center; }\n.pp-dash\
-    \ .rc .today .ic { color: var(--pp-brass); }\n.pp-dash .rc .nums { display: grid; grid-template-columns: repeat(3, 1fr);\
-    \ gap: 8px; padding: 14px 0; border-top: 1px solid var(--pp-line); border-bottom: 1px solid var(--pp-line); }\n.pp-dash\
-    \ .rc .nums b { display: block; font: 500 1.6rem/1 var(--pp-serif); }\n.pp-dash .rc .nums span { font-size: .72rem; letter-spacing:\
-    \ .1em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-dash .rc .acts { display: flex; gap: 4px; align-items:\
-    \ center; margin-top: auto; padding-top: 12px; }\n.pp-dash .rc .top { display: flex; gap: 10px; align-items: flex-start;\
-    \ }\n.pp-dash .rc .top > div { flex: 1; min-width: 0; }\n.pp-dash .new { display: grid; place-items: center; text-align:\
-    \ center; border-style: dashed; color: var(--pp-muted); min-height: 230px; }\n.pp-dash .new:hover { color: var(--pp-ink);\
-    \ border-color: var(--pp-ink); }\n.pp-dash .new .plus { width: 44px; height: 44px; border-radius: 50%; border: 1px solid\
-    \ currentColor; display: grid; place-items: center; margin: 0 auto 10px; }\n</style>\n<script>\n(function () {\n  var\
-    \ PP = window.PP;\n  PP.define('dashboard', function (root, data, emit) {\n    var esc = PP.esc;\n    var list = data.restaurants\
-    \ || [], me = data.me || {};\n\n    function greeting() {\n      var h = new Date().getHours();\n      return h < 12 ?\
-    \ 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';\n    }\n    function card(r) {\n      return '<div class=\"\
-    card rc fade-in\" data-id=\"' + esc(r.id) + '\">' +\n        '<div class=\"top\"><div><h3>' + esc(r.name) + '</h3><div\
-    \ class=\"addr\">' + esc(r.address || '/' + r.slug) + '</div></div>' +\n          (r.pending ? '<span class=\"badge pending\"\
-    >' + r.pending + ' to approve</span>' : !r.accepting ? '<span class=\"badge cancelled\">Online booking off</span>' : '')\
-    \ +\n          (r.role && r.role !== 'owner' ? '<span class=\"badge plain\">' + esc(PP.ROLE[r.role]) + '</span>' : '')\
-    \ + '</div>' +\n        '<div class=\"today\">' + PP.icon('clock') + esc(r.today) + '</div>' +\n        '<div class=\"\
-    nums\"><div><b>' + r.bookings + '</b><span>Bookings</span></div><div><b>' + r.covers + '</b><span>Guests</span></div><div><b>'\
-    \ + r.seats + '</b><span>Seats</span></div></div>' +\n        '<div class=\"acts\"><button class=\"btn primary sm\" data-action=\"\
-    open\" data-page=\"today\">Open</button>' +\n          '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"\
-    reservations\">Bookings</button>' +\n          (r.role !== 'staff' ? '<button class=\"btn ghost sm\" data-action=\"open\"\
-    \ data-page=\"website\">Website</button>' : '') + '<span class=\"spacer\"></span>' +\n          '<button class=\"btn ghost\
-    \ icon\" data-action=\"copy\" title=\"Copy booking link\" aria-label=\"Copy booking link\">' + PP.icon('link') + '</button>'\
-    \ +\n          (r.role !== 'staff' ? '<button class=\"btn ghost icon\" data-action=\"duplicate\" title=\"Duplicate\" aria-label=\"\
-    Duplicate restaurant\">' + PP.icon('copy') + '</button>' : '') + '</div></div>';\n    }\n    function render() {\n   \
-    \   var pending = list.reduce(function (n, r) { return n + r.pending; }, 0);\n      var firstName = String(me.display_name\
-    \ || '').split(' ')[0];\n      root.innerHTML = '<div class=\"wrap pp-dash\">' +\n        '<div class=\"hello\"><div><div\
-    \ class=\"eyebrow\">' + esc(new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long'\
-    \ })) + '</div>' +\n          '<h1>' + greeting() + (firstName ? ', ' + esc(firstName) : '') + '</h1></div><span class=\"\
-    spacer\"></span>' +\n          (list.length ? '<button class=\"btn primary\" data-action=\"new\">' + PP.icon('plus') +\
-    \ 'New restaurant</button>' : '') + '</div>' +\n        (pending ? '<div class=\"alert\">' + PP.icon('bell') + '<div><strong>'\
-    \ + PP.plural(pending, 'booking') + ' waiting for your approval.</strong> ' +\n          '<span class=\"muted\">They came\
-    \ in while a restaurant was nearly full, or for a large party.</span></div><span class=\"spacer\"></span>' +\n       \
-    \   list.filter(function (r) { return r.pending; }).map(function (r) {\n            return '<button class=\"btn sm\" data-action=\"\
-    open\" data-page=\"reservations\" data-id=\"' + esc(r.id) + '\">' + esc(r.name) + ' · ' + r.pending + '</button>';\n \
-    \         }).join('') + '</div>' : '') +\n        (list.length ? '<div class=\"section-title\"><h2>Your restaurants</h2><span\
-    \ class=\"muted small\">' + list.length + '</span></div>' +\n          '<div class=\"grid\">' + list.map(card).join('')\
-    \ +\n          '<button class=\"card new\" data-action=\"new\"><div><div class=\"plus\">' + PP.icon('plus') + '</div>Add\
-    \ a restaurant</div></button></div>'\n          : '<div class=\"empty\" style=\"padding:70px 20px\"><h2>Add your first\
-    \ restaurant</h2><p>Start with sample opening hours and tables, then make them yours.</p>' +\n            '<button class=\"\
-    btn primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button></div>') +\n        '</div>';\n    }\n\
-    \n    function newModal() {\n      var tz = 'UTC';\n      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone\
+    \ 'start' });\n    }\n    // Continue with Google: signs in, or makes the account on the first visit (sign-up asks for\
+    \ the tick here too).\n    function google(btn) {\n      if (S.busy) return;\n      var f = root.querySelector('.box form');\n\
+    \      if (S.mode === 'signup' && window.LegalKit && !LegalKit.consentChecked(f)) return;\n      var nm = f && f.querySelector('input[name=name]');\n\
+    \      S.msg = null; showMsg(); setBusy(true); btn.disabled = true;\n      emit('google', { name: nm ? nm.value : '' }).then(function\
+    \ (res) {\n        setBusy(false); btn.disabled = false;\n        res = res || {};\n        if (res.ok) return; // Python\
+    \ navigates away\n        S.msg = { ok: false, text: res.error || 'Something went wrong.' }; showMsg();\n      }, function\
+    \ (err) { setBusy(false); btn.disabled = false; S.msg = { ok: false, text: PP.err(err) }; showMsg(); });\n    }\n    root.addEventListener('click',\
+    \ function (e) {\n      var j = e.target.closest('[data-jump]');\n      if (j) { jump(j.dataset.jump); return; }\n   \
+    \   var g = e.target.closest('[data-action=google]');\n      if (g) { google(g); return; }\n      var el = e.target.closest('[data-action=mode]');\n\
+    \      if (!el) return;\n      var em = root.querySelector('input[name=email]');\n      if (em) S.email = em.value;\n\
+    \      var fromPage = !el.closest('.box');\n      S.mode = el.dataset.mode; S.msg = null; renderBox();\n      var box\
+    \ = root.querySelector('[data-el=box]');\n      if (fromPage) box.scrollIntoView({ behavior: 'smooth', block: 'center'\
+    \ });\n      var first = box.querySelector('form input:not([value]), form input[value=\"\"]');\n      if (first) first.focus({\
+    \ preventScroll: fromPage });\n    });\n    root.innerHTML = hero() + sections();\n    renderBox();\n    return {};\n\
+    \  });\n})();\n</script>\n\n<!-- ===== DashboardPage component ===== -->\n<style>\n.pp-dash .hello { display: flex; align-items:\
+    \ flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }\n.pp-dash .hello h1 { margin: 0; }\n.pp-dash .alert { display:\
+    \ flex; gap: 16px; align-items: center; padding: 16px 20px; margin-bottom: 30px; background: var(--pp-warn-soft); border:\
+    \ 1px solid color-mix(in srgb, var(--pp-warn) 25%, transparent); border-radius: var(--pp-radius); color: var(--pp-ink);\
+    \ flex-wrap: wrap; }\n.pp-dash .alert .ic { width: 22px; height: 22px; color: var(--pp-warn); }\n.pp-dash .alert strong\
+    \ { font-weight: 600; }\n.pp-dash .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));\
+    \ gap: 16px; }\n.pp-dash .rc { display: flex; flex-direction: column; padding: 22px 22px 16px; min-height: 230px; transition:\
+    \ border-color .15s, transform .15s; }\n.pp-dash .rc:hover { border-color: var(--pp-faint); }\n.pp-dash .rc h3 { font-size:\
+    \ 1.55rem; margin-bottom: 2px; overflow-wrap: anywhere; }\n.pp-dash .rc .addr { color: var(--pp-muted); font-size: .84rem;\
+    \ min-height: 1.3em; }\n.pp-dash .rc .today { margin: 14px 0 16px; font-size: .86rem; color: var(--pp-ink); display: flex;\
+    \ gap: 7px; align-items: center; }\n.pp-dash .rc .today .ic { color: var(--pp-brass); }\n.pp-dash .rc .nums { display:\
+    \ grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 0; border-top: 1px solid var(--pp-line); border-bottom:\
+    \ 1px solid var(--pp-line); }\n.pp-dash .rc .nums b { display: block; font: 500 1.6rem/1 var(--pp-serif); }\n.pp-dash\
+    \ .rc .nums span { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-muted); }\n.pp-dash\
+    \ .rc .acts { display: flex; gap: 4px; align-items: center; margin-top: auto; padding-top: 12px; }\n.pp-dash .rc .top\
+    \ { display: flex; gap: 10px; align-items: flex-start; }\n.pp-dash .rc .top > div { flex: 1; min-width: 0; }\n.pp-dash\
+    \ .new { display: grid; place-items: center; text-align: center; border-style: dashed; color: var(--pp-muted); min-height:\
+    \ 230px; }\n.pp-dash .new:hover { color: var(--pp-ink); border-color: var(--pp-ink); }\n.pp-dash .new .plus { width: 44px;\
+    \ height: 44px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; margin: 0 auto\
+    \ 10px; }\n</style>\n<script>\n(function () {\n  var PP = window.PP;\n  PP.define('dashboard', function (root, data, emit)\
+    \ {\n    var esc = PP.esc;\n    var list = data.restaurants || [], me = data.me || {};\n\n    function greeting() {\n\
+    \      var h = new Date().getHours();\n      return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';\n\
+    \    }\n    function card(r) {\n      return '<div class=\"card rc fade-in\" data-id=\"' + esc(r.id) + '\">' +\n     \
+    \   '<div class=\"top\"><div><h3>' + esc(r.name) + '</h3><div class=\"addr\">' + esc(r.address || '/' + r.slug) + '</div></div>'\
+    \ +\n          (r.pending ? '<span class=\"badge pending\">' + r.pending + ' to approve</span>' : !r.accepting ? '<span\
+    \ class=\"badge cancelled\">Online booking off</span>' : '') +\n          (r.role && r.role !== 'owner' ? '<span class=\"\
+    badge plain\">' + esc(PP.ROLE[r.role]) + '</span>' : '') + '</div>' +\n        '<div class=\"today\">' + PP.icon('clock')\
+    \ + esc(r.today) + '</div>' +\n        '<div class=\"nums\"><div><b>' + r.bookings + '</b><span>Bookings</span></div><div><b>'\
+    \ + r.covers + '</b><span>Guests</span></div><div><b>' + r.seats + '</b><span>Seats</span></div></div>' +\n        '<div\
+    \ class=\"acts\"><button class=\"btn primary sm\" data-action=\"open\" data-page=\"today\">Open</button>' +\n        \
+    \  '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"reservations\">Bookings</button>' +\n          (r.role\
+    \ !== 'staff' ? '<button class=\"btn ghost sm\" data-action=\"open\" data-page=\"website\">Website</button>' : '') + '<span\
+    \ class=\"spacer\"></span>' +\n          '<button class=\"btn ghost icon\" data-action=\"copy\" title=\"Copy booking link\"\
+    \ aria-label=\"Copy booking link\">' + PP.icon('link') + '</button>' +\n          (r.role !== 'staff' ? '<button class=\"\
+    btn ghost icon\" data-action=\"duplicate\" title=\"Duplicate\" aria-label=\"Duplicate restaurant\">' + PP.icon('copy')\
+    \ + '</button>' : '') + '</div></div>';\n    }\n    function render() {\n      var pending = list.reduce(function (n,\
+    \ r) { return n + r.pending; }, 0);\n      var firstName = String(me.display_name || '').split(' ')[0];\n      root.innerHTML\
+    \ = '<div class=\"wrap pp-dash\">' +\n        '<div class=\"hello\"><div><div class=\"eyebrow\">' + esc(new Date().toLocaleDateString(undefined,\
+    \ { weekday: 'long', day: 'numeric', month: 'long' })) + '</div>' +\n          '<h1>' + greeting() + (firstName ? ', '\
+    \ + esc(firstName) : '') + '</h1></div><span class=\"spacer\"></span>' +\n          (list.length ? '<button class=\"btn\
+    \ primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button>' : '') + '</div>' +\n        (pending ?\
+    \ '<div class=\"alert\">' + PP.icon('bell') + '<div><strong>' + PP.plural(pending, 'booking') + ' waiting for your approval.</strong>\
+    \ ' +\n          '<span class=\"muted\">They came in while a restaurant was nearly full, or for a large party.</span></div><span\
+    \ class=\"spacer\"></span>' +\n          list.filter(function (r) { return r.pending; }).map(function (r) {\n        \
+    \    return '<button class=\"btn sm\" data-action=\"open\" data-page=\"reservations\" data-id=\"' + esc(r.id) + '\">'\
+    \ + esc(r.name) + ' · ' + r.pending + '</button>';\n          }).join('') + '</div>' : '') +\n        (list.length ? '<div\
+    \ class=\"section-title\"><h2>Your restaurants</h2><span class=\"muted small\">' + list.length + '</span></div>' +\n \
+    \         '<div class=\"grid\">' + list.map(card).join('') +\n          '<button class=\"card new\" data-action=\"new\"\
+    ><div><div class=\"plus\">' + PP.icon('plus') + '</div>Add a restaurant</div></button></div>'\n          : '<div class=\"\
+    empty\" style=\"padding:70px 20px\"><h2>Add your first restaurant</h2><p>Start with sample opening hours and tables, then\
+    \ make them yours.</p>' +\n            '<button class=\"btn primary\" data-action=\"new\">' + PP.icon('plus') + 'New restaurant</button></div>')\
+    \ +\n        '</div>';\n    }\n\n    function newModal() {\n      var tz = 'UTC';\n      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone\
     \ || 'UTC'; } catch (e) {}\n      var d = PP.modal('<div class=\"eyebrow\">New restaurant</div><h2>What is it called?</h2>'\
     \ +\n        '<form><div class=\"stack\"><div><label class=\"f\" for=\"nrName\">Name</label><input id=\"nrName\" name=\"\
     name\" type=\"text\" required maxlength=\"80\" autofocus></div>' +\n        '<div><label class=\"f\" for=\"nrTz\">Time\
@@ -4013,6 +4029,7 @@ services:
     confirm_email: false
     enable_automatically: true
     use_email: true
+    use_google: true
   server_config:
     user_table: users
   source: /runtime/services/anvil/users.yml
@@ -4022,6 +4039,9 @@ services:
 - client_config: {}
   server_config: {}
   source: /runtime/services/anvil/secrets.yml
+- client_config: {}
+  server_config: {}
+  source: /runtime/services/google.yml
 startup:
   module: Main
   type: form

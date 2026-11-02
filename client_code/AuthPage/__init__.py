@@ -7,6 +7,15 @@ import anvil.users
 from .. import pp_ui
 
 
+def _google_step_done():
+    """After login_with_google() gave None: did the person finish the Google window (they just have no account yet)?"""
+    try:
+        import anvil.google.auth
+        return bool(anvil.google.auth.get_user_email())
+    except Exception:
+        return True  # can't tell: go on to sign-up, which asks Google again if needed
+
+
 class AuthPage(AuthPageTemplate):
     def __init__(self, **properties):
         super().__init__(**properties)
@@ -26,6 +35,12 @@ class AuthPage(AuthPageTemplate):
                 if anvil.users.get_user() is None:
                     return {"ok": True, "mode": "login",
                             "message": "Account created. Check your email for a confirmation link, then sign in."}
+            elif event == "google":
+                # Continue with Google: sign in, or create the account on the first visit.
+                if anvil.users.login_with_google(remember=True) is None:
+                    if not _google_step_done() or anvil.users.signup_with_google(remember=True) is None:
+                        return {"ok": False, "error": "Google sign-in was cancelled."}
+                    name = (p.get("name") or "").strip()
             elif event == "reset":
                 try:
                     anvil.users.send_password_reset_email(p["email"].strip())
