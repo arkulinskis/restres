@@ -1158,39 +1158,40 @@ native_deps:
     \ thumbnails, the picker (PP.mediaPicker) and picture fields (PP.pf) */\n.pp .pp-th, .pp .pp-ph { display: block; width:\
     \ 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; background: var(--pp-panel-2); }\n.pp .pp-ph { display:\
     \ grid; place-items: center; color: var(--pp-faint); border: 1px dashed var(--pp-line); }\n.pp .pp-ph .ic { width: 22px;\
-    \ height: 22px; }\n.pp .pp-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px;\
-    \ max-height: 56vh; overflow-y: auto; padding: 2px; }\n.pp .pp-pick-i { all: unset; cursor: pointer; border-radius: 12px;\
-    \ display: block; outline-offset: 2px; }\n.pp .pp-pick-i:hover .pp-th { opacity: .85; } .pp .pp-pick-i.on { outline: 3px\
-    \ solid var(--pp-brass); }\n.pp .pp-pick-i:focus-visible { outline: 2px solid var(--pp-brass); }\n.pp .pp-pf { display:\
-    \ flex; gap: 12px; align-items: center; padding: 8px; border: 1px solid var(--pp-line); border-radius: 12px; background:\
-    \ var(--pp-panel); }\n.pp .pp-pf .pp-th, .pp .pp-pf .pp-ph { width: 64px; height: 64px; flex: none; cursor: pointer; }\n\
-    .pp .pp-pf-b { min-width: 0; }\n.pp .switch { position: relative; display: inline-flex; width: 40px; height: 23px; flex:\
-    \ none; }\n.pp .switch input { opacity: 0; width: 0; height: 0; position: absolute; }\n.pp .switch span { position: absolute;\
-    \ inset: 0; border-radius: 99px; background: var(--pp-line); transition: background .15s; cursor: pointer; }\n.pp .switch\
-    \ span::after { content: \"\"; position: absolute; left: 3px; top: 3px; width: 17px; height: 17px; border-radius: 50%;\
-    \ background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }\n.pp .switch input:checked + span\
-    \ { background: var(--pp-good); } .pp .switch input:checked + span::after { transform: translateX(17px); }\n.pp .switch\
-    \ input:focus-visible + span { outline: 2px solid var(--pp-brass); outline-offset: 2px; }\n\n#pp-toasts { position: fixed;\
-    \ left: 50%; transform: translateX(-50%); bottom: 20px; z-index: 1000; display: grid; gap: 8px; font: 14px/1.4 var(--pp-sans);\
-    \ }\n#pp-toasts .t { background: var(--pp-ink); color: var(--pp-bg); padding: 11px 18px; border-radius: 99px; box-shadow:\
-    \ var(--pp-shadow); max-width: 90vw; text-align: center; }\n#pp-toasts .t.err { background: var(--pp-bad); color: #fff;\
-    \ border-radius: 12px; }\n\n@media (max-width: 720px) {\n  .pp h1 { font-size: 2rem; } .pp .pad { padding: 18px; } .pp\
-    \ .wrap { padding: 22px 16px 80px; }\n  .pp .grid2, .pp .grid3 { grid-template-columns: 1fr; }\n  .pp-modal { padding:\
-    \ 0; align-items: flex-end; }\n  .pp-modal > .box, .pp-modal > .box.wide { width: 100%; border-radius: 16px 16px 0 0;\
-    \ max-height: 92vh; overflow-y: auto; padding: 22px 18px 18px; }\n}\n\n/* Anvil's loading spinner (#loadingSpinner, shown\
-    \ during server calls): the PlanPlate mark (PP.mark)\n   breathing on a small disc, with a brass ring rippling out. The\
-    \ mark is a mask, so it takes the theme's ink colour. */\n#loadingSpinner { --anvil-spinner-size: 76px; --anvil-spinner-bg:\
-    \ var(--pp-panel); width: 76px; height: 76px; border-radius: 50%;\n  background: var(--pp-panel) !important; border: 1px\
-    \ solid var(--pp-line); box-shadow: var(--pp-shadow); }\n#loadingSpinner > svg, #loadingSpinner > img { display: none\
-    \ !important; }\n#loadingSpinner::before, #loadingSpinner::after { content: \"\"; position: absolute; pointer-events:\
-    \ none; }\n#loadingSpinner::before { inset: -1px; border-radius: 50%; border: 1px solid var(--pp-brass); animation: pp-ripple\
-    \ 1.6s ease-out infinite; }\n#loadingSpinner::after { inset: 19%; background: var(--pp-ink);\n  -webkit-mask: url(\"data:image/svg+xml,%3Csvg\
-    \ xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%23000'%3E%3Ccircle cx='16' cy='16' r='14'\
-    \ stroke-width='1.4'/%3E%3Ccircle cx='16' cy='16' r='9' stroke-width='1'/%3E%3Cpath d='M16 10.5v11' stroke-width='1.4'\
-    \ stroke-linecap='round'/%3E%3C/svg%3E\") center / contain no-repeat;\n  mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'\
+    \ height: 22px; }\n/* photo picker grid (was .pp-pick, which also matched the booking picker in forms/BookPage.html) */\n\
+    .pp .pp-photo-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; max-height:\
+    \ 56vh; overflow-y: auto; padding: 2px; }\n.pp .pp-pick-i { all: unset; cursor: pointer; border-radius: 12px; display:\
+    \ block; outline-offset: 2px; }\n.pp .pp-pick-i:hover .pp-th { opacity: .85; } .pp .pp-pick-i.on { outline: 3px solid\
+    \ var(--pp-brass); }\n.pp .pp-pick-i:focus-visible { outline: 2px solid var(--pp-brass); }\n.pp .pp-pf { display: flex;\
+    \ gap: 12px; align-items: center; padding: 8px; border: 1px solid var(--pp-line); border-radius: 12px; background: var(--pp-panel);\
+    \ }\n.pp .pp-pf .pp-th, .pp .pp-pf .pp-ph { width: 64px; height: 64px; flex: none; cursor: pointer; }\n.pp .pp-pf-b {\
+    \ min-width: 0; }\n.pp .switch { position: relative; display: inline-flex; width: 40px; height: 23px; flex: none; }\n\
+    .pp .switch input { opacity: 0; width: 0; height: 0; position: absolute; }\n.pp .switch span { position: absolute; inset:\
+    \ 0; border-radius: 99px; background: var(--pp-line); transition: background .15s; cursor: pointer; }\n.pp .switch span::after\
+    \ { content: \"\"; position: absolute; left: 3px; top: 3px; width: 17px; height: 17px; border-radius: 50%; background:\
+    \ #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }\n.pp .switch input:checked + span { background:\
+    \ var(--pp-good); } .pp .switch input:checked + span::after { transform: translateX(17px); }\n.pp .switch input:focus-visible\
+    \ + span { outline: 2px solid var(--pp-brass); outline-offset: 2px; }\n\n#pp-toasts { position: fixed; left: 50%; transform:\
+    \ translateX(-50%); bottom: 20px; z-index: 1000; display: grid; gap: 8px; font: 14px/1.4 var(--pp-sans); }\n#pp-toasts\
+    \ .t { background: var(--pp-ink); color: var(--pp-bg); padding: 11px 18px; border-radius: 99px; box-shadow: var(--pp-shadow);\
+    \ max-width: 90vw; text-align: center; }\n#pp-toasts .t.err { background: var(--pp-bad); color: #fff; border-radius: 12px;\
+    \ }\n\n@media (max-width: 720px) {\n  .pp h1 { font-size: 2rem; } .pp .pad { padding: 18px; } .pp .wrap { padding: 22px\
+    \ 16px 80px; }\n  .pp .grid2, .pp .grid3 { grid-template-columns: 1fr; }\n  .pp-modal { padding: 0; align-items: flex-end;\
+    \ }\n  .pp-modal > .box, .pp-modal > .box.wide { width: 100%; border-radius: 16px 16px 0 0; max-height: 92vh; overflow-y:\
+    \ auto; padding: 22px 18px 18px; }\n}\n\n/* Anvil's loading spinner (#loadingSpinner, shown during server calls): the\
+    \ PlanPlate mark (PP.mark)\n   breathing on a small disc, with a brass ring rippling out. The mark is a mask, so it takes\
+    \ the theme's ink colour. */\n#loadingSpinner { --anvil-spinner-size: 76px; --anvil-spinner-bg: var(--pp-panel); width:\
+    \ 76px; height: 76px; border-radius: 50%;\n  background: var(--pp-panel) !important; border: 1px solid var(--pp-line);\
+    \ box-shadow: var(--pp-shadow); }\n#loadingSpinner > svg, #loadingSpinner > img { display: none !important; }\n#loadingSpinner::before,\
+    \ #loadingSpinner::after { content: \"\"; position: absolute; pointer-events: none; }\n#loadingSpinner::before { inset:\
+    \ -1px; border-radius: 50%; border: 1px solid var(--pp-brass); animation: pp-ripple 1.6s ease-out infinite; }\n#loadingSpinner::after\
+    \ { inset: 19%; background: var(--pp-ink);\n  -webkit-mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'\
     \ viewBox='0 0 32 32' fill='none' stroke='%23000'%3E%3Ccircle cx='16' cy='16' r='14' stroke-width='1.4'/%3E%3Ccircle cx='16'\
     \ cy='16' r='9' stroke-width='1'/%3E%3Cpath d='M16 10.5v11' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E\"\
-    ) center / contain no-repeat;\n  animation: pp-pulse 1.6s ease-in-out infinite; }\n@keyframes pp-pulse { 0%, 100% { transform:\
+    ) center / contain no-repeat;\n  mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0\
+    \ 32 32' fill='none' stroke='%23000'%3E%3Ccircle cx='16' cy='16' r='14' stroke-width='1.4'/%3E%3Ccircle cx='16' cy='16'\
+    \ r='9' stroke-width='1'/%3E%3Cpath d='M16 10.5v11' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E\") center\
+    \ / contain no-repeat;\n  animation: pp-pulse 1.6s ease-in-out infinite; }\n@keyframes pp-pulse { 0%, 100% { transform:\
     \ scale(.86); opacity: .55; } 50% { transform: scale(1); opacity: 1; } }\n@keyframes pp-ripple { 0% { transform: scale(1);\
     \ opacity: .7; } 100% { transform: scale(1.45); opacity: 0; } }\n@media (prefers-reduced-motion: reduce) { #loadingSpinner::before\
     \ { animation: none; opacity: 0; } #loadingSpinner::after { animation-duration: 3.2s; } }\n</style>\n\n<script>\n/* window.PP:\
@@ -1504,10 +1505,10 @@ native_deps:
     eyebrow\">' + PP.esc(opts.eyebrow || (kind === 'video' ? 'Video' : 'Photo')) + '</div><h2>' + PP.esc(opts.title || (kind\
     \ === 'video' ? 'Choose a video' : 'Choose a photo')) + '</h2>' +\n        '<div class=\"row\" style=\"margin:6px 0 14px\"\
     ><button class=\"btn primary\" data-up>' + PP.icon('upload') + (kind === 'video' ? 'Upload a video' : 'Upload a photo')\
-    \ + '</button>' +\n        '<span class=\"small muted\" data-st></span></div><div class=\"pp-pick\" data-grid><div class=\"\
-    loading\"><span class=\"spin\"></span></div></div>',\n        { wide: true, onclose: function () { if (!answered) resolve(null);\
-    \ } });\n      function done(p) { answered = true; d.close(); resolve(p); }\n      function draw() {\n        var mine\
-    \ = list.filter(function (p) { return kind === 'any' || (p.kind || 'image') === kind; });\n        d.el.querySelector('[data-grid]').innerHTML\
+    \ + '</button>' +\n        '<span class=\"small muted\" data-st></span></div><div class=\"pp-photo-pick\" data-grid><div\
+    \ class=\"loading\"><span class=\"spin\"></span></div></div>',\n        { wide: true, onclose: function () { if (!answered)\
+    \ resolve(null); } });\n      function done(p) { answered = true; d.close(); resolve(p); }\n      function draw() {\n\
+    \        var mine = list.filter(function (p) { return kind === 'any' || (p.kind || 'image') === kind; });\n        d.el.querySelector('[data-grid]').innerHTML\
     \ = mine.length ? mine.map(function (p) {\n          return '<button type=\"button\" class=\"pp-pick-i' + (p.key === opts.current\
     \ ? ' on' : '') + '\" data-k=\"' + PP.esc(p.key) + '\" title=\"' + PP.esc(p.caption || '') + '\">' + PP.thumb(p) + '</button>';\n\
     \        }).join('') : '<div class=\"empty\" style=\"grid-column:1/-1\">' + (kind === 'video' ? 'No videos yet. Upload\
