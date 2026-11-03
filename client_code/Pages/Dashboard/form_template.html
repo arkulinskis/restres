@@ -1,0 +1,39 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-dash">
+      <div class="pp-hello">
+        <div>
+          <anvil-component type="Label" name="date_label" prop:role='["eyebrow-label"]'></anvil-component>
+          <anvil-component type="Label" name="hello_label" prop:role='["page-title"]'></anvil-component>
+        </div>
+        <span class="ui-spacer"></span>
+        <anvil-component type="Button" name="new_button" prop:text="New restaurant" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+      </div>
+
+      <div class="pp-dash-alert" anvil:name="alert_box">
+        <i class="ic ic-bell"></i>
+        <div><anvil-component type="Label" name="alert_label" prop:role='["strong"]'></anvil-component>
+          <span class="muted">They came in while a restaurant was nearly full, or for a large party.</span></div>
+        <span class="ui-spacer"></span>
+        <anvil-component type="RepeatingPanel" name="pending_panel" prop:item_template="PlanPlate_2_0.Items.PendingLink" prop:role='["chips"]'></anvil-component>
+      </div>
+
+      <div anvil:name="list_part">
+        <div class="pp-sec-head"><h2>Your restaurants</h2><anvil-component type="Label" name="count_label" prop:role='["muted", "small"]'></anvil-component></div>
+        <div class="pp-dash-grid">
+          <anvil-component type="RepeatingPanel" name="cards_panel" prop:item_template="PlanPlate_2_0.Items.RestaurantCard" prop:role='["contents"]'></anvil-component>
+          <button type="button" class="ui-card pp-dash-new" anvil:on-dom:click="self.new_click"><span><span class="plus"><i class="ic ic-plus"></i></span>Add a restaurant</span></button>
+        </div>
+      </div>
+
+      <div class="ui-empty pp-dash-empty" anvil:name="empty_part">
+        <h2>Add your first restaurant</h2>
+        <p>Start with sample opening hours and tables, then make them yours. Or look around the demo restaurant first.</p>
+        <div class="ui-row" style="justify-content:center">
+          <anvil-component type="Button" name="first_button" prop:text="New restaurant" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+          <a class="ui-btn" href="#book/maison-lumiere" target="_blank" rel="noopener"><i class="ic ic-calendar"></i>Try the demo booking form</a>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

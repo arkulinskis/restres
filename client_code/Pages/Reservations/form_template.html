@@ -1,0 +1,52 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-res">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="reservations"></anvil-component>
+
+      <section class="pp-approvals" anvil:name="approvals">
+        <div class="pp-sec-head" style="margin-top:0"><h2><i class="ic ic-bell"></i> Awaiting your approval</h2><anvil-component type="Label" name="pending_count" prop:role='["muted", "small"]'></anvil-component></div>
+        <div class="pp-ap-grid">
+          <anvil-component type="RepeatingPanel" name="approvals_panel" prop:item_template="PlanPlate_2_0.Items.ApprovalCard" prop:role='["contents"]'></anvil-component>
+        </div>
+      </section>
+
+      <div class="pp-daybar">
+        <anvil-component type="Button" name="prev_button" prop:text="Previous day" prop:role='["btn", "btn-icon", "ic-left"]'></anvil-component>
+        <anvil-component type="Label" name="day_title" prop:role='["sec-title"]'></anvil-component>
+        <anvil-component type="Button" name="next_button" prop:text="Next day" prop:role='["btn", "btn-icon", "ic-right"]'></anvil-component>
+        <anvil-component type="Button" name="today_button" prop:text="Today" prop:role='["btn", "btn-sm"]'></anvil-component>
+        <anvil-component type="DatePicker" name="date_picker" prop:format="D MMM YYYY" prop:role='["pp-date"]'></anvil-component>
+      </div>
+      <div class="pp-daymeta">
+        <span><i class="ic ic-clock"></i><anvil-component type="Label" name="hours_label"></anvil-component></span>
+        <anvil-component type="Label" name="count_label"></anvil-component>
+        <anvil-component type="Label" name="covers_label"></anvil-component>
+        <anvil-component type="Label" name="peak_label"></anvil-component>
+      </div>
+      <anvil-component type="RepeatingPanel" name="events_panel" prop:item_template="PlanPlate_2_0.Items.DayEvent"></anvil-component>
+
+      <div class="pp-res-tools">
+        <div class="ui-seg" role="group" aria-label="View">
+          <button type="button" anvil:name="view_timeline" data-v="timeline" anvil:on-dom:click="self.view_click">Timeline</button>
+          <button type="button" anvil:name="view_list" data-v="list" anvil:on-dom:click="self.view_click">List</button>
+        </div>
+        <span class="ui-spacer"></span>
+        <anvil-component type="Button" name="print_button" prop:text="Day sheet" prop:role='["btn", "btn-ghost", "ic-print"]' prop:tooltip="Print today's bookings for the host stand"></anvil-component>
+        <anvil-component type="Button" name="walkin_button" prop:text="Walk-in" prop:role='["btn", "ic-users"]' prop:tooltip="Seat someone who just walked in"></anvil-component>
+        <anvil-component type="Button" name="new_button" prop:text="New booking" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+      </div>
+
+      <div anvil:name="timeline_part">
+        <anvil-component type="PlanPlate_2_0.Components.Timeline" name="timeline"></anvil-component>
+        <p class="ui-hint">Click an empty spot on a table's row to book it at that time. Striped bookings are waiting for approval; ★ marks a regular.</p>
+      </div>
+      <div anvil:name="list_part">
+        <div class="ui-card pp-res-list" anvil:name="list_card">
+          <div class="pp-res-row pp-res-head"><span>Time</span><span>Guest</span><span>Guests</span><span>Table</span><span>Status</span><span>Source</span></div>
+          <anvil-component type="RepeatingPanel" name="list_panel" prop:item_template="PlanPlate_2_0.Items.ResRow" prop:role='["contents"]'></anvil-component>
+        </div>
+        <div class="ui-empty" anvil:name="list_empty">No reservations on this day yet.</div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

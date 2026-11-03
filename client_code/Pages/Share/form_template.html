@@ -1,0 +1,34 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-share">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="share"></anvil-component>
+
+      <section class="ui-card pp-sec">
+        <h2>QR codes</h2>
+        <p class="pp-lead">For table cards, the window, the door and flyers. They open your live pages, so you never reprint them when the menu or hours change.</p>
+        <div class="pp-qrs">
+          <div class="pp-qr"><div anvil:dom-node="qr_book"></div><b>Book a table</b>
+            <anvil-component type="Label" name="book_url_label" prop:role='["pp-code", "small"]'></anvil-component>
+            <anvil-component type="Button" name="book_png" prop:text="Download PNG" prop:role='["btn", "btn-sm", "ic-download"]'></anvil-component></div>
+          <div class="pp-qr"><div anvil:dom-node="qr_menu"></div><b>The menu</b>
+            <anvil-component type="Label" name="menu_url_label" prop:role='["pp-code", "small"]'></anvil-component>
+            <anvil-component type="Button" name="menu_png" prop:text="Download PNG" prop:role='["btn", "btn-sm", "ic-download"]'></anvil-component></div>
+          <div class="pp-qr" anvil:name="site_qr_box"><div anvil:dom-node="qr_site"></div><b>Your website</b>
+            <anvil-component type="Label" name="site_url_label" prop:role='["pp-code", "small"]'></anvil-component>
+            <anvil-component type="Button" name="site_png" prop:text="Download PNG" prop:role='["btn", "btn-sm", "ic-download"]'></anvil-component></div>
+        </div>
+        <div class="ui-row" style="margin-top:16px">
+          <anvil-component type="Button" name="card_button" prop:text="Print table cards" prop:role='["btn", "btn-primary", "ic-print"]'></anvil-component>
+          <span class="ui-hint">A4 sheet of four cards: the menu code and the booking code side by side.</span>
+        </div>
+      </section>
+
+      <section class="ui-card pp-sec">
+        <h2>Share &amp; embed</h2>
+        <p class="pp-lead">Put the booking form on your website, social pages and Google Business Profile.</p>
+        <anvil-component type="RepeatingPanel" name="codes_panel" prop:item_template="PlanPlate_2_0.Items.CodeBlock"></anvil-component>
+      </section>
+    </div>
+    <div class="pp-cards" anvil:dom-node="cards"></div>
+  </anvil-block>
+</anvil-form>

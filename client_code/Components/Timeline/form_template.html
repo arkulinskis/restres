@@ -1,0 +1,14 @@
+---
+custom_component: true
+events:
+  - name: edit
+    description: A booking block was clicked (event arg id)
+  - name: slot
+    description: An empty spot on a table row was clicked (event args time "HH:MM", table = table id or "")
+toolbox_item:
+  title: Day timeline
+  group: PlanPlate
+help_text: |
+  The Reservations day timeline, drawn by theme/assets/pp-timeline.js. Call draw(day) with Portal.get_day().
+---
+<div class="pp-tl-host" anvil:dom-node="host"></div>

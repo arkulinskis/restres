@@ -102,11 +102,17 @@ def _today_line(ctx, d):
 
 
 # ---------------------------------------------------------------- the manager
-@anvil.server.callable(require_user=True)
+@anvil.server.callable
 def get_me():
+    """Who is signed in (None for visitors), with the approvals waiting across their restaurants (the header bell)."""
+    from . import Accounts
+    me = Accounts.current_me()
+    if me is None:
+        return None
     u = _user()
-    return {"email": u["email"], "display_name": u["display_name"] or (u["email"] or "").split("@")[0].title(),
-            "alerts": get_alerts()}
+    me["display_name"] = u["display_name"] or (u["email"] or "").split("@")[0].title()
+    me["alerts"] = get_alerts()
+    return me
 
 
 @anvil.server.callable(require_user=True)
@@ -132,6 +138,8 @@ def get_alerts():
 # ---------------------------------------------------------------- restaurants
 @anvil.server.callable(require_user=True)
 def get_dashboard():
+    from . import DemoData
+    DemoData.ensure_loaded()
     out = []
     for r in _mine():
         ctx = B.Ctx(r)
@@ -174,9 +182,9 @@ def create_restaurant(name, timezone_name="UTC", sample=True):
     if len(_mine()) >= MAX_RESTAURANTS:
         return {"ok": False, "error": "You've reached the limit of %d restaurants." % MAX_RESTAURANTS}
     tz = timezone_name if B.valid_timezone(timezone_name) else "UTC"
+    defaults: dict = {k: v[0] for k, v in B.SETTINGS.items()}
     r = app_tables.restaurants.add_row(owner=u, name=name, slug=B.unique_slug(name), timezone=tz, created=B.now_utc(),
-                                       position=len(_mine()), accepting=True, over_capacity="review",
-                                       **{k: v[0] for k, v in B.SETTINGS.items()})
+                                       position=len(_mine()), accepting=True, over_capacity="review", **defaults)
     if sample:
         _sample_setup(r)
     return {"ok": True, "id": r.get_id()}
@@ -200,7 +208,8 @@ def duplicate_restaurant(rid, name=None):
         app_tables.special_days.add_row(restaurant=r, date=s["date"], label=s["label"], closed=s["closed"], hours=s["hours"])
     ids = {}
     for t in app_tables.dining_tables.search(restaurant=src):
-        n = app_tables.dining_tables.add_row(restaurant=r, **{c: t[c] for c in ("name", "seats", "min_party", "shape", "area", "x", "y", "position", "active")})
+        cols: dict = {c: t[c] for c in ("name", "seats", "min_party", "shape", "area", "x", "y", "position", "active")}
+        n = app_tables.dining_tables.add_row(restaurant=r, **cols)
         ids[t.get_id()] = n.get_id()
     for j in app_tables.table_joins.search(restaurant=src):
         app_tables.table_joins.add_row(restaurant=r, tables=[ids[i] for i in (j["tables"] or []) if i in ids], seats=j["seats"],
@@ -208,7 +217,8 @@ def duplicate_restaurant(rid, name=None):
     for sec in app_tables.menu_sections.search(restaurant=src):
         ns = app_tables.menu_sections.add_row(restaurant=r, title=sec["title"], description=sec["description"], position=sec["position"])
         for it in app_tables.menu_items.search(section=sec):
-            app_tables.menu_items.add_row(restaurant=r, section=ns, **{c: it[c] for c in ("name", "description", "price", "tags", "position", "available")})
+            cols2: dict = {c: it[c] for c in ("name", "description", "price", "tags", "position", "available")}
+            app_tables.menu_items.add_row(restaurant=r, section=ns, **cols2)
     return {"ok": True, "id": r.get_id()}
 
 
@@ -219,7 +229,7 @@ def delete_restaurant(rid, confirm_name):
         return {"ok": False, "error": "Type the restaurant's name exactly to confirm."}
     for table in (app_tables.reservations, app_tables.periods, app_tables.special_days, app_tables.dining_tables, app_tables.table_joins,
                   app_tables.members, app_tables.menu_items, app_tables.menu_sections, app_tables.specials, app_tables.posts,
-                  app_tables.events, app_tables.sites, app_tables.photos):
+                  app_tables.events, app_tables.sites, app_tables.photos, app_tables.guests):
         for row in list(table.search(restaurant=r)):
             row.delete()
     r.delete()
@@ -259,10 +269,20 @@ def get_settings(rid):
 
 
 @anvil.server.callable(require_user=True)
+def get_share(rid):
+    """The Share & QR page: links and codes for the booking form, the menu and the restaurant's website."""
+    r = _rest(rid, "manager")
+    site = app_tables.sites.get(restaurant=r)
+    origin = anvil.server.get_app_origin()
+    url = "%s/_/api/site/%s" % (origin, site["path"]) if site is not None and site["published"] and site["path"] else ""
+    return {"nav": _nav(r), "settings": _settings_view(r), "origin": origin, "site_url": url}
+
+
+@anvil.server.callable(require_user=True)
 def save_settings(rid, data):
     r = _rest(rid, "manager")
     data = dict(data or {})
-    upd = {}
+    upd: dict = {}
     for k, n in TEXT_FIELDS.items():
         if k in data:
             upd[k] = str(data[k] or "").strip()[:n]
@@ -289,7 +309,7 @@ def save_settings(rid, data):
         upd["language"] = data["language"] if data["language"] in B.LANGS else "en"
     if "languages" in data:
         upd["languages"] = [x for x in B.LANGS if x in (data["languages"] or [])]
-    if upd.get("notify_email") and not EMAIL_RE.match(upd["notify_email"]):
+    if upd.get("notify_email") and not EMAIL_RE.match(str(upd["notify_email"])):
         return {"ok": False, "error": "The alert email address doesn't look right."}
     if "over_capacity" in data:
         upd["over_capacity"] = data["over_capacity"] if data["over_capacity"] in B.OVER_CAPACITY else "review"
@@ -388,7 +408,7 @@ def save_special(rid, data, month=None):
     hours = B.intervals_text(B.clean_intervals(data.get("hours")))
     if not closed and not hours:
         return {"ok": False, "error": "Add opening hours, or mark the day as closed."}
-    fields = {"label": str(data.get("label") or "").strip()[:60], "closed": closed, "hours": [] if closed else hours}
+    fields: dict = {"label": str(data.get("label") or "").strip()[:60], "closed": closed, "hours": [] if closed else hours}
     if data.get("id") and to == d:
         row = _child(app_tables.special_days, r, data["id"])
         clash = app_tables.special_days.get(restaurant=r, date=d)
@@ -580,6 +600,15 @@ def _analysis(ctx, x):
             "threshold": B.setting(ctx.r, "auto_threshold"), "max_auto_party": B.setting(ctx.r, "max_auto_party")}
 
 
+def _with_guests(r, views):
+    """Add each guest's visits, no-shows, tags and note (the guest book) to reservation views."""
+    from . import Guests
+    idx = Guests.index(r)
+    for v in views:
+        v["guest"] = Guests.badge(idx.get(Guests.key_of(v.get("email"), v.get("phone"), v.get("name"))))
+    return views
+
+
 @anvil.server.callable(require_user=True)
 def get_day(rid, day=None):
     r = _rest(rid)
@@ -591,9 +620,10 @@ def get_day(rid, day=None):
         d = now.date()
     iv, src = B.day_hours(ctx, d)
     rows = sorted(app_tables.reservations.search(restaurant=r, date=d), key=lambda x: (int(x["start_min"] or 0), B._created_key(x)))
-    live = [x for x in rows if x["status"] in B.ACTIVE]
+    live = [x for x in rows if x["status"] in B.ACTIVE or x["status"] == "done"]
     step = B.setting(r, "slot_min")
-    curve, peak = [], {"pct": 0, "time": None}
+    curve: list = []
+    peak: dict = {"pct": 0, "time": None}
     lo = min([o for o, c in iv] + [int(x["start_min"]) for x in live]) if (iv or live) else None
     hi = max([c for o, c in iv] + [int(x["start_min"]) + int(x["duration"] or 0) for x in live]) if (iv or live) else None
     if lo is not None:
@@ -612,12 +642,13 @@ def get_day(rid, day=None):
         v = B.reservation_view(x, ctx, staff=True)
         v["analysis"] = _analysis(ctx, x)  # ctx loads each date's reservations on first use
         pending.append(v)
+    pending = _with_guests(r, pending)
     return {
         "nav": _nav(r), "date": d.isoformat(), "today": now.date().isoformat(),
         "now_min": now.hour * 60 + now.minute if d == now.date() else None,
         "weekday": B.DAY_NAMES[d.weekday()], "hours": B.intervals_text(iv), "hours_label": src["label"], "hours_kind": src["kind"],
         "tables": [B.table_view(t) for t in ctx.tables], "seats": ctx.total_seats,
-        "reservations": [B.reservation_view(x, ctx, staff=True) for x in rows],
+        "reservations": _with_guests(r, [B.reservation_view(x, ctx, staff=True) for x in rows]),
         "summary": {"bookings": len(live), "covers": sum(int(x["party"] or 0) for x in live), "peak": peak,
                     "pending_today": len([x for x in live if x["status"] == "pending"])},
         "curve": curve, "pending": pending,
@@ -685,7 +716,7 @@ def _save_reservation(r, data):
         return {"ok": False, "conflict": True, "error": " ".join(warnings) + " Save anyway?"}
     status = data.get("status") if data.get("status") in B.STATUSES else ("confirmed" if res is None else res["status"])
     source = data.get("source") if data.get("source") in B.SOURCES else ("phone" if res is None else res["source"])
-    fields = {"date": d, "start_min": t, "duration": dur, "party": party, "name": name, "tables": ids,
+    fields: dict = {"date": d, "start_min": t, "duration": dur, "party": party, "name": name, "tables": ids,
               "email": str(data.get("email") or "").strip()[:200], "phone": str(data.get("phone") or "").strip()[:40],
               "notes": str(data.get("notes") or "").strip()[:1000], "staff_note": str(data.get("staff_note") or "").strip()[:1000],
               "status": status, "source": source, "updated": B.now_utc()}
@@ -735,7 +766,8 @@ def set_status(rid, res_id, status, day=None):
                 return {"ok": False, "error": "Its table has been given to someone else, and no other table fits. Edit the booking to pick a time or table."}
             res["tables"] = unit["ids"]
     res.update(status=status, updated=B.now_utc(), review_reason="" if status != "pending" else res["review_reason"])
-    words = {"confirmed": "Approved" if before == "pending" else "Confirmed", "declined": "Declined", "cancelled": "Cancelled", "pending": "Marked as pending"}
+    words = {"confirmed": "Approved" if before == "pending" else "Confirmed", "declined": "Declined", "cancelled": "Cancelled",
+             "pending": "Marked as pending", "seated": "Seated", "done": "Marked as finished", "no_show": "Marked as a no-show"}
     B.add_history(res, "staff", "%s by staff." % words[status])
     try:
         from . import Notify

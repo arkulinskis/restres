@@ -1,0 +1,76 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-today">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="today"></anvil-component>
+
+      <div class="ui-card pp-status-card">
+        <div>
+          <anvil-component type="Label" name="when_label" prop:role='["eyebrow-label"]'></anvil-component>
+          <div class="pp-big"><span class="pp-dot" anvil:name="dot"></span><anvil-component type="Label" name="state_label" prop:role='["pp-big-t"]'></anvil-component></div>
+          <anvil-component type="Label" name="hours_label" prop:role='["muted", "small"]'></anvil-component>
+        </div>
+        <div class="ui-row" anvil:name="hours_acts">
+          <anvil-component type="Button" name="regular_button" prop:text="Back to regular hours" prop:role='["btn", "btn-sm"]'></anvil-component>
+          <anvil-component type="Button" name="hours_button" prop:text="Change today's hours" prop:role='["btn", "btn-sm", "ic-clock"]'></anvil-component>
+          <anvil-component type="Button" name="close_button" prop:text="Close today" prop:role='["btn", "btn-sm", "btn-danger"]'></anvil-component>
+        </div>
+      </div>
+
+      <div class="pp-stats">
+        <a class="ui-card pp-stat" anvil:name="stat_bookings" href="#"><anvil-component type="Label" name="n_bookings" prop:role='["num"]'></anvil-component><span>Bookings today</span></a>
+        <a class="ui-card pp-stat" anvil:name="stat_covers" href="#"><anvil-component type="Label" name="n_covers" prop:role='["num"]'></anvil-component><span>Guests today</span></a>
+        <div class="ui-card pp-stat"><anvil-component type="Label" name="n_in" prop:role='["num"]'></anvil-component><span>Guests in now</span></div>
+        <a class="ui-card pp-stat" anvil:name="stat_pending" href="#"><anvil-component type="Label" name="n_pending" prop:role='["num"]'></anvil-component><span>To approve</span></a>
+      </div>
+
+      <div class="pp-cols">
+        <div class="pp-col">
+          <div class="ui-card pp-box">
+            <div class="pp-box-hd"><h3>Who's coming</h3><span class="ui-spacer"></span><a class="ui-btn ghost sm" anvil:name="all_link" href="#">All bookings <i class="ic ic-right"></i></a></div>
+            <anvil-component type="RepeatingPanel" name="arrivals_panel" prop:item_template="PlanPlate_2_0.Items.Arrival"></anvil-component>
+            <anvil-component type="Label" name="no_arrivals" prop:role='["muted", "small"]' prop:text="No more bookings today. Walk-ins and phone bookings can be added on the Reservations page."></anvil-component>
+            <anvil-component type="Label" name="more_arrivals" prop:role='["muted", "small"]'></anvil-component>
+          </div>
+          <div class="ui-card pp-box">
+            <div class="pp-box-hd"><h3>The week ahead</h3></div>
+            <anvil-component type="RepeatingPanel" name="week_panel" prop:item_template="PlanPlate_2_0.Items.WeekRow"></anvil-component>
+          </div>
+        </div>
+        <div class="pp-col">
+          <div class="ui-card pp-box">
+            <div class="pp-box-hd"><h3>Photo of the day</h3><span class="ui-spacer"></span>
+              <anvil-component type="Button" name="post_button" prop:text="Post" prop:role='["btn", "btn-primary", "btn-sm", "ic-camera"]'></anvil-component></div>
+            <div class="pp-pod" anvil:name="pod_box">
+              <img anvil:name="pod_img" alt="">
+              <div><anvil-component type="Label" name="pod_meta" prop:role='["muted", "small"]'></anvil-component>
+                <anvil-component type="Label" name="pod_text"></anvil-component>
+                <anvil-component type="Button" name="pod_delete" prop:text="Remove" prop:role='["btn", "btn-ghost", "btn-sm", "btn-danger"]'></anvil-component></div>
+            </div>
+            <anvil-component type="Label" name="pod_hint" prop:role='["muted", "small"]' prop:text="Snap today's dish, the terrace in the sun, or the new wine. It shows at the top of your website for 3 days."></anvil-component>
+          </div>
+          <div class="ui-card pp-box">
+            <div class="pp-box-hd"><h3>Specials</h3><span class="ui-spacer"></span>
+              <anvil-component type="Button" name="new_special_button" prop:text="Add" prop:role='["btn", "btn-sm", "ic-plus"]'></anvil-component></div>
+            <anvil-component type="RepeatingPanel" name="specials_panel" prop:item_template="PlanPlate_2_0.Items.SpecialCard"></anvil-component>
+            <anvil-component type="Label" name="no_specials" prop:role='["muted", "small"]' prop:text="Dishes of the day or the week. They appear on your website the moment you add them, and disappear when they end."></anvil-component>
+          </div>
+          <div class="ui-card pp-box">
+            <div class="pp-box-hd"><h3>Coming up</h3><span class="ui-spacer"></span><a class="ui-btn ghost sm" anvil:name="events_link" href="#">Events <i class="ic ic-right"></i></a></div>
+            <anvil-component type="RepeatingPanel" name="events_panel" prop:item_template="PlanPlate_2_0.Items.EventMini"></anvil-component>
+            <anvil-component type="Label" name="no_events" prop:role='["muted", "small"]' prop:text="No events in the next 30 days."></anvil-component>
+          </div>
+          <div class="ui-card pp-box" anvil:name="site_box">
+            <div class="pp-box-hd"><h3>Website</h3><span class="ui-spacer"></span><anvil-component type="Label" name="site_badge" prop:role='["badge"]'></anvil-component></div>
+            <anvil-component type="Label" name="site_text" prop:role='["small"]'></anvil-component>
+            <div class="ui-row" style="margin-top:10px"><a class="ui-btn sm" anvil:name="site_edit" href="#">Edit website</a>
+              <a class="ui-btn ghost sm" anvil:name="site_open" href="#" target="_blank" rel="noopener"><i class="ic ic-external"></i>Open</a></div>
+          </div>
+          <div class="ui-card pp-box" anvil:name="check_box">
+            <div class="pp-box-hd"><h3>Getting set up</h3><span class="ui-spacer"></span><anvil-component type="Label" name="check_count" prop:role='["muted", "small"]'></anvil-component></div>
+            <anvil-component type="RepeatingPanel" name="check_panel" prop:item_template="PlanPlate_2_0.Items.CheckRow"></anvil-component>
+          </div>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

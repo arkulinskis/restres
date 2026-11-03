@@ -3,3 +3,4 @@
 __pycache__
 .anvil-data
 /.anvil/
+tools/live/.test-account-password.txt

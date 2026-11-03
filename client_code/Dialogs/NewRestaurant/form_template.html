@@ -1,0 +1,20 @@
+<div class="ui pp pp-dlg">
+  <anvil-component type="Label" name="eyebrow" prop:role='["eyebrow-label"]' prop:text="New restaurant"></anvil-component>
+  <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]' prop:text="What is it called?"></anvil-component>
+  <anvil-component type="Label" name="intro" prop:role='["muted", "small"]' prop:visible="false"></anvil-component>
+  <div class="ui-stack">
+    <label class="ui-field"><anvil-component type="Label" name="name_caption" prop:role='["field-cap"]' prop:text="Name"></anvil-component>
+      <anvil-component type="TextBox" name="name_box" prop:placeholder="e.g. Maison Lumière"></anvil-component>
+    </label>
+    <div class="ui-field" anvil:name="tz_part"><span>Time zone</span>
+      <div anvil:dom-node="tz"></div>
+      <span class="ui-hint">Booking times are always in the restaurant's local time. Search by country, city or GMT offset.</span>
+    </div>
+    <anvil-component type="CheckBox" name="sample_box" prop:checked="true" prop:text="Start with sample opening hours and 9 tables (you can change all of it afterwards)"></anvil-component>
+    <anvil-component type="Label" name="message" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+  </div>
+  <div class="ui-row end">
+    <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn"]'></anvil-component>
+    <anvil-component type="Button" name="save_button" prop:text="Create restaurant" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+</div>

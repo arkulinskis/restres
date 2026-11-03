@@ -1,0 +1,30 @@
+---
+custom_component: true
+properties:
+  - name: tab
+    type: string
+    default_value: today
+    description: Which tab is open (today, reservations, guests, hours, tables, events, dishes, gallery, website, share, settings)
+toolbox_item:
+  title: Restaurant sub-menu
+  group: PlanPlate
+help_text: |
+  The top of every restaurant page: "All restaurants", the restaurant's name, a switcher when the person runs several,
+  a link to the public booking page, and the tabs this person's role may open. Call show(nav) with the "nav" every
+  restaurant server call returns.
+---
+<div class="pp-subnav">
+  <div class="pp-subnav-top">
+    <div class="pp-subnav-who">
+      <a class="pp-subnav-all" href="#dashboard"><i class="ic ic-back"></i>All restaurants</a>
+      <anvil-component type="Label" name="name_label" prop:role='["pp-subnav-name"]'></anvil-component>
+    </div>
+    <span class="ui-spacer"></span>
+    <anvil-component type="Label" name="role_badge" prop:role='["badge"]' prop:visible="false"></anvil-component>
+    <anvil-component type="DropDown" name="switcher" prop:role='["pp-switch"]' prop:visible="false" prop:tooltip="Switch restaurant"></anvil-component>
+    <a class="ui-btn sm" anvil:name="book_link" target="_blank" rel="noopener" href="#"><i class="ic ic-external"></i>Booking page</a>
+  </div>
+  <nav class="pp-tabs" aria-label="Restaurant">
+    <anvil-component type="RepeatingPanel" name="tabs_panel" prop:item_template="PlanPlate_2_0.Items.TabLink" prop:role='["contents"]'></anvil-component>
+  </nav>
+</div>

@@ -1,0 +1,42 @@
+---
+custom_component: true
+events:
+  - name: change
+    description: The guests, date or time changed (read .party, .date, .time, .review)
+toolbox_item:
+  title: Table picker (guests, date, time)
+  group: PlanPlate
+help_text: |
+  The guest's booking picker: number of guests, a month calendar of open days, then the free times from Public.get_slots.
+  Used by the booking form (#book) and the guest's reservation page (#r). Call setup(...) once the restaurant is loaded.
+---
+<div class="pp-pick">
+  <div class="pp-step">
+    <anvil-component type="Label" name="guests_h" prop:role='["pp-step-h"]'></anvil-component>
+    <div class="pp-party">
+      <anvil-component type="RepeatingPanel" name="party_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips"]'></anvil-component>
+      <anvil-component type="DropDown" name="more_drop" prop:role='["pp-more"]' prop:visible="false"></anvil-component>
+    </div>
+  </div>
+  <div class="pp-step">
+    <anvil-component type="Label" name="date_h" prop:role='["pp-step-h"]'></anvil-component>
+    <div class="pp-pcal">
+      <div class="pp-pcal-hd">
+        <anvil-component type="Button" name="prev_button" prop:text="Previous month" prop:role='["btn", "btn-ghost", "btn-icon", "ic-left"]'></anvil-component>
+        <anvil-component type="Label" name="month_label" prop:role='["pp-pcal-m"]'></anvil-component>
+        <anvil-component type="Button" name="next_button" prop:text="Next month" prop:role='["btn", "btn-ghost", "btn-icon", "ic-right"]'></anvil-component>
+      </div>
+      <div class="pp-pcal-g">
+        <anvil-component type="RepeatingPanel" name="wd_panel" prop:item_template="PlanPlate_2_0.Items.PickDay" prop:role='["contents"]'></anvil-component>
+        <anvil-component type="RepeatingPanel" name="days_panel" prop:item_template="PlanPlate_2_0.Items.PickDay" prop:role='["contents"]'></anvil-component>
+      </div>
+    </div>
+  </div>
+  <div class="pp-step">
+    <anvil-component type="Label" name="time_h" prop:role='["pp-step-h"]'></anvil-component>
+    <anvil-component type="Label" name="times_msg" prop:role='["muted", "small"]'></anvil-component>
+    <anvil-component type="RepeatingPanel" name="times_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips", "pp-times"]'></anvil-component>
+    <anvil-component type="Label" name="review_note" prop:role='["pp-tnote", "pp-tnote-dot"]' prop:visible="false"></anvil-component>
+    <anvil-component type="Label" name="walk_note" prop:role='["pp-tnote"]' prop:visible="false"></anvil-component>
+  </div>
+</div>

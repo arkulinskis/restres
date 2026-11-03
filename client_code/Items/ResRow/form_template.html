@@ -1,0 +1,13 @@
+<button type="button" class="pp-res-row" anvil:on-dom:click="self.row_click">
+  <anvil-component type="Label" name="time_label" prop:role='["strong", "pp-t"]'></anvil-component>
+  <span class="pp-res-who">
+    <anvil-component type="Label" name="name_label" prop:role='["strong"]'></anvil-component>
+    <anvil-component type="Label" name="guest_badge" prop:role='["badge", "badge-brand"]' prop:visible="false"></anvil-component>
+    <anvil-component type="Label" name="notes_label" prop:role='["muted", "small", "pp-note"]'></anvil-component>
+    <anvil-component type="Label" name="staff_label" prop:role='["muted", "small", "pp-note"]'></anvil-component>
+  </span>
+  <anvil-component type="Label" name="party_label"></anvil-component>
+  <anvil-component type="Label" name="table_label" prop:role='["pp-hide-m"]'></anvil-component>
+  <anvil-component type="Label" name="status_badge" prop:role='["badge"]'></anvil-component>
+  <anvil-component type="Label" name="source_label" prop:role='["muted", "pp-hide-m"]'></anvil-component>
+</button>

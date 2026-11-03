@@ -1,0 +1,31 @@
+<div class="ui pp pp-dlg">
+  <anvil-component type="Label" name="eyebrow" prop:role='["eyebrow-label"]'></anvil-component>
+  <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]'></anvil-component>
+  <div class="ui-stack">
+    <label class="ui-field"><span>Name</span><anvil-component type="TextBox" name="name_box" prop:placeholder="Wine dinner with a small Loire producer"></anvil-component></label>
+    <div class="pp-grid3">
+      <label class="ui-field"><span>Date</span><anvil-component type="DatePicker" name="date_picker" prop:format="D MMM YYYY"></anvil-component></label>
+      <label class="ui-field"><span>Starts</span><anvil-component type="TextBox" name="start_box"></anvil-component></label>
+      <label class="ui-field"><span>Ends</span><anvil-component type="TextBox" name="end_box"></anvil-component></label>
+    </div>
+    <div class="ui-field"><span>Kind</span>
+      <div class="ui-seg" role="group">
+        <button type="button" anvil:name="k_public" data-k="public" anvil:on-dom:click="self.kind_click">Public (anyone can come)</button>
+        <button type="button" anvil:name="k_private" data-k="private" anvil:on-dom:click="self.kind_click">Private (a booked party)</button>
+      </div></div>
+    <anvil-component type="CheckBox" name="blocks_box" prop:text="Close online booking during the event (staff can still add bookings by hand)"></anvil-component>
+    <anvil-component type="CheckBox" name="site_box" prop:text="Show it on our website"></anvil-component>
+    <div class="pp-split">
+      <label class="ui-field"><span>Guests expected</span><anvil-component type="TextBox" name="guests_box" prop:type="number"></anvil-component></label>
+      <label class="ui-field" anvil:name="host_field"><span>Host contact</span><anvil-component type="TextBox" name="host_box" prop:placeholder="Name and phone"></anvil-component></label>
+    </div>
+    <label class="ui-field"><span>Description <em>(shown on the website)</em></span><anvil-component type="TextArea" name="desc_box" prop:height="80"></anvil-component></label>
+    <anvil-component type="PlanPlate_2_0.Components.PhotoField" name="photo_field" prop:label="Photo for the website (optional)"></anvil-component>
+    <label class="ui-field"><span>Notes for the team</span><anvil-component type="TextArea" name="notes_box" prop:height="60"></anvil-component></label>
+    <anvil-component type="Label" name="message" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+  </div>
+  <div class="ui-row end">
+    <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn"]'></anvil-component>
+    <anvil-component type="Button" name="save_button" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+</div>

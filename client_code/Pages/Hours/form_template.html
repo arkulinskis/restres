@@ -1,0 +1,40 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-hours">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="hours"></anvil-component>
+      <div class="pp-hours-layout">
+        <div>
+          <div class="ui-row" style="margin-bottom:8px"><h2 style="margin:0">Regular hours</h2><span class="ui-spacer"></span>
+            <anvil-component type="Button" name="new_period_button" prop:text="Add a period" prop:role='["btn", "btn-primary", "btn-sm", "ic-plus"]'></anvil-component></div>
+          <p class="pp-intro">A period sets the hours for each weekday between two dates (or always). Where periods overlap, the <strong>shorter one wins</strong>: a “Summer 2026” period overrides “Regular hours” for those dates. Special days override both.</p>
+          <anvil-component type="RepeatingPanel" name="periods_panel" prop:item_template="PlanPlate_2_0.Items.PeriodCard"></anvil-component>
+          <div class="ui-empty" anvil:name="periods_empty">No opening hours yet. Guests can't book until you add a period.</div>
+
+          <div class="pp-sec-head"><h2>Special days</h2><span class="ui-spacer"></span>
+            <anvil-component type="Button" name="new_special_button" prop:text="Add a special day" prop:role='["btn", "btn-sm", "ic-plus"]'></anvil-component></div>
+          <div class="ui-card pp-sp-list" anvil:name="specials_card">
+            <anvil-component type="RepeatingPanel" name="specials_panel" prop:item_template="PlanPlate_2_0.Items.SpecialRow"></anvil-component>
+          </div>
+          <div class="ui-empty" anvil:name="specials_empty">No special days yet. Add holidays, closures, or events with different hours.</div>
+          <anvil-component type="Label" name="past_label" prop:role='["hint"]'></anvil-component>
+        </div>
+
+        <div class="pp-cal-col">
+          <div class="ui-card pp-cal">
+            <div class="pp-cal-hd">
+              <anvil-component type="Button" name="prev_month" prop:text="Previous month" prop:role='["btn", "btn-icon", "ic-left"]'></anvil-component>
+              <anvil-component type="Label" name="month_label" prop:role='["card-title", "pp-center"]'></anvil-component>
+              <anvil-component type="Button" name="next_month" prop:text="Next month" prop:role='["btn", "btn-icon", "ic-right"]'></anvil-component>
+            </div>
+            <div class="pp-cal-g">
+              <span class="wd">Mo</span><span class="wd">Tu</span><span class="wd">We</span><span class="wd">Th</span><span class="wd">Fr</span><span class="wd">Sa</span><span class="wd">Su</span>
+              <anvil-component type="RepeatingPanel" name="days_panel" prop:item_template="PlanPlate_2_0.Items.CalDay" prop:role='["contents"]'></anvil-component>
+            </div>
+            <div class="pp-legend" anvil:dom-node="legend"></div>
+            <p class="ui-hint">Click a day to give it special hours or close it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

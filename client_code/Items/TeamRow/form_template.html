@@ -1,0 +1,8 @@
+<div class="pp-member-row">
+  <div class="pp-grow"><anvil-component type="Label" name="name_label" prop:role='["strong"]'></anvil-component>
+    <anvil-component type="Label" name="email_label" prop:role='["muted", "small"]'></anvil-component></div>
+  <anvil-component type="Label" name="invited_badge" prop:role='["badge", "badge-warn"]' prop:text="Invited" prop:tooltip="They get access when they sign in with this email"></anvil-component>
+  <anvil-component type="Label" name="role_badge" prop:role='["badge"]'></anvil-component>
+  <anvil-component type="DropDown" name="role_drop" prop:items='[["Manager", "manager"], ["Staff", "staff"]]'></anvil-component>
+  <anvil-component type="Button" name="remove_button" prop:text="Remove" prop:role='["btn", "btn-ghost", "btn-icon", "ic-x"]'></anvil-component>
+</div>

@@ -14,8 +14,9 @@ import anvil.server
 import anvil.tables as tables
 from anvil.tables import app_tables
 
-ACTIVE = ("pending", "confirmed")          # statuses that hold a table
-STATUSES = ("pending", "confirmed", "declined", "cancelled")
+ACTIVE = ("pending", "confirmed", "seated")          # statuses that hold a table
+STATUSES = ("pending", "confirmed", "declined", "cancelled", "seated", "done", "no_show")
+VISITED = ("seated", "done")                          # the guest came (plus confirmed bookings in the past)
 SOURCES = ("online", "phone", "walk_in", "staff")
 DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 SHAPES = ("square", "round", "long")

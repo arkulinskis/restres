@@ -1,0 +1,101 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-set">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="settings"></anvil-component>
+      <div class="pp-set-layout">
+        <nav class="pp-toc">
+          <a href="javascript:void(0)" data-to="st-details" anvil:on-dom:click="self.toc_click">Details</a>
+          <a href="javascript:void(0)" data-to="st-rules" anvil:on-dom:click="self.toc_click">Booking rules</a>
+          <a href="javascript:void(0)" data-to="st-approval" anvil:on-dom:click="self.toc_click">Approvals</a>
+          <a href="javascript:void(0)" data-to="st-form" anvil:on-dom:click="self.toc_click">Booking form</a>
+          <a href="javascript:void(0)" data-to="st-emails" anvil:on-dom:click="self.toc_click">Emails</a>
+          <a href="javascript:void(0)" data-to="st-langs" anvil:on-dom:click="self.toc_click">Languages</a>
+          <a href="javascript:void(0)" data-to="st-team" anvil:on-dom:click="self.toc_click">Team</a>
+          <a href="javascript:void(0)" data-to="st-danger" anvil:name="toc_danger" anvil:on-dom:click="self.toc_click">Delete</a>
+        </nav>
+        <div>
+          <section class="ui-card pp-sec" id="st-details"><h2>Details</h2><p class="pp-lead">Shown to guests on the booking form, the menu and their reservation page.</p>
+            <div class="ui-stack">
+              <label class="ui-field"><span>Restaurant name</span><anvil-component type="TextBox" name="name_box"></anvil-component></label>
+              <label class="ui-field"><span>Short description</span><anvil-component type="TextArea" name="description_box" prop:height="60" prop:placeholder="Seasonal French cooking in the heart of the old town."></anvil-component></label>
+              <div class="pp-split">
+                <label class="ui-field"><span>Address</span><anvil-component type="TextBox" name="address_box"></anvil-component></label>
+                <label class="ui-field"><span>Phone</span><anvil-component type="TextBox" name="phone_box" prop:type="tel"></anvil-component></label>
+              </div>
+              <div class="pp-split">
+                <label class="ui-field"><span>Email</span><anvil-component type="TextBox" name="email_box" prop:type="email"></anvil-component></label>
+                <label class="ui-field"><span>Website</span><anvil-component type="TextBox" name="website_box" prop:type="url" prop:placeholder="https://"></anvil-component></label>
+              </div>
+              <div class="pp-split">
+                <label class="ui-field"><span>Booking link</span><anvil-component type="TextBox" name="slug_box"></anvil-component>
+                  <anvil-component type="Label" name="slug_hint" prop:role='["hint"]'></anvil-component></label>
+                <div class="ui-field"><span>Time zone</span><div anvil:dom-node="tz"></div>
+                  <span class="ui-hint">All booking times are in this time zone. Search by country, city or GMT offset.</span></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="ui-card pp-sec" id="st-rules"><h2>Booking rules</h2><p class="pp-lead">How guests can book online. Staff bookings in the portal can go outside these.</p>
+            <anvil-component type="CheckBox" name="accepting_box" prop:text="Take bookings online (turn off to pause the booking form: guests are asked to call instead)"></anvil-component>
+            <anvil-component type="RepeatingPanel" name="rules_panel" prop:item_template="PlanPlate_2_0.Items.RuleRow"></anvil-component>
+          </section>
+
+          <section class="ui-card pp-sec" id="st-approval"><h2>Approvals</h2><p class="pp-lead">Bookings are confirmed straight away while there is room. Past these limits a manager decides.</p>
+            <anvil-component type="RepeatingPanel" name="approval_panel" prop:item_template="PlanPlate_2_0.Items.RuleRow"></anvil-component>
+            <div class="pp-rule"><div><div class="t">When the limit is reached</div><div class="d">Take requests for you to approve, or stop online booking at that time and invite guests to walk in.</div></div>
+              <anvil-component type="DropDown" name="over_drop" prop:items='[["Ask me to approve", "review"], ["Suggest walking in", "walk_in"]]'></anvil-component></div>
+          </section>
+
+          <section class="ui-card pp-sec" id="st-form"><h2>Booking form</h2><p class="pp-lead">Texts on the form your guests fill in.</p>
+            <div class="ui-stack">
+              <label class="ui-field"><span>Note for guests</span><anvil-component type="TextArea" name="form_note_box" prop:height="70" prop:placeholder="e.g. We hold tables for 15 minutes. For groups over 8, please call us."></anvil-component></label>
+              <label class="ui-field"><span>Privacy notice</span><anvil-component type="TextArea" name="privacy_box" prop:height="140"></anvil-component>
+                <span class="ui-hint">Guests must tick a box confirming they have read this before they can book. Leave it empty to use the standard text shown above. The text each guest agreed to is saved with their booking.</span></label>
+            </div>
+          </section>
+
+          <section class="ui-card pp-sec" id="st-emails"><h2>Emails</h2><p class="pp-lead">Guests get an email when they book, when you approve or decline, and when a booking is cancelled. Each includes their private link.</p>
+            <div class="ui-stack">
+              <anvil-component type="CheckBox" name="emails_box" prop:text="Email guests (turn off if you contact guests yourself)"></anvil-component>
+              <label class="ui-field"><span>Send approval alerts to</span><anvil-component type="TextBox" name="notify_box" prop:type="email"></anvil-component>
+                <anvil-component type="Label" name="notify_hint" prop:role='["hint"]'></anvil-component></label>
+              <label class="ui-field"><span>Added to confirmations</span><anvil-component type="TextArea" name="msg_confirmed_box" prop:height="60" prop:placeholder="e.g. Parking is free behind the building."></anvil-component></label>
+              <label class="ui-field"><span>Added to “request received”</span><anvil-component type="TextArea" name="msg_pending_box" prop:height="60" prop:placeholder="e.g. We reply within the hour during opening times."></anvil-component></label>
+              <label class="ui-field"><span>Added to declines</span><anvil-component type="TextArea" name="msg_declined_box" prop:height="60" prop:placeholder="e.g. Our bar always keeps a few seats for walk-ins."></anvil-component></label>
+            </div>
+          </section>
+
+          <section class="ui-card pp-sec" id="st-langs"><h2>Languages</h2><p class="pp-lead">The booking form, guest page, menu and emails come in these languages. Guests can switch between the ones you offer.</p>
+            <div class="ui-stack">
+              <label class="ui-field"><span>Main language</span><anvil-component type="DropDown" name="language_drop" prop:items='[["English", "en"], ["Français", "fr"], ["Latviešu", "lv"]]'></anvil-component></label>
+              <div class="ui-field"><span>Also offer</span>
+                <div class="ui-row"><anvil-component type="CheckBox" name="lang_en" prop:text="English"></anvil-component>
+                  <anvil-component type="CheckBox" name="lang_fr" prop:text="Français"></anvil-component>
+                  <anvil-component type="CheckBox" name="lang_lv" prop:text="Latviešu"></anvil-component></div></div>
+            </div>
+          </section>
+
+          <div class="pp-savebar">
+            <anvil-component type="Label" name="save_msg" prop:text="Changes are saved when you press Save."></anvil-component><span class="ui-spacer"></span>
+            <anvil-component type="Button" name="revert_button" prop:text="Discard" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component>
+            <anvil-component type="Button" name="save_button" prop:text="Save changes" prop:role='["btn", "btn-primary", "btn-sm"]'></anvil-component>
+          </div>
+
+          <section class="ui-card pp-sec" id="st-team"><h2>Team</h2><anvil-component type="Label" name="team_lead" prop:role='["muted", "small"]'></anvil-component>
+            <anvil-component type="RepeatingPanel" name="team_panel" prop:item_template="PlanPlate_2_0.Items.TeamRow"></anvil-component>
+            <div class="pp-invite" anvil:name="invite_row">
+              <anvil-component type="TextBox" name="invite_email" prop:type="email" prop:placeholder="colleague@restaurant.com"></anvil-component>
+              <anvil-component type="DropDown" name="invite_role" prop:items='[["Staff", "staff"], ["Manager", "manager"]]'></anvil-component>
+              <anvil-component type="Button" name="invite_button" prop:text="Invite" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+            </div>
+            <p class="ui-hint" anvil:name="invite_hint">They sign in, or create an account, with that email and the restaurant appears in their list. We email them an invitation.</p>
+          </section>
+
+          <section class="ui-card pp-sec pp-danger" id="st-danger" anvil:name="danger"><h2>Delete restaurant</h2><p class="pp-lead">Removes the restaurant with its hours, tables, menu, guest book and every reservation. This can't be undone.</p>
+            <anvil-component type="Button" name="delete_button" prop:role='["btn", "btn-danger", "ic-trash"]'></anvil-component>
+          </section>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

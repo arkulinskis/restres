@@ -1093,3 +1093,52 @@ planplate-gallery{display:block}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero .bg video,.hero .bg .yt{display:none}}
 """
+
+
+DEMO_PHOTOS = [  # (theme asset, caption, in gallery): PlanPlate's own landing pictures (assets/CREDITS.md)
+    ("photo-room.webp", "The dining room, laid for dinner", True), ("photo-plate.webp", "A plate from the evening menu", True),
+    ("photo-table.webp", "A table by the window", True), ("photo-evening.webp", "The bar after dark", True),
+]
+
+
+def load_demo_site(rid):
+    """The website PlanPlate builds for the demo restaurant (DemoData), published at /_/api/site/maison-lumiere."""
+    r = _rest(rid, "manager")
+    s = MD.site_row(r)
+    have = {p["url"]: p for p in app_tables.photos.search(restaurant=r, provider="example")}
+    keys = {}
+    for name, caption, gallery in DEMO_PHOTOS:
+        row = have.get(name) or MD._new_row(r, kind="image", provider="example", url=name, caption=caption, in_gallery=gallery,
+                                            format="webp", width=1600.0, height=1067.0)
+        keys[name] = row["key"]
+    content = {
+        "cuisine": "French bistro", "tagline": "Seasonal French cooking, natural wine and a terrace on the square, in the heart of Old Montréal.",
+        "logo": None, "logo_light": True,
+        "hero": {"kind": "photo", "photo": keys["photo-room.webp"], "video": "", "youtube": ""},
+        "about": {"heading": "Bienvenue", "photo1": keys["photo-plate.webp"], "photo2": keys["photo-table.webp"], "text":
+                  "Maison Lumière is a small bistro on **rue Saint-Paul**, in a stone house from 1842.\n\n"
+                  "The kitchen follows the markets of Québec: **Malpeque oysters**, trout from the Eastern Townships, apples from Rougemont, "
+                  "and maple syrup from the Laurentians. The wine list leans towards small French growers.\n\n"
+                  "This is a **demo restaurant**: it shows what PlanPlate builds. The menu, hours and bookings are made up."},
+        "menu": {"heading": "La carte", "intro": "Entrées, plats, desserts and wines by the glass. The menu changes with the season.",
+                 "photo": keys["photo-evening.webp"], "link": ""},
+        "location": {"heading": "Old Montréal", "directions": "On rue Saint-Paul Ouest, two minutes from Place d'Youville. Métro Square-Victoria.",
+                     "map": "", "show_map": False},
+        "gallery": {"heading": "At the bistro"},
+        "specials_heading": "Today's specials", "events_heading": "Events",
+        "reviews_heading": "What guests say", "reviews": [
+            {"name": "A demo guest", "source": "PlanPlate demo", "rating": 5, "text": "The duck confit was perfect and the booking took ten seconds."},
+            {"name": "Another demo guest", "source": "PlanPlate demo", "rating": 5, "text": "Lovely terrace. They remembered our anniversary."}],
+        "highlights_heading": "Why Maison Lumière", "highlights": [
+            {"title": "Market cooking", "text": "A short menu that changes with what Québec's farms and rivers bring in."},
+            {"title": "A terrace on the square", "text": "From June to August the terrace is open from lunch until late."},
+            {"title": "Private dinners", "text": "The back room seats up to 24 for birthdays and company dinners."}],
+        "contact": {"whatsapp": False},
+        "social": {"facebook": "", "instagram": "", "tripadvisor": "", "google": "", "tiktok": "", "youtube": ""},
+        "sections": {k: True for k in SECTIONS},
+        "seo": "Maison Lumière, a demo French bistro in Old Montréal run on PlanPlate: book a table, see the menu and today's specials.",
+    }
+    s.update(content=clean_content(content, r), palette="bordeaux" if "bordeaux" in PALETTE else s["palette"], accent="",
+             language="en", path="maison-lumiere", updated=B.now_utc())
+    _apply(r, s, {"published": True})
+    return _reply(r, s)

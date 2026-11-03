@@ -1,0 +1,76 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-tables">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="tables"></anvil-component>
+
+      <div class="pp-when">
+        <div><div class="pp-lbl">Layout on</div>
+          <anvil-component type="RepeatingPanel" name="days_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips"]'></anvil-component></div>
+        <div class="pp-when-hours"><div class="pp-lbl">At</div>
+          <anvil-component type="RepeatingPanel" name="hours_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips", "pp-hours"]'></anvil-component></div>
+      </div>
+
+      <div class="pp-tables-layout">
+        <anvil-component type="PlanPlate_2_0.Components.FloorPlan" name="floor"></anvil-component>
+
+        <div class="ui-card pp-side">
+          <!-- nothing selected: the summary -->
+          <div anvil:name="summary_part" class="ui-stack">
+            <anvil-component type="Label" name="sum_eyebrow" prop:role='["eyebrow-label"]' prop:text="Floor plan"></anvil-component>
+            <anvil-component type="Label" name="sum_title" prop:role='["card-title"]'></anvil-component>
+            <anvil-component type="Label" name="sum_text" prop:role='["muted", "small"]'></anvil-component>
+            <anvil-component type="Button" name="add_button" prop:text="Add a table" prop:role='["btn", "btn-primary", "btn-block", "ic-plus"]'></anvil-component>
+            <anvil-component type="Button" name="join_mode_button" prop:text="Join tables" prop:role='["btn", "btn-block", "ic-join"]'></anvil-component>
+          </div>
+          <!-- a table is selected -->
+          <div anvil:name="table_part" class="ui-stack">
+            <div class="ui-row"><anvil-component type="Label" name="t_eyebrow" prop:role='["eyebrow-label"]' prop:text="Table"></anvil-component><span class="ui-spacer"></span>
+              <anvil-component type="Button" name="deselect_button" prop:text="Close" prop:role='["btn", "btn-ghost", "btn-icon", "ic-x"]'></anvil-component></div>
+            <div class="pp-split">
+              <label class="ui-field"><span>Name</span><anvil-component type="TextBox" name="t_name"></anvil-component></label>
+              <label class="ui-field"><span>Seats</span><anvil-component type="TextBox" name="t_seats" prop:type="number"></anvil-component></label>
+            </div>
+            <div class="pp-split">
+              <label class="ui-field"><span>Shape</span><anvil-component type="DropDown" name="t_shape" prop:items='[["Square", "square"], ["Round", "round"], ["Long", "long"]]'></anvil-component></label>
+              <label class="ui-field"><span>Smallest party</span><anvil-component type="TextBox" name="t_min" prop:type="number"></anvil-component></label>
+            </div>
+            <label class="ui-field"><span>Area</span><anvil-component type="TextBox" name="t_area" prop:placeholder="e.g. Terrace"></anvil-component></label>
+            <anvil-component type="CheckBox" name="t_active" prop:text="Available for bookings"></anvil-component>
+            <div class="pp-join-note" anvil:name="join_note">
+              <anvil-component type="Label" name="join_note_label"></anvil-component>
+              <div class="ui-row">
+                <anvil-component type="Button" name="split_hour_button" prop:text="Split at this hour" prop:role='["btn", "btn-sm", "ic-split"]'></anvil-component>
+                <anvil-component type="Button" name="split_all_button" prop:text="Split all day" prop:role='["btn", "btn-sm", "btn-ghost"]'></anvil-component>
+              </div>
+            </div>
+            <div class="ui-row">
+              <anvil-component type="Button" name="save_table_button" prop:text="Save" prop:role='["btn", "btn-primary"]'></anvil-component>
+              <anvil-component type="Button" name="join_from_button" prop:text="Join with…" prop:role='["btn", "btn-ghost", "ic-join"]'></anvil-component>
+              <span class="ui-spacer"></span>
+              <anvil-component type="Button" name="delete_table_button" prop:text="Delete table" prop:role='["btn", "btn-ghost", "btn-icon", "btn-danger", "ic-trash"]'></anvil-component>
+            </div>
+            <anvil-component type="Button" name="add_more_button" prop:text="Add another table" prop:role='["btn", "btn-ghost", "btn-sm", "ic-plus"]'></anvil-component>
+          </div>
+          <!-- joining tables -->
+          <div anvil:name="join_part" class="ui-stack">
+            <anvil-component type="Label" name="j_eyebrow" prop:role='["eyebrow-label"]' prop:text="Join tables"></anvil-component>
+            <anvil-component type="Label" name="j_title" prop:role='["card-title"]'></anvil-component>
+            <anvil-component type="Label" name="j_help" prop:role='["muted", "small"]' prop:text="Click two or more tables on the plan. Joined tables are booked as one table during the hours you choose."></anvil-component>
+            <div anvil:name="j_form" class="ui-stack">
+              <label class="ui-field"><span>Seats when joined</span><anvil-component type="TextBox" name="j_seats" prop:type="number"></anvil-component>
+                <span class="ui-hint">Pushing tables together can lose or add a seat or two.</span></label>
+              <div><div class="pp-lbl">Hours</div><anvil-component type="RepeatingPanel" name="j_hours_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips"]'></anvil-component></div>
+              <div><div class="pp-lbl">Days</div><anvil-component type="RepeatingPanel" name="j_days_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips"]'></anvil-component></div>
+              <anvil-component type="Button" name="join_button" prop:text="Join tables" prop:role='["btn", "btn-primary", "btn-block", "ic-join"]'></anvil-component>
+            </div>
+            <anvil-component type="Button" name="join_done_button" prop:text="Done" prop:role='["btn", "btn-ghost", "btn-block"]'></anvil-component>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-sec-head"><h2>Joined tables</h2><span class="muted small">Tables pushed together are booked as one</span></div>
+      <anvil-component type="RepeatingPanel" name="joins_panel" prop:item_template="PlanPlate_2_0.Items.JoinCard"></anvil-component>
+      <div class="ui-empty" anvil:name="joins_empty">No joined tables. Use <b>Join tables</b> to push tables together at busy times, or to keep a large table split into smaller ones at quiet times.</div>
+    </div>
+  </anvil-block>
+</anvil-form>

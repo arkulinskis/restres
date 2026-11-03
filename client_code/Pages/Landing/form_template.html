@@ -1,0 +1,113 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="lp">
+      <section class="lp-hero">
+        <div class="lp-side">
+          <svg class="lp-ring" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor"><circle cx="16" cy="16" r="14" stroke-width="1.4"/><circle cx="16" cy="16" r="9" stroke-width="1"/><path d="M16 10.5v11" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div class="lp-top">
+            <a class="lp-brand" href="#landing"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor"><circle cx="16" cy="16" r="14" stroke-width="1.4"/><circle cx="16" cy="16" r="9" stroke-width="1"/><path d="M16 10.5v11" stroke-width="1.4" stroke-linecap="round"/></svg>PlanPlate</a>
+            <nav class="lp-jump" aria-label="On this page">
+              <button type="button" data-jump="pp-how" anvil:on-dom:click="self.jump_click">Set it up</button>
+              <button type="button" data-jump="pp-why" anvil:on-dom:click="self.jump_click">Why PlanPlate</button>
+              <button type="button" data-jump="pp-features" anvil:on-dom:click="self.jump_click">Features</button>
+              <button type="button" data-jump="pp-guests" anvil:on-dom:click="self.jump_click">For guests</button>
+              <button type="button" data-jump="pp-demo" anvil:on-dom:click="self.jump_click">See a demo</button>
+            </nav>
+          </div>
+          <div class="lp-copy">
+            <div class="eyebrow">Simple · Smart · Reliable</div>
+            <h1>Reservations, <em>made simple.</em></h1>
+            <p>One calm place to run bookings for every restaurant you manage. PlanPlate keeps up with busy evenings, walk-ins and changing hours, so your team can look after the guests in front of them.</p>
+            <button type="button" class="lp-more" data-jump="pp-how" anvil:on-dom:click="self.jump_click">See how it works <i class="ic ic-chevron"></i></button>
+          </div>
+          <div class="lp-stats"><div><b>30 min</b><span>to set up</span></div><div><b>5 min</b><span>staff training</span></div><div><b>3</b><span>languages</span></div></div>
+        </div>
+        <div class="lp-main">
+          <div class="lp-box" anvil:name="box_holder">
+            <anvil-component type="PlanPlate_2_0.Components.AuthBox" name="auth_box"></anvil-component>
+          </div>
+          <button type="button" class="lp-cue" data-jump="pp-how" anvil:on-dom:click="self.jump_click">Discover PlanPlate<span class="dot"><i class="ic ic-chevron"></i></span></button>
+        </div>
+      </section>
+
+      <div class="lp-land">
+        <section class="lp-sec" id="pp-how">
+          <div class="lp-head"><div class="eyebrow">Set it up</div>
+            <h2>Ready in <em>30 minutes.</em></h2>
+            <p class="lp-lede">An online portal that keeps up with changing hours, confirms bookings on its own and makes room for walk-ins when you are busy. Three steps and you are taking reservations.</p></div>
+          <div class="lp-steps">
+            <div class="ui-card lp-step"><div class="shot"><img class="lt" src="_/theme/step-tables-l.webp" alt="The floor plan editor with tables for two, four and six" loading="lazy" width="960" height="600"><img class="dk" src="_/theme/step-tables-d.webp" alt="The floor plan editor with tables for two, four and six" loading="lazy" width="960" height="600"></div>
+              <div class="txt"><div class="n">01</div><h3>Describe your restaurant</h3><p>Opening hours and seasons, holidays and closures, your tables and how they join, and how full you can get before bookings need a look.</p></div></div>
+            <div class="ui-card lp-step"><div class="shot"><img class="lt" src="_/theme/step-book-l.webp" alt="The booking form on a phone" loading="lazy" width="960" height="600"><img class="dk" src="_/theme/step-book-d.webp" alt="The booking form on a phone" loading="lazy" width="960" height="600"></div>
+              <div class="txt"><div class="n">02</div><h3>Add the Reserve button</h3><p>Paste one line of code into your website, or print the QR code for your window. Guests book in a window sized for phones.</p></div></div>
+            <div class="ui-card lp-step"><div class="shot"><img class="lt" src="_/theme/step-day-l.webp" alt="The day view, with each table's bookings on a timeline" loading="lazy" width="960" height="600"><img class="dk" src="_/theme/step-day-d.webp" alt="The day view, with each table's bookings on a timeline" loading="lazy" width="960" height="600"></div>
+              <div class="txt"><div class="n">03</div><h3>Show your team</h3><p>Staff learn the day view in about five minutes: accept, decline, seat a walk-in, take a booking by phone.</p></div></div>
+          </div>
+        </section>
+
+        <section class="lp-sec ytf" id="watch"><div class="ytf-in"><div class="ytf-copy"><div class="eyebrow ytf-kick"><svg viewBox="0 0 28 20" width="20" height="14" aria-hidden="true"><rect width="28" height="20" rx="5" fill="#FF0033"/><path d="M11.2 5.8v8.4l7.3-4.2z" fill="#fff"/></svg>Watch</div><h2>See PlanPlate <em>in a minute.</em></h2><p class="lp-lede">A short video tour of what PlanPlate does and how it works.</p><a class="ytf-link" href="https://www.youtube.com/watch?v=4KcdhVtqgNQ" target="_blank" rel="noopener">Watch on YouTube &#8599;</a></div><div><div class="ytf-frame" anvil:name="film"><button type="button" class="ytf-cover" anvil:on-dom:click="self.film_click" aria-label="Play the PlanPlate video (1:11)"><img src="_/theme/yt-cover.jpg" alt="" loading="lazy" decoding="async" width="960" height="540"><span class="ytf-play" aria-hidden="true"><svg viewBox="0 0 68 48" width="68" height="48"><path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.3.3 34 .3 34 .3s-21.3 0-26.5 1.4a8.5 8.5 0 0 0-6 6C.1 13 .1 24 .1 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6c5.2 1.4 26.5 1.4 26.5 1.4s21.3 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.9 35 67.9 24 67.9 24s0-11-1.4-16.3z" fill="#FF0033"/><path d="M45 24 27 14v20z" fill="#fff"/></svg></span><span class="ytf-len">1:11</span></button></div><p class="ytf-note">The video loads from YouTube when you press play.</p></div></div></section>
+
+        <section class="lp-sec" id="pp-why"><div class="lp-why"><div><div class="eyebrow">Why PlanPlate?</div>
+          <h2>Built for <em>independent</em> restaurants.</h2>
+          <p class="lp-lede">Fast to set up, easy to run, and nothing you will never use. PlanPlate does reservations well and stays out of the way of service.</p>
+          <figure class="lp-photo"><img src="_/theme/photo-room.webp" alt="A bright dining room laid for service" loading="lazy"><figcaption>Five buttons. One calm screen. A full house.</figcaption></figure></div>
+          <div class="lp-points">
+            <div class="lp-point"><span class="lp-ico"><i class="ic ic-clock"></i></span><div><h3>Ready in about 30 minutes</h3><p>No developer needed. Enter your details and the booking button is ready for your site.</p></div></div>
+            <div class="lp-point"><span class="lp-ico"><i class="ic ic-phone"></i></span><div><h3>Run it from your phone</h3><p>Every screen works on a phone or tablet, at the host stand or at home.</p></div></div>
+            <div class="lp-point"><span class="lp-ico"><i class="ic ic-users"></i></span><div><h3>Staff trained in under 10 minutes</h3><p>A handful of buttons covers a full service. Nothing to configure for them.</p></div></div>
+            <div class="lp-point"><span class="lp-ico"><i class="ic ic-link"></i></span><div><h3>Help with the setup</h3><p>We help you put the booking button on your website, free of charge.</p></div></div>
+          </div></div></section>
+
+        <section class="lp-sec" id="pp-features"><div class="lp-head"><div class="eyebrow">Core features</div>
+          <h2>Everything a busy dining room <em>needs.</em></h2>
+          <p class="lp-lede">From one restaurant to many, the same simple tools for hours, tables, bookings, your guests and your website.</p></div>
+          <div class="lp-feats">
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-grid"></i></span><h3>Every location, one login</h3><p>Run all your restaurants from one account, each with its own hours, tables and team.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-users"></i></span><h3>Roles for your team</h3><p>Owners, managers and staff each see what they need. Staff handle bookings; managers set things up.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-phone"></i></span><h3>Walk-ins and phone bookings</h3><p>Add a guest at the door or on the phone in a few taps, from a tablet or phone.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-check"></i></span><h3>Bookings confirm themselves</h3><p>Online bookings are accepted on the spot while there is room. You decide how full is full.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-table"></i></span><h3>Room kept for walk-ins</h3><p>Past 80% full, new bookings wait for your approval, or the time shows as walk-in only.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-bell"></i></span><h3>Alerts within a minute</h3><p>When a booking needs a decision, your team sees it in the app and gets an email.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-calendar"></i></span><h3>Hours that change with you</h3><p>Seasonal hours, holidays and one-off closures, each taking over from the usual week.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-join"></i></span><h3>Join and split tables</h3><p>Push tables together for larger parties at the hours you choose, and split them again after.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-heart"></i></span><h3>Know your regulars</h3><p>Every guest's visits, no-shows and notes in one place, so the team greets regulars by name.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-globe"></i></span><h3>Your website, built for you</h3><p>Fill in one form and get a restaurant website with live hours, menu, gallery and the Reserve button.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-mail"></i></span><h3>Guest emails in your words</h3><p>Confirmed, waiting and declined emails go out by themselves in English, French or Latvian.</p></div>
+            <div class="lp-feat"><span class="lp-ico"><i class="ic ic-qr"></i></span><h3>Live menu and QR codes</h3><p>Change hours or prices once and your website follows. The table QR codes never change.</p></div>
+          </div></section>
+
+        <section class="lp-sec" id="pp-guests"><div class="lp-guests"><div><div class="eyebrow">For your guests</div>
+          <h2>What your guests <em>see.</em></h2>
+          <p class="lp-lede">Not a long form. A focused booking window on your own website that checks real availability and answers straight away.</p>
+          <ul class="lp-ticks">
+            <li><i class="ic ic-check"></i><span>Only shows times when you are open and have a table</span></li>
+            <li><i class="ic ic-check"></i><span>Confirms on the spot, or tells the guest you will reply shortly</span></li>
+            <li><i class="ic ic-check"></i><span>Sends a private link to change or cancel, and a calendar entry</span></li>
+            <li><i class="ic ic-check"></i><span>Speaks English, French or Latvian</span></li>
+          </ul></div>
+          <div class="lp-stage"><div class="ui-card lp-mock" aria-hidden="true">
+            <div class="mtop"><svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor"><circle cx="16" cy="16" r="14" stroke-width="1.4"/><circle cx="16" cy="16" r="9" stroke-width="1"/><path d="M16 10.5v11" stroke-width="1.4" stroke-linecap="round"/></svg><b>Your restaurant</b><i class="ic ic-x"></i></div>
+            <div class="lbl">Guests</div><div class="pp-chips"><span class="chip">1</span><span class="chip on">2</span><span class="chip">3</span><span class="chip">4</span><span class="chip">5</span><span class="chip">6+</span></div>
+            <div class="lbl">Day</div><div class="days"><div class="day">Thu<b>12</b></div><div class="day on">Fri<b>13</b></div><div class="day">Sat<b>14</b></div><div class="day">Sun<b>15</b></div><div class="day shut">Mon<b>16</b></div></div>
+            <div class="lbl">Time</div><div class="pp-chips"><span class="chip">18:00</span><span class="chip">18:30</span><span class="chip on">19:00</span><span class="chip">19:30</span><span class="chip">20:00</span><span class="chip walk">20:30 · Walk-in</span></div>
+            <div class="ok"><i class="ic ic-check"></i>Table for 2 on Friday at 19:00 is available</div>
+            <span class="ui-btn primary block">Reserve</span></div></div></div></section>
+
+        <section class="lp-sec" id="pp-demo"><div class="lp-demo"><div><div class="eyebrow">A demo restaurant</div>
+          <h2>Book a table at <em>Maison Lumière.</em></h2>
+          <p class="lp-lede">A made-up bistro run on PlanPlate: try the booking form, read the menu its QR code opens, and visit the website PlanPlate built for it.</p></div>
+          <div class="lp-demo-links">
+            <a class="ui-btn primary" href="#book/maison-lumiere" target="_blank" rel="noopener"><i class="ic ic-calendar"></i>Book a table</a>
+            <a class="ui-btn" href="#menu/maison-lumiere" target="_blank" rel="noopener"><i class="ic ic-list"></i>The menu</a>
+            <a class="ui-btn" anvil:name="demo_site" href="_/api/site/maison-lumiere" target="_blank" rel="noopener"><i class="ic ic-globe"></i>Its website</a>
+          </div></div></section>
+
+        <div class="lp-cta"><section class="lp-sec"><div class="eyebrow">Get started</div>
+          <h2>Take your first booking <em>tonight.</em></h2>
+          <p>Create an account, add your restaurant and paste the Reserve button on your site. Your team will be ready before the first guest arrives.</p>
+          <div class="acts"><button type="button" class="ui-btn light" data-mode="signup" anvil:on-dom:click="self.mode_click">Create account</button>
+          <button type="button" class="ui-btn line" data-mode="login" anvil:on-dom:click="self.mode_click">Sign in</button></div></section></div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

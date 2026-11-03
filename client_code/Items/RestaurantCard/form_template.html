@@ -1,0 +1,24 @@
+<div class="ui-card pp-rc">
+  <div class="pp-rc-top">
+    <div class="pp-rc-name">
+      <anvil-component type="Label" name="name_label" prop:role='["card-title"]' bind:text="self.item['name']"></anvil-component>
+      <anvil-component type="Label" name="addr_label" prop:role='["muted", "small"]'></anvil-component>
+    </div>
+    <anvil-component type="Label" name="state_badge" prop:role='["badge"]' prop:visible="false"></anvil-component>
+    <anvil-component type="Label" name="role_badge" prop:role='["badge"]' prop:visible="false"></anvil-component>
+  </div>
+  <div class="pp-rc-today"><i class="ic ic-clock"></i><anvil-component type="Label" name="today_label" bind:text="self.item['today']"></anvil-component></div>
+  <div class="pp-rc-nums">
+    <div><anvil-component type="Label" name="bookings_label" prop:role='["num"]'></anvil-component><span>Bookings</span></div>
+    <div><anvil-component type="Label" name="covers_label" prop:role='["num"]'></anvil-component><span>Guests</span></div>
+    <div><anvil-component type="Label" name="seats_label" prop:role='["num"]'></anvil-component><span>Seats</span></div>
+  </div>
+  <div class="pp-rc-acts">
+    <a class="ui-btn primary sm" anvil:name="open_link" href="#">Open</a>
+    <a class="ui-btn ghost sm" anvil:name="bookings_link" href="#">Bookings</a>
+    <a class="ui-btn ghost sm" anvil:name="site_link" href="#">Website</a>
+    <span class="ui-spacer"></span>
+    <anvil-component type="Button" name="copy_button" prop:text="Copy booking link" prop:tooltip="Copy booking link" prop:role='["btn", "btn-ghost", "btn-icon", "ic-link"]'></anvil-component>
+    <anvil-component type="Button" name="dup_button" prop:text="Duplicate" prop:tooltip="Duplicate" prop:role='["btn", "btn-ghost", "btn-icon", "ic-copy"]'></anvil-component>
+  </div>
+</div>

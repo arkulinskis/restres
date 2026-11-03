@@ -1,0 +1,13 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-menued">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="dishes"></anvil-component>
+      <div class="ui-row" style="margin-bottom:8px"><h2 style="margin:0">Menu</h2><span class="ui-spacer"></span>
+        <a class="ui-btn sm" anvil:name="public_link" href="#" target="_blank" rel="noopener"><i class="ic ic-external"></i>See the guest menu</a>
+        <anvil-component type="Button" name="new_section_button" prop:text="Add a section" prop:role='["btn", "btn-primary", "btn-sm", "ic-plus"]'></anvil-component></div>
+      <p class="pp-intro">Sections and dishes, with dietary labels. The guest menu (what the table QR code opens), the website and the live menu widget update the moment you save. Switch a dish off when it sells out.</p>
+      <anvil-component type="RepeatingPanel" name="sections_panel" prop:item_template="PlanPlate_2_0.Items.EdSection"></anvil-component>
+      <div class="ui-empty" anvil:name="empty">No menu yet. Start with a section, such as Starters.</div>
+    </div>
+  </anvil-block>
+</anvil-form>

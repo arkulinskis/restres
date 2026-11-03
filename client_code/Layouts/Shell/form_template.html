@@ -1,0 +1,83 @@
+---
+layout_metadata:
+  title: App frame
+  description: Header with the restaurants link, the approvals bell and the account menu; the page; the footer; the phone tab bar
+---
+<div class="ui pp ui-shell">
+  <header class="ui-header">
+    <div class="ui-header-in">
+      <a class="ui-brand pp-brand" anvil:name="brand" href="#landing" aria-label="PlanPlate home">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor"><circle cx="16" cy="16" r="14" stroke-width="1.4"/><circle cx="16" cy="16" r="9" stroke-width="1"/><path d="M16 10.5v11" stroke-width="1.4" stroke-linecap="round"/></svg><span>PlanPlate</span>
+      </a>
+      <nav class="ui-nav" aria-label="Main">
+        <anvil-component type="RepeatingPanel" name="nav_panel" prop:item_template="PlanPlate_2_0.Items.NavLink" prop:role='["contents"]'></anvil-component>
+      </nav>
+      <div class="ui-header-right">
+        <div class="ui-row" anvil:name="guest_actions">
+          <a class="ui-btn ghost" href="#auth">Sign in</a>
+          <a class="ui-btn primary" href="#auth/signup">Get started</a>
+        </div>
+        <div class="ui-row pp-member" anvil:name="member_actions">
+          <span class="pp-bell-wrap">
+            <anvil-component type="Button" name="bell_button" prop:role='["btn", "btn-ghost", "btn-icon", "ic-bell"]' prop:text="Approvals" prop:tooltip="Bookings waiting for your approval"></anvil-component>
+            <anvil-component type="Label" name="bell_count" prop:role='["pp-bell-n"]' prop:visible="false"></anvil-component>
+          </span>
+          <anvil-component type="Button" name="avatar_button" prop:role='["avatar"]' prop:tooltip="Your account"></anvil-component>
+          <div class="ui-menu pp-alerts" anvil:name="alerts_menu">
+            <div class="ui-menu-head"><b>Awaiting your approval</b></div>
+            <anvil-component type="RepeatingPanel" name="alerts_panel" prop:item_template="PlanPlate_2_0.Items.AlertRow" prop:role='["pp-alert-list"]'></anvil-component>
+            <anvil-component type="Label" name="alerts_none" prop:role='["pp-menu-none"]' prop:text="Nothing to approve. New requests show up here when a booking needs a decision."></anvil-component>
+            <anvil-component type="Label" name="alerts_more" prop:role='["pp-menu-none"]' prop:visible="false"></anvil-component>
+          </div>
+          <div class="ui-menu" anvil:name="menu">
+            <div class="ui-menu-head">
+              <anvil-component type="Label" name="menu_name" prop:role='["menu-name"]'></anvil-component>
+              <anvil-component type="Label" name="menu_email" prop:role='["menu-email"]'></anvil-component>
+            </div>
+            <a href="#dashboard"><i class="ic ic-grid"></i>Your restaurants</a>
+            <a href="#profile"><i class="ic ic-user"></i>Your profile</a>
+            <a href="#admin" anvil:name="admin_link"><i class="ic ic-shield"></i>Admin</a>
+            <div class="ui-menu-block"><span class="small muted">Appearance</span>
+              <div class="ui-seg" role="group" aria-label="Appearance">
+                <button type="button" data-theme-set="auto" anvil:name="theme_auto" anvil:on-dom:click="self.theme_click">Auto</button>
+                <button type="button" data-theme-set="light" anvil:name="theme_light" anvil:on-dom:click="self.theme_click">Light</button>
+                <button type="button" data-theme-set="dark" anvil:name="theme_dark" anvil:on-dom:click="self.theme_click">Dark</button>
+              </div>
+            </div>
+            <button type="button" anvil:on-dom:click="self.feedback_click"><i class="ic ic-chat"></i>Submit feedback</button>
+            <button type="button" data-lk-open="overview"><i class="ic ic-lock"></i>Privacy &amp; Terms</button>
+            <button type="button" anvil:on-dom:click="self.sign_out_click"><i class="ic ic-logout"></i>Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="ui-main">
+    <anvil-slot name="content"></anvil-slot>
+  </main>
+
+  <footer class="ui-footer">
+    <div class="ui-footer-in">
+      <div class="ui-footer-brand">
+        <a class="ui-brand pp-brand" href="#landing"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor"><circle cx="16" cy="16" r="14" stroke-width="1.4"/><circle cx="16" cy="16" r="9" stroke-width="1"/><path d="M16 10.5v11" stroke-width="1.4" stroke-linecap="round"/></svg><span>PlanPlate</span></a>
+        <p class="muted small">Reservations, made simple. For independent restaurants.</p>
+      </div>
+      <div class="ui-footer-links">
+        <a href="#landing">About</a>
+        <a href="https://prepsto.com/#f/3jhqeaj" target="_blank" rel="noopener" data-prepsto-open>Submit feedback</a>
+        <button type="button" data-lk-open="overview">Privacy &amp; Terms</button>
+      </div>
+      <div class="ui-footer-legal">
+        <anvil-component type="Label" name="copyright_label" prop:text="© PlanPlate" prop:role='["fine-print"]'></anvil-component>
+      </div>
+    </div>
+  </footer>
+  <div class="pp-guest-foot">Reservations by PlanPlate · <a href="https://prepsto.com/#f/3jhqeaj" target="_blank" rel="noopener" data-prepsto-open>Submit feedback</a> · <button type="button" data-lk-open="overview">Privacy &amp; Terms</button></div>
+
+  <nav class="ui-tabbar" aria-label="Main" anvil:name="tabbar">
+    <anvil-component type="RepeatingPanel" name="tab_panel" prop:item_template="PlanPlate_2_0.Items.NavLink" prop:role='["contents"]'></anvil-component>
+    <a href="#profile" anvil:name="tab_profile"><i class="ic ic-user"></i><span>You</span></a>
+  </nav>
+  <anvil-component type="Timer" name="poll_timer" prop:interval="60"></anvil-component>
+</div>
