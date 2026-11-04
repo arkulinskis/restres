@@ -13,6 +13,7 @@ class PublicMenu(PublicMenuTemplate):
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
+        state.heading(self.name_label, 1)  # the restaurant's name is the main heading
         self.slug = args[0] if args else ""
         self.D = anvil.server.call("get_menu", self.slug)
         R = self.D.get("restaurant") or {}
@@ -25,7 +26,8 @@ class PublicMenu(PublicMenuTemplate):
         ok = bool(D.get("ok"))
         langs = R.get("languages") or []
         self.langs_panel.visible = ok and len(langs) > 1
-        self.langs_panel.items = [{"label": l.upper(), "value": l, "on": l == i18n.lang(), "title": i18n.NAMES.get(l, l)} for l in langs]
+        self.langs_panel.items = [{"label": l.upper(), "value": l, "on": l == i18n.lang(), "title": i18n.NAMES.get(l, l),
+                                   "aria": i18n.NAMES.get(l, l)} for l in langs]
         self.eyebrow.text = T("menu")
         if not ok:
             self.name_label.text, self.desc_label.text = T("menuNotFound"), D.get("error") or ""

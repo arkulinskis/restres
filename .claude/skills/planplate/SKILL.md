@@ -33,6 +33,8 @@ details and deploys. Guest texts in English, French and Latvian.
 2. Edit a page's template and Python side by side (`client_code/Pages/X/form_template.html` + `__init__.py`).
 3. `python tools/check.py` -> **ALL CHECKS PASSED** (anvil validate, JS syntax, asset hashes, server tests).
 4. `python -I tools/ui_test.py` (Docker Desktop running) -> **ALL UI TESTS PASSED**. Server edits: `--restart`.
+   It includes tools/ui/a11y.js: axe-core (WCAG 2.2 AA) on every page in light + dark, and keyboard checks on the
+   booking form and the Privacy page. `--only a11y.js` runs just that.
    `--shots DIR` = every page, desktop + phone, light + dark, guest + member. The local App Server runs with
    `--auto-migrate`, so new tables/columns appear locally by themselves.
    Member pages sign in as arkulinskis@gmail.com **on the local server only** (password in the git-ignored
@@ -141,6 +143,32 @@ price from Stripe. Stripe unreachable = nobody locked out. Legal kit: provider `
 
 Demo website using all of it: `Documents/CLAUDE/maison-lumiere-site` (static; `?planplate=http://localhost:3876` for
 local testing).
+
+## Accessibility (WCAG 2.2 AA; audit + fixes 2026-11-04)
+
+tools/ui/a11y.js runs axe-core on every page (light +
+dark, guest + member) and fails on serious problems; add new pages to its page lists. The rules:
+- Text colours reach 4.5:1 on every surface: check new tokens (`--c-faint`, `--c-accent` used as text, status
+  colours on their `-soft` fills). Text on good/bad/warn fills is `var(--c-on-status)` (white light, ink dark).
+- Every field has a name: wrap it in `<label class="ui-field"><span>Caption</span>...</label>`, or
+  `state.set_control_attr(box, "aria-label", "...")` when the caption isn't a label (set it AFTER `.items` on a
+  DropDown: Anvil rebuilds the select). Name/email/phone/password get `autocomplete` (set_control_attr).
+- The page's title Label is a heading: `state.heading(label, 1)` (one per page; Labels render as divs).
+- Toggle buttons say they're on: `.ui-seg` buttons get aria-pressed from the "on" class automatically (app-kit.js);
+  elsewhere `state.set_control_attr(btn, "aria-pressed", ...)`. Never `role="tablist"` without real tabs.
+- Messages that appear are read out: roles msg-error/msg-note get role alert/status automatically; other changing
+  Labels: `state.live(label)`. Hidden text just for screen readers: Label role `sr`.
+- When a click redraws a RepeatingPanel, keep the keyboard's place: give the item's button a `data-key` and call
+  `state.refocus(panel, key)` after the event (PlanPlate's Items/Chip). Buttons have no `.focus()`: `state.focus(btn)`.
+- Images: content images get real alt text (photos: their caption); decorative ones `alt=""`; a Button icon image
+  is set to alt="" automatically. Hidden anti-spam fields: `tabindex=-1`, `autocomplete=off`.
+- PlanPlate specifics: Items/Chip and Items/PickDay carry `data-key` + aria-pressed and restore focus after the row
+  redraws; SlotPicker's hidden `sr_status` says "N free times on <day>" (i18n `timesFree`); the booking form moves
+  focus to the first empty field (`fillIn`, aria-invalid), shows "time taken" errors on the pick step (`pick_error`),
+  focuses the done title; the guest pages' restaurant name is the h1. Website builder (Site.py): `--accent-text`
+  (`_readable`) is the accent darkened/lightened to 4.5:1 for eyebrows, prices and icons; `_ink_for` picks button
+  text by real contrast (black when neither ink passes); the menu tabs are toggle buttons (aria-pressed).
+- The brass is `#826638` now (was #9c7a43, 3.4:1); `--c-faint` #70695e light / #8f8980 dark; `--c-warn` #8a5e0e.
 
 ## Recipes
 

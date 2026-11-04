@@ -10,6 +10,7 @@ class Guests(GuestsTemplate):
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
+        state.set_control_attr(self.sort_drop, "aria-label", "Sort guests by")
         self.rid = args[0]
         self.guests_panel.add_event_handler("x-open", self._open)
         self.sort_drop.selected_value = "recent"

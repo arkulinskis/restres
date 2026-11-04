@@ -6,7 +6,7 @@ from anvil.js import window
 
 from . import legal, pp, router, state
 
-LEGAL_THEME = {"accent": "#9c7a43"}  # colours for the Privacy & Terms page (the brass of app.css)
+LEGAL_THEME = {"accent": "#826638"}  # colours for the Privacy & Terms page (the brass of app.css)
 
 legal.setup(LEGAL_THEME)
 pp.setup()

@@ -15,6 +15,7 @@ class Reservations(ReservationsTemplate):
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
+        state.set_control_attr(self.date_picker, "aria-label", "Day")
         self.rid = args[0]
         self.view = state.store_get("resView", "timeline")
         self.D = anvil.server.call("get_day", self.rid, args[1] if len(args) > 1 else None)

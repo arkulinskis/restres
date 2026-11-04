@@ -17,6 +17,7 @@ class Manage(ManageTemplate):
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
+        state.heading(self.name_label, 1)  # the restaurant's name is the main heading
         self.token = args[0] if args else ""
         self.D = anvil.server.call("get_reservation", self.token)
         self.mode = "view"
@@ -30,7 +31,8 @@ class Manage(ManageTemplate):
         R, r = D.get("restaurant") or {}, D.get("reservation") or {}
         langs = R.get("languages") or []
         self.langs_panel.visible = ok and len(langs) > 1
-        self.langs_panel.items = [{"label": l.upper(), "value": l, "on": l == i18n.lang(), "title": i18n.NAMES.get(l, l)} for l in langs]
+        self.langs_panel.items = [{"label": l.upper(), "value": l, "on": l == i18n.lang(), "title": i18n.NAMES.get(l, l),
+                                   "aria": i18n.NAMES.get(l, l)} for l in langs]
         self.masthead.visible = ok
         self.name_label.text = R.get("name") or ""
         self.addr_label.text = R.get("address") or ""

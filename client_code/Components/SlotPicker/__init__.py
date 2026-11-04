@@ -5,7 +5,7 @@ import anvil.server
 from anvil.js import window
 
 from ._anvil_designer import SlotPickerTemplate
-from ... import i18n, pp
+from ... import i18n, pp, state
 
 T = i18n.T
 
@@ -20,6 +20,8 @@ class SlotPicker(SlotPickerTemplate):
         self.slots: dict = {}
         self.error = ""
         self.init_components(**properties)
+        state.live(self.sr_status)  # screen readers hear "12 free times on Friday 6 November" after each choice
+        state.live(self.times_msg)
         self.party_panel.add_event_handler("x-chip", self._party)
         self.times_panel.add_event_handler("x-chip", self._time)
         self.days_panel.add_event_handler("x-day", self._day)
@@ -89,7 +91,8 @@ class SlotPicker(SlotPickerTemplate):
             slots: list = list(r.get("slots") or [])
             for s in slots:
                 if s["state"] == "open":
-                    items.append({"label": s["time"] + (" •" if s.get("review") else ""), "value": s["time"], "on": self.time == s["time"]})
+                    items.append({"label": s["time"] + (" •" if s.get("review") else ""), "value": s["time"], "on": self.time == s["time"],
+                                  "aria": "%s, %s" % (s["time"], T("reviewTime")) if s.get("review") else None})
                 elif s["state"] == "walk_in" and any_open:
                     items.append({"label": "%s · %s" % (s["time"], T("walkIn")), "value": None, "disabled": True, "title": T("walkNote")})
             self.times_panel.items = items
@@ -97,6 +100,8 @@ class SlotPicker(SlotPickerTemplate):
             self.walk_note.visible, self.walk_note.text = walk, T("walkNote")
         self.times_msg.visible = bool(msg)
         self.times_msg.text = msg
+        free = len([x for x in self.times_panel.items or [] if x.get("value")])
+        self.sr_status.text = msg or (T("timesFree", n=free, d=pp.fmt_date(self.date)) if self.date else "")
 
     def _load(self):
         self.slots, self.error = {}, ""
@@ -148,6 +153,11 @@ class SlotPicker(SlotPickerTemplate):
             y, m = y + 1, 1
         self.month = "%04d-%02d" % (y, m)
         self._draw_month()
+        self.sr_status.text = self.month_label.text
+        # the last (or first) month disables its own arrow: move the keyboard to the other one
+        pressed, other = (self.next_button, self.prev_button) if n > 0 else (self.prev_button, self.next_button)
+        if not pressed.enabled and other.enabled:
+            state.focus(other)
 
     @handle("prev_button", "click")
     def prev_button_click(self, **event_args):

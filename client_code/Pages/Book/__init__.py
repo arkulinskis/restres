@@ -1,4 +1,5 @@
 from anvil import *
+import anvil.js
 import anvil.server
 from anvil.js import window
 
@@ -23,9 +24,23 @@ class Book(BookTemplate):
         self.langs_panel.add_event_handler("x-chip", self._lang)
         self.embedded = window.self != window.top
         self.close_row.visible = self.embedded
+        self._a11y()
         if self.D.get("ok") and self.R.get("accepting"):
             self.picker.setup(self.slug, self.D["days"], self.D.get("today"), self.R.get("max_party"))
         self._draw()
+
+    def _a11y(self):
+        """What the screen reader and the browser's autofill need (WCAG AA)."""
+        state.heading(self.name_label, 1)  # the restaurant's name is the page's main heading
+        for box, kind in ((self.name_box, "name"), (self.email_box, "email"), (self.phone_box, "tel")):
+            state.set_control_attr(box, "autocomplete", kind)
+            state.set_control_attr(box, "aria-required", "true")
+        for box in (self.consent_box, self.pp_consent_box):
+            state.set_control_attr(box, "aria-required", "true")
+        # the hidden anti-spam box: out of the Tab order and away from autofill (a filled box blocks the booking)
+        state.set_control_attr(self.website_box, "tabindex", "-1")
+        state.set_control_attr(self.website_box, "autocomplete", "off")
+        state.set_attr(self.done_title, "tabindex", "-1")
 
     # ---------------------------------------------------------------- drawing
     def _draw(self):
@@ -33,7 +48,8 @@ class Book(BookTemplate):
         accepting = ok and bool(R.get("accepting"))
         langs = R.get("languages") or []
         self.langs_panel.visible = ok and len(langs) > 1
-        self.langs_panel.items = [{"label": l.upper(), "value": l, "on": l == i18n.lang(), "title": i18n.NAMES.get(l, l)} for l in langs]
+        self.langs_panel.items = [{"label": l.upper(), "value": l, "on": l == i18n.lang(), "title": i18n.NAMES.get(l, l),
+                                   "aria": i18n.NAMES.get(l, l)} for l in langs]
         self.masthead.visible = ok
         self.eyebrow.text = T("reserve")
         self.name_label.text = R.get("name") or ""
@@ -127,6 +143,7 @@ class Book(BookTemplate):
     @handle("picker", "change")
     def picker_change(self, **event_args):
         self.next_button.enabled = bool(self.picker.time)
+        self.pick_error.visible = False
 
     @handle("next_button", "click")
     def next_button_click(self, **event_args):
@@ -138,8 +155,9 @@ class Book(BookTemplate):
     @handle("back_button", "click")
     def back_button_click(self, **event_args):
         self.step = "pick"
-        self.error_label.visible = False
+        self.error_label.visible = self.pick_error.visible = False
         self._draw()
+        state.focus(self.next_button)
 
     @handle("privacy_link", "click")
     def privacy_link_click(self, **event_args):
@@ -153,8 +171,13 @@ class Book(BookTemplate):
     def submit_button_click(self, **event_args):
         name, email, phone = (self.name_box.text or "").strip(), (self.email_box.text or "").strip(), (self.phone_box.text or "").strip()
         problem = None
-        if not name or not email or not phone:
-            problem = "%s, %s, %s" % (T("name"), T("email"), T("phone"))
+        missing = [(box, label) for box, label, v in ((self.name_box, T("name"), name), (self.email_box, T("email"), email),
+                                                     (self.phone_box, T("phone"), phone)) if not v]
+        for box in (self.name_box, self.email_box, self.phone_box):
+            state.set_control_attr(box, "aria-invalid", "true" if any(b is box for b, _ in missing) else None)
+        if missing:
+            problem = T("fillIn", f=", ".join(label for _, label in missing))
+            missing[0][0].focus()
         elif not self.consent_box.checked:
             problem = T("consent", link=T("privacyLink"), r=self.R.get("name") or "")
         elif not self.pp_consent_box.checked:
@@ -176,6 +199,7 @@ class Book(BookTemplate):
             self.error_label.visible = False
             self._draw()
             window.scrollTo(0, 0)
+            getattr(anvil.js.get_dom_node(self.done_title), "focus")()  # screen readers start at "Your table is booked"
             return
         err = (r or {}).get("error") or "Something went wrong."
         self.error_label.visible, self.error_label.text = True, err
@@ -183,6 +207,7 @@ class Book(BookTemplate):
             self.step = "pick"
             self.picker.setup(self.slug, self.D["days"], self.D.get("today"), self.R.get("max_party"), p.party, p.date)
             self._draw()
+            self.pick_error.visible, self.pick_error.text = True, err  # the details card is hidden now: say it here
 
     @handle("close_button", "click")
     def close_button_click(self, **event_args):

@@ -22,6 +22,7 @@ class SpecialCard(SpecialCardTemplate):
 
     def __init__(self, **properties):
         super().__init__(**properties)
+        state.set_control_attr(self.active_box, "aria-label", "Show on the website")
         s = self.item
         self.classes["off"] = not s["active"]
         src = pp.thumb(s.get("photo"))

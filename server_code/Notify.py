@@ -104,7 +104,7 @@ def _page(title, paragraphs, facts=None, button=None, footer=""):
     return ('<div style="background:#f6f3ee;padding:32px 12px"><div style="max-width:520px;margin:0 auto;background:#fffdf9;'
             'border:1px solid #e4ded4;border-radius:12px;padding:32px 30px">'
             '<h1 style="margin:0 0 18px;font:28px/1.2 Georgia,serif;font-weight:normal;color:#1d1b18">%s</h1>%s%s%s'
-            '<p style="margin:18px 0 0;font:12px/1.5 Arial,sans-serif;color:#a19a8f">%s</p></div></div>') % (_esc(title), rows, fx, btn, footer)
+            '<p style="margin:18px 0 0;font:12px/1.5 Arial,sans-serif;color:#70695e">%s</p></div></div>') % (_esc(title), rows, fx, btn, footer)
 
 
 def guest_email(res, event):
@@ -152,7 +152,7 @@ def _link_text(line):
     if i < 0:
         return out
     url = out[i:].split(" ")[0]
-    return out.replace(url, '<a href="%s" style="color:#a19a8f">%s</a>' % (url, url))
+    return out.replace(url, '<a href="%s" style="color:#70695e">%s</a>' % (url, url))
 
 
 def staff_alert(res):

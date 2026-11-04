@@ -8,6 +8,9 @@
     state.store_get/store_set  this browser's storage (same keys as the JavaScript version, so drafts carry over)
     state.set_theme(t)         "auto", "light" or "dark"
     state.set_attr(c, name, v) an HTML attribute on a component's root (href on a named <a>, aria-label ...)
+    state.set_control_attr     the same on the real <input>/<button> inside (autocomplete, aria-pressed)
+    state.heading(label, 1)    a Label that screen readers treat as a heading; state.live(label) reads it out on change
+    state.focus_key/refocus    keep the keyboard focus on the same choice after a RepeatingPanel redraw (data-key)
 """
 import anvil.js
 import anvil.server
@@ -136,3 +139,57 @@ def feedback():
         window.Prepsto.open()
     else:
         window.open("https://prepsto.com/#f/3jhqeaj", "_blank", "noopener")
+
+
+# ---------------------------------------------------------------- accessibility (WCAG AA)
+# app-kit.js already makes msg-error/msg-note Labels speak and .ui-seg toggles say which one is on.
+def control(component):
+    """The real <input>, <textarea>, <select> or <button> inside an Anvil component (for ARIA attributes and focus)."""
+    node = anvil.js.get_dom_node(component)
+    if str(node.tagName) in ("INPUT", "TEXTAREA", "SELECT", "BUTTON"):
+        return node
+    return node.querySelector("input, textarea, select, button") or node
+
+
+def focus(component):
+    """Keyboard focus on a component's real control (Anvil's Button has no focus())."""
+    getattr(control(component), "focus")()
+
+
+def set_control_attr(component, name, value):
+    """An HTML attribute on the component's real control: autocomplete on a TextBox, aria-pressed on a Button."""
+    el = control(component)
+    if value is None:
+        el.removeAttribute(name)
+    else:
+        el.setAttribute(name, str(value))
+
+
+def heading(component, level=1):
+    """Make a Label a real heading for screen readers (an Anvil Label renders as a <div>)."""
+    set_attr(component, "role", "heading")
+    set_attr(component, "aria-level", level)
+
+
+def live(component, urgent=False):
+    """Have screen readers read a Label out whenever its text changes ("Loading...", "No tables left")."""
+    set_attr(component, "role", "alert" if urgent else "status")
+
+
+def focus_key():
+    """The data-key of the focused element, so a redraw can put the keyboard focus back (see refocus)."""
+    el = window.document.activeElement
+    hit = el.closest("[data-key]") if el and getattr(el, "closest", None) else None
+    return hit.getAttribute("data-key") if hit else None
+
+
+def refocus(component, key, fallback=None):
+    """After a RepeatingPanel redraw replaced the focused button: focus the new one with the same data-key
+    inside component (else fallback), so keyboard users keep their place instead of landing at the top of the page."""
+    if not key:
+        return
+    el = anvil.js.get_dom_node(component).querySelector('[data-key="%s"]' % window.CSS.escape(str(key)))
+    if el and not getattr(el, "disabled", False):
+        getattr(el, "focus")()
+    elif fallback is not None:
+        focus(fallback)

@@ -21,6 +21,10 @@ class SiteField(SiteFieldTemplate):
             c.visible = False
         self.cap.visible = bool(sp.get("label")) and t in ("text", "area", "path", "palette", "language")
         self.cap.text = sp.get("label") or ""
+        if sp.get("label"):  # the caption above isn't a <label>: give the field its name directly
+            for c in (self.prefix_text, self.text_box, self.area_box, self.drop):
+                state.set_control_attr(c, "aria-label", sp["label"])
+        state.set_attr(self.accent_in, "aria-label", "Your accent colour")
         self.hint.visible = bool(sp.get("hint"))
         self.hint.text = sp.get("hint") or ""
         if t == "text":
@@ -71,6 +75,7 @@ class SiteField(SiteFieldTemplate):
             self.drop.visible = True
             self.drop.items = [(site_model.LANG_NAMES.get(l, l), l) for l in m.D["languages"]]
             self.drop.selected_value = m.F["language"]
+            state.set_control_attr(self.drop, "aria-label", sp.get("label") or "Language")  # after .items: the select is rebuilt
         elif t == "hero":
             self.chips_panel.visible = True
             kind = m.get("content.hero.kind") or "photo"

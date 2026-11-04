@@ -14,7 +14,7 @@ help_text: |
   Used in the landing page's hero and on #auth. After signing in it goes where the person was heading (router.after_sign_in).
 ---
 <div class="pp-authbox">
-  <div class="pp-auth-tabs" role="tablist" anvil:name="mode_tabs">
+  <div class="pp-auth-tabs" role="group" aria-label="Sign in or create an account" anvil:name="mode_tabs">
     <button type="button" anvil:name="tab_login" data-mode="login" anvil:on-dom:click="self.mode_click">Sign in</button>
     <button type="button" anvil:name="tab_signup" data-mode="signup" anvil:on-dom:click="self.mode_click">Create account</button>
   </div>

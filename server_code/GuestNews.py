@@ -153,7 +153,7 @@ def _html(title, body, lang):
             '<body style="margin:0;background:#f6f3ee;font:16px/1.6 Georgia,serif;color:#1d1b18">'
             '<div style="max-width:520px;margin:40px auto;padding:32px 28px;background:#fffdf9;border:1px solid #e4ded4;border-radius:12px">'
             '<h1 style="margin:0 0 16px;font-weight:normal;font-size:26px">%s</h1>%s'
-            '<p style="margin:24px 0 0;font:12px Arial,sans-serif;color:#a19a8f">PlanPlate</p></div></body></html>') % (
+            '<p style="margin:24px 0 0;font:12px Arial,sans-serif;color:#70695e">PlanPlate</p></div></body></html>') % (
         lang, _esc(title), _esc(title), body)
 
 

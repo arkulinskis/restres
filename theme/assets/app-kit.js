@@ -107,4 +107,46 @@
     return '<svg class="ui-ic ' + (cls || '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
       'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (UI.ICONS[name] || UI.ICONS.sparkle) + '</svg>';
   };
+
+  /* Accessibility glue for things the Python side shows with classes only (WCAG AA, 2026-11-04):
+     - error and note messages (Label roles msg-error / msg-note / msg-ok) are read out by screen readers;
+     - toggle buttons in a .ui-seg group say which one is chosen (aria-pressed follows the "on" class);
+     - an icon image inside a button with its own text (Button prop:icon="_/theme/x.svg") gets alt="";
+     - Anvil's own pieces: the "Build web apps with Anvil" banner link and a notification's close button get names.
+     One observer for the whole page, so every page and dialog gets it without extra code. */
+  var A11Y = '.anvil-role-msg-error,.anvil-role-msg-note,.anvil-role-msg-ok,.ui-seg button,button img:not([alt]),#anvil-badge,[data-notify="dismiss"],.anvil-close';
+  UI.a11y = function (el) {
+    if (!el || el.nodeType !== 1) return;
+    var c = el.classList, want = null;
+    if (c.contains('anvil-role-msg-error')) want = 'alert';
+    else if (c.contains('anvil-role-msg-note') || c.contains('anvil-role-msg-ok')) want = 'status';
+    if (want && el.getAttribute('role') !== want) el.setAttribute('role', want);
+    if (el.tagName === 'BUTTON' && el.closest('.ui-seg')) {
+      var on = c.contains('on') ? 'true' : 'false';
+      if (el.getAttribute('aria-pressed') !== on) el.setAttribute('aria-pressed', on);
+    }
+    if (el.tagName === 'IMG' && !el.hasAttribute('alt') && el.closest('button')) el.setAttribute('alt', '');
+    if (el.id === 'anvil-badge' && !el.hasAttribute('aria-label')) el.setAttribute('aria-label', 'Built with Anvil (opens anvil.works)');
+    if ((el.getAttribute('data-notify') === 'dismiss' || c.contains('anvil-close')) && el.getAttribute('aria-hidden') === 'true') {
+      el.removeAttribute('aria-hidden');
+      el.setAttribute('aria-label', 'Close');
+    }
+  };
+  function a11yScan(root) {
+    if (!root || root.nodeType !== 1) return;
+    UI.a11y(root);
+    var list = root.querySelectorAll(A11Y);
+    for (var i = 0; i < list.length; i++) UI.a11y(list[i]);
+  }
+  function a11yStart() {
+    a11yScan(document.body);
+    new MutationObserver(function (records) {
+      for (var i = 0; i < records.length; i++) {
+        var r = records[i];
+        if (r.type === 'attributes') UI.a11y(r.target);
+        else for (var j = 0; j < r.addedNodes.length; j++) a11yScan(r.addedNodes[j]);
+      }
+    }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+  }
+  if (document.body) a11yStart(); else document.addEventListener('DOMContentLoaded', a11yStart);
 })();

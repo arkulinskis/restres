@@ -23,6 +23,9 @@ class Settings(SettingsTemplate):
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
+        state.set_control_attr(self.over_drop, "aria-label", "When the limit is reached")
+        state.set_control_attr(self.invite_email, "aria-label", "Colleague's email")
+        state.set_control_attr(self.invite_role, "aria-label", "Their role")
         self.rid = args[0]
         self.D = anvil.server.call("get_settings", self.rid)
         self.team_panel.add_event_handler("x-role", self._role)

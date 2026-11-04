@@ -1,6 +1,7 @@
 from anvil import *
 
 from ._anvil_designer import AuthTemplate
+from ... import state
 
 
 class Auth(AuthTemplate):
@@ -8,6 +9,7 @@ class Auth(AuthTemplate):
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
+        state.heading(self.box.heading, 1)
         self.box.set_mode(args[0] if args else "login")
 
     @handle("", "show")

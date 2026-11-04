@@ -54,8 +54,8 @@
     const submit = () => (btn('.pp-panel', 'Book table') || btn('.pp-panel', 'Send request')).click();
     ticks[0].click();
     submit();
-    await until(() => vis($('.pp-panel .anvil-role-msg-error')), 'the PlanPlate tick is required');
-    ok(/required boxes/.test($('.pp-panel .anvil-role-msg-error').textContent) && vis($('.pp-summary')), 'booking form: no booking without the PlanPlate tick');
+    await until(() => vis($$('.pp-panel .anvil-role-msg-error').find(vis)), 'the PlanPlate tick is required');
+    ok(/required boxes/.test($$('.pp-panel .anvil-role-msg-error').find(vis).textContent) && vis($('.pp-summary')), 'booking form: no booking without the PlanPlate tick');
     ticks[1].click(); ticks[2].click();
     submit();
     await until(() => vis($('.pp-done')), 'booked', 40000);

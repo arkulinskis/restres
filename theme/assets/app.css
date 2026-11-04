@@ -10,17 +10,18 @@
   --c-surface-2: #f1ede6;   /* subtle fills, hovers */
   --c-ink: #1d1b18;         /* warm ink */
   --c-muted: #6f6a62;
-  --c-faint: #a19a8f;
+  --c-faint: #70695e;       /* hints, fine print: still 4.5:1 on every surface (WCAG AA) */
   --c-line: #e4ded4;
   --c-brand: #1d1b18;       /* primary buttons are ink */
   --c-brand-ink: #faf8f4;
   --c-brand-soft: #f3ebdc;
-  --c-accent: #9c7a43;      /* brass: eyebrows, highlights, focus */
+  --c-accent: #826638;      /* brass: eyebrows, highlights, focus (#826638 = 4.5:1 text contrast; #9c7a43 was 3.4) */
   --c-accent-soft: #f3ebdc;
   --c-good: #3f6b4e; --c-good-soft: #e5efe7;
-  --c-warn: #93650f; --c-warn-soft: #f7ecd6;
+  --c-warn: #8a5e0e; --c-warn-soft: #f7ecd6;
   --c-bad: #a23b2c;  --c-bad-soft: #f6e4e0;
   --c-info: #3d5a80; --c-info-soft: #e6ecf4;
+  --c-on-status: #fff;     /* text on good/bad/warn/brass fills (dark mode: ink, since those fills turn light) */
   --radius: 14px; --radius-sm: 10px;
   --shadow: 0 1px 2px rgba(29, 27, 24, .04), 0 10px 30px rgba(29, 27, 24, .06);
   --shadow-lg: 0 18px 50px rgba(29, 27, 24, .16);
@@ -32,18 +33,18 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --c-bg: #121110; --c-surface: #1b1a18; --c-surface-2: #23211e; --c-ink: #ece7de; --c-muted: #a39d92; --c-faint: #6f6a62;
+    --c-bg: #121110; --c-surface: #1b1a18; --c-surface-2: #23211e; --c-ink: #ece7de; --c-muted: #a39d92; --c-faint: #8f8980;
     --c-line: #2e2b27; --c-brand: #ece7de; --c-brand-ink: #151412; --c-brand-soft: #2c2519; --c-accent: #c9a56a; --c-accent-soft: #2c2519;
     --c-good: #8fbf9c; --c-good-soft: #1d2a21; --c-warn: #e2b660; --c-warn-soft: #2f2615; --c-bad: #e6907f; --c-bad-soft: #33201b;
-    --c-info: #9db7da; --c-info-soft: #1c2532;
+    --c-info: #9db7da; --c-info-soft: #1c2532; --c-on-status: #151412;
     --shadow: none; --shadow-lg: 0 18px 50px rgba(0, 0, 0, .5); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --c-bg: #121110; --c-surface: #1b1a18; --c-surface-2: #23211e; --c-ink: #ece7de; --c-muted: #a39d92; --c-faint: #6f6a62;
+  --c-bg: #121110; --c-surface: #1b1a18; --c-surface-2: #23211e; --c-ink: #ece7de; --c-muted: #a39d92; --c-faint: #8f8980;
   --c-line: #2e2b27; --c-brand: #ece7de; --c-brand-ink: #151412; --c-brand-soft: #2c2519; --c-accent: #c9a56a; --c-accent-soft: #2c2519;
   --c-good: #8fbf9c; --c-good-soft: #1d2a21; --c-warn: #e2b660; --c-warn-soft: #2f2615; --c-bad: #e6907f; --c-bad-soft: #33201b;
-  --c-info: #9db7da; --c-info-soft: #1c2532;
+  --c-info: #9db7da; --c-info-soft: #1c2532; --c-on-status: #151412;
   --shadow: none; --shadow-lg: 0 18px 50px rgba(0, 0, 0, .5); color-scheme: dark;
 }
 /* Big monitors: a little larger type and a wider page, so nothing looks lost in the middle of a 1440p/4K screen. */
@@ -105,7 +106,7 @@ html.ui-modal-open { overflow: hidden; }
 :is(.ui-btn.ghost, .anvil-role-btn.anvil-role-btn-ghost > button, a.anvil-role-btn.anvil-role-btn-ghost):hover { background: var(--c-surface-2); color: var(--c-ink); }
 :is(.ui-btn.danger, .anvil-role-btn.anvil-role-btn-danger > button, a.anvil-role-btn.anvil-role-btn-danger) { color: var(--c-bad); }
 :is(.ui-btn.danger, .anvil-role-btn.anvil-role-btn-danger > button, a.anvil-role-btn.anvil-role-btn-danger):hover { border-color: var(--c-bad); }
-:is(.ui-btn.danger.solid, .anvil-role-btn.anvil-role-btn-danger.anvil-role-btn-solid > button, a.anvil-role-btn.anvil-role-btn-danger.anvil-role-btn-solid) { background: var(--c-bad); border-color: var(--c-bad); color: #fff; }
+:is(.ui-btn.danger.solid, .anvil-role-btn.anvil-role-btn-danger.anvil-role-btn-solid > button, a.anvil-role-btn.anvil-role-btn-danger.anvil-role-btn-solid) { background: var(--c-bad); border-color: var(--c-bad); color: var(--c-on-status); }
 :is(.ui-btn.sm, .anvil-role-btn.anvil-role-btn-sm > button, a.anvil-role-btn.anvil-role-btn-sm) { min-height: 34px; padding: 6px 12px; font-size: .85rem; }
 :is(.ui-btn.lg, .anvil-role-btn.anvil-role-btn-lg > button, a.anvil-role-btn.anvil-role-btn-lg) { min-height: 54px; padding: 14px 26px; font-size: 1.05rem; }
 :is(.ui-btn.icon, .anvil-role-btn.anvil-role-btn-icon > button, a.anvil-role-btn.anvil-role-btn-icon) { width: 40px; min-height: 40px; padding: 0; }
@@ -127,7 +128,7 @@ html.ui-modal-open { overflow: hidden; }
   font: inherit; font-size: 1rem; color: var(--c-ink); background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--radius-sm);
   padding: 11px 13px; width: 100%; min-height: 46px; margin: 0; box-shadow: none; transition: border-color .15s, box-shadow .15s; }
 .ui textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
-.ui input:focus, .ui select:focus, .ui textarea:focus { outline: none; border-color: var(--c-brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-accent) 22%, transparent); }
+.ui input:not([type=checkbox]):not([type=radio]):focus, .ui select:focus, .ui textarea:focus { outline: none; border-color: var(--c-brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-accent) 22%, transparent); }
 .ui ::placeholder { color: var(--c-faint); }
 .ui-hint { font-size: .85rem; color: var(--c-muted); margin: 6px 0 0; }
 .ui-check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; font-size: .95rem; }
@@ -213,8 +214,8 @@ html.ui-modal-open { overflow: hidden; }
 .ui-toasts { position: fixed; z-index: 1000; left: 50%; bottom: 24px; transform: translateX(-50%); display: grid; gap: 8px; width: min(92vw, 440px); pointer-events: none; }
 .ui-toast { display: flex; gap: 10px; align-items: center; background: var(--c-ink); color: var(--c-bg); padding: 13px 16px; border-radius: 14px; box-shadow: var(--shadow-lg);
   font-weight: 500; animation: ui-pop .2s ease-out; transition: opacity .3s, transform .3s; }
-.ui-toast.error { background: var(--c-bad); color: #fff; }
-.ui-toast.ok { background: var(--c-good); color: #fff; }
+.ui-toast.error { background: var(--c-bad); color: var(--c-on-status); }
+.ui-toast.ok { background: var(--c-good); color: var(--c-on-status); }
 .ui-toast.out { opacity: 0; transform: translateY(8px); }
 .ui-modal-wrap { position: fixed; inset: 0; z-index: 900; background: rgba(10, 12, 20, .5); display: grid; place-items: center; padding: 16px; overflow-y: auto; animation: ui-fade .15s; }
 .ui-modal { position: relative; width: min(100%, 520px); background: var(--c-surface); border-radius: calc(var(--radius) + 4px); padding: 28px; box-shadow: var(--shadow-lg); animation: ui-pop .18s ease-out; outline: none; }
@@ -324,8 +325,8 @@ html.ui-modal-open { overflow: hidden; }
 /* notifications (state.toast) look like the old toasts */
 .anvil-notification { background: var(--c-ink); color: var(--c-bg); border: 0; border-radius: 14px; box-shadow: var(--shadow-lg);
   font: 600 1rem/1.4 var(--font-body); }
-.anvil-notification.anvil-role-ok { background: var(--c-good); color: #fff; }
-.anvil-notification.anvil-role-error { background: var(--c-bad); color: #fff; }
+.anvil-notification.anvil-role-ok { background: var(--c-good); color: var(--c-on-status); }
+.anvil-notification.anvil-role-error { background: var(--c-bad); color: var(--c-on-status); }
 .anvil-notification .anvil-notification-title { font-weight: 800; }
 
 /* dialogs (alert / confirm with a Form inside) look like the old modals */
@@ -381,8 +382,8 @@ html.ui-modal-open { overflow: hidden; }
   .ad-user-row { grid-template-columns: 1fr 1fr; }
   .ad-lib-head, .ad-lib-row { grid-template-columns: minmax(0, 1fr) 50px 50px 50px; }
 }
-.anvil-notification.alert-success, .anvil-notification.anvil-notification-success { background: var(--c-good); color: #fff; }
-.anvil-notification.alert-danger, .anvil-notification.anvil-notification-danger { background: var(--c-bad); color: #fff; }
+.anvil-notification.alert-success, .anvil-notification.anvil-notification-success { background: var(--c-good); color: var(--c-on-status); }
+.anvil-notification.alert-danger, .anvil-notification.anvil-notification-danger { background: var(--c-bad); color: var(--c-on-status); }
 
 /* The open-source runtime (App Server 1.18) wraps named elements and components in <anvil-dropzone> tags; hosted Anvil
    has dropped them. Make them invisible to layout so child selectors and grids behave the same on both. */
@@ -390,8 +391,8 @@ anvil-dropzone { display: contents; }
 /* Notifications on the open-source runtime (1.18): Bootstrap-style alerts. Same look as .anvil-notification above. */
 [data-notify="container"].anvil-alert { background: var(--c-ink); color: var(--c-bg); border: 2.5px solid var(--c-line); border-radius: 14px;
   box-shadow: var(--shadow); font: 700 1rem/1.4 var(--font-body); padding: 12px 40px 12px 16px; }
-[data-notify="container"].anvil-alert-success { background: var(--c-good); color: #fff; }
-[data-notify="container"].anvil-alert-danger { background: var(--c-bad); color: #fff; }
+[data-notify="container"].anvil-alert-success { background: var(--c-good); color: var(--c-on-status); }
+[data-notify="container"].anvil-alert-danger { background: var(--c-bad); color: var(--c-on-status); }
 [data-notify="container"].anvil-alert .anvil-close, [data-notify="container"].anvil-alert [data-notify="dismiss"] { color: inherit; opacity: .8; text-shadow: none; }
 /* header: the guest buttons stay on one line, the logo never shrinks */
 .ui-brand img { flex: none; }
@@ -402,8 +403,8 @@ anvil-dropzone { display: contents; }
 }
 .pf-pw { margin-top: 22px !important; }
 /* Toast colours win over the plain rule above on both runtimes (hosted: anvil-role-ok/error; App Server 1.18: alert-success/danger). */
-:is(.anvil-notification, [data-notify="container"]):is(.anvil-role-ok, .anvil-alert-success) { background: var(--c-good); color: #fff; }
-:is(.anvil-notification, [data-notify="container"]):is(.anvil-role-error, .anvil-alert-danger) { background: var(--c-bad); color: #fff; }
+:is(.anvil-notification, [data-notify="container"]):is(.anvil-role-ok, .anvil-alert-success) { background: var(--c-good); color: var(--c-on-status); }
+:is(.anvil-notification, [data-notify="container"]):is(.anvil-role-error, .anvil-alert-danger) { background: var(--c-bad); color: var(--c-on-status); }
 /* Our dialogs: Anvil's normal alert is a 300 px "small" modal; give them the old modal's width. */
 
 /* ---- template pages (component version) */
@@ -484,7 +485,7 @@ anvil-dropzone { display: contents; }
 .pp .btn.primary:hover { opacity: .9; }
 .pp .btn.ghost { background: transparent; border-color: transparent; color: var(--pp-muted); }
 .pp .btn.ghost:hover { color: var(--pp-ink); background: var(--pp-panel-2); }
-.pp .btn.good { background: var(--pp-good); border-color: var(--pp-good); color: #fff; }
+.pp .btn.good { background: var(--pp-good); border-color: var(--pp-good); color: var(--c-on-status); }
 .pp .btn.danger { color: var(--pp-bad); }
 .pp .btn.danger:hover { border-color: var(--pp-bad); }
 .pp .btn.sm { padding: 6px 12px; font-size: .82rem; }
@@ -494,7 +495,8 @@ anvil-dropzone { display: contents; }
 .pp .btn svg, .pp .ic { width: 16px; height: 16px; flex: none; }
 .pp .ic.rot { transform: rotate(90deg); }
 .pp .btn:focus-visible, .pp input:focus-visible, .pp textarea:focus-visible, .pp select:focus-visible, .pp [tabindex]:focus-visible { outline: 2px solid var(--pp-brass); outline-offset: 2px; }
-.pp input:focus, .pp textarea:focus, .pp select:focus { border-color: var(--pp-ink); outline: none; }
+/* tick boxes keep the focus ring above: only typed-in fields swap it for the darker border */
+.pp input:not([type=checkbox]):not([type=radio]):focus, .pp textarea:focus, .pp select:focus { border-color: var(--pp-ink); outline: none; }
 
 .pp input[type=text], .pp input[type=email], .pp input[type=password], .pp input[type=tel], .pp input[type=number], .pp input[type=date], .pp input[type=time], .pp input[type=search], .pp input[type=url], .pp textarea, .pp select {
   font: inherit; color: var(--pp-ink); background: var(--pp-panel); border: 1px solid var(--pp-line); border-radius: 10px; padding: 10px 12px; width: 100%; margin: 0; box-shadow: none; height: auto; min-height: 42px;
@@ -553,7 +555,7 @@ anvil-dropzone { display: contents; }
 .pp .subnav .tabs button { all: unset; cursor: pointer; padding: 10px 14px; font-size: .9rem; color: var(--pp-muted); border-bottom: 2px solid transparent; white-space: nowrap; display: inline-flex; gap: 7px; align-items: center; }
 .pp .subnav .tabs button:hover { color: var(--pp-ink); }
 .pp .subnav .tabs button.on { color: var(--pp-ink); border-bottom-color: var(--pp-ink); }
-.pp .subnav .tabs .n { background: var(--pp-warn); color: #fff; font-size: .7rem; border-radius: 99px; padding: 1px 7px; font-weight: 600; }
+.pp .subnav .tabs .n { background: var(--pp-warn); color: var(--c-on-status); font-size: .7rem; border-radius: 99px; padding: 1px 7px; font-weight: 600; }
 
 /* Time-zone picker (PP.tzField) */
 .pp .pp-tz { position: relative; }
@@ -600,7 +602,7 @@ anvil-dropzone { display: contents; }
 .pp-brand .mark { width: 30px; height: 30px; color: var(--c-accent); flex: none; }
 .pp-bell-wrap { position: relative; display: inline-flex; }
 .anvil-role-pp-bell-n { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--c-warn);
-  color: #fff; font: 600 .68rem/18px var(--font-body); text-align: center; pointer-events: none; }
+  color: var(--c-on-status); font: 600 .68rem/18px var(--font-body); text-align: center; pointer-events: none; }
 .pp-alerts { width: 360px; }
 .pp-alert-row { display: grid; gap: 2px; width: 100%; text-align: left; padding: 9px 12px; border: 0; background: none; border-radius: var(--radius-sm); cursor: pointer;
   font: inherit; color: var(--c-ink); }
@@ -623,7 +625,7 @@ anvil-dropzone { display: contents; }
 .pp-tab:hover { color: var(--c-ink) !important; }
 .pp-tab.on { color: var(--c-ink) !important; border-bottom-color: var(--c-ink); }
 .pp-tab .ic { width: 16px; height: 16px; }
-.anvil-role-pp-tab-n { background: var(--c-warn); color: #fff; font-size: .7rem; border-radius: 99px; padding: 1px 7px; font-weight: 600; }
+.anvil-role-pp-tab-n { background: var(--c-warn); color: var(--c-on-status); font-size: .7rem; border-radius: 99px; padding: 1px 7px; font-weight: 600; }
 
 /* guest pages (#book, #r, #menu): no app chrome, one quiet line at the bottom */
 .pp-guest-foot { display: none; }
@@ -649,7 +651,7 @@ anvil-dropzone { display: contents; }
 .anvil-role-chip.anvil-role-on > button { background: var(--c-brand); color: var(--c-brand-ink); border-color: var(--c-brand); }
 .anvil-role-chip > button:disabled { opacity: .35; cursor: not-allowed; text-decoration: line-through; }
 .anvil-role-chips > div, .pp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.anvil-role-btn.anvil-role-btn-good > button { background: var(--c-good); border-color: var(--c-good); color: #fff; }
+.anvil-role-btn.anvil-role-btn-good > button { background: var(--c-good); border-color: var(--c-good); color: var(--c-on-status); }
 .ui-check input[type=checkbox] { accent-color: var(--c-brand); }
 .anvil-checkbox label, .anvil-role-check label { display: flex; gap: 10px; align-items: flex-start; font-size: .92rem; cursor: pointer; }
 .pp .ui-wrap { padding-top: 28px; }
@@ -876,7 +878,7 @@ html.ui-dark .lp-land img.dk { display: block !important; }
 
 @media (max-width: 720px) { .pp-res .tl { --lab: 70px; } .pp-res .tl .lab { padding: 10px 8px; } }
 
-.pp-res .tl .blk.seated { background: var(--c-good); color: #fff; }
+.pp-res .tl .blk.seated { background: var(--c-good); color: var(--c-on-status); }
 .pp-res .tl .blk.done { background: var(--c-surface-2); color: var(--c-muted); }
 .pp-res-list { padding: 0 !important; overflow: hidden; }
 .pp-res-row { display: grid; grid-template-columns: 70px minmax(0, 2.2fr) 70px minmax(0, 1fr) 150px 90px; gap: 10px; align-items: start; width: 100%; text-align: left;
@@ -935,7 +937,7 @@ html.ui-dark .lp-land img.dk { display: block !important; }
 .pp-floor .tb.sel .top { box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-accent) 40%, transparent); border-color: var(--c-accent); }
 .pp-floor .tb.joined .top { background: var(--c-accent-soft); border-color: var(--c-accent); }
 .pp-floor .tb.off { opacity: .4; } .pp-floor .tb.off .top { border-style: dashed; }
-.pp-floor .tb .jtag { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: .62rem; background: var(--c-accent); color: #fff;
+.pp-floor .tb .jtag { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: .62rem; background: var(--c-accent); color: var(--c-on-status);
   padding: 1px 6px; border-radius: 99px; white-space: nowrap; letter-spacing: .04em; }
 .pp-floor .hint-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--c-muted); padding: 20px; text-align: center; }
 @media (max-width: 900px) { .pp-floor { min-height: 0; aspect-ratio: 1 / 1; } }
@@ -976,7 +978,9 @@ html.ui-dark .lp-land img.dk { display: block !important; }
 .pp-day.blank { visibility: hidden; pointer-events: none; }
 .pp-day.closed { background: transparent; border: 1px dashed var(--c-line); border-left: 3px solid var(--c, var(--c-line)); }
 .pp-day.today .anvil-role-pp-day-n { color: var(--c-accent); }
-.pp-day.past { opacity: .5; }
+/* past days look faded without fading the text below 4.5:1: a lighter tile and the faint text colour */
+.pp-day.past { background: transparent; color: var(--c-faint); border-left-color: color-mix(in srgb, var(--c, transparent) 45%, transparent); }
+.pp-day.past .anvil-role-pp-day-n { color: var(--c-faint); }
 .anvil-role-pp-day-n { display: block; font: 600 .82rem var(--font-body); color: var(--c-ink); }
 .anvil-role-pp-day-h { display: block; white-space: pre-line; }
 .pp-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: .78rem; color: var(--c-muted); }
@@ -1162,7 +1166,7 @@ a.pp-stat:hover { border-color: var(--c-faint); }
 .anvil-role-pp-evd-n { font: 500 1.3rem var(--font-display); } .anvil-role-pp-evd-m { font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--c-muted); }
 .pp-ck { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--c-line); font-size: .9rem; }
 .pp-ck-m { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--c-line); display: grid; place-items: center; flex: none; color: transparent; }
-.pp-ck.done .pp-ck-m { background: var(--c-good); border-color: var(--c-good); color: #fff; }
+.pp-ck.done .pp-ck-m { background: var(--c-good); border-color: var(--c-good); color: var(--c-on-status); }
 .pp-ck.done .anvil-label { color: var(--c-muted); text-decoration: line-through; }
 .pp-ck-m .ic { width: 13px; height: 13px; }
 /* photo pickers and fields */
@@ -1245,7 +1249,7 @@ button.pp-grow-row:hover { background: var(--c-surface-2); }
 .pp-ssec .pp-tick { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--c-line); display: grid; place-items: center; flex: none; margin: 0;
   background: none; color: transparent; }
 .pp-ssec .pp-tick .ic { width: 12px; height: 12px; }
-.pp-ssec-wrap.ok .pp-tick { background: var(--c-good); border-color: var(--c-good); color: #fff; }
+.pp-ssec-wrap.ok .pp-tick { background: var(--c-good); border-color: var(--c-good); color: var(--c-on-status); }
 .pp-ssec-wrap.off .anvil-role-strong { color: var(--c-faint); }
 .pp-ssec > summary::after { content: ""; width: 8px; height: 8px; border-right: 1.5px solid var(--c-muted); border-bottom: 1.5px solid var(--c-muted); transform: rotate(45deg);
   margin: -4px 4px 0 6px; transition: transform .15s; flex: none; }
@@ -1304,3 +1308,6 @@ a.anvil-file-loader.anvil-component[class*="anvil-role-ic-"] label i.anvil-compo
 /* Admin -> Old PlanPlate: the restaurants to bring in */
 .ad-choices .column-panel { display: grid; gap: 2px; background: var(--c-surface-2); border: 1px solid var(--c-line); border-radius: 12px; padding: 8px 12px; }
 .ad-choices label { white-space: normal; line-height: 1.4; }
+
+/* Screen-reader-only text (Label role "sr", or class ui-sr): read out, not shown */
+.anvil-role-sr, .ui-sr { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

@@ -18,7 +18,18 @@ class AuthBox(AuthBoxTemplate):
         self.mode = "login"
         self.init_components(**properties)
         self.dom_nodes["consent"].innerHTML = legal.consent_field()
+        self._a11y(2)  # a section heading on the landing page; the #auth page makes it the main heading
         self._draw()
+
+    def _a11y(self, level):
+        """Screen readers: the title is a heading; the browser fills in the right saved email and password;
+        the Google logo is decoration (the button says "Continue with Google")."""
+        state.heading(self.heading, level)
+        state.set_control_attr(self.name_box, "autocomplete", "name")
+        state.set_control_attr(self.email_box, "autocomplete", "email")
+        img = state.control(self.google_button).querySelector("img")
+        if img:
+            img.setAttribute("alt", "")
 
     def set_mode(self, mode, focus=False):
         self.mode = mode if mode in HEADINGS else "login"
@@ -33,6 +44,9 @@ class AuthBox(AuthBoxTemplate):
         self.mode_tabs.visible = mode != "reset"
         self.tab_login.classes["on"] = mode == "login"
         self.tab_signup.classes["on"] = mode == "signup"
+        state.set_attr(self.tab_login, "aria-pressed", "true" if mode == "login" else "false")
+        state.set_attr(self.tab_signup, "aria-pressed", "true" if mode == "signup" else "false")
+        state.set_control_attr(self.password_box, "autocomplete", "new-password" if mode == "signup" else "current-password")
         self.name_field.visible = mode == "signup"
         self.password_field.visible = mode != "reset"
         self.consent_box.visible = mode == "signup"

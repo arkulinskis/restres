@@ -1,6 +1,7 @@
 """Run the app for real in the open-source Anvil App Server (Docker) and drive it with headless Chrome.
 
-    python -I tools/ui_test.py                 the user journey (tools/ui/flow.js), the phone-width check (phone.js), admin (admin.js)
+    python -I tools/ui_test.py                 the user journey (tools/ui/flow.js), the phone-width check (phone.js), admin (admin.js),
+                                               accessibility (a11y.js: axe-core WCAG 2.2 AA on every page + keyboard checks)
     python -I tools/ui_test.py --shots DIR     also screenshots of every page (desktop + phone, light + dark) into DIR
     python -I tools/ui_test.py --stop          stop the local server afterwards
 
@@ -8,7 +9,7 @@ The server runs this folder's app files (no build step): container "<key>-dev" o
 Docker volume "<key>-data" (accounts made by tests stay there; `docker volume rm <key>-data` to start clean).
 The app files are COPIED into the Docker volume "<key>-app" on every run (a Windows folder mounted into Docker made
 each request take 15-60 s when Docker's file sharing was busy). Client edits apply on the next run; server-code edits
-need the container restarted (--restart). --only flow.js|phone.js|admin.js runs one script.
+need the container restarted (--restart). --only flow.js|phone.js|admin.js|a11y.js runs one script.
 Needs Docker Desktop running and Chrome installed.
 """
 import json
@@ -26,6 +27,7 @@ KEY = "restres"
 NAME, IMAGE = KEY + "-dev", "anvilworks/anvil-app-server:1.18.0"
 PORT = 3100 + sum(map(ord, KEY)) % 800  # one port per app, so several apps can run side by side
 URL = "http://localhost:%d" % PORT
+AXE = pathlib.Path("C:/Users/arkvi/Documents/CLAUDE/APP_MAKER/vendor/axe-core/axe.min.js")  # a11y.js's checker
 
 
 def sh(*args, check=True):
@@ -83,6 +85,8 @@ def drive(script, window, out, shots=(), seed=False):
         code = (ROOT / "tools" / "ui" / script).read_text(encoding="utf-8")
         seed_js = (ROOT / "tools" / "ui" / "seed.js").read_text(encoding="utf-8").strip().rstrip(";")
         code = code.replace("(async () => { /*SEED*/ })()", seed_js)  # flow/phone sign in the same way seed.js does
+        if "/*AXE*/" in code:
+            code = code.replace("/*AXE*/", "window.__AXE_SRC = %s;" % json.dumps(AXE.read_text(encoding="utf-8")), 1)
         steps.append({"eval": code})
     if seed:
         steps.append({"eval": (ROOT / "tools" / "ui" / "seed.js").read_text(encoding="utf-8")})
@@ -120,7 +124,7 @@ def main():
     out = pathlib.Path(tempfile.mkdtemp(prefix=KEY + "-ui-"))
     failed = False
     only = args[args.index("--only") + 1] if "--only" in args else None  # e.g. --only admin.js
-    for script, window in (("flow.js", "1280,1000"), ("phone.js", "390,844"), ("admin.js", "1280,1000")):
+    for script, window in (("flow.js", "1280,1000"), ("phone.js", "390,844"), ("admin.js", "1280,1000"), ("a11y.js", "1280,1000")):
         if only and script != only:
             continue
         text = drive(script, window, out / script.replace(".js", ""))

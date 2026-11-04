@@ -12,6 +12,7 @@
 #
 # The content lives in sites.content (JSON); name, address, phone and email stay on the restaurant row, so the
 # booking form, emails and website never disagree.
+import colorsys
 import html as _html
 import io
 import json
@@ -513,10 +514,41 @@ def prose(text):
     return "".join(out)
 
 
-def _ink_for(hex_color):
+def _lum(hex_color):
+    """WCAG relative luminance of #rrggbb."""
     h = hex_color.lstrip("#")
-    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-    return "#1a1714" if (0.299 * r + 0.587 * g + 0.114 * b) > 165 else "#ffffff"
+    out = []
+    for i in (0, 2, 4):
+        c = int(h[i:i + 2], 16) / 255
+        out.append(c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * out[0] + 0.7152 * out[1] + 0.0722 * out[2]
+
+
+def _contrast(a, b):
+    la, lb = sorted([_lum(a), _lum(b)], reverse=True)
+    return (la + 0.05) / (lb + 0.05)
+
+
+def _ink_for(hex_color):
+    """Text colour on an accent fill (buttons, event dates): whichever of dark ink or white reads better,
+    or pure black when neither reaches 4.5:1 (mid-tone accents such as terracotta)."""
+    best = max(("#1a1714", "#ffffff"), key=lambda ink: _contrast(ink, hex_color))
+    return best if _contrast(best, hex_color) >= 4.5 else "#000000"
+
+
+def _readable(hex_color, backgrounds, target=4.6):
+    """The accent as TEXT (eyebrows, prices): the same hue, darkened (light pages) or lightened (dark pages) just
+    enough to reach WCAG AA contrast on every background. Buttons keep the restaurant's exact colour."""
+    if all(_contrast(hex_color, bg) >= target for bg in backgrounds):
+        return hex_color
+    h, l, s = colorsys.rgb_to_hls(*[int(hex_color.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4)])
+    lighten = _lum(backgrounds[0]) < 0.2
+    for step in range(1, 101):
+        l2 = min(1.0, l + step / 100) if lighten else max(0.0, l - step / 100)
+        c = "#%02x%02x%02x" % tuple(round(x * 255) for x in colorsys.hls_to_rgb(h, l2, s))
+        if all(_contrast(c, bg) >= target for bg in backgrounds):
+            return c
+    return "#ffffff" if lighten else "#000000"
 
 
 ICONS = {
@@ -613,8 +645,9 @@ class Render(object):
         if self.accent:
             p["accent"] = self.accent
         p["accent_ink"] = _ink_for(p["accent"])
+        p["accent_text"] = _readable(p["accent"], [p["bg"], p["surface"]])
         vars_ = ("--bg:%(bg)s;--surface:%(surface)s;--ink:%(ink)s;--muted:%(muted)s;--line:%(line)s;--accent:%(accent)s;"
-                 "--accent-ink:%(accent_ink)s;--deep:%(deep)s;--deep-ink:%(deep_ink)s;" % p)
+                 "--accent-ink:%(accent_ink)s;--accent-text:%(accent_text)s;--deep:%(deep)s;--deep-ink:%(deep_ink)s;" % p)
         return ":root{%s%s}%s" % (vars_, "color-scheme:dark;" if p["key"] == "noir" else "", CSS)
 
     def header(self):
@@ -730,7 +763,7 @@ class Render(object):
         if not self.on.get("menu"):
             return '<div data-live="menu"></div>'
         sections = _menu(self.r)
-        tabs = "".join('<button class="tab%s" type="button" data-tab="m%d">%s</button>' % (" on" if i == 0 else "", i, esc(s["title"]))
+        tabs = "".join('<button class="tab%s" type="button" data-tab="m%d" aria-pressed="%s">%s</button>' % (" on" if i == 0 else "", i, "true" if i == 0 else "false", esc(s["title"]))
                        for i, s in enumerate(sections)) if len(sections) > 1 else ""
         panels = []
         for i, s in enumerate(sections):
@@ -745,10 +778,11 @@ class Render(object):
         photo = self.photo(m.get("photo"))
         body = ("".join(panels) if panels else '<p class="note">%s</p>' % esc(self.L["menu_soon"]))
         link = '<a class="btn line" href="%s" target="_blank" rel="noopener">%s</a>' % (esc(m["link"]), esc(self.L["full_menu"])) if m.get("link") else ""
-        return ('<section class="menu" id="menu" data-live="menu"><div class="wrap in%s"><div>%s%s<div class="tabs" role="tablist">%s</div>%s'
+        return ('<section class="menu" id="menu" data-live="menu"><div class="wrap in%s"><div>%s%s<div class="tabs" role="group" aria-label="%s">%s</div>%s'
                 '<div class="btns">%s%s</div></div>%s</div></section>'
                 % ("" if photo else " solo", self.heading(m.get("heading") or self.L["menu"]),
-                   '<p class="lead">%s</p>' % esc(m.get("intro")) if m.get("intro") else "", tabs, body, self.book_btn(), link,
+                   '<p class="lead">%s</p>' % esc(m.get("intro")) if m.get("intro") else "", esc(m.get("heading") or self.L["menu"]), tabs, body,
+                   self.book_btn(), link,
                    '<div class="pic">%s</div>' % self.img(photo) if photo else ""))
 
     def events_part(self):
@@ -926,7 +960,7 @@ SITE_JS = r"""(function(){
     if(b){var open=!hd.classList.contains('open');hd.classList.toggle('open',open);b.setAttribute('aria-expanded',String(open));return;}
     if(e.target.closest('.nav a')&&hd){hd.classList.remove('open');}
     var t=e.target.closest('[data-tab]');
-    if(t){var box=t.closest('section');box.querySelectorAll('[data-tab]').forEach(function(x){x.classList.toggle('on',x===t);});
+    if(t){var box=t.closest('section');box.querySelectorAll('[data-tab]').forEach(function(x){x.classList.toggle('on',x===t);x.setAttribute('aria-pressed',x===t?'true':'false');});
       box.querySelectorAll('[data-panel]').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-panel')===t.getAttribute('data-tab'));});return;}
     var k=e.target.closest('[data-pp-book]');
     if(k&&!e.metaKey&&!e.ctrlKey&&window.innerWidth>0){e.preventDefault();book();}
@@ -963,7 +997,7 @@ p{margin:0 0 1em}
 .skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;z-index:100;background:var(--surface);padding:8px 12px;border-radius:8px}
 .wrap{max-width:1160px;margin:0 auto;padding:0 20px}
 section{padding:clamp(56px,8vw,104px) 0}
-.eyebrow{font:600 .72rem/1.2 "Inter Tight",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:block}
+.eyebrow{font:600 .72rem/1.2 "Inter Tight",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-text);margin-bottom:12px;display:block}
 .ic{width:20px;height:20px;flex:none}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:.85rem 1.7rem;border-radius:999px;background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);font:600 .95rem/1.2 "Inter Tight",sans-serif;text-decoration:none;cursor:pointer;transition:filter .15s,transform .15s;white-space:nowrap}
 .btn:hover{filter:brightness(1.07)}.btn:active{transform:translateY(1px)}
@@ -1005,7 +1039,7 @@ section{padding:clamp(56px,8vw,104px) 0}
 .today .in{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between}
 .pills{display:flex;flex-wrap:wrap;gap:8px;min-width:0}
 .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border-radius:99px;background:var(--surface);border:1px solid var(--line);font-size:.92rem;text-decoration:none;max-width:100%}
-.pill .ic{width:16px;height:16px;color:var(--accent)}
+.pill .ic{width:16px;height:16px;color:var(--accent-text)}
 .pill .dot{width:8px;height:8px;border-radius:50%;background:#3f8f5a;flex:none}.pill .dot.off{background:#b04a3a}
 .pod{display:flex;gap:14px;align-items:center;margin:0;max-width:440px}
 .pod img{width:84px;height:84px;object-fit:cover;border-radius:12px;flex:none}
@@ -1019,7 +1053,7 @@ section{padding:clamp(56px,8vw,104px) 0}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin-top:28px}
 .sp{overflow:hidden;display:flex;flex-direction:column}.sp img{width:100%;aspect-ratio:4/3;height:auto;object-fit:cover}
 .sp .body{padding:18px 20px 20px}.sp .row{display:flex;gap:12px;align-items:baseline;justify-content:space-between}.sp h3{margin:0}
-.price{font-weight:600;color:var(--accent);white-space:nowrap}.sp p{color:var(--muted);margin:8px 0 0}
+.price{font-weight:600;color:var(--accent-text);white-space:nowrap}.sp p{color:var(--muted);margin:8px 0 0}
 .when{display:inline-block;margin-top:12px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .menu .in{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(28px,5vw,64px);align-items:start}
 .menu .in.solo{grid-template-columns:minmax(0,48rem)}
@@ -1049,7 +1083,7 @@ section{padding:clamp(56px,8vw,104px) 0}
 .hours{border-collapse:collapse;width:100%;max-width:420px}
 .hours th,.hours td{padding:7px 0;border-bottom:1px solid var(--line);text-align:left;font-weight:400}
 .hours td{text-align:right;font-variant-numeric:tabular-nums}
-.hours tr.now th,.hours tr.now td{font-weight:600;color:var(--accent)}
+.hours tr.now th,.hours tr.now td{font-weight:600;color:var(--accent-text)}
 .spdays{margin-top:18px}.spdays ul{list-style:none;padding:0;margin:0}.spdays li{padding:4px 0;color:var(--muted)}.spdays b{color:var(--ink);font-weight:600}
 .map{border-radius:16px;overflow:hidden;border:1px solid var(--line);min-height:380px;height:100%}
 .map iframe{width:100%;height:100%;min-height:380px;border:0}
@@ -1062,10 +1096,10 @@ planplate-gallery{display:block}
 .highlights{background:var(--surface)}
 .hls{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:10px 48px;margin-top:24px}
 .hl{display:flex;gap:18px;padding:20px 0;border-top:1px solid var(--line)}
-.hl .n{font:500 1.6rem/1 Lora,Georgia,serif;color:var(--accent);min-width:2.2ch}.hl h3{margin:0 0 6px}.hl p{color:var(--muted);margin:0}
+.hl .n{font:500 1.6rem/1 Lora,Georgia,serif;color:var(--accent-text);min-width:2.2ch}.hl h3{margin:0 0 6px}.hl p{color:var(--muted);margin:0}
 .ccs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:24px}
 .cc{display:flex;gap:14px;align-items:center;padding:20px;text-decoration:none;transition:border-color .15s}
-.cc:hover{border-color:var(--accent)}.cc .ic{width:26px;height:26px;color:var(--accent)}
+.cc:hover{border-color:var(--accent)}.cc .ic{width:26px;height:26px;color:var(--accent-text)}
 .cc span{min-width:0;overflow-wrap:anywhere}.cc small{display:block;color:var(--muted);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
 .cc.book{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.cc.book .ic,.cc.book small{color:var(--accent-ink)}
 .ft{background:var(--deep);color:var(--deep-ink);padding:44px 0 36px}

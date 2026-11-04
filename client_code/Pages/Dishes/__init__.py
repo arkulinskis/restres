@@ -10,6 +10,8 @@ class Dishes(DishesTemplate):
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
+        state.set_control_attr(self.file_title, "aria-label", "Menu file name")
+        state.set_control_attr(self.file_lang, "aria-label", "Menu file language")
         self.rid = args[0]
         self.D = anvil.server.call("get_menu_admin", self.rid)
         p = self.sections_panel
