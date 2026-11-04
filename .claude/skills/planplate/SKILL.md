@@ -113,8 +113,20 @@ restaurant's Settings has its **Old PlanPlate ID** (the old uuid, column `legacy
   `cloudinary_url` or the old three secrets `cloudinary_cloud` + `cloudinary_api` + `cloudinary_secret`.
 Old behaviours ported: special day "open, no online bookings" (`special_days.no_online`), guest note per language
 (`restaurants.form_notes`). The demo has the made-up old id 4d2c1f0a-9b7e-4c3d-8a6f-2e5b7c9d1a30.
-Not ported yet (decisions pending, Nov 2026): moving the old data (restaurants, bookings, menu files, staff, gallery),
-Stripe plans (old: Basic 1 restaurant, Recommended up to 3 + managers, Premium unlimited), old passwords.
+**Moving the old data (the user chose CSV, Nov 2026):** Admin -> Old PlanPlate (`server_code/OldImport.py`). The
+user downloads each old table as CSV from the old app's Data Tables (users, new_staff_access, restaurants, reservations,
+menu_files, gallery_flags, cloudinary_related, special_actions); files are recognised by their columns. Passwords are
+kept (old password_hash copied into an EMPTY password only). Re-importing updates restaurants by old id and replaces
+their hours/special days/tables; bookings (token = old reservation_uid), photos and people are only added. CSVs carry
+no media: imported menu files wait for their upload (Menu page -> "Upload the file", keeps the old id so old links work).
+
+**Billing (`server_code/Billing.py`, user's pricing Nov 2026: one flat plan, 100 a month, everything included):** on
+only when the app secrets `stripe_secret_key` (or the old `stripe_live_key_secret`) and `stripe_price_id` are set;
+otherwise everything is free. Stripe's REST API via anvil.http (no stripe package). Access = admin, demo owner, Admin ->
+Users -> "Free plan" (the user's dad's restaurant), or a live subscription (active/trialing/past_due) for the price's
+product or an old plan (OLD_PRODUCTS). Without a plan you can't ADD restaurants; existing ones keep running. Dashboard
+plan card -> Stripe Checkout (back to `#dashboard/paid`); Profile -> Manage billing (Stripe portal); landing shows the
+price from Stripe. Stripe unreachable = nobody locked out. Legal kit: provider `stripe_billing` + "Paid plan" terms.
 
 Demo website using all of it: `Documents/CLAUDE/maison-lumiere-site` (static; `?planplate=http://localhost:3876` for
 local testing).

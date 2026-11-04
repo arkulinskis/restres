@@ -5,7 +5,7 @@ from ... import state
 
 
 class UserRow(UserRowTemplate):
-    """Admin → Users: one person with the Admin and Active switches (saved straight away)."""
+    """Admin → Users: one person with the Admin, Active and Free plan switches (saved straight away)."""
 
     def __init__(self, **properties):
         super().__init__(**properties)
@@ -25,3 +25,7 @@ class UserRow(UserRowTemplate):
     @handle("active_box", "change")
     def active_box_change(self, **event_args):
         self._save("set_enabled", self.active_box)
+
+    @handle("free_box", "change")
+    def free_box_change(self, **event_args):
+        self._save("set_free_plan", self.free_box)

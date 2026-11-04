@@ -1,9 +1,9 @@
 from anvil import *
 
 from ._anvil_designer import AdminTemplate
-from ... import state
+from ... import pp, state
 
-TABS = ["overview", "feedback", "users", "demo"]
+TABS = ["overview", "feedback", "users", "demo", "import"]
 
 
 class Admin(AdminTemplate):
@@ -15,9 +15,9 @@ class Admin(AdminTemplate):
         self.tab = args[0] if args and args[0] in TABS else "overview"
         self._filter = "new"
         parts = {"overview": self.overview_part, "feedback": self.feedback_part,
-                 "users": self.users_part, "demo": self.demo_part}
+                 "users": self.users_part, "demo": self.demo_part, "import": self.import_part}
         tabs = {"overview": self.tab_overview, "feedback": self.tab_feedback,
-                "users": self.tab_users, "demo": self.tab_demo}
+                "users": self.tab_users, "demo": self.tab_demo, "import": self.tab_import}
         for name in TABS:
             parts[name].visible = name == self.tab
             tabs[name].classes["on"] = name == self.tab
@@ -104,3 +104,43 @@ class Admin(AdminTemplate):
             if state.call("demo_remove"):
                 state.toast("Done", "ok")
                 self._demo()
+
+    # ---- the old PlanPlate (CSV import, OldImport.py)
+    def _import(self):
+        self._csv = []
+        self.dom_nodes["tz"].innerHTML = pp.tz_field_html("timezone", "Europe/Riga", "ad_timezone")
+
+    @handle("import_loader", "change")
+    def import_loader_change(self, files=None, **event_args):
+        self._csv = list(files or self.import_loader.files or [])
+        self.import_files.text = ", ".join(f.name or "file" for f in self._csv)
+        self.import_report.visible = False
+        r = state.call("old_import_preview", self._csv) if self._csv else None
+        self.import_button.enabled = bool(r)
+        self.import_preview.visible = bool(r)
+        if r:
+            s = r["summary"]
+            lines = ["In these files:"] + ["  %s: %d rows" % (k, n) for k, n in sorted(s["counts"].items())]
+            lines += ["", "Restaurants:"] + ["  %s (%s)%s" % (x["name"], x["id"], ", already here: will be updated" if x["exists"] else "")
+                                             for x in s["restaurants"]]
+            if r.get("unknown"):
+                lines += ["", "Not old PlanPlate tables (left out): " + ", ".join(r["unknown"])]
+            self.import_preview.text = "\n".join(lines)
+
+    @handle("import_button", "click")
+    def import_button_click(self, **event_args):
+        if not confirm("Restaurants already imported get their hours, special days and tables replaced by the old ones. "
+                       "Bookings, photos and people are only added.", title="Import from the old PlanPlate?",
+                       buttons=[("Cancel", False), ("Import", True)], role="app-dialog"):
+            return
+        node = self.dom_nodes["tz"].querySelector("input[type=hidden]")
+        r = state.call("old_import", self._csv, getattr(node, "value", None) or "Europe/Riga")
+        if r:
+            rep = r["report"]
+            lines = ["Done."] + ["  %s: %d" % (k, n) for k, n in sorted(rep["counts"].items())]
+            lines += ["", "Restaurants:"] + ["  %s (old id %s)" % (x["name"], x["old_id"]) for x in rep["restaurants"]]
+            if rep["warnings"]:
+                lines += ["", "To look at:"] + ["  - " + w for w in rep["warnings"]]
+            self.import_report.text = "\n".join(lines)
+            self.import_report.visible = True
+            state.toast("Imported", "ok")

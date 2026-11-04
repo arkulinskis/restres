@@ -7,6 +7,7 @@
         <a href="#admin/feedback" anvil:name="tab_feedback"><i class="ic ic-inbox"></i>Feedback</a>
         <a href="#admin/users" anvil:name="tab_users"><i class="ic ic-users"></i>Users</a>
         <a href="#admin/demo" anvil:name="tab_demo"><i class="ic ic-database"></i>Demo data</a>
+        <a href="#admin/import" anvil:name="tab_import"><i class="ic ic-upload"></i>Old PlanPlate</a>
       </nav>
 
       <div anvil:name="overview_part">
@@ -42,8 +43,30 @@
           <anvil-component type="Button" name="search_button" prop:text="Search" prop:role='["btn", "ic-search"]'></anvil-component>
           <anvil-component type="Label" name="users_count" prop:role='["fine-print"]'></anvil-component>
         </div>
-        <div class="ad-table ad-users-head"><b>Name</b><b>Email</b><b>Joined</b><b>Admin</b><b>Active</b></div>
+        <div class="ad-table ad-users-head"><b>Name</b><b>Email</b><b>Joined</b><b>Admin</b><b>Active</b><b>Plan</b></div>
         <anvil-component type="RepeatingPanel" name="users_panel" prop:item_template="PlanPlate_2_0.Items.UserRow"></anvil-component>
+      </div>
+
+      <div anvil:name="import_part">
+        <div class="ui-card ui-narrow ad-import ui-stack">
+          <h3>Bring in the old PlanPlate</h3>
+          <p class="muted">Moves restaurants, opening hours, tables, bookings, staff, sign-ins (people keep their passwords), gallery photos and menu-file names from restaurant.planplate.com into this app. Each restaurant keeps its old ID, so its website code and printed QR codes keep working.</p>
+          <ol class="ad-steps">
+            <li>Open the old <b>restaurant.planplate.com</b> app in Anvil, then <b>Data</b>.</li>
+            <li>For each table, use <b>Download as CSV</b>: users, new_staff_access, restaurants, reservations, menu_files, gallery_flags, cloudinary_related and special_actions.</li>
+            <li>Choose all the files here, check what's in them, then import. Importing twice is safe: nothing is added twice.</li>
+          </ol>
+          <label class="ui-field"><span>Time zone of the imported restaurants</span><div anvil:dom-node="tz"></div></label>
+          <div class="ui-row">
+            <anvil-component type="FileLoader" name="import_loader" prop:text="Choose the CSV files" prop:multiple="true" prop:file_types=".csv,text/csv" prop:role='["btn", "ic-upload"]'></anvil-component>
+            <anvil-component type="Label" name="import_files" prop:role='["fine-print"]'></anvil-component>
+          </div>
+          <anvil-component type="Label" name="import_preview" prop:role='["ad-pre"]' prop:visible="false"></anvil-component>
+          <div class="ui-row">
+            <anvil-component type="Button" name="import_button" prop:text="Import" prop:role='["btn", "btn-primary", "ic-database"]' prop:enabled="false"></anvil-component>
+          </div>
+          <anvil-component type="Label" name="import_report" prop:role='["ad-pre"]' prop:visible="false"></anvil-component>
+        </div>
       </div>
 
       <div anvil:name="demo_part">

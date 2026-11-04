@@ -1,4 +1,5 @@
 from anvil import *
+import anvil.server
 from anvil.js import window
 
 from ._anvil_designer import LandingTemplate
@@ -10,6 +11,16 @@ class Landing(LandingTemplate):
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
+        self.add_event_handler("show", self._price)  # after the page is on screen, so the price never slows it down
+
+    def _price(self, **event_args):
+        try:
+            p = anvil.server.call_s("get_pricing")
+        except Exception:
+            return
+        if p.get("on") and p.get("price"):
+            self.price_label.text = "%s, everything included. Cancel any time." % p["price"]
+            self.price_label.visible = True
 
     def jump_click(self, event):
         window.PP.scrollToId(event.currentTarget.getAttribute("data-jump"))

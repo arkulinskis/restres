@@ -20,7 +20,8 @@ def admin_overview():
 
 def _user(u):
     return {"id": u.get_id(), "email": u["email"], "name": C.name_of(u), "is_admin": C.is_admin(u),
-            "enabled": u["enabled"] is not False, "joined": C.iso(u["signed_up"]), "last_seen": C.iso(u["last_seen"])}
+            "enabled": u["enabled"] is not False, "joined": C.iso(u["signed_up"]), "last_seen": C.iso(u["last_seen"]),
+            "plan_free": bool(u["plan_free"])}
 
 
 @anvil.server.callable(require_user=True)
@@ -42,6 +43,17 @@ def set_admin(user_id, flag):
     if u == me and not flag:
         return C.fail("You can't remove your own admin rights.")
     u["is_admin"] = bool(flag)
+    return C.ok(user=_user(u))
+
+
+@anvil.server.callable(require_user=True)
+def set_free_plan(user_id, flag):
+    """A free plan: this person has everything without a Stripe subscription (family, friends, partners)."""
+    C.require_admin()
+    u = C.row_by_id(app_tables.users, user_id)
+    if u is None:
+        return C.fail("That account no longer exists.")
+    u["plan_free"] = bool(flag)
     return C.ok(user=_user(u))
 
 

@@ -63,7 +63,7 @@ def _text(code, body, ctype="text/html; charset=utf-8"):
 def _file_view(f, r):
     ref = r["legacy_id"] or r["slug"]
     return {"id": f.get_id(), "key": f["key"], "title": f["title"] or "", "language": f["language"] or "",
-            "type": f["content_type"] or "", "name": f["file"].name if f["file"] is not None else "",
+            "type": f["content_type"] or "", "name": f["file"].name if f["file"] is not None else "", "missing": f["file"] is None,
             "url": "%s/_/api/menu/%s/%s" % (anvil.server.get_app_origin(), ref, f["key"]), "position": int(f["position"] or 0)}
 
 
@@ -78,22 +78,43 @@ def get_menu_files(rid):
     return {"ok": True, "files": [_file_view(f, r) for f in files_of(r)], "languages": list(B.LANGS)}
 
 
+def _check_file(media):
+    """The error for a menu file that can't be used, or None."""
+    if media is None:
+        return "Choose a PDF or a photo of the menu."
+    if (media.content_type or "").lower() not in FILE_TYPES:
+        return "Menus can be PDFs or photos (JPEG, PNG, WebP)."
+    if len(media.get_bytes()) > MAX_FILE:
+        return "That file is over 15 MB. Make it smaller first."
+    return None
+
+
 @anvil.server.callable(require_user=True)
 def add_menu_file(rid, media, title, language=""):
     r = P._rest(rid, "manager")
     title = str(title or "").strip()[:60]
     if not title:
         return {"ok": False, "error": "Give the menu a name, like Food or Drinks."}
-    if media is None:
-        return {"ok": False, "error": "Choose a PDF or a photo of the menu."}
+    err = _check_file(media)
+    if err:
+        return {"ok": False, "error": err}
     ctype = (media.content_type or "").lower()
-    if ctype not in FILE_TYPES:
-        return {"ok": False, "error": "Menus can be PDFs or photos (JPEG, PNG, WebP)."}
-    if len(media.get_bytes()) > MAX_FILE:
-        return {"ok": False, "error": "That file is over 15 MB. Make it smaller first."}
     language = language if language in B.LANGS else ""
     app_tables.menu_files.add_row(restaurant=r, key=uuid.uuid4().hex, title=title, language=language, file=media,
                                   content_type=ctype, position=len(files_of(r)), created=B.now_utc())
+    return get_menu_files(rid)
+
+
+@anvil.server.callable(require_user=True)
+def replace_menu_file(rid, fid, media):
+    """Put a file into a menu file (one imported from the old PlanPlate arrives without its file). Keeps its id, so the
+    old website links and QR codes to it work again."""
+    r = P._rest(rid, "manager")
+    f = P._child(app_tables.menu_files, r, fid)
+    err = _check_file(media)
+    if err:
+        return {"ok": False, "error": err}
+    f.update(file=media, content_type=(media.content_type or "").lower())
     return get_menu_files(rid)
 
 
@@ -105,7 +126,8 @@ def delete_menu_file(rid, fid):
 
 
 def public_files(r, lang):
-    return [{"title": f["title"] or "", "url": _file_view(f, r)["url"], "type": f["content_type"] or ""} for f in files_of(r, lang)]
+    return [{"title": f["title"] or "", "url": _file_view(f, r)["url"], "type": f["content_type"] or ""}
+            for f in files_of(r, lang) if f["file"] is not None]
 
 
 # ---------------------------------------------------------------- the old public addresses

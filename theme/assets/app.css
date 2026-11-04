@@ -371,7 +371,7 @@ html.ui-modal-open { overflow: hidden; }
 .ad-filter, .ad-search { margin-bottom: 16px; }
 .ad-search .anvil-role-ad-search-box { max-width: 360px; }
 .ad-table { display: grid; gap: 8px; align-items: center; padding: 10px 8px; border-bottom: 1px solid var(--c-line); font-size: .93rem; }
-.ad-users-head, .ad-user-row { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.6fr) 90px 90px 90px; }
+.ad-users-head, .ad-user-row { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.6fr) 90px 90px 90px 110px; }
 .ad-lib-head, .ad-lib-row { grid-template-columns: minmax(0, 3fr) 70px 70px 70px; }
 .ad-users-head b, .ad-lib-head b { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--c-muted); }
 .anvil-role-ad-email { overflow-wrap: anywhere; }
@@ -1283,3 +1283,17 @@ button.pp-grow-row:hover { background: var(--c-surface-2); }
 .pp-pod { display: flex; gap: 14px; align-items: center; }
 .pp-pod img { width: 120px; flex: none; }
 @media (min-width: 861px) { .pp-tabs { flex-wrap: wrap; } .pp-tab { padding: 10px 11px; font-size: .9rem; } }
+
+/* plan / billing */
+.pp-plan { display: flex; align-items: center; gap: 16px; padding: 18px 22px !important; margin-bottom: 16px; border-color: var(--c-accent) !important; }
+.pp-plan .lp-ico { flex: none; }
+@media (max-width: 640px) { .pp-plan { flex-wrap: wrap; } .pp-plan .anvil-role-btn { width: 100%; } }
+.pf-plan { margin-top: 16px; }
+.anvil-role-lp-price { display: block; margin: 0 0 18px; font: 500 1.25rem/1.3 var(--font-display); letter-spacing: .01em; }
+.ad-steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--c-muted); font-size: .93rem; }
+.anvil-role-ad-pre { display: block; white-space: pre-wrap; font: .82rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+  background: var(--c-surface-2); border: 1px solid var(--c-line); border-radius: 12px; padding: 12px 14px; }
+/* File buttons (Anvil FileLoader = <a><label><i fa-icon>…): our role icon only, no box around the label */
+a.anvil-file-loader.anvil-component[class*="anvil-role-ic-"] label i.anvil-component-icon.fa { display: none !important; }
+.anvil-file-loader label { border: 0 !important; outline: 0 !important; background: none !important; padding: 0 !important; margin: 0 !important;
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font: inherit; color: inherit; }

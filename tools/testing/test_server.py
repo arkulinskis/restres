@@ -896,9 +896,174 @@ except Exception:
     leaked = False
 assert not leaked, "only the restaurant's managers add menu files"
 
+# ---------------------------------------------------------------------------------- importing the old PlanPlate (CSV files)
+def csv_file(name, header, rows):
+    import csv as _csv
+    import io as _io
+    buf = _io.StringIO()
+    w = _csv.writer(buf)
+    w.writerow(header)
+    w.writerows(rows)
+    return anvil.BlobMedia("text/csv", ("﻿" + buf.getvalue()).encode("utf-8"), name=name)
+
+
+OLD = "859d82ac-39b7-467c-ba3e-c1f60bdfb10f"
+future = (TODAY + dt.timedelta(days=9)).isoformat()
+past = (TODAY - dt.timedelta(days=30)).isoformat()
+d12, d14 = TODAY + dt.timedelta(days=12), TODAY + dt.timedelta(days=14)
+old_files = [
+    csv_file("users.csv", ["email", "enabled", "last_login", "password_hash", "n_password_failures", "confirmed_email", "remembered_logins", "signed_up"],
+             [["dad@dilettante.example", "True", "", "$2b$12$abcdefghijklmnopqrstuuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012", "0", "True", "", "2025-05-01 10:00:00.000000+00:00"],
+              ["anna@example.com", "True", "", "$2b$12$shouldnotreplaceanexistingpassword....................", "0", "True", "", ""]]),
+    csv_file("new_staff_access.csv", ["restaurant_id", "user_id", "type_id", "user_name"],
+             [[OLD, "dad@dilettante.example", "owner", ""], [OLD, "waiter@dilettante.example", "staff", "Jānis"]]),
+    csv_file("restaurants.csv", ["uid", "restaurant", "eating_time", "regular", "special", "table_seats", "contact_email",
+                                 "resto_message_en", "resto_message_fr", "resto_message_lv"],
+             [[OLD, "Dilettante", "2", json.dumps([["Monday", "17:00", "22:00"], ["Friday", "10:00", "15:00"], ["Friday", "17:00", "23:00"],
+                                                     ["Sunday", "Closed", "Closed"]]),
+               json.dumps([[future, "Closed", "Closed"], [d12.isoformat(), "12:00", "20:00", False], ["2020-01-01", "Closed", "Closed"]]),
+               str([["a", False, "4"], ["b", True, "2"], ["c", False, "6"]]), "dad@dilettante.example", "Welcome!", "", "Laipni lūdzam!"]]),
+    csv_file("reservations.csv", ["restaurant", "guests", "special_comments", "name", "phone", "email", "mydate", "mytime",
+                                  "reservation_request_time", "approved", "seated", "done", "reservation_uid", "notified_info_email", "resto_comment", "status"],
+             [[OLD, "4", "Window please", "Līga", "+37120000000", "liga@example.com", future, "19:00", "2026-10-01 09:00:00+00:00", "True", "False", "False",
+               "11111111-2222-3333-4444-555555555555", "True", "Regular", ""],
+              [OLD, "2", "", "walk-in", "walk-in", "walk-in", past, "18:30", "", "True", "True", "False", "21111111-2222-3333-4444-555555555555", "True", "", ""],
+              [OLD, "3", "", "Ēriks", "", "eriks@example.com", future, "20:00", "", "False", "False", "False", "31111111-2222-3333-4444-555555555555", "", "", "deleted"],
+              ["00000000-0000-0000-0000-000000000000", "2", "", "Nobody", "", "", future, "19:00", "", "", "", "", "41111111-2222-3333-4444-555555555555", "", "", ""]]),
+    csv_file("menu_files.csv", ["restaurant", "menu_id", "file_description", "menu_file", "language"],
+             [[OLD, "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "Dzērieni", "", "lv"]]),
+    csv_file("gallery_flags.csv", ["restaurant_id", "public_id", "secure_url"],
+             [[OLD, "restaurants/%s/terrace" % OLD, "https://res.cloudinary.com/dzqa1mwom/image/upload/v1/restaurants/%s/terrace.jpg" % OLD]]),
+    csv_file("cloudinary_related.csv", ["resto_id", "gallery_title", "secondary_color", "theme", "framing", "background_options", "bg_color", "image_size", "motion_on_scroll"],
+             [[OLD, "Mūsu foto", "#aa3322", "classic", "frame", "paper", "#101010", "lg", "fade"]]),
+    csv_file("special_actions.csv", ["restaurant", "close_reservations", "mydate"], [[OLD, "True", d14.isoformat()]]),
+    csv_file("notes.csv", ["something", "else"], [["x", "y"]]),
+]
+as_user(ana)
+assert denied("old_import_preview", old_files), "admins only"
+as_user(admin)
+bad(call("old_import_preview", [csv_file("x.csv", ["a"], [["1"]])]))
+pv = ok(call("old_import_preview", old_files))
+assert pv["summary"]["counts"]["reservations"] == 4 and pv["summary"]["restaurants"][0]["name"] == "Dilettante" and pv["unknown"] == ["notes.csv"]
+T.users.get(email="anna@example.com")["password_hash"] = ana_hash = "$2b$12$the-password-anna-uses-here-now"
+rep = ok(call("old_import", old_files, "Europe/Riga"))["report"]
+dil = T.restaurants.get(legacy_id=OLD)
+assert dil is not None and dil["name"] == "Dilettante" and dil["timezone"] == "Europe/Riga" and dil["duration_min"] == 120
+dad = T.users.get(email="dad@dilettante.example")
+assert dil["owner"] == dad and dad["password_hash"].startswith("$2b$12$abc"), "the owner keeps their old password"
+assert T.users.get(email="anna@example.com")["password_hash"] == ana_hash, "an existing password is never replaced"
+assert dil["form_note"] == "Welcome!" and dil["form_notes"] == {"lv": "Laipni lūdzam!"}
+week = T.periods.get(restaurant=dil)["week"]
+assert week["0"] == [["17:00", "22:00"]] and week["4"] == [["10:00", "15:00"], ["17:00", "23:00"]] and week["6"] == []
+sds = {s["date"].isoformat(): s for s in T.special_days.search(restaurant=dil)}
+assert sds[future]["closed"] and "2020-01-01" not in sds, "past special days are left out"
+assert sds[d12.isoformat()]["no_online"] is True, "'allow reservations' off -> no online bookings"
+if d14.weekday() in (0, 4):  # a day the old restaurant opens: "close reservations" keeps it open without online booking
+    assert sds[d14.isoformat()]["no_online"] is True and not sds[d14.isoformat()]["closed"]
+assert sorted((t["name"], t["seats"]) for t in T.dining_tables.search(restaurant=dil)) == [("a", 4), ("b", 2), ("c", 6)]
+assert [m["email"] for m in T.members.search(restaurant=dil)] == ["waiter@dilettante.example"]
+rs = {x["token"]: x for x in T.reservations.search(restaurant=dil)}
+assert rs["11111111222233334444555555555555"]["status"] == "confirmed" and rs["11111111222233334444555555555555"]["notes"] == "Window please"
+assert rs["11111111222233334444555555555555"]["staff_note"] == "Regular"
+assert rs["21111111222233334444555555555555"]["status"] == "done" and rs["21111111222233334444555555555555"]["source"] == "walk_in"
+assert rs["31111111222233334444555555555555"]["status"] == "cancelled"
+assert rep["counts"]["bookings skipped (restaurant not imported)"] == 1
+mfile = T.menu_files.get(key="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
+assert mfile["file"] is None and mfile["title"] == "Dzērieni"
+assert anvil.server.ENDPOINTS["/menu/:ref/:key"](ref=OLD, key=mfile["key"]).status == 404, "no file yet"
+assert "Dzērieni" not in anvil.server.ENDPOINTS["/menus/:ref/:lang"](ref=OLD, lang="lv").body
+photo = T.photos.get(restaurant=dil, public_id="restaurants/%s/terrace" % OLD)
+assert photo["provider"] == "cloudinary" and photo["in_gallery"] is True
+g = T.sites.get(restaurant=dil)["gallery"]
+assert g["theme"] == "classic" and g["picture_style"] == "frame" and g["accent"] == "#aa3322" and g["heading"] == "Mūsu foto"
+rep2 = ok(call("old_import", old_files, "Europe/Riga"))["report"]
+assert len(list(T.restaurants.search(legacy_id=OLD))) == 1 and len(list(T.reservations.search(restaurant=dil))) == 3, "importing twice adds nothing twice"
+assert rep2["counts"]["bookings already here"] == 3 and len(list(T.dining_tables.search(restaurant=dil))) == 3
+assert E["/reserve/:ref/:lang"](ref=OLD, lang="lv").headers["Location"] == "/#book/%s/lv" % dil["slug"], "the printed QR codes now open Dilettante"
+# the owner uploads the missing menu file; the old link works again
+as_user(dad)
+mf_rows = call("get_menu_files", dil.get_id())["files"]
+assert mf_rows[0]["missing"] is True
+ok(call("replace_menu_file", dil.get_id(), mf_rows[0]["id"], anvil.BlobMedia("application/pdf", b"%PDF-1.4 drinks", name="dzerieni.pdf")))
+assert anvil.server.ENDPOINTS["/menu/:ref/:key"](ref=OLD, key="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee").status == 200
+assert "Dzērieni" in anvil.server.ENDPOINTS["/menus/:ref/:lang"](ref=OLD, lang="lv").body
+
+# ---------------------------------------------------------------------------------- billing (one flat Stripe plan)
+Bill = MODS["Billing"]
+as_user(bob)
+assert call("get_plan")["on"] is False and call("get_pricing")["on"] is False, "billing is off without the Stripe secrets"
+SECRETS = {"stripe_secret_key": "sk_test_x", "stripe_price_id": "price_flat"}
+STRIPE: dict = {"subs": {}, "customers": {"dad@dilettante.example": "cus_dad"}, "calls": []}
+
+
+def fake_api(method, path, data=None):
+    STRIPE["calls"].append((method, path, data))
+    if path.startswith("prices/"):
+        return {"id": "price_flat", "unit_amount": 10000, "currency": "eur", "recurring": {"interval": "month"}, "product": "prod_NEW"}
+    if path == "customers":
+        cid = STRIPE["customers"].get(data["email"])
+        return {"data": [{"id": cid}] if cid else []}
+    if path == "subscriptions":
+        return {"data": STRIPE["subs"].get(data["customer"], [])}
+    if path == "checkout/sessions":
+        return {"url": "https://checkout.stripe.com/c/pay/test"}
+    if path == "billing_portal/sessions":
+        return {"url": "https://billing.stripe.com/p/session/test"}
+    raise AssertionError(path)
+
+
+Bill._secret = lambda name: SECRETS.get(name, "")
+Bill.api = fake_api
+for row in T.app_settings.search(key="stripe_price"):
+    row.delete()
+assert call("get_pricing") == {"on": True, "price": "€100 a month"}
+pl = call("get_plan", True)
+assert pl["on"] and pl["active"] is False and pl["price"] == "€100 a month"
+nb = P.create_restaurant("Bob's Bistro")
+assert nb["ok"] is False and nb.get("needs_plan") and "€100 a month" in nb["error"], "no plan: no new restaurant"
+assert call("get_dashboard")["plan"]["active"] is False
+ck = ok(call("start_checkout"))
+assert ck["url"].startswith("https://checkout.stripe.com/")
+sent = STRIPE["calls"][-1][2]
+assert sent["mode"] == "subscription" and sent["line_items"][0]["price"] == "price_flat" and sent["customer_email"] == "bobby@example.com"
+assert ("line_items[0][price]", "price_flat") in Bill._flat(sent), "Stripe's form encoding"
+STRIPE["customers"]["bobby@example.com"] = "cus_bob"
+STRIPE["subs"]["cus_bob"] = [{"status": "active", "items": {"data": [{"price": {"product": "prod_NEW"}}]}}]
+assert call("get_plan", True)["active"] is True
+assert P.create_restaurant("Bob's Bistro")["ok"], "subscribed: restaurants can be added"
+assert ok(call("billing_portal"))["url"].startswith("https://billing.stripe.com/")
+bad(call("start_checkout"))
+STRIPE["subs"]["cus_bob"] = [{"status": "canceled", "items": {"data": [{"price": {"product": "prod_NEW"}}]}}]
+assert call("get_plan", True)["active"] is False, "a cancelled subscription ends the plan"
+# the old plans still count (the existing licence), and admins can give a free plan
+as_user(dad)
+STRIPE["subs"]["cus_dad"] = [{"status": "trialing", "items": {"data": [{"price": {"product": "prod_SXebVc9d5USMxV"}}]}}]
+assert call("get_plan", True)["why"] == "subscription"
+STRIPE["subs"]["cus_dad"] = []
+assert call("get_plan", True)["active"] is False
+as_user(bob)
+assert denied("set_free_plan", dad.get_id(), True)
+as_user(admin)
+ok(call("set_free_plan", dad.get_id(), True))
+assert call("list_users", "dad@")["users"][0]["plan_free"] is True
+as_user(dad)
+assert call("get_plan", True)["why"] == "free" and P.create_restaurant("Dilettante 2")["ok"]
+as_user(admin)
+assert call("get_plan", True)["why"] == "included", "admins are never blocked"
+
+
+def stripe_down(*a, **k):
+    raise RuntimeError("Stripe is down")
+
+
+Bill.api = stripe_down
+as_user(bob)
+assert call("get_plan", True)["active"] is True, "Stripe unreachable: nobody is locked out"
+SECRETS.clear()
+
 # ---------------------------------------------------------------------------------- every callable is covered by a permission check
 # A callable that changes data without require_user / a C.require_* check is a security hole. List the public ones here.
-PUBLIC = {"get_me", "submit_feedback", "legal_state", "legal_accept",
+PUBLIC = {"get_me", "submit_feedback", "legal_state", "legal_accept", "get_pricing",
           "get_booking_form", "get_slots", "book", "get_reservation", "change_reservation", "cancel_reservation", "get_menu"}
 for name, (f, need) in sorted(anvil.server.CALLABLES.items()):
     if name in PUBLIC:

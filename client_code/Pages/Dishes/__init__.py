@@ -20,6 +20,7 @@ class Dishes(DishesTemplate):
         p.add_event_handler("x-new-dish", self._new_dish)
         p.add_event_handler("x-toggle-dish", self._toggle_dish)
         self.files_panel.add_event_handler("x-delete-file", self._delete_file)
+        self.files_panel.add_event_handler("x-upload-file", self._upload_file)
         self._draw()
         self._files(anvil.server.call("get_menu_files", self.rid))
 
@@ -83,6 +84,12 @@ class Dishes(DishesTemplate):
             self.file_title.text = ""
             self._files(r)
             state.toast("Menu file added", "ok")
+
+    def _upload_file(self, file, media, **event_args):
+        r = state.call("replace_menu_file", self.rid, file["id"], media)
+        if r:
+            self._files(r)
+            state.toast("File added", "ok")
 
     def _delete_file(self, file, **event_args):
         if confirm("Guests won't see it any more.", title="Delete %s?" % file["title"], buttons=[("Keep it", False), ("Delete", True)]):

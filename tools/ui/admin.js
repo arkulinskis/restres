@@ -1,5 +1,5 @@
 /* Admin pages (local App Server only: signs up the ADMIN_EMAILS address, which becomes admin there).
-   Visits every tab, flips a user's Active switch twice, opens the demo-data confirm. Resolves to {ok, log}. */
+   Visits every tab, flips a user's Active switch twice, opens the demo-data confirm, imports old-PlanPlate CSV files. Resolves to {ok, log}. */
 (async function () {
   const log = [];
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -51,6 +51,37 @@
     ok(/0 people/.test(document.body.textContent), 'users: search');
     await page('#admin/demo', () => $('.ad-demo'));
     ok(/Status:/.test($('.ad-demo').textContent), 'demo: status line');
+
+    // Old PlanPlate: import CSV files the way Anvil's Data Tables download them
+    await page('#admin/users', () => $$('.ad-user-row').length >= 1);
+    ok($$('.ad-user-row')[0].querySelectorAll('input[type=checkbox]').length === 3, 'users: Admin, Active and Free plan switches');
+    await page('#admin/import', () => $('.ad-import') && $('.ad-import input[type=file]'));
+    ok($('.ad-import input[name=timezone], .ad-import input[type=hidden]'), 'import: the time zone field');
+    const OLD = 'c0ffee00-1111-4222-8333-944445555666';
+    const day = new Date(Date.now() + 10 * 864e5).toISOString().slice(0, 10);
+    const csv = (name, rows) => new File([rows.map((r) => r.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join(String.fromCharCode(13, 10))], name, { type: 'text/csv' });
+    const files = [
+      csv('restaurants.csv', [['uid', 'restaurant', 'eating_time', 'regular', 'special', 'table_seats', 'contact_email', 'resto_message_en', 'resto_message_fr', 'resto_message_lv'],
+        [OLD, 'UI Import Bistro', '1.5', JSON.stringify([['Monday', '17:00', '22:00'], ['Tuesday', '17:00', '22:00']]), '[]', JSON.stringify([['a', false, '4'], ['b', false, '2']]),
+         'ui.import@example.com', 'Hello from the old app', '', '']]),
+      csv('new_staff_access.csv', [['restaurant_id', 'user_id', 'type_id', 'user_name'], [OLD, 'ui.import@example.com', 'owner', '']]),
+      csv('reservations.csv', [['restaurant', 'guests', 'special_comments', 'name', 'phone', 'email', 'mydate', 'mytime', 'reservation_request_time', 'approved', 'seated', 'done', 'reservation_uid', 'notified_info_email', 'resto_comment', 'status'],
+        [OLD, '2', '', 'Old Guest', '123', 'old.guest@example.com', day, '19:00', '', 'True', 'False', 'False', 'c0ffee00-aaaa-4bbb-8ccc-000000000001', 'True', '', '']]),
+    ];
+    const input = $('.ad-import input[type=file]');
+    const dtf = new DataTransfer(); files.forEach((f) => dtf.items.add(f)); input.files = dtf.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    await until(() => /UI Import Bistro/.test(($('.anvil-role-ad-pre') || {}).textContent || ''), 'import preview', 40000);
+    ok(/reservations: 1 rows/.test($('.anvil-role-ad-pre').textContent), 'import: the preview lists what is in the files');
+    $('.ad-import .anvil-role-ic-database button').click();
+    const go = await until(() => $$('.modal button, .anvil-modal-content button').find((b) => b.textContent.trim() === 'Import' && b.offsetParent), 'import confirm');
+    go.click();
+    await until(() => $$('.anvil-role-ad-pre').some((p) => /^Done\./.test(p.textContent) && p.offsetParent), 'import report', 60000);
+    ok(/restaurants (added|updated): 1/.test(document.body.textContent), 'import: the restaurant is in');
+    const hours = await (await fetch('/_/api/v1/' + OLD + '/en')).text();
+    ok(/Monday:<\/strong> 17:00-22:00/.test(hours), 'import: the old hours widget answers for the imported restaurant');
+    const qr = await fetch('/reserve/' + OLD + '/en', { redirect: 'manual' });
+    ok(qr.type === 'opaqueredirect' || qr.status === 302 || qr.redirected, 'import: its printed booking QR code opens the booking form');
     log.push('PASSED');
     return { ok: true, log };
   } catch (e) {

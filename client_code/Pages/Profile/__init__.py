@@ -1,16 +1,45 @@
 from anvil import *
+import anvil.server
+from anvil.js import window
 
 from ._anvil_designer import ProfileTemplate
 from ... import auth, router, state
 
 
 class Profile(ProfileTemplate):
-    """#profile: your name, light/dark, a password reset link, Privacy & Terms, feedback, sign out."""
+    """#profile: your name, light/dark, a password reset link, your plan (when billing is on), Privacy & Terms, feedback, sign out."""
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
         self._show_me()
         self._show_theme()
+        self._show_plan()
+
+    def _show_plan(self):
+        p = anvil.server.call("get_plan")
+        self.plan_card.visible = bool(p.get("on"))
+        why = p.get("why")
+        self.plan_line.text = {
+            "included": "Everything is included with your account.",
+            "free": "You're on a free plan: everything is included.",
+            "subscription": "PlanPlate, %s. Everything included." % (p.get("price") or "monthly") +
+                            (" Stripe couldn't take the last payment: check your card." if p.get("status") == "past_due" else ""),
+            "error": "Your plan can't be checked right now. Everything keeps working.",
+        }.get(why, "No subscription yet. PlanPlate is %s, everything included." % (p.get("price") or "a flat monthly price"))
+        self.plan_subscribe.visible = not p.get("active")
+        self.plan_manage.visible = why == "subscription"
+
+    @handle("plan_subscribe", "click")
+    def plan_subscribe_click(self, **event_args):
+        r = state.call("start_checkout")
+        if r and r.get("url"):
+            window.location.href = r["url"]
+
+    @handle("plan_manage", "click")
+    def plan_manage_click(self, **event_args):
+        r = state.call("billing_portal")
+        if r and r.get("url"):
+            window.location.href = r["url"]
 
     def _show_me(self):
         me = state.me()

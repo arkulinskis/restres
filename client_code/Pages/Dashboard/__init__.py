@@ -12,11 +12,21 @@ class Dashboard(DashboardTemplate):
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
         self.cards_panel.add_event_handler("x-duplicate", self._duplicate)
+        self.paid = bool(args) and args[0] == "paid"  # back from Stripe's payment page
         self._load()
+        if self.paid:
+            state.toast("Thank you! Your subscription is on." if self.plan.get("active") else
+                        "Thanks! Stripe is still confirming the payment: refresh in a minute.", "ok")
 
     def _load(self):
         data = anvil.server.call("get_dashboard")
+        if getattr(self, "paid", False):
+            data["plan"] = anvil.server.call("get_plan", True)
         me = data.get("me") or {}
+        self.plan = data.get("plan") or {}
+        self.plan_box.visible = bool(self.plan.get("on")) and not self.plan.get("active")
+        self.plan_text.text = ("%s, everything included: any number of restaurants, your whole team and every feature. "
+                               "Cancel any time." % (self.plan.get("price") or "One flat monthly price"))
         lst = data["restaurants"]
         self.date_label.text = pp.fmt_date(pp.today_iso())
         hour = window.Date().getHours()
@@ -42,6 +52,12 @@ class Dashboard(DashboardTemplate):
         rid = alert(NewRestaurant(), buttons=[], role="app-dialog", dismissible=True)
         if rid:
             router.go("today", rid)
+
+    @handle("subscribe_button", "click")
+    def subscribe_button_click(self, **event_args):
+        r = state.call("start_checkout")
+        if r and r.get("url"):
+            window.location.href = r["url"]
 
     @handle("new_button", "click")
     def new_button_click(self, **event_args):

@@ -149,7 +149,8 @@ def get_dashboard():
                     "today": _today_line(ctx, today), "bookings": len(res), "covers": sum(int(x["party"] or 0) for x in res),
                     "pending": len(_pending(r)), "tables": len(ctx.tables), "seats": ctx.total_seats,
                     "accepting": r["accepting"] is not False, "role": _role(r, _user())})
-    return {"restaurants": out, "me": get_me()}
+    from . import Billing
+    return {"restaurants": out, "me": get_me(), "plan": Billing.get_plan()}
 
 
 SAMPLE_WEEK = {"0": [], "1": [["12:00", "15:00"], ["18:00", "22:00"]], "2": [["12:00", "15:00"], ["18:00", "22:00"]],
@@ -181,6 +182,10 @@ def create_restaurant(name, timezone_name="UTC", sample=True):
         return {"ok": False, "error": "Give the restaurant a name."}
     if len(_mine()) >= MAX_RESTAURANTS:
         return {"ok": False, "error": "You've reached the limit of %d restaurants." % MAX_RESTAURANTS}
+    from . import Billing
+    need = Billing.blocked(u)
+    if need:
+        return {"ok": False, "error": need, "needs_plan": True}
     tz = timezone_name if B.valid_timezone(timezone_name) else "UTC"
     defaults: dict = {k: v[0] for k, v in B.SETTINGS.items()}
     r = app_tables.restaurants.add_row(owner=u, name=name, slug=B.unique_slug(name), timezone=tz, created=B.now_utc(),
@@ -196,6 +201,10 @@ def duplicate_restaurant(rid, name=None):
     src = _rest(rid, "manager")
     if len(_mine()) >= MAX_RESTAURANTS:
         return {"ok": False, "error": "You've reached the limit of %d restaurants." % MAX_RESTAURANTS}
+    from . import Billing
+    need = Billing.blocked(_user())
+    if need:
+        return {"ok": False, "error": need, "needs_plan": True}
     name = str(name or "").strip()[:80] or (src["name"] + " (copy)")
     copy_cols = ["description", "address", "phone", "email", "website", "timezone", "form_note", "form_notes", "privacy_text",
                  "accepting", "over_capacity"] + list(B.SETTINGS)

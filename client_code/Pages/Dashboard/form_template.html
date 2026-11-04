@@ -10,6 +10,13 @@
         <anvil-component type="Button" name="new_button" prop:text="New restaurant" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
       </div>
 
+      <div class="ui-card pp-plan" anvil:name="plan_box">
+        <span class="lp-ico"><i class="ic ic-sparkle"></i></span>
+        <div class="pp-grow"><anvil-component type="Label" name="plan_title" prop:role='["strong"]' prop:text="Start your PlanPlate subscription"></anvil-component>
+          <anvil-component type="Label" name="plan_text" prop:role='["muted", "small"]'></anvil-component></div>
+        <anvil-component type="Button" name="subscribe_button" prop:text="Subscribe" prop:role='["btn", "btn-primary"]'></anvil-component>
+      </div>
+
       <div class="pp-dash-alert" anvil:name="alert_box">
         <i class="ic ic-bell"></i>
         <div><anvil-component type="Label" name="alert_label" prop:role='["strong"]'></anvil-component>

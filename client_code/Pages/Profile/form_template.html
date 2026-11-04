@@ -29,6 +29,14 @@
           <anvil-component type="Button" name="reset_button" prop:text="Email me a reset link" prop:role='["btn", "ic-mail"]'></anvil-component>
         </div>
       </div>
+      <div class="ui-card ui-stack pf-plan" anvil:name="plan_card">
+        <h3>Your plan</h3>
+        <anvil-component type="Label" name="plan_line" prop:role='["muted", "small"]'></anvil-component>
+        <div class="ui-row">
+          <anvil-component type="Button" name="plan_subscribe" prop:text="Subscribe" prop:role='["btn", "btn-primary"]'></anvil-component>
+          <anvil-component type="Button" name="plan_manage" prop:text="Manage billing" prop:role='["btn", "ic-external"]'></anvil-component>
+        </div>
+      </div>
       <div class="ui-card pf-more">
         <div class="pf-links">
           <a href="#admin" anvil:name="admin_link"><i class="ic ic-shield"></i>Admin</a>
