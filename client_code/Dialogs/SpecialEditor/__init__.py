@@ -21,6 +21,7 @@ class SpecialEditor(SpecialEditorTemplate):
         self.to_field.visible = is_new
         self.label_box.text = s.get("label") or ""
         self.closed = bool(s["closed"])
+        self.no_online_box.checked = bool(s.get("no_online"))
         self.ivs_panel.items = [{"open": a, "close": b} for a, b in (s.get("hours") or [["12:00", "22:00"]])]
         self.ivs_panel.add_event_handler("x-remove", self._remove)
         self._mode()
@@ -29,6 +30,7 @@ class SpecialEditor(SpecialEditorTemplate):
         self.mode_closed.classes["on"] = self.closed
         self.mode_open.classes["on"] = not self.closed
         self.ivs_box.visible = not self.closed
+        self.no_online_box.visible = not self.closed
 
     def mode_click(self, event):
         self.closed = event.currentTarget.getAttribute("data-mode") == "closed"
@@ -57,7 +59,8 @@ class SpecialEditor(SpecialEditorTemplate):
             return
         data = {"id": self.special["id"] if self.special else None, "date": self.date_picker.date.isoformat(),
                 "to": self.to_picker.date.isoformat() if self.special is None and self.to_picker.date else None,
-                "label": self.label_box.text or "", "closed": self.closed, "hours": ivs}
+                "label": self.label_box.text or "", "closed": self.closed, "hours": ivs,
+                "no_online": bool(self.no_online_box.checked) and not self.closed}
         r = anvil.server.call("save_special", self.rid, data, self.D["month"])
         if r and r.get("ok") is False:
             self.message.visible, self.message.text = True, r.get("error") or "Could not save."

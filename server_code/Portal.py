@@ -197,7 +197,7 @@ def duplicate_restaurant(rid, name=None):
     if len(_mine()) >= MAX_RESTAURANTS:
         return {"ok": False, "error": "You've reached the limit of %d restaurants." % MAX_RESTAURANTS}
     name = str(name or "").strip()[:80] or (src["name"] + " (copy)")
-    copy_cols = ["description", "address", "phone", "email", "website", "timezone", "form_note", "privacy_text",
+    copy_cols = ["description", "address", "phone", "email", "website", "timezone", "form_note", "form_notes", "privacy_text",
                  "accepting", "over_capacity"] + list(B.SETTINGS)
     now = B.now_utc()
     r = app_tables.restaurants.add_row(owner=_user(), name=name, slug=B.unique_slug(name), created=now,
@@ -205,7 +205,8 @@ def duplicate_restaurant(rid, name=None):
     for p in app_tables.periods.search(restaurant=src):
         app_tables.periods.add_row(restaurant=r, name=p["name"], start=p["start"], end=p["end"], week=p["week"], created=p["created"] or now)
     for s in app_tables.special_days.search(restaurant=src):
-        app_tables.special_days.add_row(restaurant=r, date=s["date"], label=s["label"], closed=s["closed"], hours=s["hours"])
+        app_tables.special_days.add_row(restaurant=r, date=s["date"], label=s["label"], closed=s["closed"], hours=s["hours"],
+                                        no_online=s["no_online"])
     ids = {}
     for t in app_tables.dining_tables.search(restaurant=src):
         cols: dict = {c: t[c] for c in ("name", "seats", "min_party", "shape", "area", "x", "y", "position", "active")}
@@ -257,7 +258,8 @@ def _settings_view(r):
     v.update({"id": r.get_id(), "slug": r["slug"], "timezone": r["timezone"] or "UTC", "accepting": r["accepting"] is not False,
               "over_capacity": r["over_capacity"] or "review", "default_privacy": B.DEFAULT_PRIVACY,
               "emails_on": r["emails_on"] is not False, "language": B.language(r), "languages": B.languages(r),
-              "owner_email": r["owner"]["email"] if r["owner"] else "", "legacy_id": r["legacy_id"] or ""})
+              "owner_email": r["owner"]["email"] if r["owner"] else "", "legacy_id": r["legacy_id"] or "",
+              "form_notes": {k: str(v) for k, v in dict(r["form_notes"] or {}).items() if k in B.LANGS}})
     return v
 
 
@@ -319,6 +321,8 @@ def save_settings(rid, data):
         if other is not None and other != r:
             return {"ok": False, "error": "Another restaurant already uses that old PlanPlate ID."}
         upd["legacy_id"] = old or None
+    if "form_notes" in data:  # the guest note in other languages; empty = the main note is shown
+        upd["form_notes"] = {k: str(v).strip()[:600] for k, v in dict(data["form_notes"] or {}).items() if k in B.LANGS and str(v or "").strip()}
     if "over_capacity" in data:
         upd["over_capacity"] = data["over_capacity"] if data["over_capacity"] in B.OVER_CAPACITY else "review"
     r.update(**upd)
@@ -333,7 +337,7 @@ def _period_view(p):
 
 def _special_view(s):
     return {"id": s.get_id(), "date": B.iso(s["date"]), "label": s["label"] or "", "closed": bool(s["closed"]),
-            "hours": B.intervals_text(B.clean_intervals(s["hours"]))}
+            "hours": B.intervals_text(B.clean_intervals(s["hours"])), "no_online": bool(s["no_online"]) and not s["closed"]}
 
 
 def _calendar(ctx, first):
@@ -416,7 +420,8 @@ def save_special(rid, data, month=None):
     hours = B.intervals_text(B.clean_intervals(data.get("hours")))
     if not closed and not hours:
         return {"ok": False, "error": "Add opening hours, or mark the day as closed."}
-    fields: dict = {"label": str(data.get("label") or "").strip()[:60], "closed": closed, "hours": [] if closed else hours}
+    fields: dict = {"label": str(data.get("label") or "").strip()[:60], "closed": closed, "hours": [] if closed else hours,
+                    "no_online": bool(data.get("no_online")) and not closed}
     if data.get("id") and to == d:
         row = _child(app_tables.special_days, r, data["id"])
         clash = app_tables.special_days.get(restaurant=r, date=d)

@@ -12,7 +12,7 @@ class SpecialRow(SpecialRowTemplate):
         s = self.item
         self.date_label.text = pp.fmt_date(s["date"], "short") + " " + s["date"][:4]
         self.label_label.text = s.get("label") or "Special day"
-        self.hours_label.text = "Closed" if s["closed"] else pp.hours_text(s.get("hours") or [])
+        self.hours_label.text = "Closed" if s["closed"] else pp.hours_text(s.get("hours") or []) + (" · no online bookings" if s.get("no_online") else "")
 
     @handle("edit_button", "click")
     def edit_button_click(self, **event_args):

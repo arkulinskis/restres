@@ -856,6 +856,37 @@ assert [x["title"] for x in gm["files"]] == ["Food", "Dzērieni"] and gm["files"
 red = anvil.server.ENDPOINTS["/restaurant/:ref"](ref=OLD_ID)
 assert red.status == 302 and red.headers["Location"] == "/#book/" + rr["slug"], "the old booking page opens the new booking form"
 assert MODS["Media"].find_restaurant(OLD_ID) == rr, "the gallery feed finds a restaurant by its old id"
+E = anvil.server.ENDPOINTS
+assert E["/restaurant/:ref/:lang"](ref=OLD_ID, lang="lv").headers["Location"] == "/#book/%s/lv" % rr["slug"], "old pop-up with a language"
+assert E["/restaurant/:ref/:lang/:token"](ref=OLD_ID, lang="fr", token="x").headers["Location"] == "/#book/%s/fr" % rr["slug"]
+assert E["/reserve/:ref/:lang"](ref=OLD_ID, lang="en").headers["Location"] == "/#book/%s/en" % rr["slug"], "printed booking QR codes"
+assert E["/restaurant/:ref/:lang"](ref=OLD_ID, lang="xx").headers["Location"] == "/#book/" + rr["slug"], "unknown language: the default"
+qm = E["/menus/:ref/:lang"](ref=OLD_ID, lang=key)
+assert qm.status == 200 and qm.headers["Content-Type"] == "application/pdf", "old MENU QR codes (a file id in the language slot) open the file"
+qp = E["/menus/:ref/:key/:lang"](ref=OLD_ID, key=key, lang="fr")
+assert qp.status == 200 and "Voici le code QR du menu" in qp.body and key in qp.body, "printable menu QR page"
+assert E["/menus/:ref/:key/:lang"](ref=OLD_ID, key="0" * 32, lang="en").status == 404
+assert E["/reservations/:ref"](ref=OLD_ID).headers["Location"] == "/#reservations/" + rid_pp, "old approval-email link"
+assert E["/demo"]().headers["Location"] == "/#book/maison-lumiere"
+# a guest note per language
+ok(P.save_settings(rid_pp, {"language": "en", "languages": ["en", "fr"], "form_note": "Hello", "form_notes": {"fr": " Bonjour ", "lv": "", "xx": "no"}}))
+assert T.restaurants.get_by_id(rid_pp)["form_notes"] == {"fr": "Bonjour"}
+assert call("get_booking_form", rr["slug"], "fr")["restaurant"]["form_note"] == "Bonjour"
+assert call("get_booking_form", rr["slug"], "en")["restaurant"]["form_note"] == "Hello"
+# a special day that is open but takes no online bookings (the old "allow reservations" switch)
+sp_day = None
+for i in range(3, 40):
+    dd = TODAY + dt.timedelta(days=i)
+    if any(s["state"] == "open" for s in call("get_slots", rr["slug"], dd.isoformat(), 2)["slots"]):
+        sp_day = dd
+        break
+assert sp_day is not None, "a day with online slots"
+ok(call("save_special", rid_pp, {"date": sp_day.isoformat(), "label": "Wedding", "closed": False, "hours": [["12:00", "22:00"]], "no_online": True}))
+sl = call("get_slots", rr["slug"], sp_day.isoformat(), 2)["slots"]
+assert sl and all(s["state"] == "walk_in" for s in sl), "no online bookings that day: every time is walk-in only"
+assert T.special_days.get(restaurant=rr, date=sp_day)["no_online"] is True
+ok(call("save_special", rid_pp, {"date": sp_day.isoformat(), "label": "Wedding", "closed": True, "hours": [], "no_online": True}))
+assert T.special_days.get(restaurant=rr, date=sp_day)["no_online"] is False, "a closed day has no online switch"
 ok(call("delete_menu_file", rid_pp, mf[0]["id"]))
 as_user(bob_pp)
 try:

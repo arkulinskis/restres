@@ -54,6 +54,10 @@ class Settings(SettingsTemplate):
         self.language_drop.selected_value = s["language"]
         for l in ("en", "fr", "lv"):
             getattr(self, "lang_" + l).checked = l in s["languages"]
+        notes = s.get("form_notes") or {}
+        for l in ("en", "fr", "lv"):
+            getattr(self, "note_%s_box" % l).text = notes.get(l) or ""
+            getattr(self, "note_%s_field" % l).visible = l != s["language"]
         owner = D.get("role") == "owner"
         self.team_lead.text = ("Give managers and staff their own sign-in. Managers can change everything except the team; staff see and "
                                "manage reservations and the guest book only.") if owner else "Only the owner can change the team."
@@ -71,7 +75,9 @@ class Settings(SettingsTemplate):
         v = {k: self._box(k).text or "" for k in TEXT}
         v.update(slug=self.slug_box.text or "", legacy_id=(self.legacy_box.text or "").strip(), accepting=self.accepting_box.checked, over_capacity=self.over_drop.selected_value,
                  privacy_text=self.privacy_box.text or "", emails_on=self.emails_box.checked, language=self.language_drop.selected_value,
-                 languages=[l for l in ("en", "fr", "lv") if getattr(self, "lang_" + l).checked])
+                 languages=[l for l in ("en", "fr", "lv") if getattr(self, "lang_" + l).checked],
+                 form_notes={l: getattr(self, "note_%s_box" % l).text or "" for l in ("en", "fr", "lv")
+                             if l != self.language_drop.selected_value})
         node = self.dom_nodes["tz"].querySelector("input[type=hidden]")
         v["timezone"] = getattr(node, "value", None) or self.D["settings"]["timezone"]
         for row in list(self.rules_panel.items) + list(self.approval_panel.items):

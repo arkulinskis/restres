@@ -55,6 +55,12 @@
           <section class="ui-card pp-sec" id="st-form"><h2>Booking form</h2><p class="pp-lead">Texts on the form your guests fill in.</p>
             <div class="ui-stack">
               <label class="ui-field"><span>Note for guests</span><anvil-component type="TextArea" name="form_note_box" prop:height="70" prop:placeholder="e.g. We hold tables for 15 minutes. For groups over 8, please call us."></anvil-component></label>
+              <div class="pp-split" anvil:name="notes_box">
+                <label class="ui-field" anvil:name="note_en_field"><span>Note in English</span><anvil-component type="TextArea" name="note_en_box" prop:height="60"></anvil-component></label>
+                <label class="ui-field" anvil:name="note_fr_field"><span>Note in French</span><anvil-component type="TextArea" name="note_fr_box" prop:height="60"></anvil-component></label>
+                <label class="ui-field" anvil:name="note_lv_field"><span>Note in Latvian</span><anvil-component type="TextArea" name="note_lv_box" prop:height="60"></anvil-component></label>
+              </div>
+              <anvil-component type="Label" name="notes_hint" prop:role='["field-cap"]' prop:text="Guests who switch the form to another language see that language's note. Left empty, they see the note above."></anvil-component>
               <label class="ui-field"><span>Privacy notice</span><anvil-component type="TextArea" name="privacy_box" prop:height="140"></anvil-component>
                 <span class="ui-hint">Guests must tick a box confirming they have read this before they can book. Leave it empty to use the standard text shown above. The text each guest agreed to is saved with their booking.</span></label>
             </div>

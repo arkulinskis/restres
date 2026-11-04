@@ -869,6 +869,11 @@ db_schema:
         width: 260
       name: legacy_id
       type: string
+    - admin_ui:
+        order: 41
+        width: 260
+      name: form_notes
+      type: simpleObject
     indexes: []
     server: full
     title: Restaurants
@@ -968,6 +973,11 @@ db_schema:
         width: 200
       name: hours
       type: simpleObject
+    - admin_ui:
+        order: 5
+        width: 200
+      name: no_online
+      type: bool
     indexes: []
     server: full
     title: Special days

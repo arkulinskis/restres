@@ -45,15 +45,24 @@ HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
 
 # ---------------------------------------------------------------- storage
-def cloudinary():
-    """{"key", "secret", "cloud"} from the app secret "cloudinary_url", or None (photos stay in PlanPlate)."""
+def _secret(name):
     try:
         import anvil.secrets
-        url = anvil.secrets.get_secret("cloudinary_url")
+        return str(anvil.secrets.get_secret(name) or "").strip()
     except Exception:
-        return None
-    m = re.match(r"^\s*cloudinary://([^:\s]+):([^@\s]+)@([\w-]+)\s*$", url or "")
-    return {"key": m.group(1), "secret": m.group(2), "cloud": m.group(3)} if m else None
+        return ""
+
+
+def cloudinary():
+    """{"key", "secret", "cloud"} from the app secret "cloudinary_url" (cloudinary://key:secret@cloud), or from the old
+    PlanPlate's three secrets cloudinary_cloud + cloudinary_api + cloudinary_secret; None = photos stay in PlanPlate."""
+    m = re.match(r"^cloudinary://([^:\s]+):([^@\s]+)@([\w-]+)$", _secret("cloudinary_url"))
+    if m:
+        return {"key": m.group(1), "secret": m.group(2), "cloud": m.group(3)}
+    cloud, key, secret = _secret("cloudinary_cloud"), _secret("cloudinary_api"), _secret("cloudinary_secret")
+    if cloud and key and secret:
+        return {"key": key, "secret": secret, "cloud": cloud}
+    return None
 
 
 def sign(params, secret):

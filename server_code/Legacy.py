@@ -2,9 +2,14 @@
 # addresses of the OLD PlanPlate apps (client.planplate.com, restaurant.planplate.com), so restaurant websites that
 # embed the old code keep working once those domains point at this app:
 #
-#   /restaurant/<old id>          the booking page (the old "Reserve" pop-up loads it in an iframe)  -> #book/<slug>
+#   /restaurant/<old id>[/<lang>[/<token>]]  the booking page (the old "Reserve" pop-up's iframe)  -> #book/<slug>[/<lang>]
+#   /reserve/<old id>/<lang>      the PRINTED booking QR codes -> #book; on restaurant.* the owners' printable QR page
+#   /menus/<old id>/<file>/<lang> (restaurant.*) the printable QR page of one menu file
+#   /reservations/<old id>        (restaurant.*) the link in the old approval emails -> #reservations
+#   /_/theme/planplate_client.js, planplate_client2.js  the old embed scripts, rewritten to call this app (theme/assets)
 #   /_/api/v1/<old id>/<lang>     opening hours as an HTML list (the old <div restaurant="..."> widget)
-#   /_/api/menus/<old id>/<lang>  links to the menu files in that language (the old <div menus="..."> widget)
+#   /_/api/menus/<old id>/<lang>  links to the menu files in that language (the old <div menus="..."> widget);
+#                                 with a menu file's id instead of <lang> (the old MENU QR codes) -> that file
 #   /_/api/menu/<old id>/<file>   one menu file, shown in the browser
 #   /_/api/gallery/<old id>       the gallery feed (Media.gallery_feed also finds restaurants by old id)
 #
@@ -12,6 +17,7 @@
 # pages of dilettante.lv and the old APIs' public answers (Nov 2026); photos there live on Cloudinary under
 # restaurants/<old id>/, and Media.folder() uploads into the same folder when the old id is set.
 import html
+import json
 import re
 import uuid
 from datetime import timedelta
@@ -103,12 +109,101 @@ def public_files(r, lang):
 
 
 # ---------------------------------------------------------------- the old public addresses
+def _go(target):
+    return anvil.server.HttpResponse(302, "", headers={"Location": target})
+
+
+def _book_target(ref, lang=""):
+    r = by_ref(ref)
+    if r is None:
+        return "/"
+    return "/#book/%s" % r["slug"] + ("/%s" % lang if lang in B.LANGS else "")
+
+
+def _host():
+    try:
+        return str(anvil.server.request.headers.get("host") or "").lower()
+    except Exception:
+        return ""
+
+
 @anvil.server.route("/restaurant/:ref")
 def old_booking_page(ref, **kw):
     """The old booking page: send the guest to the new booking form (the old pop-up shows it in its iframe)."""
+    return _go(_book_target(ref))
+
+
+@anvil.server.route("/restaurant/:ref/:lang")
+def old_booking_page_lang(ref, lang, **kw):
+    """The old pop-up with a language (the old embed code: iframe_launcher="<id>/en")."""
+    return _go(_book_target(ref, lang))
+
+
+@anvil.server.route("/restaurant/:ref/:lang/:token")
+def old_booking_page_staff(ref, lang, token, **kw):
+    """The old staff link (booked without approval). Staff now add bookings in the portal; this opens the guest form."""
+    return _go(_book_target(ref, lang))
+
+
+@anvil.server.route("/reserve/:ref/:lang")
+def old_reserve(ref, lang, **kw):
+    """client.planplate.com/reserve/<id>/<lang>: what the PRINTED booking QR codes open -> the booking form.
+    restaurant.planplate.com/reserve/<id>/<lang>: the owners' printable QR page."""
+    if _host().startswith("restaurant."):
+        r = by_ref(ref)
+        if r is None:
+            return _text(404, "Restaurant not found", "text/plain; charset=utf-8")
+        lang = _lang(r, lang)
+        url = anvil.server.get_app_origin() + _book_target(ref, lang)
+        return _qr_page(r["name"], url, {"en": "Reserve today!", "fr": "Réservez dès aujourd'hui!", "lv": "Rezervē jau šodien!"}[lang], lang)
+    return _go(_book_target(ref, lang))
+
+
+@anvil.server.route("/menus/:ref/:key/:lang")
+def old_menu_qr_page(ref, key, lang, **kw):
+    """restaurant.planplate.com/menus/<id>/<menu file>/<lang>: the owners' printable QR page for one menu file."""
     r = by_ref(ref)
-    target = "/#book/%s" % r["slug"] if r is not None else "/"
-    return anvil.server.HttpResponse(302, "", headers={"Location": target})
+    f = _file_by_key(r, key)
+    if r is None or f is None:
+        return _text(404, "Not found", "text/plain; charset=utf-8")
+    lang = _lang(r, lang)
+    return _qr_page(r["name"], _file_view(f, r)["url"],
+                    {"en": "Here is the menu QR code!", "fr": "Voici le code QR du menu !", "lv": "Šeit ir ēdienkartes QR kods!"}[lang], lang)
+
+
+@anvil.server.route("/reservations/:ref")
+def old_staff_list(ref, **kw):
+    """restaurant.planplate.com/reservations/<id>: the link in the old approval emails -> the Reservations page."""
+    r = by_ref(ref)
+    return _go("/#reservations/%s" % r.get_id() if r is not None else "/#dashboard")
+
+
+@anvil.server.route("/demo")
+def old_demo(**kw):
+    return _go("/#book/maison-lumiere")
+
+
+def _qr_page(name, url, caption, lang):
+    """A plain printable page: the restaurant's name, a big QR code and a caption (drawn in the browser)."""
+    body = """<!doctype html><html lang="%(lang)s"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>%(name)s</title><meta name="robots" content="noindex">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fff;color:#222;font-family:Georgia,serif;text-align:center}
+h1{font-weight:400;font-size:2.4rem;margin:0 0 18px}#q svg{width:min(70vw,360px);height:auto}p{font-size:1.6rem;margin:18px 0 0}
+small{display:block;margin-top:10px;font:13px system-ui,sans-serif;color:#777;word-break:break-all}@media print{small{display:none}}</style></head>
+<body><main><h1>%(name)s</h1><div id="q"></div><p>%(caption)s</p><small>%(url)s</small></main>
+<script>var q=qrcode(0,'M');q.addData(%(js_url)s);q.make();document.getElementById('q').innerHTML=q.createSvgTag({cellSize:8,margin:2,scalable:true});</script>
+</body></html>""" % {"lang": lang, "name": html.escape(name or "PlanPlate"), "caption": html.escape(caption), "url": html.escape(url),
+                     "js_url": json.dumps(url)}
+    return anvil.server.HttpResponse(200, body, headers={"Content-Type": "text/html; charset=utf-8"})
+
+
+def _file_by_key(r, key):
+    key = str(key or "")
+    if r is None or not re.match(r"^[0-9a-fA-F-]{24,36}$", key):
+        return None
+    f = app_tables.menu_files.get(key=key)
+    return f if f is not None and f["restaurant"] == r and f["file"] is not None else None
 
 
 @anvil.server.http_endpoint("/v1/:ref/:lang")
@@ -145,6 +240,9 @@ def old_menu_links(ref, lang, **kw):
     r = by_ref(ref)
     if r is None:
         return _text(404, "Restaurant not found", "text/plain; charset=utf-8")
+    f = _file_by_key(r, lang)
+    if f is not None:  # the old MENU QR codes point here with a menu file's id instead of a language: show that file
+        return _serve_file(f)
     lang = _lang(r, lang)
     links = "".join(
         '<a href="%s" target="_blank" rel="noopener" style="display:block;margin:10px 0;padding:10px 15px;background-color:#555;color:#fff;'
@@ -160,11 +258,14 @@ def old_menu_links(ref, lang, **kw):
 
 @anvil.server.http_endpoint("/menu/:ref/:key")
 def old_menu_file(ref, key, **kw):
-    r = by_ref(ref)
-    f = app_tables.menu_files.get(key=str(key or "")) if re.match(r"^[0-9a-f-]{24,36}$", str(key or "")) else None
-    if r is None or f is None or f["restaurant"] != r or f["file"] is None:
+    f = _file_by_key(by_ref(ref), key)
+    if f is None:
         return _text(404, "Not found", "text/plain; charset=utf-8")
-    name = re.sub(r"[^\w .-]", "", f["file"].name or "menu") or "menu"
+    return _serve_file(f)
+
+
+def _serve_file(f):
+    name =re.sub(r"[^\w .-]", "", f["file"].name or "menu") or "menu"
     return anvil.server.HttpResponse(200, f["file"], headers=dict(CORS, **{"Content-Type": f["content_type"] or "application/octet-stream",
                                                                          "Content-Disposition": 'inline; filename="%s"' % name,
                                                                          "Cache-Control": "max-age=300"}))

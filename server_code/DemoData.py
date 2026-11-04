@@ -19,6 +19,7 @@ from . import common as C
 
 OWNER = ("Camille Moreau", "camille.demo@example.com")
 SLUG = "maison-lumiere"
+LEGACY_ID = "4d2c1f0a-9b7e-4c3d-8a6f-2e5b7c9d1a30"  # a made-up old-PlanPlate id: shows the old embed code working
 GUESTS = [("Élise Martin", "elise.martin@example.com", "+1 514 555 0101"), ("Jonas Berg", "jonas.berg@example.com", "+1 514 555 0102"),
           ("Priya Shah", "priya.shah@example.com", "+1 514 555 0103"), ("Tom O'Neill", "tom.oneill@example.com", "+1 514 555 0104"),
           ("Marta Kalniņa", "marta.k@example.com", "+1 514 555 0105"), ("Lucas Moreau", "lucas.moreau@example.com", "+1 438 555 0106"),
@@ -100,10 +101,14 @@ def _build():
         raise RuntimeError("the demo restaurant was not created")
     if app_tables.restaurants.get(slug=SLUG) is None:  # a real restaurant may already use the address: then keep the generated one
         r.update(slug=SLUG)
+    if app_tables.restaurants.get(legacy_id=LEGACY_ID) is None:
+        r.update(legacy_id=LEGACY_ID)
     Portal.save_settings(rid, {
         "description": "A small French bistro in Old Montréal: seasonal cooking, natural wine and a terrace on the square.",
         "address": "88 rue Saint-Paul Ouest, Montréal, QC", "phone": "+1 514 555 0188", "email": "bonjour@maisonlumiere.example",
         "form_note": "We hold tables for 15 minutes. For groups larger than 8, please call us.",
+        "form_notes": {"fr": "Nous gardons les tables 15 minutes. Pour les groupes de plus de 8, appelez-nous.",
+                       "lv": "Galdiņu turam 15 minūtes. Grupām, kas lielākas par 8, lūdzu, zvaniet."},
         "max_auto_party": 6, "languages": ["fr", "lv"], "msg_confirmed": "Street parking is free after 18:00 on rue Saint-Paul."})
     today = B.local_now(r).date()
     year = today.year

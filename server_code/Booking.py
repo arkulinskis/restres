@@ -390,9 +390,14 @@ def guest_slots(ctx, d, party, exclude=None):
         return []
     dur = setting(r, "duration_min")
     walk_in_mode = (r["over_capacity"] or "review") == "walk_in"
+    sp = ctx.specials.get(d)
+    no_online = sp is not None and not sp["closed"] and bool(sp["no_online"])  # open, but no online bookings that day
     out = []
     for t in start_times(ctx, d):
         if datetime.combine(d, time()) + timedelta(minutes=t) < earliest:
+            continue
+        if no_online:
+            out.append({"time": hm(t), "state": "walk_in"})
             continue
         unit = find_unit(ctx, d, t, party, dur, exclude)
         if unit is None:
@@ -444,7 +449,7 @@ def public_restaurant(r, lang=None):
     lang = pick_language(r, lang)
     return {"name": r["name"], "slug": r["slug"], "description": r["description"] or "", "address": r["address"] or "",
             "phone": r["phone"] or "", "email": r["email"] or "", "website": r["website"] or "",
-            "form_note": r["form_note"] or "", "privacy_text": r["privacy_text"] or DEFAULT_PRIVACY_BY_LANG.get(lang, DEFAULT_PRIVACY),
+            "form_note": dict(r["form_notes"] or {}).get(lang) or r["form_note"] or "", "privacy_text": r["privacy_text"] or DEFAULT_PRIVACY_BY_LANG.get(lang, DEFAULT_PRIVACY),
             "max_party": setting(r, "max_party"), "accepting": r["accepting"] is not False,
             "duration_min": setting(r, "duration_min"), "language": language(r), "languages": languages(r)}
 

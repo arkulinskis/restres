@@ -92,18 +92,29 @@ form/menu opens; ADMIN_EMAILS become its managers. Admin -> Demo data reloads or
 
 ## Replacing the old PlanPlate (client.planplate.com, restaurant.planplate.com)
 
-The old apps live only in Anvil (not on GitHub) and must not be changed. Their public interface, which restaurant
-websites (e.g. dilettante.lv) still call, is answered by `server_code/Legacy.py` once a restaurant's Settings ->
-"Coming from the old PlanPlate" has its **Old PlanPlate ID** (the UUID in the old embed code, column `legacy_id`):
-- `/restaurant/<id>` (the old booking iframe) -> 302 to `/#book/<slug>`; the Book page's "Close" posts `close_div`
-  to the parent, as the old pop-up expected.
-- `/_/api/v1/<id>/<lang>`: opening hours as the old `<ul>` HTML (week + special days).
-- `/_/api/menus/<id>/<lang>` (links to menu files) and `/_/api/menu/<id>/<file key>` (serves the image/PDF inline).
-  Menu files: table `menu_files`, managed on the Menu page (Dishes) -> "Menu files"; shown on #menu too.
-- Gallery: `/_/api/gallery/<id or slug>` (Media.py) lists the photos; with `legacy_id` set, Cloudinary uploads go to the
-  old folder `restaurants/<id>/` of the old cloud (`dzqa1mwom`) once the app secret `cloudinary_url` points at it.
-To switch a domain over, point client.planplate.com / restaurant.planplate.com at this app (Anvil custom domain) only
-after every restaurant has its Old PlanPlate ID filled in.
+The old apps live only in Anvil and must not be changed. Read-only copies (Anvil CLI checkout, push disabled) are in
+`Documents/CLAUDE/planplate-old/client` (app AYKERJ732EPKSD2F: guest booking + public APIs) and `.../restaurant`
+(IBNHSVPERTSB5OFE: back office, Stripe plans, Cloudinary gallery, approval emails). `git pull` there to refresh.
+Both used the same tables: restaurants (uid, regular/special hours as lists, table_seats, eating_time in hours,
+resto_message_en/fr/lv), reservations (approved/seated/done + status "deleted"), menu_files, new_staff_access (owner/
+manager/staff by email), gallery_flags, cloudinary_related, special_actions.
+
+Everything public that old websites and printed QR codes use is answered by `server_code/Legacy.py` once a
+restaurant's Settings has its **Old PlanPlate ID** (the old uuid, column `legacy_id`):
+- `/restaurant/<id>[/<lang>[/<token>]]` and `/reserve/<id>/<lang>` (PRINTED booking QR codes) -> `#book/<slug>[/<lang>]`.
+  On a `restaurant.*` host, `/reserve/...` and `/menus/<id>/<file>/<lang>` are the owners' printable QR pages instead.
+- `/reservations/<id>` (old approval emails) -> `#reservations/<rid>`; `/demo` -> the demo booking form.
+- `/_/api/v1/<id>/<lang>` hours HTML; `/_/api/menus/<id>/<lang>` menu-file links (with a file id in the `<lang>` slot,
+  as the old, broken menu QR codes do, it serves that file); `/_/api/menu/<id>/<file>` the file.
+- `/_/theme/planplate_client2.js` + `planplate_client.js`: the old embed scripts rewritten (same names: iframe_launcher,
+  restaurant, menus/menu attributes, get_work_hours, get_menu_links, open_reservation_iframe), calling the origin they
+  were loaded from. Test page: `maison-lumiere-site/old-code.html`.
+- Gallery feed `/_/api/gallery/<id>`; Cloudinary uploads go to `restaurants/<id>/`. Media.cloudinary() reads
+  `cloudinary_url` or the old three secrets `cloudinary_cloud` + `cloudinary_api` + `cloudinary_secret`.
+Old behaviours ported: special day "open, no online bookings" (`special_days.no_online`), guest note per language
+(`restaurants.form_notes`). The demo has the made-up old id 4d2c1f0a-9b7e-4c3d-8a6f-2e5b7c9d1a30.
+Not ported yet (decisions pending, Nov 2026): moving the old data (restaurants, bookings, menu files, staff, gallery),
+Stripe plans (old: Basic 1 restaurant, Recommended up to 3 + managers, Premium unlimited), old passwords.
 
 Demo website using all of it: `Documents/CLAUDE/maison-lumiere-site` (static; `?planplate=http://localhost:3876` for
 local testing).
