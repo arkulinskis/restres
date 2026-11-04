@@ -39,6 +39,7 @@ class Settings(SettingsTemplate):
             box = self._box({"form_note": "form_note", "notify_email": "notify_email"}.get(k, k))
             box.text = s.get(k) or ""
         self.slug_box.text = s["slug"]
+        self.legacy_box.text = s.get("legacy_id") or ""
         self.slug_hint.text = pp.book_url(s["slug"])
         self.dom_nodes["tz"].innerHTML = pp.tz_field_html("timezone", s["timezone"], "st_timezone")
         self.accepting_box.checked = s["accepting"]
@@ -68,7 +69,7 @@ class Settings(SettingsTemplate):
     @handle("save_button", "click")
     def save_button_click(self, **event_args):
         v = {k: self._box(k).text or "" for k in TEXT}
-        v.update(slug=self.slug_box.text or "", accepting=self.accepting_box.checked, over_capacity=self.over_drop.selected_value,
+        v.update(slug=self.slug_box.text or "", legacy_id=(self.legacy_box.text or "").strip(), accepting=self.accepting_box.checked, over_capacity=self.over_drop.selected_value,
                  privacy_text=self.privacy_box.text or "", emails_on=self.emails_box.checked, language=self.language_drop.selected_value,
                  languages=[l for l in ("en", "fr", "lv") if getattr(self, "lang_" + l).checked])
         node = self.dom_nodes["tz"].querySelector("input[type=hidden]")

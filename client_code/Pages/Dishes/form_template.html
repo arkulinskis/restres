@@ -8,6 +8,16 @@
       <p class="pp-intro">Sections and dishes, with dietary labels. The guest menu (what the table QR code opens), the website and the live menu widget update the moment you save. Switch a dish off when it sells out.</p>
       <anvil-component type="RepeatingPanel" name="sections_panel" prop:item_template="PlanPlate_2_0.Items.EdSection"></anvil-component>
       <div class="ui-empty" anvil:name="empty">No menu yet. Start with a section, such as Starters.</div>
+
+      <div class="pp-sec-head"><h2>Menu files</h2><span class="muted small">PDFs or photos of a menu, per language (Food, Drinks, Wine list…). Guests see them on the menu page and in the old PlanPlate menu box.</span></div>
+      <div class="ui-card pp-sec">
+        <anvil-component type="RepeatingPanel" name="files_panel" prop:item_template="PlanPlate_2_0.Items.MenuFileRow"></anvil-component>
+        <div class="pp-mfadd">
+          <anvil-component type="TextBox" name="file_title" prop:placeholder="Name, e.g. Drinks"></anvil-component>
+          <anvil-component type="DropDown" name="file_lang" prop:items='[["Every language", ""], ["English", "en"], ["Français", "fr"], ["Latviešu", "lv"]]'></anvil-component>
+          <anvil-component type="FileLoader" name="file_loader" prop:text="Upload a PDF or photo" prop:file_types="application/pdf,image/*" prop:role='["btn", "ic-upload"]'></anvil-component>
+        </div>
+      </div>
     </div>
   </anvil-block>
 </anvil-form>

@@ -19,7 +19,9 @@ class Dishes(DishesTemplate):
         p.add_event_handler("x-edit-dish", self._edit_dish)
         p.add_event_handler("x-new-dish", self._new_dish)
         p.add_event_handler("x-toggle-dish", self._toggle_dish)
+        self.files_panel.add_event_handler("x-delete-file", self._delete_file)
         self._draw()
+        self._files(anvil.server.call("get_menu_files", self.rid))
 
     def _draw(self):
         D = self.D
@@ -64,6 +66,27 @@ class Dishes(DishesTemplate):
 
     def _new_dish(self, section_id, **event_args):
         self._dish_dialog(None, section_id)
+
+    # ---- menu files (PDFs or photos, per language)
+    def _files(self, r):
+        if r:
+            self.files_panel.items = r["files"]
+
+    @handle("file_loader", "change")
+    def file_loader_change(self, file, **event_args):
+        if file is None:
+            return
+        title = (self.file_title.text or "").strip() or (file.name or "Menu").rsplit(".", 1)[0][:60]
+        r = state.call("add_menu_file", self.rid, file, title, self.file_lang.selected_value or "")
+        self.file_loader.clear()
+        if r:
+            self.file_title.text = ""
+            self._files(r)
+            state.toast("Menu file added", "ok")
+
+    def _delete_file(self, file, **event_args):
+        if confirm("Guests won't see it any more.", title="Delete %s?" % file["title"], buttons=[("Keep it", False), ("Delete", True)]):
+            self._files(state.call("delete_menu_file", self.rid, file["id"]))
 
     def _toggle_dish(self, dish, section_id, **event_args):
         data = {k: v for k, v in dish.items() if not k.startswith("_")}

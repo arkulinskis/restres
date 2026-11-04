@@ -1115,7 +1115,7 @@ html.ui-dark .lp-land img.dk { display: block !important; }
 .pp-edsec { padding: 0 !important; overflow: hidden; margin-bottom: 18px; }
 .pp-edsec-hd { display: flex; align-items: center; gap: 6px; padding: 16px 20px 12px; border-bottom: 1px solid var(--c-line); flex-wrap: wrap; }
 .anvil-role-pp-full { flex-basis: 100%; }
-.anvil-role-pp-up > button .ic, .anvil-role-pp-up > button i { transform: rotate(180deg); }
+.anvil-role-pp-up > button::before { transform: rotate(180deg); }
 .pp-eddish { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 14px; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--c-line); }
 .pp-eddish.off .anvil-role-strong, .pp-eddish.off .anvil-role-pp-dish-price { color: var(--c-faint); text-decoration: line-through; }
 .pp-eddish-acts { display: flex; gap: 2px; }
@@ -1133,7 +1133,7 @@ html.ui-dark .lp-land img.dk { display: block !important; }
 .pp-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 22px; }
 @media (max-width: 720px) { .pp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .pp-stat { padding: 16px 18px !important; display: grid; gap: 6px; text-decoration: none; color: inherit !important; }
-.pp-stat span { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--c-muted); }
+.pp-stat > span { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--c-muted); }
 a.pp-stat:hover { border-color: var(--c-faint); }
 .pp-stat.warn .anvil-role-num { color: var(--c-warn); }
 .pp-cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
@@ -1268,3 +1268,18 @@ button.pp-grow-row:hover { background: var(--c-surface-2); }
 .pp-pvbox { position: relative; height: calc(100vh - 170px); min-height: 480px; overflow: hidden; background: var(--c-surface-2); }
 .pp-pvbox iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: #fff; }
 .pp-pvbox.phone iframe { left: 50%; border-radius: 22px; box-shadow: 0 0 0 8px #1d1b18, 0 20px 50px rgba(0,0,0,.25); top: 16px; }
+/* menu files */
+.pp-mfrow { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--c-line); }
+.pp-mfadd { display: grid; grid-template-columns: minmax(0, 1fr) 170px auto; gap: 8px; margin-top: 12px; }
+@media (max-width: 620px) { .pp-mfadd { grid-template-columns: minmax(0, 1fr); } }
+.pp-mfiles { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: -8px 0 30px; }
+.pp-mfile .anvil-label { display: inline; }
+.pp-embed-close { display: flex; justify-content: flex-end; margin: -24px -6px 6px; }
+/* Cormorant's default numerals are old-style (small): numbers that matter use full-height figures */
+.anvil-role-num, .anvil-role-pp-evd-n, .anvil-role-pp-ec-n, .anvil-role-pp-big-t, .anvil-role-pp-dish-price, .pp-stats, .pp-facts, .pp-gstats { font-variant-numeric: lining-nums tabular-nums; }
+/* specials and photo of the day: flexible rows, so a special without a photo keeps its full width */
+.pp-spc { display: flex; gap: 12px; align-items: center; }
+.pp-spc .pp-grow { flex: 1; }
+.pp-pod { display: flex; gap: 14px; align-items: center; }
+.pp-pod img { width: 120px; flex: none; }
+@media (min-width: 861px) { .pp-tabs { flex-wrap: wrap; } .pp-tab { padding: 10px 11px; font-size: .9rem; } }

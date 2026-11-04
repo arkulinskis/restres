@@ -9,6 +9,7 @@
           <anvil-component type="Label" name="name_label" prop:role='["pp-mast-name"]'></anvil-component>
           <anvil-component type="Label" name="desc_label" prop:role='["muted"]'></anvil-component>
         </div>
+        <div class="pp-mfiles" anvil:name="files_box"><anvil-component type="RepeatingPanel" name="files_panel" prop:item_template="PlanPlate_2_0.Items.MenuFileLink" prop:role='["contents"]'></anvil-component></div>
         <anvil-component type="RepeatingPanel" name="sections_panel" prop:item_template="PlanPlate_2_0.Items.MenuSection"></anvil-component>
         <anvil-component type="Label" name="empty_label" prop:role='["muted", "pp-center"]' prop:visible="false"></anvil-component>
         <anvil-component type="Label" name="legend_label" prop:role='["faint", "small", "pp-center"]'></anvil-component>

@@ -293,6 +293,52 @@ db_schema:
     indexes: []
     server: full
     title: Members
+  menu_files:
+    client: none
+    columns:
+    - admin_ui:
+        order: 0
+        width: 200
+      name: restaurant
+      target: restaurants
+      type: link_single
+    - admin_ui:
+        order: 1
+        width: 200
+      name: key
+      type: string
+    - admin_ui:
+        order: 2
+        width: 200
+      name: title
+      type: string
+    - admin_ui:
+        order: 3
+        width: 80
+      name: language
+      type: string
+    - admin_ui:
+        order: 4
+        width: 200
+      name: file
+      type: media
+    - admin_ui:
+        order: 5
+        width: 160
+      name: content_type
+      type: string
+    - admin_ui:
+        order: 6
+        width: 80
+      name: position
+      type: number
+    - admin_ui:
+        order: 7
+        width: 200
+      name: created
+      type: datetime
+    server: full
+    title: Menu files
   menu_items:
     client: none
     columns:
@@ -818,6 +864,11 @@ db_schema:
         width: 200
       name: languages
       type: simpleObject
+    - admin_ui:
+        order: 40
+        width: 260
+      name: legacy_id
+      type: string
     indexes: []
     server: full
     title: Restaurants
@@ -1129,7 +1180,7 @@ metadata:
 name: PlanPlate
 native_deps:
   head_html: |
-    <script src="_/theme/legal-kit.js?v=38bdd46a58"></script>
+    <script src="_/theme/legal-kit.js?v=fe3991f0e4"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#f6f3ee">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1178,7 +1229,7 @@ native_deps:
     <!-- Prepsto feedback panel: every "Submit feedback" link and button opens it (it is the only feedback channel). No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->
     <script src="https://prepsto.com/_/theme/widget.js" data-prepsto="3jhqeaj" data-button="false" data-label="Submit feedback" async></script>
     <link rel="stylesheet" href="_/theme/icons.css?v=dbadc7ab1d">
-    <link rel="stylesheet" href="_/theme/app.css?v=8801bb9895">
+    <link rel="stylesheet" href="_/theme/app.css?v=4f77532249">
     <script src="_/theme/app-kit.js?v=cccc67c93f"></script>
     <script src="_/theme/pp-kit.js?v=113422e270"></script>
     <script src="_/theme/pp-timeline.js?v=21a8c268cb"></script>

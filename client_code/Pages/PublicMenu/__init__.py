@@ -34,8 +34,11 @@ class PublicMenu(PublicMenuTemplate):
         self.name_label.text = R["name"]
         self.desc_label.visible = bool(R.get("description"))
         self.desc_label.text = R.get("description") or ""
+        files = [f for f in D.get("files") or [] if not f["language"] or f["language"] == i18n.lang()]
+        self.files_box.visible = bool(files)
+        self.files_panel.items = files
         self.sections_panel.items = D["sections"]
-        self.empty_label.visible = not D["sections"]
+        self.empty_label.visible = not D["sections"] and not files
         self.empty_label.text = T("menuSoon")
         used = sorted({t for s in D["sections"] for i in s["items"] for t in i["tags"]})
         self.legend_label.visible = bool(used)

@@ -62,7 +62,23 @@
     // ---------------------------------------------------------------- the manager
     const seed = await (async () => { /*SEED*/ })();
     ok(seed && seed.rid, 'signed in; the demo restaurant is on the dashboard');
-    const rid = encodeURIComponent(seed.rid);
+    // Admin -> Demo data -> Reload: every run starts from the same demo (fresh bookings, two requests to approve)
+    await page('#admin/demo', () => $('.ad-demo') && btn('.ad-demo', 'Reload demo data'), 'admin demo');
+    btn('.ad-demo', 'Reload demo data').click();
+    const load = await until(() => dialog() && Array.from(dialog().querySelectorAll('button')).find((b) => b.textContent.trim() === 'Load'), 'reload confirm');
+    load.click();
+    await until(() => !dialog(), 'confirm closed');
+    // the rebuilt demo is a new restaurant row: wait until the dashboard links to a new id
+    const demoId = () => { const c = $$('.pp-rc').find((x) => /Maison Lumi/.test(x.textContent));
+                           return c && decodeURIComponent(c.querySelector('a.ui-btn.primary').getAttribute('href').split('/')[1]); };
+    let fresh = null;
+    for (let i = 0; i < 12 && !fresh; i++) {
+      await sleep(5000);
+      await page(i % 2 ? '#dashboard' : '#profile', () => true);
+      if (location.hash === '#dashboard') { await until(() => $('.pp-rc'), 'dashboard cards'); const id = demoId(); if (id && id !== seed.rid) fresh = id; }
+    }
+    ok(fresh, 'admin: demo restaurant reloaded');
+    const rid = encodeURIComponent(fresh);
     await page('#today/' + rid, () => $('.pp-status-card'));
     ok(/Open now|Closed/.test($('.anvil-role-pp-big-t').textContent), 'today: open or closed right now');
     ok($$('.pp-stat').length === 4, 'today: the four numbers');

@@ -828,6 +828,43 @@ ok(call("demo_load"))
 ok(call("demo_load"))
 assert len(T.restaurants.search(slug="maison-lumiere")) == 1, "reloading replaces the demo instead of doubling it"
 
+# ---------------------------------------------------------------------------------- the old PlanPlate's public addresses + menu files
+import anvil  # noqa: E402
+as_user(ana_pp)
+OLD_ID = "a022c1f9-7cc3-44ce-9523-0952a8b6f8be"
+bad(P.save_settings(rid_pp, {"legacy_id": "not-an-id"}))
+ok(P.save_settings(rid_pp, {"legacy_id": OLD_ID.upper()}))
+rr = T.restaurants.get_by_id(rid_pp)
+assert rr["legacy_id"] == OLD_ID and MODS["Media"].folder(rr) == "restaurants/" + OLD_ID, "uploads share the old Cloudinary folder"
+hv = anvil.server.ENDPOINTS["/v1/:ref/:lang"](ref=OLD_ID, lang="lv")
+assert hv.status == 200 and "<ul style='list-style-type: none; padding-left: 0;'>" in hv.body and "Pirmdiena" in hv.body, hv.body[:200]
+assert anvil.server.ENDPOINTS["/v1/:ref/:lang"](ref="00000000-0000-0000-0000-000000000000", lang="en").status == 404
+ml = anvil.server.ENDPOINTS["/menus/:ref/:lang"](ref=OLD_ID, lang="en")
+assert ml.status == 200 and "#menu/" in ml.body, "no files yet: the live menu link"
+bad(call("add_menu_file", rid_pp, anvil.BlobMedia("text/plain", b"hi", name="x.txt"), "Food", "en"))
+bad(call("add_menu_file", rid_pp, anvil.BlobMedia("application/pdf", b"%PDF-1.4", name="food.pdf"), "  ", "en"))
+mf = ok(call("add_menu_file", rid_pp, anvil.BlobMedia("application/pdf", b"%PDF-1.4 menu", name="food.pdf"), "Food", "en"))["files"]
+ok(call("add_menu_file", rid_pp, anvil.BlobMedia("image/jpeg", bytes([255, 216]) + b"jpeg", name="dzerieni.jpg"), "Dzērieni", "lv"))
+ml = anvil.server.ENDPOINTS["/menus/:ref/:lang"](ref=OLD_ID, lang="en").body
+assert ">Food</a>" in ml and "Dzērieni" not in ml, "only that language's files"
+key = mf[0]["url"].rsplit("/", 1)[1]
+f = anvil.server.ENDPOINTS["/menu/:ref/:key"](ref=OLD_ID, key=key)
+assert f.status == 200 and f.headers["Content-Type"] == "application/pdf" and "inline" in f.headers["Content-Disposition"]
+assert anvil.server.ENDPOINTS["/menu/:ref/:key"](ref="le-petit-jardin-2", key=key).status == 404, "a file only through its own restaurant"
+gm = call("get_menu", rr["slug"])
+assert [x["title"] for x in gm["files"]] == ["Food", "Dzērieni"] and gm["files"][1]["language"] == "lv"
+red = anvil.server.ENDPOINTS["/restaurant/:ref"](ref=OLD_ID)
+assert red.status == 302 and red.headers["Location"] == "/#book/" + rr["slug"], "the old booking page opens the new booking form"
+assert MODS["Media"].find_restaurant(OLD_ID) == rr, "the gallery feed finds a restaurant by its old id"
+ok(call("delete_menu_file", rid_pp, mf[0]["id"]))
+as_user(bob_pp)
+try:
+    call("add_menu_file", rid_pp, anvil.BlobMedia("application/pdf", b"%PDF", name="x.pdf"), "Hack", "")
+    leaked = True
+except Exception:
+    leaked = False
+assert not leaked, "only the restaurant's managers add menu files"
+
 # ---------------------------------------------------------------------------------- every callable is covered by a permission check
 # A callable that changes data without require_user / a C.require_* check is a security hole. List the public ones here.
 PUBLIC = {"get_me", "submit_feedback", "legal_state", "legal_accept",

@@ -1107,9 +1107,13 @@ def load_demo_site(rid):
     s = MD.site_row(r)
     have = {p["url"]: p for p in app_tables.photos.search(restaurant=r, provider="example")}
     keys = {}
+    origin = anvil.server.get_app_origin()
     for name, caption, gallery in DEMO_PHOTOS:
-        row = have.get(name) or MD._new_row(r, kind="image", provider="example", url=name, caption=caption, in_gallery=gallery,
-                                            format="webp", width=1600.0, height=1067.0)
+        # With the Cloudinary account connected the demo's photos live there, like every restaurant's uploads.
+        row = MD.upload_remote(r, "%s/_/theme/%s" % (origin, name), caption, gallery) if MD.cloudinary() else None
+        if row is None:
+            row = have.get(name) or MD._new_row(r, kind="image", provider="example", url=name, caption=caption, in_gallery=gallery,
+                                                format="webp", width=1600.0, height=1067.0)
         keys[name] = row["key"]
     content = {
         "cuisine": "French bistro", "tagline": "Seasonal French cooking, natural wine and a terrace on the square, in the heart of Old Montréal.",

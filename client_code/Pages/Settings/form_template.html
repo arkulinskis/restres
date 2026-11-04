@@ -5,6 +5,7 @@
       <div class="pp-set-layout">
         <nav class="pp-toc">
           <a href="javascript:void(0)" data-to="st-details" anvil:on-dom:click="self.toc_click">Details</a>
+          <a href="javascript:void(0)" data-to="st-old" anvil:on-dom:click="self.toc_click">Old PlanPlate</a>
           <a href="javascript:void(0)" data-to="st-rules" anvil:on-dom:click="self.toc_click">Booking rules</a>
           <a href="javascript:void(0)" data-to="st-approval" anvil:on-dom:click="self.toc_click">Approvals</a>
           <a href="javascript:void(0)" data-to="st-form" anvil:on-dom:click="self.toc_click">Booking form</a>
@@ -33,6 +34,11 @@
                   <span class="ui-hint">All booking times are in this time zone. Search by country, city or GMT offset.</span></div>
               </div>
             </div>
+          </section>
+
+          <section class="ui-card pp-sec" id="st-old"><h2>Coming from the old PlanPlate</h2><p class="pp-lead">If your website still has the old PlanPlate code (a booking pop-up from client.planplate.com, hours and menu boxes, the gallery), paste your old restaurant ID here. The old code then shows this restaurant's booking form, hours, menu files and photos, and new photos go into the same Cloudinary folder.</p>
+            <label class="ui-field"><span>Old PlanPlate ID</span><anvil-component type="TextBox" name="legacy_box" prop:placeholder="e.g. a022c1f9-7cc3-44ce-9523-0952a8b6f8be"></anvil-component>
+              <span class="ui-hint">It is in your website's code: restaurant="…" or client.planplate.com/restaurant/…</span></label>
           </section>
 
           <section class="ui-card pp-sec" id="st-rules"><h2>Booking rules</h2><p class="pp-lead">How guests can book online. Staff bookings in the portal can go outside these.</p>

@@ -65,7 +65,8 @@ theme/assets/       app.css (template tokens set to PlanPlate's look + --pp-* al
 server_code/        Booking (rules engine), Portal (manager callables), Public (guest callables, /embed.js),
                     Menu, Board (Today, specials, posts, events), Media (Cloudinary or Anvil media, /photo, /gallery feed),
                     Site (website builder, /_/api/site/<path>), Notify (emails), Guests (guest book), DemoData (Maison
-                    Lumière), Accounts/Admin/Feedback/common (template), SchemaCheck, seo_routes, legal_server
+                    Lumière), Legacy (old PlanPlate endpoints + menu files), Accounts/Admin/Feedback/common (template),
+                    SchemaCheck, seo_routes, legal_server
 ```
 
 Every restaurant page: `RestaurantNav` at the top (`self.rnav.show(D["nav"])`, `prop:tab="<page>"`), data from one server
@@ -89,6 +90,24 @@ public events, past visits (regulars, a no-show), bookings for the next open day
 and a published website (`/_/api/site/maison-lumiere`). It loads by itself the first time the dashboard or its booking
 form/menu opens; ADMIN_EMAILS become its managers. Admin -> Demo data reloads or removes it (removing is remembered).
 
+## Replacing the old PlanPlate (client.planplate.com, restaurant.planplate.com)
+
+The old apps live only in Anvil (not on GitHub) and must not be changed. Their public interface, which restaurant
+websites (e.g. dilettante.lv) still call, is answered by `server_code/Legacy.py` once a restaurant's Settings ->
+"Coming from the old PlanPlate" has its **Old PlanPlate ID** (the UUID in the old embed code, column `legacy_id`):
+- `/restaurant/<id>` (the old booking iframe) -> 302 to `/#book/<slug>`; the Book page's "Close" posts `close_div`
+  to the parent, as the old pop-up expected.
+- `/_/api/v1/<id>/<lang>`: opening hours as the old `<ul>` HTML (week + special days).
+- `/_/api/menus/<id>/<lang>` (links to menu files) and `/_/api/menu/<id>/<file key>` (serves the image/PDF inline).
+  Menu files: table `menu_files`, managed on the Menu page (Dishes) -> "Menu files"; shown on #menu too.
+- Gallery: `/_/api/gallery/<id or slug>` (Media.py) lists the photos; with `legacy_id` set, Cloudinary uploads go to the
+  old folder `restaurants/<id>/` of the old cloud (`dzqa1mwom`) once the app secret `cloudinary_url` points at it.
+To switch a domain over, point client.planplate.com / restaurant.planplate.com at this app (Anvil custom domain) only
+after every restaurant has its Old PlanPlate ID filled in.
+
+Demo website using all of it: `Documents/CLAUDE/maison-lumiere-site` (static; `?planplate=http://localhost:3876` for
+local testing).
+
 ## Recipes
 
 - **New restaurant page:** Pages/X with RestaurantNav, add to router (PAGES, RESTAURANT, _form), pp.TABS, flow.js + phone.js.
@@ -104,6 +123,8 @@ form/menu opens; ADMIN_EMAILS become its managers. Admin -> Demo data reloads or
 - The template's landing CSS was removed: `.lp-hero` is PlanPlate's full-screen split hero.
 - Heredocs with apostrophes fail in the Bash tool: write files with the Write tool.
 - Test password and seeded admin exist only in the local Docker volume `restres-data`.
+- An Anvil Label is `<div><span>`: page CSS must use child selectors (`.pp-stat > span`), or it restyles Labels too.
+- Button icons are `::before` masks (icons.css): rotate the `::before` to flip one (`.anvil-role-pp-up`).
 
 ## Privacy & Terms (legal kit)
 

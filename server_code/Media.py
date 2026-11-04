@@ -63,6 +63,9 @@ def sign(params, secret):
 
 
 def folder(r):
+    """Where uploads go on Cloudinary. With the old PlanPlate ID set: restaurants/<old id>, the old apps' own folder."""
+    if r["legacy_id"]:
+        return "restaurants/" + r["legacy_id"]
     return "planplate/r" + re.sub(r"\D", "", r.get_id())
 
 
@@ -220,6 +223,33 @@ def media_ticket(rid, kind="image"):
     rtype = "video" if kind == "video" else "image"
     return {"ok": True, "provider": "cloudinary", "url": "https://api.cloudinary.com/v1_1/%s/%s/upload" % (cl["cloud"], rtype),
             "fields": fields, "max_video_mb": 100, "max_image_mb": 20}
+
+
+def upload_remote(r, source_url, caption="", in_gallery=False):
+    """Copy a picture that is online (e.g. one of the app's own theme pictures) into the restaurant's Cloudinary folder,
+    server-side (Cloudinary fetches it). Returns the new photo row, or None when Cloudinary isn't set up or refuses."""
+    cl = cloudinary()
+    if cl is None:
+        return None
+    import urllib.parse
+    import anvil.http
+    params = {"folder": folder(r), "timestamp": str(int(time.time()))}
+    body = urllib.parse.urlencode(dict(params, file=source_url, api_key=cl["key"], signature=sign(params, cl["secret"])))
+    try:
+        info = anvil.http.request("https://api.cloudinary.com/v1_1/%s/image/upload" % cl["cloud"], method="POST", data=body,
+                                  headers={"Content-Type": "application/x-www-form-urlencoded"}, json=True)
+    except Exception as e:
+        print("cloudinary upload failed:", e)
+        return None
+    if not isinstance(info, dict):
+        return None
+    url =str(info.get("secure_url") or "")
+    if not url.startswith("https://res.cloudinary.com/"):
+        return None
+    return _new_row(r, kind="image", provider="cloudinary", url=url, public_id=str(info.get("public_id") or ""),
+                    version=str(info.get("version") or ""), format=str(info.get("format") or "")[:10],
+                    caption=_clean_caption(caption), in_gallery=bool(in_gallery), width=_num(info.get("width")),
+                    height=_num(info.get("height")), size=_num(info.get("bytes")))
 
 
 @anvil.server.callable(require_user=True)
@@ -411,6 +441,8 @@ def find_restaurant(ref):
     if not ref:
         return None
     r = app_tables.restaurants.get(slug=ref.lower())
+    if r is None and re.match(r"^[0-9a-fA-F-]{32,36}$", ref):
+        r = app_tables.restaurants.get(legacy_id=ref.lower())
     if r is None and ref.startswith("["):
         try:
             r = app_tables.restaurants.get_by_id(ref)

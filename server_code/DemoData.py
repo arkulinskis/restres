@@ -176,7 +176,7 @@ def remove(remember=True):
             for table in (app_tables.reservations, app_tables.periods, app_tables.special_days, app_tables.dining_tables,
                           app_tables.table_joins, app_tables.members, app_tables.menu_items, app_tables.menu_sections,
                           app_tables.specials, app_tables.posts, app_tables.events, app_tables.sites, app_tables.photos,
-                          app_tables.guests):
+                          app_tables.guests, app_tables.menu_files):
                 for row in list(table.search(restaurant=r)):
                     row.delete()
             r.delete()

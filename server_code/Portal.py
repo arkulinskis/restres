@@ -229,7 +229,7 @@ def delete_restaurant(rid, confirm_name):
         return {"ok": False, "error": "Type the restaurant's name exactly to confirm."}
     for table in (app_tables.reservations, app_tables.periods, app_tables.special_days, app_tables.dining_tables, app_tables.table_joins,
                   app_tables.members, app_tables.menu_items, app_tables.menu_sections, app_tables.specials, app_tables.posts,
-                  app_tables.events, app_tables.sites, app_tables.photos, app_tables.guests):
+                  app_tables.events, app_tables.sites, app_tables.photos, app_tables.guests, app_tables.menu_files):
         for row in list(table.search(restaurant=r)):
             row.delete()
     r.delete()
@@ -257,7 +257,7 @@ def _settings_view(r):
     v.update({"id": r.get_id(), "slug": r["slug"], "timezone": r["timezone"] or "UTC", "accepting": r["accepting"] is not False,
               "over_capacity": r["over_capacity"] or "review", "default_privacy": B.DEFAULT_PRIVACY,
               "emails_on": r["emails_on"] is not False, "language": B.language(r), "languages": B.languages(r),
-              "owner_email": r["owner"]["email"] if r["owner"] else ""})
+              "owner_email": r["owner"]["email"] if r["owner"] else "", "legacy_id": r["legacy_id"] or ""})
     return v
 
 
@@ -311,6 +311,14 @@ def save_settings(rid, data):
         upd["languages"] = [x for x in B.LANGS if x in (data["languages"] or [])]
     if upd.get("notify_email") and not EMAIL_RE.match(str(upd["notify_email"])):
         return {"ok": False, "error": "The alert email address doesn't look right."}
+    if "legacy_id" in data:
+        old = str(data["legacy_id"] or "").strip().lower()
+        if old and not re.match(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", old):
+            return {"ok": False, "error": "The old PlanPlate ID looks like a022c1f9-7cc3-44ce-9523-0952a8b6f8be (from your old website code)."}
+        other = app_tables.restaurants.get(legacy_id=old) if old else None
+        if other is not None and other != r:
+            return {"ok": False, "error": "Another restaurant already uses that old PlanPlate ID."}
+        upd["legacy_id"] = old or None
     if "over_capacity" in data:
         upd["over_capacity"] = data["over_capacity"] if data["over_capacity"] in B.OVER_CAPACITY else "review"
     r.update(**upd)

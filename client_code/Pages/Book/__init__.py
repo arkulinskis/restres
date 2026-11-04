@@ -22,6 +22,7 @@ class Book(BookTemplate):
         i18n.set_lang(self.D.get("lang") or self.R.get("language") or "en")
         self.langs_panel.add_event_handler("x-chip", self._lang)
         self.embedded = window.self != window.top
+        self.close_row.visible = self.embedded
         if self.D.get("ok") and self.R.get("accepting"):
             self.picker.setup(self.slug, self.D["days"], self.D.get("today"), self.R.get("max_party"))
         self._draw()
@@ -166,6 +167,12 @@ class Book(BookTemplate):
             self.step = "pick"
             self.picker.setup(self.slug, self.D["days"], self.D.get("today"), self.R.get("max_party"), p.party, p.date)
             self._draw()
+
+    @handle("close_button", "click")
+    def close_button_click(self, **event_args):
+        """Inside a website's pop-up: ask the page to close it (the old PlanPlate pop-up listens for "close_div")."""
+        window.parent.postMessage("close_div", "*")
+        window.parent.postMessage({"planplate": "close"}, "*")
 
     @handle("copy_button", "click")
     def copy_button_click(self, **event_args):

@@ -4,15 +4,19 @@
     python -I tools/ui_test.py --shots DIR     also screenshots of every page (desktop + phone, light + dark) into DIR
     python -I tools/ui_test.py --stop          stop the local server afterwards
 
-The server runs this folder as it is (no build step): container "<key>-dev" on http://localhost:<PORT>, data in the
+The server runs this folder's app files (no build step): container "<key>-dev" on http://localhost:<PORT>, data in the
 Docker volume "<key>-data" (accounts made by tests stay there; `docker volume rm <key>-data` to start clean).
-Edits to client code show up on the next page load; server-code edits need the container restarted (--restart).
+The app files are COPIED into the Docker volume "<key>-app" on every run (a Windows folder mounted into Docker made
+each request take 15-60 s when Docker's file sharing was busy). Client edits apply on the next run; server-code edits
+need the container restarted (--restart). --only flow.js|phone.js|admin.js runs one script.
 Needs Docker Desktop running and Chrome installed.
 """
 import json
 import pathlib
+import io
 import subprocess
 import sys
+import tarfile
 import tempfile
 import time
 import urllib.request
@@ -33,15 +37,33 @@ def running():
     return r.stdout.strip().startswith("Up")
 
 
+APP_PARTS = ("anvil.yaml", ".anvil_editor.yaml", "__init__.py", "client_code", "server_code", "theme")
+
+
+def copy_app():
+    """Copy the files the App Server needs into the container's /apps/MainApp (the "<key>-app" volume)."""
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w") as tar:
+        for part in APP_PARTS:
+            if (ROOT / part).exists():
+                tar.add(str(ROOT / part), arcname=part, filter=lambda t: None if "__pycache__" in t.name else t)
+    subprocess.run(["docker", "cp", "-", NAME + ":/apps/MainApp/"], input=buf.getvalue(), capture_output=True, check=True)
+
+
 def start(restart=False):
     if restart:
         sh("docker", "rm", "-f", NAME, check=False)
     if not running():
         sh("docker", "rm", "-f", NAME, check=False)
-        sh("docker", "run", "-d", "--name", NAME, "-p", "%d:%d" % (PORT, PORT), "-v", "%s:/apps/MainApp" % ROOT.as_posix(),
+        sh("docker", "volume", "rm", KEY + "-app", check=False)  # fresh copy: no files left over from old versions
+        sh("docker", "create", "--name", NAME, "-p", "%d:%d" % (PORT, PORT), "-v", KEY + "-app:/apps/MainApp",
            "-v", KEY + "-data:/anvil-data", IMAGE, "--app", "MainApp", "--origin", URL,
-           "--auto-migrate")  # new tables/columns apply locally; columns a service adds by itself (e.g. Users) must not stop local tests
+           "--auto-migrate")  # new tables/columns apply to the local database (--ignore-invalid-schema would block that)
+        copy_app()
+        sh("docker", "start", NAME)
         print("starting the App Server ...")
+    else:
+        copy_app()  # client edits since the last run
     for _ in range(300):
         logs = sh("docker", "logs", NAME, check=False)
         if "Downlink client connected" in logs.stdout + logs.stderr:
@@ -97,7 +119,10 @@ def main():
     start(restart="--restart" in args)
     out = pathlib.Path(tempfile.mkdtemp(prefix=KEY + "-ui-"))
     failed = False
+    only = args[args.index("--only") + 1] if "--only" in args else None  # e.g. --only admin.js
     for script, window in (("flow.js", "1280,1000"), ("phone.js", "390,844"), ("admin.js", "1280,1000")):
+        if only and script != only:
+            continue
         text = drive(script, window, out / script.replace(".js", ""))
         res = result(text)
         errors = [l for l in text.splitlines() if "[EXCEPTION]" in l or "Python exception" in l or "Error report" in l]

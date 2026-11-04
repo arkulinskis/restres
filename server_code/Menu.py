@@ -131,7 +131,10 @@ def get_menu(slug):
     r = _find(slug)
     if r is None:
         return {"ok": False, "error": "We couldn't find this restaurant."}
-    return {"ok": True, "restaurant": B.public_restaurant(r), "sections": _menu(r), "tags": TAGS}
+    from . import Legacy
+    files = [dict(Legacy._file_view(f, r), language=f["language"] or "") for f in Legacy.files_of(r)]
+    return {"ok": True, "restaurant": B.public_restaurant(r), "sections": _menu(r), "tags": TAGS,
+            "files": [{"title": f["title"], "url": f["url"], "type": f["type"], "language": f["language"]} for f in files]}
 
 
 def hours_feed(r, days=7):
