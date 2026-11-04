@@ -170,7 +170,7 @@ html.ui-modal-open { overflow: hidden; }
 @keyframes ui-skel { to { background-position: -200% 0; } }
 .ui-stat { display: block; }
 .ui-stat b { display: block; font: 500 2rem/1.1 var(--font-display); }
-.ui-stat span { color: var(--c-muted); font-size: .9rem; }
+.ui-stat > span { color: var(--c-muted); font-size: .9rem; }
 
 /* header */
 .ui-header { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--c-bg) 84%, transparent);
@@ -364,9 +364,9 @@ html.ui-modal-open { overflow: hidden; }
 .pf-pw { margin-top: 22px; }
 .pf-more { margin-top: 16px; }
 .anvil-role-strong { font-weight: 800; }
-.anvil-role-stat-num { font: 500 2rem/1.1 var(--font-display); color: var(--c-ink); }
+.anvil-role-stat-num, .anvil-role-stat-num > span { font: 500 2rem/1.1 var(--font-display); color: var(--c-ink); font-variant-numeric: lining-nums tabular-nums; }
 .ad-stat { text-decoration: none; color: inherit !important; }
-.ad-stat span, .ad-stat .anvil-role-fine-print { color: var(--c-muted); font-size: .9rem; }
+.ad-stat > span, .ad-stat .anvil-role-fine-print { color: var(--c-muted); font-size: .9rem; }
 .anvil-role-ad-demo-line { margin-top: 18px; }
 .ad-filter, .ad-search { margin-bottom: 16px; }
 .ad-search .anvil-role-ad-search-box { max-width: 360px; }
@@ -1031,6 +1031,10 @@ html.ui-dark .lp-land img.dk { display: block !important; }
 .pp-summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--c-surface-2); border-radius: 10px; font-size: .94rem; flex-wrap: wrap; }
 .pp-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .pp-consent { display: grid; gap: 6px; }
+.pp-consent-opt { padding-top: 12px; border-top: 1px dashed var(--c-line); }
+.pp-consent-opt label, .pp-news-row label { color: var(--c-muted); font-size: .92rem; }
+.pp-news-row { margin-top: 18px; padding: 14px 16px; border: 1px solid var(--c-line); border-radius: 10px; text-align: left; }
+.ad-news-stats { margin: 4px 0; }
 .anvil-role-pp-privacy { display: block; font-size: .84rem; color: var(--c-muted); background: var(--c-surface-2); border-radius: 10px; padding: 12px 14px;
   white-space: pre-wrap; max-height: 220px; overflow-y: auto; }
 .pp-done, .pp-status { text-align: center; padding: 32px 26px 26px !important; display: grid; justify-items: center; gap: 6px; }

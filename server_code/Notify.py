@@ -128,10 +128,31 @@ def guest_email(res, event):
     else:
         button, footer = (t["manage"], link), t["private"]
     contact = " · ".join(x for x in (r["address"], r["phone"]) if x)
-    html = _page(r["name"], paras, facts, button, _esc(footer) + ("<br>" if footer and contact else "") + _esc(contact))
+    news = _news_line(res)  # only for guests on PlanPlate's news list: how to stop it
+    foot = "<br>".join(x for x in (_esc(footer), _esc(contact), _link_text(news)) if x)
+    html = _page(r["name"], paras, facts, button, foot)
     text = "\n\n".join([t["hello"].format(n=res["name"]), t["b_" + key]] + ([custom] if custom else []) +
-                       ["%s: %s\n%s: %s\n%s: %s" % (facts[0] + facts[1] + facts[2]), "%s:\n%s" % button, footer, contact])
+                       ["%s: %s\n%s: %s\n%s: %s" % (facts[0] + facts[1] + facts[2]), "%s:\n%s" % button, footer, contact, news])
     return subject, text.strip(), html
+
+
+def _news_line(res):
+    try:
+        from . import GuestNews
+        return GuestNews.email_line(res)
+    except Exception as e:
+        print("news line failed:", e)
+        return ""
+
+
+def _link_text(line):
+    """Escape a line and make its web address clickable."""
+    out = _esc(line)
+    i = out.find("http")
+    if i < 0:
+        return out
+    url = out[i:].split(" ")[0]
+    return out.replace(url, '<a href="%s" style="color:#a19a8f">%s</a>' % (url, url))
 
 
 def staff_alert(res):

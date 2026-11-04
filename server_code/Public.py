@@ -10,6 +10,7 @@ import anvil.tables as tables
 from anvil.tables import app_tables
 
 from . import Booking as B
+from . import GuestNews
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -84,7 +85,8 @@ def get_booking_form(slug, lang=None):
     ctx = B.Ctx(r)
     lang = B.pick_language(r, lang)
     return {"ok": True, "restaurant": B.public_restaurant(r, lang), "days": _days(ctx), "today": B.local_now(r).date().isoformat(),
-            "lang": lang, "privacy": {x: B.public_restaurant(r, x)["privacy_text"] for x in B.languages(r)}}
+            "lang": lang, "privacy": {x: B.public_restaurant(r, x)["privacy_text"] for x in B.languages(r)},
+            "pp": GuestNews.texts()}
 
 
 @anvil.server.callable
@@ -111,7 +113,7 @@ def get_slots(slug, day, party, token=None):
 
 
 @tables.in_transaction
-def _book(r, d, t, party, guest, consent_text, lang="en"):
+def _book(r, d, t, party, guest, consent_text, lang="en", pp=None):
     ctx = B.Ctx(r)
     state = _slot_state(ctx, d, t, party)
     if state != "open":
@@ -127,7 +129,8 @@ def _book(r, d, t, party, guest, consent_text, lang="en"):
         restaurant=r, token=B.new_token(), date=d, start_min=t, duration=dur, party=party,
         name=guest["name"], email=guest["email"], phone=guest["phone"], notes=guest["notes"],
         status=status, source="online", tables=unit["ids"], review_reason=reason, capacity_pct=pct,
-        consent=True, consent_text=consent_text, consent_at=now, created=now, updated=now, history=[], language=lang)
+        consent=True, consent_text=consent_text, consent_at=now, created=now, updated=now, history=[], language=lang,
+        **(pp or {}))
     B.add_history(res, "guest", "Booked online for %d on %s at %s%s." % (
         party, d.isoformat(), B.hm(t), "" if status == "confirmed" else " (awaiting approval)"))
     return res, None
@@ -154,10 +157,18 @@ def book(slug, data):
     if err:
         return {"ok": False, "error": err}
     lang = B.pick_language(r, data.get("language"))
+    if not data.get("pp_consent"):  # PlanPlate's own required tick (GuestNews)
+        return {"ok": False, "error": GuestNews.t(lang)["need"]}
     consent_text = B.public_restaurant(r, lang)["privacy_text"]
-    res, err = _book(r, d, t, party, guest, consent_text, lang)
+    news = bool(data.get("pp_news"))
+    pp = {"pp_consent": True, "pp_consent_text": GuestNews.t(lang)["consent"], "pp_consent_at": B.now_utc(), "pp_news": news}
+    res, err = _book(r, d, t, party, guest, consent_text, lang, pp)
     if err:
         return {"ok": False, "error": err}
+    try:
+        GuestNews.on_booking(res, news)
+    except Exception as e:  # the news list must never break a booking
+        print("news list failed:", e)
     _notify_new(res)
     return {"ok": True, "token": res["token"], "status": res["status"], "reservation": B.reservation_view(res),
             "restaurant": B.public_restaurant(r)}
@@ -194,7 +205,8 @@ def _guest_reply(res):
     can_change, can_cancel = _can(res)
     out = {"ok": True, "reservation": B.reservation_view(res), "restaurant": B.public_restaurant(r, res["language"]),
            "can_change": can_change, "can_cancel": can_cancel,
-           "guest": {"email": res["email"] or "", "phone": res["phone"] or ""}}
+           "guest": {"email": res["email"] or "", "phone": res["phone"] or ""},
+           "news": GuestNews.subscribed(res["email"]), "pp": GuestNews.texts()}
     if can_change:
         ctx = B.Ctx(r)
         out["days"] = _days(ctx)

@@ -1,11 +1,12 @@
 import time
 
 from anvil import *
+import anvil.media
 
 from ._anvil_designer import AdminTemplate
 from ... import pp, state
 
-TABS = ["overview", "feedback", "users", "demo", "import"]
+TABS = ["overview", "feedback", "users", "demo", "import", "news"]
 
 
 class Admin(AdminTemplate):
@@ -17,9 +18,9 @@ class Admin(AdminTemplate):
         self.tab = args[0] if args and args[0] in TABS else "overview"
         self._filter = "new"
         parts = {"overview": self.overview_part, "feedback": self.feedback_part,
-                 "users": self.users_part, "demo": self.demo_part, "import": self.import_part}
+                 "users": self.users_part, "demo": self.demo_part, "import": self.import_part, "news": self.news_part}
         tabs = {"overview": self.tab_overview, "feedback": self.tab_feedback,
-                "users": self.tab_users, "demo": self.tab_demo, "import": self.tab_import}
+                "users": self.tab_users, "demo": self.tab_demo, "import": self.tab_import, "news": self.tab_news}
         for name in TABS:
             parts[name].visible = name == self.tab
             tabs[name].classes["on"] = name == self.tab
@@ -83,6 +84,24 @@ class Admin(AdminTemplate):
     @handle("search_button", "click")
     def search_button_click(self, **event_args):
         self._users(self.search_box.text)
+
+    # ---- PlanPlate's news list (GuestNews.py: guests who ticked the optional box)
+    def _news(self):
+        d = state.call("admin_news")
+        self.n_yes.text, self.n_stopped.text = str(d["subscribed"]), str(d["stopped"])
+        self.news_csv_button.enabled = d["subscribed"] > 0
+        if d["recent"]:
+            lines = ["Latest:"] + ["  %s · %s · %s · %s" % (x["name"] or "-", x["email"], x["restaurant"] or "-", state.short_date(x["since"] or ""))
+                                   for x in d["recent"]]
+            self.news_recent.text = "\n".join(lines)
+        else:
+            self.news_recent.text = "Nobody yet. The box appears on every booking form, unticked."
+
+    @handle("news_csv_button", "click")
+    def news_csv_button_click(self, **event_args):
+        media = state.call("admin_news_csv")
+        if media:
+            anvil.media.download(media)
 
     # ---- demo data
     def _demo(self):

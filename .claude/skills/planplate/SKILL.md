@@ -15,9 +15,10 @@ description: Context, workflow and recipes for PlanPlate (the restres project, f
 
 **Where it lives:**
 - Folder `C:\Users\arkvi\Documents\CLAUDE\restres-forms\` = git clone of **github.com/arkulinskis/restres**.
-  The Forms rebuild is on branch **`forms`** until the user approves it; `master` (still the old JS version, built from
-  `C:\Users\arkvi\Documents\CLAUDE\restres` with tools/deploy.py) runs at planplate-test.anvil.app.
-  "git" layout: the folder *is* the Anvil app. Pushing is the deploy (once merged to master).
+  The user merged the Forms rebuild (branch `forms`) into **`master`** on 2026-11-04; master runs at
+  planplate-test.anvil.app. "git" layout: the folder *is* the Anvil app. Pushing master is the deploy.
+  The old JS source folder `C:\Users\arkvi\Documents\CLAUDE\restres` is retired: **never run its tools/deploy.py**
+  (it would overwrite master with the old version).
 - planplate.com still runs the older PlanPlate apps (client.planplate.com, restaurant.planplate.com) until the user migrates.
 - Made from `APP_MAKER\template-forms`; Anvil's own skills: `APP_MAKER\vendor\anvil-agent-references\skills\client-forms`.
 
@@ -64,7 +65,8 @@ theme/assets/       app.css (template tokens set to PlanPlate's look + --pp-* al
                     pp-floor.js, planplate-gallery.js (the <planplate-gallery> web component), photos, icons
 server_code/        Booking (rules engine), Portal (manager callables), Public (guest callables, /embed.js),
                     Menu, Board (Today, specials, posts, events), Media (Cloudinary or Anvil media, /photo, /gallery feed),
-                    Site (website builder, /_/api/site/<path>), Notify (emails), Guests (guest book), DemoData (Maison
+                    Site (website builder, /_/api/site/<path>), Notify (emails), Guests (guest book), GuestNews
+                    (PlanPlate's own booking tick + optional news list, /_/api/news/stop/<token>), DemoData (Maison
                     Lumière), Legacy (old PlanPlate endpoints + menu files), Accounts/Admin/Feedback/common (template),
                     SchemaCheck, seo_routes, legal_server
 ```
@@ -160,5 +162,21 @@ local testing).
 
 ## Privacy & Terms (legal kit)
 
-`APP_MAKER/legal-kit/apps/restres.json`; build + install there, then `python tools/assets.py`. The guest booking form keeps
-its own consent tick (the restaurant's privacy text, stored with each booking).
+`APP_MAKER/legal-kit/apps/restres.json`; build + install there, then `python tools/assets.py`. The facts file has its own
+`"version"` (2026-11-04, later than the kit's): bump it when PlanPlate's documents change in a way people must re-accept.
+
+**The booking form's three ticks (EU rules, user's decision 2026-11-04):**
+1. The restaurant's privacy notice (required; its text is stored with the booking: `consent`, `consent_text`, `consent_at`).
+2. **PlanPlate's own agreement** (required, no tick = no booking, checked in the browser AND in `Public.book`): PlanPlate,
+   the booking service, keeps a record of the booking and emails the guest about it. Stored as `pp_consent`,
+   `pp_consent_text` (the exact words), `pp_consent_at`. Link opens PlanPlate's Privacy Policy (`legal.open("privacy")`).
+3. **PlanPlate news** (optional, never pre-ticked): "PlanPlate may also email me now and then with news and offers".
+   Marketing consent must be optional under GDPR Art. 7(4) and ePrivacy, so never make it required or pre-tick it.
+   Yes = a row in `pp_contacts` (one per lower-cased email: subscribed, consent_text, consent_at, stopped_at, token) +
+   `reservations.pp_news`. Guests switch it on/off on `#r/<token>` (`set_guest_news`) or with the stop link
+   `/_/api/news/stop/<token>` (GET shows a button, POST stops: mail scanners open links). Guest emails carry the stop link
+   while the address is subscribed (`GuestNews.email_line`). Admin -> **News list**: counts + CSV with each person's stop
+   link (put it in every news email). Stopped addresses keep their row so they are never emailed again.
+All texts live in `server_code/GuestNews.py` (`TEXT`, en/fr/lv) and reach the browser through `get_booking_form` /
+`get_reservation` (`pp`), so what's stored is exactly what the guest saw. Staff-made and imported bookings have no PlanPlate
+tick (`pp_consent` empty): the guest never saw the form.

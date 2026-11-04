@@ -188,7 +188,7 @@ sl = ok(G.get_slots('le-petit-jardin', fri.isoformat(), 2))
 times = [s['time'] for s in sl['slots']]
 assert times[0] == '12:00' and '14:00' in times and '14:15' not in times and '22:00' in times and '22:15' not in times, times
 assert all(s['state'] == 'open' and not s['review'] for s in sl['slots'])
-guest = {'name': 'Marie Curie', 'email': 'marie@example.com', 'phone': '+33 1 23 45 67 89', 'notes': 'Window please'}
+guest = {'name': 'Marie Curie', 'email': 'marie@example.com', 'phone': '+33 1 23 45 67 89', 'notes': 'Window please', 'pp_consent': True}
 assert not G.book('le-petit-jardin', dict(guest, date=fri.isoformat(), time='19:00', party=2))['ok'], 'consent required'
 assert 'email' in G.book('le-petit-jardin', dict(guest, email='nope', consent=True, date=fri.isoformat(), time='19:00', party=2))['error']
 assert not G.book('le-petit-jardin', dict(guest, consent=True, date=fri.isoformat(), time='19:07', party=2))['ok'], 'not a slot'
@@ -359,6 +359,43 @@ assert '#r/' + e1['token'] in m['html'] and 'Parking is behind' in m['text'] and
 assert T.reservations.get(token=e1['token'])['language'] == 'fr'
 assert T.reservations.get(token=e1['token'])['consent_text'].startswith('Nous utilisons') and G.get_reservation(e1['token'])['restaurant']['privacy_text'].startswith('Nous')
 assert set(G.get_booking_form('le-petit-jardin')['privacy']) == {'en', 'fr', 'lv'}
+
+# ---- PlanPlate's own ticks (GuestNews): a required agreement, and the optional news list
+GN = MODS['GuestNews']
+far = next_weekday(2, 16)  # a Wednesday nobody else books in these tests
+assert set(G.get_booking_form('le-petit-jardin')['pp']) == {'en', 'fr', 'lv'} and G.get_booking_form('le-petit-jardin')['pp']['fr']['consent'] == GN.TEXT['fr']['consent']
+no_pp = G.book('le-petit-jardin', dict(guest, consent=True, pp_consent=False, date=far.isoformat(), time='12:00', party=2))
+assert not no_pp['ok'] and 'required' in no_pp['error'], 'no PlanPlate tick, no booking'
+assert T.pp_contacts.get(email='nora@example.com') is None
+del OUT[:]
+n1 = ok(G.book('le-petit-jardin', dict(guest, name='Nora', email='Nora@Example.com', consent=True, pp_news=True, date=far.isoformat(), time='12:00', party=2, language='lv')))
+row = T.reservations.get(token=n1['token'])
+assert row['pp_consent'] and row['pp_consent_text'] == GN.TEXT['lv']['consent'] and row['pp_consent_at'] and row['pp_news'] is True
+c = T.pp_contacts.get(email='nora@example.com')
+assert c is not None and c['subscribed'] and c['consent_text'] == GN.TEXT['lv']['news'] and c['restaurant_name'] == 'Le Petit Jardin' and len(c['token']) == 32
+assert c['language'] == 'lv' and c['consent_at'] and c['stopped_at'] is None
+assert '/news/stop/' + c['token'] in OUT[-1]['text'] and 'href="' in OUT[-1]['html'] and '/news/stop/' + c['token'] in OUT[-1]['html'], 'stop link in the email'
+assert G.get_reservation(n1['token'])['news'] is True and 'manage' in G.get_reservation(n1['token'])['pp']['en']
+n0 = ok(G.book('le-petit-jardin', dict(guest, name='Quiet Quentin', email='quiet@example.com', consent=True, date=far.isoformat(), time='13:00', party=2)))
+assert T.pp_contacts.get(email='quiet@example.com') is None and '/news/stop/' not in OUT[-1]['text'], 'no tick, not on the list'
+assert T.reservations.get(token=n0['token'])['pp_news'] is False and G.get_reservation(n0['token'])['news'] is False
+# the guest stops it on their booking page, and can start it again
+ok(call('set_guest_news', n1['token'], False, 'en'))
+assert not c['subscribed'] and c['stopped_at'] and G.get_reservation(n1['token'])['news'] is False
+assert 'stopped' in T.reservations.get(token=n1['token'])['history'][-1]['what']
+assert '/news/stop/' not in (GN.email_line(row) or ''), 'stopped addresses get no stop line'
+ok(call('set_guest_news', n1['token'], True, 'fr'))
+assert c['subscribed'] and c['stopped_at'] is None and c['consent_text'] == GN.TEXT['fr']['manage'] and c['language'] == 'fr'
+assert call('set_guest_news', 'nope', True)['ok'] is False
+# the stop link: GET asks first (mail scanners open links), POST stops
+EP = anvil.server.ENDPOINTS['/news/stop/:code']
+page = EP(code=c['token'])
+assert page.status == 200 and '<form method="post"' in page.body and c['subscribed'] and 'nora@example.com' in page.body
+anvil.server.request.method = 'POST'
+page = EP(code=c['token'])
+anvil.server.request.method = 'GET'
+assert not c['subscribed'] and c['stopped_at'] and 'form' not in page.body and 'Arrêter' in page.body, page.body
+assert 'form' not in EP(code='0' * 32).body and 'form' not in EP(code='x').body
 del OUT[:]
 e2 = ok(G.book('le-petit-jardin', dict(guest, name='Big Table', consent=True, date=nxt.isoformat(), time='13:00', party=6)))
 assert e2['status'] == 'pending' and len(OUT) == 2, OUT
@@ -1125,10 +1162,24 @@ as_user(bob)
 assert call("get_plan", True)["active"] is True, "Stripe unreachable: nobody is locked out"
 SECRETS.clear()
 
+# ---- Admin -> News list (GuestNews): admins only, a CSV with each person's stop link
+GN.set_news('Nora@example.com', 'Nora', 'en', 'Le Petit Jardin', True, GN.TEXT['en']['news'])
+GN.set_news('gone@example.com', 'Gone', 'en', 'Le Petit Jardin', True, GN.TEXT['en']['news'])
+GN.set_news('gone@example.com', '', 'en', '', False, '')
+as_user(bob)
+assert denied('admin_news') and denied('admin_news_csv')
+as_user(admin)
+nl = call('admin_news')
+assert nl['subscribed'] == 1 and nl['stopped'] == 1 and nl['recent'][0]['email'] == 'nora@example.com', nl
+csv_text = GN.admin_news_csv().get_bytes().decode('utf-8-sig')
+assert 'nora@example.com' in csv_text and 'gone@example.com' not in csv_text and '/news/stop/' in csv_text, csv_text
+as_user(None)
+
 # ---------------------------------------------------------------------------------- every callable is covered by a permission check
 # A callable that changes data without require_user / a C.require_* check is a security hole. List the public ones here.
 PUBLIC = {"get_me", "submit_feedback", "legal_state", "legal_accept", "get_pricing",
-          "get_booking_form", "get_slots", "book", "get_reservation", "change_reservation", "cancel_reservation", "get_menu"}
+          "get_booking_form", "get_slots", "book", "get_reservation", "change_reservation", "cancel_reservation", "get_menu",
+          "set_guest_news"}
 for name, (f, need) in sorted(anvil.server.CALLABLES.items()):
     if name in PUBLIC:
         continue

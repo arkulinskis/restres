@@ -8,6 +8,7 @@
         <a href="#admin/users" anvil:name="tab_users"><i class="ic ic-users"></i>Users</a>
         <a href="#admin/demo" anvil:name="tab_demo"><i class="ic ic-database"></i>Demo data</a>
         <a href="#admin/import" anvil:name="tab_import"><i class="ic ic-upload"></i>Old PlanPlate</a>
+        <a href="#admin/news" anvil:name="tab_news"><i class="ic ic-mail"></i>News list</a>
       </nav>
 
       <div anvil:name="overview_part">
@@ -68,6 +69,21 @@
             <anvil-component type="Button" name="import_button" prop:text="Import" prop:role='["btn", "btn-primary", "ic-database"]' prop:enabled="false"></anvil-component>
           </div>
           <anvil-component type="Label" name="import_report" prop:role='["ad-pre"]' prop:visible="false"></anvil-component>
+        </div>
+      </div>
+
+      <div anvil:name="news_part">
+        <div class="ui-card ui-narrow ad-news ui-stack">
+          <h3>PlanPlate news list</h3>
+          <p class="muted">Guests who ticked the optional box on a booking form ("PlanPlate may also email me now and then with news and offers"). It's PlanPlate's own list, kept apart from the restaurants' guest data. Email only these people, about PlanPlate, and put each person's stop link in every email you send (it's in the CSV). People who stopped stay out for good.</p>
+          <div class="ad-stats ad-news-stats">
+            <div class="ui-card ui-stat ad-stat"><anvil-component type="Label" name="n_yes" prop:role='["stat-num"]'></anvil-component><span>said yes</span></div>
+            <div class="ui-card ui-stat ad-stat"><anvil-component type="Label" name="n_stopped" prop:role='["stat-num"]'></anvil-component><span>stopped</span></div>
+          </div>
+          <div class="ui-row">
+            <anvil-component type="Button" name="news_csv_button" prop:text="Download the list (CSV)" prop:role='["btn", "btn-primary", "ic-download"]'></anvil-component>
+          </div>
+          <anvil-component type="Label" name="news_recent" prop:role='["ad-pre"]'></anvil-component>
         </div>
       </div>
 

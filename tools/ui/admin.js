@@ -51,6 +51,8 @@
     ok(/0 people/.test(document.body.textContent), 'users: search');
     await page('#admin/demo', () => $('.ad-demo'));
     ok(/Status:/.test($('.ad-demo').textContent), 'demo: status line');
+    await page('#admin/news', () => $('.ad-news') && $$('.ad-news .anvil-role-stat-num').length === 2);
+    ok(/said yes/.test($('.ad-news').textContent) && $$('.ad-news button').some((b) => /Download the list/.test(b.textContent)), 'news list: counts and the CSV download');
 
     // Old PlanPlate: import CSV files the way Anvil's Data Tables download them
     await page('#admin/users', () => $$('.ad-user-row').length >= 1);

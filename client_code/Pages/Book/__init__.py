@@ -3,7 +3,7 @@ import anvil.server
 from anvil.js import window
 
 from ._anvil_designer import BookTemplate
-from ... import i18n, pp, state
+from ... import i18n, legal, pp, state
 
 T = i18n.T
 
@@ -87,7 +87,16 @@ class Book(BookTemplate):
         self.consent_box.text = consent
         self.privacy_link.text = T("privacyLink")
         self.privacy_text.text = self.R.get("privacy_text") or ""
+        ppt = self._pp()
+        self.pp_consent_box.text = ppt.get("consent") or ""
+        self.pp_policy_link.text = ppt.get("policy") or ""
+        self.pp_news_box.text = ppt.get("news") or ""
         self.submit_button.text = T("submitReview") if p.review else T("submit")
+
+    def _pp(self):
+        """PlanPlate's own consent texts (GuestNews.TEXT on the server) in the form's language."""
+        texts: dict = self.D.get("pp") or {}
+        return texts.get(i18n.lang()) or texts.get("en") or {}
 
     def _draw_done(self):
         res, ok = self.result["reservation"], self.result["status"] == "confirmed"
@@ -136,6 +145,10 @@ class Book(BookTemplate):
     def privacy_link_click(self, **event_args):
         self.privacy_text.visible = not self.privacy_text.visible
 
+    @handle("pp_policy_link", "click")
+    def pp_policy_link_click(self, **event_args):
+        legal.open("privacy")
+
     @handle("submit_button", "click")
     def submit_button_click(self, **event_args):
         name, email, phone = (self.name_box.text or "").strip(), (self.email_box.text or "").strip(), (self.phone_box.text or "").strip()
@@ -144,12 +157,15 @@ class Book(BookTemplate):
             problem = "%s, %s, %s" % (T("name"), T("email"), T("phone"))
         elif not self.consent_box.checked:
             problem = T("consent", link=T("privacyLink"), r=self.R.get("name") or "")
+        elif not self.pp_consent_box.checked:
+            problem = self._pp().get("need") or ""
         if problem:
             self.error_label.visible, self.error_label.text = True, problem
             return
         p = self.picker
         data = {"date": p.date, "time": p.time, "party": p.party, "name": name, "email": email, "phone": phone,
-                "notes": self.notes_box.text or "", "consent": True, "website": self.website_box.text or "", "language": i18n.lang()}
+                "notes": self.notes_box.text or "", "consent": True, "pp_consent": True, "pp_news": bool(self.pp_news_box.checked),
+                "website": self.website_box.text or "", "language": i18n.lang()}
         self.submit_button.enabled = False
         try:
             r = anvil.server.call("book", self.slug, data)

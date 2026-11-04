@@ -3,7 +3,7 @@ import anvil.server
 from anvil.js import window
 
 from ._anvil_designer import ManageTemplate
-from ... import i18n, pp, state
+from ... import i18n, legal, pp, state
 
 T = i18n.T
 LIVE = ("pending", "confirmed")
@@ -68,6 +68,10 @@ class Manage(ManageTemplate):
         state.set_attr(self.again_link, "href", pp.book_url(R.get("slug") or ""))
         self.nochange_label.visible = live and not D.get("can_change") and bool(R.get("phone"))
         self.nochange_label.text = T("noChange")
+        ppt = self._pp()
+        self.news_box.text = ppt.get("manage") or ""
+        self.news_box.checked = bool(D.get("news"))
+        self.pp_policy_link.text = ppt.get("policy") or ""
         if self.mode == "change":
             g = D.get("guest") or {}
             self.details_h.text = T("details")
@@ -125,6 +129,27 @@ class Manage(ManageTemplate):
             self._draw()
         else:
             state.toast((r or {}).get("error") or "Could not cancel.", "error")
+
+    def _pp(self):
+        """PlanPlate's own texts (GuestNews.TEXT on the server) in the page's language."""
+        texts: dict = self.D.get("pp") or {}
+        return texts.get(i18n.lang()) or texts.get("en") or {}
+
+    @handle("news_box", "change")
+    def news_box_change(self, **event_args):
+        """Start or stop PlanPlate's news emails (the optional tick from the booking form)."""
+        on = bool(self.news_box.checked)
+        r = anvil.server.call("set_guest_news", self.token, on, i18n.lang())
+        if r and r.get("ok"):
+            self.D["news"] = r["on"]
+            state.toast(self._pp().get("saved") or "Saved", "ok")
+        else:
+            self.news_box.checked = not on
+            state.toast((r or {}).get("error") or "Something went wrong.", "error")
+
+    @handle("pp_policy_link", "click")
+    def pp_policy_link_click(self, **event_args):
+        legal.open("privacy")
 
     @handle("ics_button", "click")
     def ics_button_click(self, **event_args):

@@ -89,7 +89,7 @@ def _reserve(Portal, rid, data):
     out = Portal.save_reservation(rid, dict(data, force=True))
     row = app_tables.reservations.get_by_id(out["id"]) if out.get("ok") else None
     if row is not None:
-        row.update(consent=True, consent_at=C.now())
+        row.update(consent=True, consent_at=C.now(), pp_consent=True, pp_consent_at=C.now())
     return out
 
 
