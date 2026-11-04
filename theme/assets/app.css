@@ -1297,3 +1297,6 @@ button.pp-grow-row:hover { background: var(--c-surface-2); }
 a.anvil-file-loader.anvil-component[class*="anvil-role-ic-"] label i.anvil-component-icon.fa { display: none !important; }
 .anvil-file-loader label { border: 0 !important; outline: 0 !important; background: none !important; padding: 0 !important; margin: 0 !important;
   display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font: inherit; color: inherit; }
+/* Admin -> Old PlanPlate: the restaurants to bring in */
+.ad-choices .column-panel { display: grid; gap: 2px; background: var(--c-surface-2); border: 1px solid var(--c-line); border-radius: 12px; padding: 8px 12px; }
+.ad-choices label { white-space: normal; line-height: 1.4; }

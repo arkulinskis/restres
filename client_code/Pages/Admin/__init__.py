@@ -1,3 +1,5 @@
+import time
+
 from anvil import *
 
 from ._anvil_designer import AdminTemplate
@@ -108,6 +110,7 @@ class Admin(AdminTemplate):
     # ---- the old PlanPlate (CSV import, OldImport.py)
     def _import(self):
         self._csv = []
+        self._choices = {}
         self.dom_nodes["tz"].innerHTML = pp.tz_field_html("timezone", "Europe/Riga", "ad_timezone")
 
     @handle("import_loader", "change")
@@ -118,29 +121,65 @@ class Admin(AdminTemplate):
         r = state.call("old_import_preview", self._csv) if self._csv else None
         self.import_button.enabled = bool(r)
         self.import_preview.visible = bool(r)
+        self.import_choices.clear()
+        self._choices = {}
         if r:
             s = r["summary"]
             lines = ["In these files:"] + ["  %s: %d rows" % (k, n) for k, n in sorted(s["counts"].items())]
-            lines += ["", "Restaurants:"] + ["  %s (%s)%s" % (x["name"], x["id"], ", already here: will be updated" if x["exists"] else "")
-                                             for x in s["restaurants"]]
+            if s.get("missing"):
+                lines += ["", "Not in the restaurants file (download that table again to bring these in):"]
+                lines += ["  %s: %d bookings, %d menu files, %d people" % (x["id"], x["bookings"], x["menus"], x["team"]) for x in s["missing"]]
             if r.get("unknown"):
                 lines += ["", "Not old PlanPlate tables (left out): " + ", ".join(r["unknown"])]
             self.import_preview.text = "\n".join(lines)
+            for x in s["restaurants"]:
+                bits = [state.plural(x["bookings"], "booking", "bookings")]
+                if x["last"]:
+                    bits.append("latest %s" % x["last"])
+                bits.append(state.plural(x["team"], "person", "people"))
+                if x["exists"]:
+                    bits.append("already here: will be updated")
+                cb = CheckBox(text="%s  ·  %s" % (x["name"], ", ".join(bits)), checked=bool(x["suggested"] or x["exists"]))
+                self.import_choices.add_component(cb)
+                self._choices[x["id"]] = cb
+        self.import_choose.visible = self.import_choices.visible = bool(self._choices)
 
     @handle("import_button", "click")
     def import_button_click(self, **event_args):
-        if not confirm("Restaurants already imported get their hours, special days and tables replaced by the old ones. "
-                       "Bookings, photos and people are only added.", title="Import from the old PlanPlate?",
-                       buttons=[("Cancel", False), ("Import", True)], role="app-dialog"):
+        only = [uid for uid, cb in self._choices.items() if cb.checked]
+        if self._choices and not only:
+            alert("Tick at least one restaurant to bring in.", title="Nothing chosen", role="app-dialog")
+            return
+        if not confirm("%s come over. Restaurants already imported get their hours, special days and tables replaced by the old "
+                       "ones; bookings, photos and people are added, and bookings nobody has touched here yet take the old app's "
+                       "latest status." % state.plural(len(only), "restaurant", "restaurants"),
+                       title="Import from the old PlanPlate?", buttons=[("Cancel", False), ("Import", True)], role="app-dialog"):
             return
         node = self.dom_nodes["tz"].querySelector("input[type=hidden]")
-        r = state.call("old_import", self._csv, getattr(node, "value", None) or "Europe/Riga")
-        if r:
-            rep = r["report"]
-            lines = ["Done."] + ["  %s: %d" % (k, n) for k, n in sorted(rep["counts"].items())]
-            lines += ["", "Restaurants:"] + ["  %s (old id %s)" % (x["name"], x["old_id"]) for x in rep["restaurants"]]
-            if rep["warnings"]:
-                lines += ["", "To look at:"] + ["  - " + w for w in rep["warnings"]]
-            self.import_report.text = "\n".join(lines)
-            self.import_report.visible = True
-            state.toast("Imported", "ok")
+        r = state.call("old_import", self._csv, getattr(node, "value", None) or "Europe/Riga", only if self._choices else None)
+        if not r:
+            return
+        self.import_button.enabled = False
+        self.import_report.visible = True
+        self.import_report.text = "Importing… (this page can stay open; thousands of bookings take a few minutes)"
+        s = None
+        while True:  # the import runs as a background task on the server; read its progress every 2 seconds
+            s = state.call_quiet("old_import_status", r["job"])
+            if s and (not s.get("ok") or s.get("state") in ("done", "failed")):
+                break
+            if s:
+                part = " %d of %d" % (s["done"], s["total"]) if s.get("step") == "Bookings" and s.get("total") else ""
+                self.import_report.text = "Importing… %s%s" % (s.get("step") or "", part)
+            time.sleep(2)
+        self.import_button.enabled = True
+        if not s.get("ok") or s.get("state") == "failed":
+            self.import_report.text = "The import stopped: %s\nNothing is lost: fix it and import again (nothing is added twice)." % (
+                s.get("error") or "unknown error")
+            return
+        rep = s["report"]
+        lines = ["Done."] + ["  %s: %d" % (k, n) for k, n in sorted(rep["counts"].items())]
+        lines += ["", "Restaurants:"] + ["  %s (old id %s)" % (x["name"], x["old_id"]) for x in rep["restaurants"]]
+        if rep["warnings"]:
+            lines += ["", "To look at:"] + ["  - " + w for w in rep["warnings"]]
+        self.import_report.text = "\n".join(lines)
+        state.toast("Imported", "ok")

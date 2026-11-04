@@ -100,7 +100,8 @@ class Shell(ShellTemplate):
             self.alerts_menu.visible = False
 
     def _key(self, event):
-        if event.key == "Escape":
+        # Chrome's autofill sends plain "keydown" Events without .key; only a real Escape closes the menus
+        if getattr(event, "key", None) == "Escape":
             self.menu.visible = False
             self.alerts_menu.visible = False
 

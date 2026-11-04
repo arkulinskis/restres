@@ -71,8 +71,11 @@
     const input = $('.ad-import input[type=file]');
     const dtf = new DataTransfer(); files.forEach((f) => dtf.items.add(f)); input.files = dtf.files;
     input.dispatchEvent(new Event('change', { bubbles: true }));
-    await until(() => /UI Import Bistro/.test(($('.anvil-role-ad-pre') || {}).textContent || ''), 'import preview', 40000);
+    await until(() => /UI Import Bistro/.test(($('.ad-choices') || {}).textContent || ''), 'import preview', 40000);
     ok(/reservations: 1 rows/.test($('.anvil-role-ad-pre').textContent), 'import: the preview lists what is in the files');
+    const picks = $$('.ad-choices input[type=checkbox]');
+    ok(picks.length === 1 && picks[0].checked && /UI Import Bistro/.test($('.ad-choices').textContent),
+       'import: the restaurant with an upcoming booking is ticked');
     $('.ad-import .anvil-role-ic-database button').click();
     const go = await until(() => $$('.modal button, .anvil-modal-content button').find((b) => b.textContent.trim() === 'Import' && b.offsetParent), 'import confirm');
     go.click();

@@ -119,6 +119,15 @@ menu_files, gallery_flags, cloudinary_related, special_actions); files are recog
 kept (old password_hash copied into an EMPTY password only). Re-importing updates restaurants by old id and replaces
 their hours/special days/tables; bookings (token = old reservation_uid), photos and people are only added. CSVs carry
 no media: imported menu files wait for their upload (Menu page -> "Upload the file", keeps the old id so old links work).
+Tested on the REAL exports (Nov 3 2026, files `export (3..9).csv` in the user's Downloads; never commit them, they hold
+guests' data and password hashes): Anvil writes datetimes as `2026-10-08A21:28:27.161000+0000`, booleans 1/0, `null`,
+and puts `'` before text starting with + - = @ (all handled). The admin ticks which restaurants come over (recent
+bookings = pre-ticked; only Dilettante - Riga a022c1f9 in the real data); people come only from those teams. ~4,300
+bookings is too much for one server call, so `old_import` launches the background task `old_import_task` and the page
+polls `old_import_status` (progress in app_settings "old_import"). A re-import also refreshes status/date/time/party of
+bookings nobody touched here (history = just the import line), so a final import right before the DNS switch syncs.
+The real restaurants export lacked Dilettante Jūrmala `54a6400c…` (308 bookings, 4 menus, 3 staff point to it): the
+report names it; the user has to re-download the restaurants table.
 
 **Billing (`server_code/Billing.py`, user's pricing Nov 2026: one flat plan, 100 a month, everything included):** on
 only when the app secrets `stripe_secret_key` (or the old `stripe_live_key_secret`) and `stripe_price_id` are set;

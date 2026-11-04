@@ -907,6 +907,14 @@ def csv_file(name, header, rows):
     return anvil.BlobMedia("text/csv", ("﻿" + buf.getvalue()).encode("utf-8"), name=name)
 
 
+def run_import(files, tz="Europe/Riga", only=None):
+    """old_import starts a background task (the mock runs it at once); the report comes from old_import_status."""
+    job = ok(call("old_import", files, tz, only))["job"]
+    st = ok(call("old_import_status", job))
+    assert st["state"] == "done", st
+    return st["report"]
+
+
 OLD = "859d82ac-39b7-467c-ba3e-c1f60bdfb10f"
 future = (TODAY + dt.timedelta(days=9)).isoformat()
 past = (TODAY - dt.timedelta(days=30)).isoformat()
@@ -916,7 +924,8 @@ old_files = [
              [["dad@dilettante.example", "True", "", "$2b$12$abcdefghijklmnopqrstuuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012", "0", "True", "", "2025-05-01 10:00:00.000000+00:00"],
               ["anna@example.com", "True", "", "$2b$12$shouldnotreplaceanexistingpassword....................", "0", "True", "", ""]]),
     csv_file("new_staff_access.csv", ["restaurant_id", "user_id", "type_id", "user_name"],
-             [[OLD, "dad@dilettante.example", "owner", ""], [OLD, "waiter@dilettante.example", "staff", "Jānis"]]),
+             [[OLD, "dad@dilettante.example", "owner", ""], [OLD, "waiter@dilettante.example", "staff", "Jānis"],
+              [OLD, "anna@example.com", "manager", "Anna"]]),
     csv_file("restaurants.csv", ["uid", "restaurant", "eating_time", "regular", "special", "table_seats", "contact_email",
                                  "resto_message_en", "resto_message_fr", "resto_message_lv"],
              [[OLD, "Dilettante", "2", json.dumps([["Monday", "17:00", "22:00"], ["Friday", "10:00", "15:00"], ["Friday", "17:00", "23:00"],
@@ -946,7 +955,7 @@ bad(call("old_import_preview", [csv_file("x.csv", ["a"], [["1"]])]))
 pv = ok(call("old_import_preview", old_files))
 assert pv["summary"]["counts"]["reservations"] == 4 and pv["summary"]["restaurants"][0]["name"] == "Dilettante" and pv["unknown"] == ["notes.csv"]
 T.users.get(email="anna@example.com")["password_hash"] = ana_hash = "$2b$12$the-password-anna-uses-here-now"
-rep = ok(call("old_import", old_files, "Europe/Riga"))["report"]
+rep = run_import(old_files)
 dil = T.restaurants.get(legacy_id=OLD)
 assert dil is not None and dil["name"] == "Dilettante" and dil["timezone"] == "Europe/Riga" and dil["duration_min"] == 120
 dad = T.users.get(email="dad@dilettante.example")
@@ -961,7 +970,7 @@ assert sds[d12.isoformat()]["no_online"] is True, "'allow reservations' off -> n
 if d14.weekday() in (0, 4):  # a day the old restaurant opens: "close reservations" keeps it open without online booking
     assert sds[d14.isoformat()]["no_online"] is True and not sds[d14.isoformat()]["closed"]
 assert sorted((t["name"], t["seats"]) for t in T.dining_tables.search(restaurant=dil)) == [("a", 4), ("b", 2), ("c", 6)]
-assert [m["email"] for m in T.members.search(restaurant=dil)] == ["waiter@dilettante.example"]
+assert sorted(m["email"] for m in T.members.search(restaurant=dil)) == ["anna@example.com", "waiter@dilettante.example"]
 rs = {x["token"]: x for x in T.reservations.search(restaurant=dil)}
 assert rs["11111111222233334444555555555555"]["status"] == "confirmed" and rs["11111111222233334444555555555555"]["notes"] == "Window please"
 assert rs["11111111222233334444555555555555"]["staff_note"] == "Regular"
@@ -976,10 +985,65 @@ photo = T.photos.get(restaurant=dil, public_id="restaurants/%s/terrace" % OLD)
 assert photo["provider"] == "cloudinary" and photo["in_gallery"] is True
 g = T.sites.get(restaurant=dil)["gallery"]
 assert g["theme"] == "classic" and g["picture_style"] == "frame" and g["accent"] == "#aa3322" and g["heading"] == "Mūsu foto"
-rep2 = ok(call("old_import", old_files, "Europe/Riga"))["report"]
+rep2 = run_import(old_files)
 assert len(list(T.restaurants.search(legacy_id=OLD))) == 1 and len(list(T.reservations.search(restaurant=dil))) == 3, "importing twice adds nothing twice"
 assert rep2["counts"]["bookings already here"] == 3 and len(list(T.dining_tables.search(restaurant=dil))) == 3
 assert E["/reserve/:ref/:lang"](ref=OLD, lang="lv").headers["Location"] == "/#book/%s/lv" % dil["slug"], "the printed QR codes now open Dilettante"
+bad(call("old_import_status", "nope"), "an unknown job")
+bad(call("old_import", old_files, "Europe/Riga", []), "tick at least one restaurant")
+
+# the real Anvil export (Nov 2026): "export (N).csv", 1/0 booleans, "2026-10-08A21:28:27.161000+0000", "null", a ' before + - = @,
+# demo_1 restaurants, test restaurants left behind, and people only from the chosen restaurants' teams
+REAL, TEST_R = "b0b0b0b0-7cc3-44ce-9523-0952a8b6f8be", "45d3d272-cd15-46d1-85e9-438db74fd6a9"
+soon = (TODAY + dt.timedelta(days=5)).isoformat()
+real_files = [
+    csv_file("export (3).csv", ["ID", "contact_email", "table_seats", "eating_time", "resto_message_lv", "resto_message_fr", "uid", "restaurant",
+                                "special", "resto_message_en", "regular"],
+             [["[877895,1]", "dil@example.lv", json.dumps([["1", True, "2"], ["10", True, "7"]]), "2", "", "", REAL, "Dilettante - Riga", "[]", "Hi",
+               json.dumps([["Monday", "17:00", "22:00", True], ["Saturday", "4:00", "23:00", True]])],
+              ["[877895,2]", "", "null", "", "", "", TEST_R, "Awesome restaurant", "null", "", "null"],
+              ["[877895,3]", "info@planplate.com", "[]", "3", "", "", "demo_1", "La Boucherie", "[]", "", "[]"]]),
+    csv_file("export (5).csv", ["ID", "user_id", "type_id", "user_name", "restaurant_id"],
+             [["[1,1]", "boss@dil.example", "owner", "", REAL], ["[1,2]", "tester@example.com", "owner", "", TEST_R]]),
+    csv_file("export (9).csv", ["ID", "last_login", "password_hash", "enabled", "email", "confirmed_email", "signed_up", "n_password_failures",
+                                "remembered_logins"],
+             [["[1,1]", "2026-10-08A21:28:27.161000+0000", "$2a$10$bosshashbosshashbosshashbosshash", "1", "boss@dil.example", "0",
+               "2024-12-20A03:34:18.924000+0000", "0", "[]"],
+              ["[1,2]", "", "$2a$10$testerhash", "1", "tester@example.com", "0", "2025-06-18A20:59:10.275000+0000", "0", "[]"]]),
+    csv_file("export (4).csv", ["ID", "seated", "notified_info_email", "reservation_request_time", "approved", "guests", "mytime", "email", "mydate",
+                                "restaurant", "name", "status", "reservation_uid", "phone", "special_comments", "done", "resto_comment"],
+             [["[2,1]", "0", "1", "2026-10-09A21:46:34.789172+0000", "1", "4", "19:30", "g@example.com", soon, REAL, "Guest", "",
+               "aaaa1111-bbbb-4ccc-8ddd-000000000001", "'+37129000000", "'-20% discount", "0", ""],
+              ["[2,2]", "0", "1", "", "1", "2", "18:00", "", soon, "54a6400c-e1fd-42f0-8efb-855abf9a865f", "Elsewhere", "",
+               "aaaa1111-bbbb-4ccc-8ddd-000000000002", "", "", "0", ""]]),
+]
+pv2 = ok(call("old_import_preview", real_files))
+by = {x["id"]: x for x in pv2["summary"]["restaurants"]}
+assert set(by) == {REAL, TEST_R}, "demo_1 isn't offered"
+assert by[REAL]["suggested"] and not by[TEST_R]["suggested"] and by[REAL]["bookings"] == 1 and by[REAL]["last"] == soon
+assert pv2["summary"]["missing"][0]["id"] == "54a6400c-e1fd-42f0-8efb-855abf9a865f", "bookings of a restaurant missing from the file are listed"
+rep3 = run_import(real_files, only=[REAL])
+rr = T.restaurants.get(legacy_id=REAL)
+assert rr is not None and T.restaurants.get(legacy_id=TEST_R) is None and rep3["counts"]["restaurants left behind"] == 1
+assert T.users.get(email="tester@example.com") is None, "people of a restaurant left behind stay behind"
+boss = T.users.get(email="boss@dil.example")
+assert rr["owner"] == boss and boss["password_hash"] == "$2a$10$bosshashbosshashbosshashbosshash"
+assert boss["signed_up"].year == 2024, "Anvil's 'A' datetimes are read"
+assert T.periods.get(restaurant=rr)["week"]["5"] == [["04:00", "23:00"]], "single-digit hours become 04:00"
+bk = T.reservations.get(token="aaaa1111bbbb4ccc8ddd000000000001")
+assert bk["phone"] == "+37129000000" and bk["notes"] == "-20% discount", "the export's ' before + and - is removed"
+assert bk["status"] == "confirmed" and bk["created"].month == 10
+assert any("54a6400c" in w for w in rep3["warnings"]), "the missing restaurant is named in the report"
+# the old app kept running: a re-import brings over a cancellation, unless someone already worked on the booking here
+real_files[3] = csv_file("export (4).csv", ["seated", "approved", "guests", "mytime", "email", "mydate", "restaurant", "name", "status",
+                                            "reservation_uid", "done", "resto_comment"],
+                         [["0", "1", "4", "19:30", "g@example.com", soon, REAL, "Guest", "deleted", "aaaa1111-bbbb-4ccc-8ddd-000000000001", "0", ""]])
+rep4 = run_import(real_files, only=[REAL])
+assert T.reservations.get(token="aaaa1111bbbb4ccc8ddd000000000001")["status"] == "cancelled" and rep4["counts"]["bookings updated from the old app"] == 1
+bk = T.reservations.get(token="aaaa1111bbbb4ccc8ddd000000000001")
+bk.update(status="confirmed", history=list(bk["history"]) + [{"at": "now", "what": "Confirmed by staff"}])
+run_import(real_files, only=[REAL])
+assert T.reservations.get(token="aaaa1111bbbb4ccc8ddd000000000001")["status"] == "confirmed", "work done here is never overwritten"
 # the owner uploads the missing menu file; the old link works again
 as_user(dad)
 mf_rows = call("get_menu_files", dil.get_id())["files"]

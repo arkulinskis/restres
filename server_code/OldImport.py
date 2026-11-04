@@ -16,6 +16,14 @@
 #   gallery_flags       -> gallery photos (still on Cloudinary, restaurants/<old id>/)
 #   cloudinary_related  -> the gallery's style
 #
+# Real exports (Nov 2026): the files are called "export (N).csv", booleans are 1/0, datetimes look like
+# "2026-10-08A21:28:27.161000+0000", empty objects are "null", and text starting with + - = @ gets a leading ' (so
+# spreadsheets don't treat it as a formula). All handled here.
+#
+# The admin picks which restaurants to bring in (test restaurants stay behind); people come along only when they're on
+# the team of a chosen restaurant. Thousands of bookings take longer than one server call may run, so the import runs
+# as a background task and writes its progress to app_settings["old_import"], which the Admin page polls.
+#
 # Each file is recognised by its columns, not its name. Importing again updates the same restaurants (found by old id)
 # and replaces their hours, special days and tables with the old ones; bookings, photos and people are only added.
 import ast
@@ -24,6 +32,8 @@ import io
 import json
 import re
 from datetime import date, datetime, timedelta, timezone
+
+import uuid
 
 import anvil.server
 from anvil.tables import app_tables
@@ -65,8 +75,15 @@ def read_files(files):
         if kind is None:
             unknown.append(f.name or "file")
             continue
-        out.setdefault(kind, []).extend({str(k).strip(): v for k, v in r.items() if k} for r in rows)
+        out.setdefault(kind, []).extend({str(k).strip(): _cell(v) for k, v in r.items() if k} for r in rows)
     return out, unknown
+
+
+def _cell(v):
+    """Undo the ' that Anvil's CSV download puts before text starting with + - = @ ("'+37120000000" -> "+37120000000")."""
+    if isinstance(v, str) and len(v) > 1 and v[0] == "'" and v[1] in "+-=@":
+        return v[1:]
+    return v
 
 
 def _s(v):
@@ -110,7 +127,8 @@ def _date(v):
 
 
 def _dt(v):
-    v = _s(v).replace("Z", "+00:00")
+    v = re.sub(r"^(\d{4}-\d{2}-\d{2})[AT ]", r"\1 ", _s(v).replace("Z", "+00:00"))  # Anvil's export: 2026-10-08A21:28:27
+    v = re.sub(r"([+-]\d{2})(\d{2})$", r"\1:\2", v)  # +0000 -> +00:00
     if not v:
         return None
     for parse in (datetime.fromisoformat, lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S.%f%z"),
@@ -130,13 +148,53 @@ def _hm(v):
         return None
 
 
+def _hhmm(v):
+    """ "4:00" -> "04:00" (the old app wrote single-digit hours)."""
+    m = _hm(v)
+    return "%02d:%02d" % divmod(m, 60) if m is not None else _s(v)[:5]
+
+
 # ---------------------------------------------------------------- what the files hold (shown before importing)
 def summary(data):
+    """What's in the files, per restaurant: bookings (and the latest booked date), team size, whether it's here already,
+    and whether it looks in use ("suggested": a booking within the last 6 months or later). Bookings, menu files and staff
+    of restaurants that aren't in the restaurants file are listed under "missing"."""
     rs = data.get("restaurants") or []
     known = {r["legacy_id"] for r in app_tables.restaurants.search() if r["legacy_id"]}
-    return {"counts": {k: len(v) for k, v in data.items()},
-            "restaurants": [{"id": _s(r.get("uid")).lower(), "name": _s(r.get("restaurant")) or "(no name)",
-                             "exists": _s(r.get("uid")).lower() in known} for r in rs]}
+    since = B.now_utc().date() - timedelta(days=183)
+    bookings: dict = {}  # old uid -> number of bookings
+    latest: dict = {}  # old uid -> the latest booked date
+    for row in data.get("reservations") or []:
+        uid = _s(row.get("restaurant")).lower()
+        bookings[uid] = bookings.get(uid, 0) + 1
+        d = _date(row.get("mydate"))
+        if d is not None and (uid not in latest or d > latest[uid]):
+            latest[uid] = d
+    team: dict = {}
+    for row in data.get("new_staff_access") or []:
+        team.setdefault(_s(row.get("restaurant_id")).lower(), set()).add(_s(row.get("user_id")).lower())
+    menus: dict = {}
+    for row in data.get("menu_files") or []:
+        uid = _s(row.get("restaurant")).lower()
+        menus[uid] = menus.get(uid, 0) + 1
+    out = []
+    ids = set()
+    for r in rs:
+        uid = _s(r.get("uid")).lower()
+        ids.add(uid)
+        if not UUID_RE.match(uid):
+            continue  # the old demo restaurants (demo_1 ...)
+        last = latest.get(uid)
+        n = int(bookings.get(uid, 0))
+        name = _s(r.get("restaurant")) or "(no name)"
+        out.append((last is None or last < since, -n, name.lower(),
+                    {"id": uid, "name": name, "exists": uid in known, "bookings": n, "last": last.isoformat() if last else "",
+                     "team": len(team.get(uid, ())), "menus": menus.get(uid, 0), "suggested": bool(last and last >= since)}))
+    out.sort(key=lambda x: x[:3])
+    missing = sorted((-int(bookings.get(uid, 0)), uid) for uid in set(bookings) | set(team) | set(menus)
+                     if UUID_RE.match(uid) and uid not in ids)
+    missing = [{"id": uid, "bookings": -nb, "menus": menus.get(uid, 0), "team": len(team.get(uid, ()))} for nb, uid in missing]
+    return {"counts": {k: len(v) for k, v in data.items()}, "restaurants": [x[3] for x in out], "missing": missing}
 
 
 @anvil.server.callable(require_user=True)
@@ -151,8 +209,20 @@ def old_import_preview(files):
     return C.ok(summary=summary(data), unknown=unknown)
 
 
+JOB_KEY = "old_import"
+
+
+def _job(**changes):
+    v = dict(C.get_setting(JOB_KEY) or {})
+    v.update(changes)
+    C.set_setting(JOB_KEY, v)
+    return v
+
+
 @anvil.server.callable(require_user=True)
-def old_import(files, timezone_name="Europe/Riga"):
+def old_import(files, timezone_name="Europe/Riga", only=None):
+    """Starts the import in the background. `only`: the old ids of the restaurants to bring in (None: all of them).
+    Returns {"job": id}; the Admin page then polls old_import_status(id)."""
     me = C.require_admin()
     try:
         data, unknown = read_files(files)
@@ -160,20 +230,58 @@ def old_import(files, timezone_name="Europe/Riga"):
         return C.fail(str(e))
     if not data.get("restaurants") and not data.get("reservations"):
         return C.fail("Add the restaurants CSV (and the others) from the old app.")
+    if only is not None and not [x for x in only if _s(x)]:
+        return C.fail("Tick at least one restaurant to import.")
+    cur = C.get_setting(JOB_KEY) or {}
+    if cur.get("state") == "running" and B.now_utc().timestamp() - float(cur.get("at") or 0) < 1800:
+        return C.fail("An import is already running. Wait for it to finish.")
     tz = timezone_name if B.valid_timezone(timezone_name) else "Europe/Riga"
-    report = Importer(data, me, tz).run()
-    report["unknown"] = unknown
-    return C.ok(report=report)
+    job = uuid.uuid4().hex
+    C.set_setting(JOB_KEY, {"id": job, "state": "running", "at": B.now_utc().timestamp(), "step": "Starting", "done": 0,
+                            "total": len(data.get("reservations") or []), "report": None, "error": ""})
+    anvil.server.launch_background_task("old_import_task", files, tz, [_s(x).lower() for x in only] if only is not None else None,
+                                        me, unknown, job)
+    return C.ok(job=job)
+
+
+@anvil.server.background_task
+def old_import_task(files, tz, only, admin, unknown, job):
+    try:
+        data, _ = read_files(files)
+        report = Importer(data, admin, tz, only=only, job=job).run()
+        report["unknown"] = unknown
+        _job(state="done", report=report, step="Done")
+    except Exception as e:  # shown on the Admin page instead of a silent stop
+        print("old import failed:", repr(e))
+        _job(state="failed", error="%s: %s" % (type(e).__name__, e))
+        raise
+
+
+@anvil.server.callable(require_user=True)
+def old_import_status(job):
+    C.require_admin()
+    v = dict(C.get_setting(JOB_KEY) or {})
+    if v.get("id") != job:
+        return C.fail("That import isn't known (another one started since).")
+    return C.ok(state=v.get("state"), step=v.get("step", ""), done=v.get("done", 0), total=v.get("total", 0),
+                report=v.get("report"), error=v.get("error", ""))
 
 
 # ---------------------------------------------------------------- the import
 class Importer:
-    def __init__(self, data, admin, tz):
-        self.d, self.admin, self.tz = data, admin, tz
+    def __init__(self, data, admin, tz, only=None, job=None):
+        self.d, self.admin, self.tz, self.job = data, admin, tz, job
+        self.only = set(only) if only is not None else None  # old ids to bring in; None: every restaurant in the file
         self.n: dict = {}
         self.warnings: list = []
         self.rest: dict = {}  # old uid -> restaurant row
         self.today = B.now_utc().date()
+        file_ids = {_s(r.get("uid")).lower() for r in self.d.get("restaurants") or []}
+        self.chosen = {u for u in file_ids if UUID_RE.match(u) and (self.only is None or u in self.only)}
+
+    def progress(self, step, done=None):
+        if self.job:
+            _job(step=step, **({"done": done} if done is not None else {}))
 
     def count(self, what, k=1):
         self.n[what] = self.n.get(what, 0) + k
@@ -183,14 +291,18 @@ class Importer:
             self.warnings.append(text)
 
     def run(self):
-        self.users()
         access = self.access()
+        self.progress("People")
+        self.users(access)
+        self.progress("Restaurants, hours and tables")
         for row in self.d.get("restaurants") or []:
             self.restaurant(row, access)
         for uid, r in list(self.rest.items()):
             self.team(uid, r, access)
         self.closures()
+        self.progress("Bookings", 0)
         self.reservations()
+        self.progress("Menus and photos")
         self.menu_files()
         self.gallery()
         self.gallery_style()
@@ -209,10 +321,15 @@ class Importer:
             self.warn("%s had no row in the users file: they set a password with 'Forgot password' (or use Google)." % email)
         return u
 
-    def users(self):
+    def users(self, access):
+        """Only the people on a chosen restaurant's team come along (test accounts and people of restaurants left behind don't)."""
+        linked = {e for uid in self.chosen for role, e, n in access.get(uid, [])}
         for row in self.d.get("users") or []:
             email = _s(row.get("email")).lower()
             if not email or "@" not in email:
+                continue
+            if email not in linked:
+                self.count("people left behind (not on a chosen restaurant's team)")
                 continue
             u = app_tables.users.get(email=email)
             pw = _s(row.get("password_hash"))
@@ -250,9 +367,11 @@ class Importer:
     def restaurant(self, row, access):
         uid = _s(row.get("uid")).lower()
         if not UUID_RE.match(uid):
-            self.warn("Skipped a restaurant without a proper old id (%s)." % (_s(row.get("restaurant")) or "no name"))
+            if not uid.startswith("demo"):  # the old app's demo restaurants (demo_1 ...) stay behind quietly
+                self.warn("Skipped a restaurant without a proper old id (%s)." % (_s(row.get("restaurant")) or "no name"))
             return
-        if uid.startswith("demo"):
+        if uid not in self.chosen:
+            self.count("restaurants left behind")
             return
         name = _s(row.get("restaurant"))[:80] or "Restaurant"
         owners = [e for role, e, n in access.get(uid, []) if role == "owner"]
@@ -294,7 +413,7 @@ class Importer:
             o, c = _s(e[1]), _s(e[2])
             if "Closed" in (o, c) or _hm(o) is None or _hm(c) is None:
                 continue
-            week[str(DAYS.index(e[0]))].append([o[:5], c[:5]])
+            week[str(DAYS.index(e[0]))].append([_hhmm(o), _hhmm(c)])
         week = {k: B.intervals_text(B.clean_intervals(v)) for k, v in week.items()}
         app_tables.periods.add_row(restaurant=r, name="Opening hours", start=None, end=None, week=week, created=B.now_utc())
         for s in app_tables.special_days.search(restaurant=r):
@@ -310,7 +429,7 @@ class Importer:
             if "Closed" in (_s(e[1]), _s(e[2])):
                 day["closed"] = True
             elif _hm(e[1]) is not None and _hm(e[2]) is not None:
-                day["hours"].append([_s(e[1])[:5], _s(e[2])[:5]])
+                day["hours"].append([_hhmm(e[1]), _hhmm(e[2])])
             if len(e) > 3 and e[3] is False:
                 day["no_online"] = True
         for d, v in sorted(days.items()):
@@ -356,11 +475,22 @@ class Importer:
 
     # ---- bookings
     def reservations(self):
-        tokens: dict = {}
-        for row in self.d.get("reservations") or []:
-            r = self.rest.get(_s(row.get("restaurant")).lower()) or app_tables.restaurants.get(legacy_id=_s(row.get("restaurant")).lower())
+        tokens: dict = {}  # restaurant id -> {token: the booking row here}
+        added: set = set()  # tokens added during this import (a second row with the same id in the file is skipped)
+        found: dict = {}  # old uid -> restaurant row here (or None), looked up once
+        file_ids = {_s(r.get("uid")).lower() for r in self.d.get("restaurants") or []}
+        missing: dict = {}
+        for i, row in enumerate(self.d.get("reservations") or []):
+            if i % 250 == 0 and i:
+                self.progress("Bookings", i)
+            uid = _s(row.get("restaurant")).lower()
+            if uid not in found:
+                found[uid] = self.rest.get(uid) or (app_tables.restaurants.get(legacy_id=uid) if uid in self.chosen else None)
+            r = found[uid]
             if r is None:
                 self.count("bookings skipped (restaurant not imported)")
+                if uid not in file_ids and UUID_RE.match(uid):
+                    missing[uid] = missing.get(uid, 0) + 1
                 continue
             token = re.sub(r"[^0-9a-f]", "", _s(row.get("reservation_uid")).lower())[:32]
             d, t = _date(row.get("mydate")), _hm(row.get("mytime"))
@@ -369,10 +499,10 @@ class Importer:
                 continue
             have = tokens.get(r.get_id())
             if have is None:
-                have = tokens[r.get_id()] = {x["token"] for x in app_tables.reservations.search(restaurant=r)}
-            if token in have:
-                self.count("bookings already here")
-                continue
+                have = {}
+                for x in app_tables.reservations.search(restaurant=r):
+                    have[x["token"]] = x
+                tokens[r.get_id()] = have
             walk_in = _s(row.get("email")).lower() == "walk-in" or _s(row.get("name")).lower() == "walk-in"
             past = d < self.today
             if _s(row.get("status")).lower() == "deleted":
@@ -385,17 +515,37 @@ class Importer:
                 status = "confirmed"
             else:
                 status = "declined" if past else "pending"
+            party = max(1, int(_num(row.get("guests"), 2) or 2))
+            if token in added:
+                self.count("bookings already here")
+                continue
+            old = have.get(token)
+            if old is not None:
+                # Imported before. The old app kept running since, so bring over what changed there (cancelled, seated,
+                # moved) unless someone already worked on the booking here (then its history has more than the import line).
+                note = _s(row.get("resto_comment"))[:1000]
+                changed = (old["status"], old["date"], old["start_min"], old["party"], old["staff_note"]) != (status, d, t, party, note)
+                if len(old["history"] or []) <= 1 and changed:
+                    old.update(status=status, date=d, start_min=t, party=party, staff_note=note, updated=B.now_utc())
+                    self.count("bookings updated from the old app")
+                else:
+                    self.count("bookings already here")
+                continue
             created = _dt(row.get("reservation_request_time")) or B.now_utc()
             app_tables.reservations.add_row(
                 restaurant=r, token=token, date=d, start_min=t, duration=int(r["duration_min"] or 120),
-                party=max(1, int(_num(row.get("guests"), 2) or 2)), name="Walk-in" if walk_in else _s(row.get("name"))[:80],
+                party=party, name="Walk-in" if walk_in else _s(row.get("name"))[:80],
                 email="" if walk_in else _s(row.get("email")).lower()[:200], phone="" if walk_in else _s(row.get("phone"))[:40],
                 notes=_s(row.get("special_comments"))[:1000], staff_note=_s(row.get("resto_comment"))[:1000], status=status,
                 source="walk_in" if walk_in else "online", tables=[], review_reason="", capacity_pct=0, consent=False,
                 created=created, updated=B.now_utc(), history=[{"at": B.now_utc().isoformat(), "what": "Imported from the old PlanPlate"}],
                 language=None)
-            have.add(token)
+            added.add(token)
             self.count("bookings")
+        self.progress("Bookings", len(self.d.get("reservations") or []))
+        for uid, n in sorted(missing.items(), key=lambda x: -x[1]):
+            self.warn("%d bookings belong to restaurant %s, which isn't in the restaurants file. Download the old restaurants "
+                      "table again and import it with the bookings file (importing twice is safe)." % (n, uid))
 
     # ---- menu files, photos
     def menu_files(self):
