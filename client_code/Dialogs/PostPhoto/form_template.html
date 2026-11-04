@@ -1,0 +1,18 @@
+<div class="ui pp pp-dlg">
+  <anvil-component type="Label" name="eyebrow" prop:role='["eyebrow-label"]' prop:text="Photo of the day"></anvil-component>
+  <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]' prop:text="What's good today?"></anvil-component>
+  <div class="ui-stack">
+    <div class="pp-shot">
+      <img anvil:name="shot_img" alt="">
+      <anvil-component type="Button" name="shot_button" prop:text="Take or choose a photo" prop:role='["btn", "btn-primary", "btn-block", "ic-camera"]'></anvil-component>
+      <anvil-component type="Label" name="status_label" prop:role='["muted", "small"]'></anvil-component>
+    </div>
+    <label class="ui-field"><span>A line about it</span><anvil-component type="TextBox" name="text_box" prop:placeholder="Fresh porcini, only today"></anvil-component></label>
+    <anvil-component type="CheckBox" name="gallery_box" prop:text="Also add it to the gallery"></anvil-component>
+    <anvil-component type="Label" name="message" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+  </div>
+  <div class="ui-row end">
+    <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn"]'></anvil-component>
+    <anvil-component type="Button" name="save_button" prop:text="Post" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+</div>

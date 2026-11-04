@@ -1,0 +1,17 @@
+<div class="ui pp pp-dlg">
+  <anvil-component type="Label" name="eyebrow" prop:role='["eyebrow-label"]' prop:text="Today only"></anvil-component>
+  <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]' prop:text="Change today's hours"></anvil-component>
+  <div class="ui-stack">
+    <div class="pp-ivs">
+      <anvil-component type="RepeatingPanel" name="ivs_panel" prop:item_template="PlanPlate_2_0.Items.Interval" prop:role='["contents"]'></anvil-component>
+      <anvil-component type="Button" name="add_button" prop:text="Add hours" prop:role='["btn", "btn-ghost", "btn-sm", "ic-plus"]'></anvil-component>
+    </div>
+    <label class="ui-field"><span>Why <em>(shown on your website)</em></span><anvil-component type="TextBox" name="label_box" prop:placeholder="e.g. Private party from 21:00"></anvil-component></label>
+    <span class="ui-hint">Only today changes. Tomorrow your regular hours apply again.</span>
+    <anvil-component type="Label" name="message" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+  </div>
+  <div class="ui-row end">
+    <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn"]'></anvil-component>
+    <anvil-component type="Button" name="save_button" prop:text="Save today's hours" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+</div>

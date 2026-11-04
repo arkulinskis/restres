@@ -1,0 +1,15 @@
+<div class="ui-card pp-ec">
+  <div class="pp-ec-d"><anvil-component type="Label" name="day_label" prop:role='["pp-ec-n"]'></anvil-component><anvil-component type="Label" name="mon_label" prop:role='["pp-ec-m"]'></anvil-component></div>
+  <div class="pp-grow">
+    <anvil-component type="Label" name="title_label" prop:role='["card-title"]' bind:text="self.item['title']"></anvil-component>
+    <anvil-component type="Label" name="meta_label" prop:role='["muted", "small"]'></anvil-component>
+    <anvil-component type="Label" name="desc_label" prop:role='["muted", "small"]'></anvil-component>
+    <anvil-component type="Label" name="warn_label" prop:role='["pp-warnline"]'></anvil-component>
+    <img anvil:name="img" class="pp-ec-img" alt="">
+  </div>
+  <div class="pp-ec-acts">
+    <anvil-component type="Button" name="setup_button" prop:role='["btn", "btn-primary", "btn-sm", "ic-table"]'></anvil-component>
+    <anvil-component type="Button" name="edit_button" prop:text="Edit" prop:role='["btn", "btn-sm"]'></anvil-component>
+    <anvil-component type="Button" name="delete_button" prop:text="Delete" prop:role='["btn", "btn-ghost", "btn-icon", "btn-danger", "ic-trash"]'></anvil-component>
+  </div>
+</div>

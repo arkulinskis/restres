@@ -1,0 +1,22 @@
+<div class="ui-card pp-ap">
+  <anvil-component type="Label" name="when" prop:role='["muted", "small"]'></anvil-component>
+  <div class="pp-ap-name"><anvil-component type="Label" name="name_label" prop:role='["card-title"]'></anvil-component><anvil-component type="Label" name="party_label" prop:role='["muted"]'></anvil-component>
+    <anvil-component type="Label" name="guest_badge" prop:role='["badge", "badge-brand"]' prop:visible="false"></anvil-component></div>
+  <anvil-component type="Label" name="why" prop:role='["small"]'></anvil-component>
+  <div class="pp-meter">
+    <div class="pp-meter-bar"><span class="with" anvil:name="bar_with"></span><span class="without" anvil:name="bar_without"></span><span class="thr" anvil:name="bar_thr" title="Auto-approval limit"></span></div>
+    <anvil-component type="Label" name="meter_label" prop:role='["muted", "small"]'></anvil-component>
+  </div>
+  <div class="pp-ap-facts">
+    <span><i class="ic ic-table"></i><anvil-component type="Label" name="table_label"></anvil-component></span>
+    <span><i class="ic ic-grid"></i><anvil-component type="Label" name="free_label"></anvil-component></span>
+    <a anvil:name="phone_link" href="#"><i class="ic ic-phone"></i><anvil-component type="Label" name="phone_label"></anvil-component></a>
+  </div>
+  <anvil-component type="Label" name="notes_label" prop:role='["muted", "small"]'></anvil-component>
+  <div class="ui-row">
+    <anvil-component type="Button" name="approve_button" prop:text="Approve" prop:role='["btn", "btn-good", "btn-sm", "ic-check"]'></anvil-component>
+    <anvil-component type="Button" name="decline_button" prop:text="Decline" prop:role='["btn", "btn-danger", "btn-sm"]'></anvil-component>
+    <anvil-component type="Button" name="details_button" prop:text="Details" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component>
+    <anvil-component type="Button" name="goto_button" prop:text="See the day" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component>
+  </div>
+</div>

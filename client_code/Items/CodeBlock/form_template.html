@@ -1,0 +1,9 @@
+<div class="pp-codeblock">
+  <anvil-component type="Label" name="title_label" prop:role='["strong"]' bind:text="self.item['title']"></anvil-component>
+  <anvil-component type="Label" name="text_label" prop:role='["muted", "small"]' bind:text="self.item['text']"></anvil-component>
+  <div class="pp-code">
+    <anvil-component type="Label" name="code_label" prop:role='["pp-pre-code"]' bind:text="self.item['code']"></anvil-component>
+    <anvil-component type="Button" name="copy_button" prop:text="Copy" prop:role='["btn", "btn-sm", "ic-copy"]'></anvil-component>
+  </div>
+  <a class="ui-btn sm" anvil:name="open_link" href="#" target="_blank" rel="noopener"><i class="ic ic-external"></i>Open it</a>
+</div>

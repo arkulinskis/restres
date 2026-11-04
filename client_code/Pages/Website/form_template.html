@@ -1,0 +1,49 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-site">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="website"></anvil-component>
+      <div class="ui-card pp-sbar">
+        <div class="pp-grow">
+          <anvil-component type="Label" name="bar_eyebrow" prop:role='["eyebrow-label"]' prop:text="Your website"></anvil-component>
+          <anvil-component type="Label" name="url_label" prop:role='["small"]'></anvil-component>
+          <anvil-component type="Label" name="visits_label" prop:role='["muted", "small"]'></anvil-component>
+        </div>
+        <anvil-component type="Label" name="live_badge" prop:role='["badge"]'></anvil-component>
+        <div class="ui-row">
+          <a class="ui-btn sm" anvil:name="open_link" href="#" target="_blank" rel="noopener"><i class="ic ic-external"></i>Open</a>
+          <anvil-component type="Button" name="download_button" prop:text="Download" prop:role='["btn", "btn-sm", "ic-download"]'></anvil-component>
+          <anvil-component type="Button" name="save_button" prop:text="Save" prop:role='["btn", "btn-sm"]'></anvil-component>
+          <anvil-component type="Button" name="publish_button" prop:role='["btn", "btn-sm"]'></anvil-component>
+        </div>
+      </div>
+
+      <div class="ui-card pp-welcome" anvil:name="welcome">
+        <div class="eyebrow">Website</div>
+        <h2>Your restaurant website, from what PlanPlate already knows</h2>
+        <p class="muted">Hours, menu, specials, events, photos and the booking button are filled in and kept up to date for you. Add your story, pictures and links, pick colours, and publish.</p>
+        <div class="pp-choices">
+          <button type="button" class="ui-card pp-choice" anvil:on-dom:click="self.begin_click"><i class="ic ic-edit"></i><b>Start from my details</b><span class="small muted">Your name, address, menu and hours are already in. About 10 minutes.</span></button>
+          <button type="button" class="ui-card pp-choice" anvil:on-dom:click="self.example_click"><i class="ic ic-sparkle"></i><b>See an example first</b><span class="small muted">Fill the form with Dilettante, a modern Italian restaurant in Riga (dilettante.lv). Change anything, or start over.</span></button>
+        </div>
+      </div>
+
+      <div class="pp-site-layout" anvil:name="builder">
+        <div>
+          <anvil-component type="RepeatingPanel" name="sections_panel" prop:item_template="PlanPlate_2_0.Items.SiteSection"></anvil-component>
+          <p class="small muted">Not sure? <a href="javascript:void(0)" anvil:on-dom:click="self.example_click">Load the Dilettante example</a> to see a finished site.</p>
+        </div>
+        <div class="pp-pvwrap">
+          <div class="ui-card pp-pv">
+            <div class="pp-pvbar">
+              <div class="ui-seg"><button type="button" anvil:name="dev_desktop" data-dev="desktop" anvil:on-dom:click="self.device_click">Computer</button>
+                <button type="button" anvil:name="dev_phone" data-dev="phone" anvil:on-dom:click="self.device_click">Phone</button></div>
+              <span class="ui-spacer"></span><anvil-component type="Label" name="pv_status" prop:role='["muted", "small"]'></anvil-component>
+            </div>
+            <div class="pp-pvbox" anvil:dom-node="pvbox"><iframe anvil:dom-node="frame" title="Website preview"></iframe></div>
+          </div>
+        </div>
+      </div>
+      <anvil-component type="Timer" name="preview_timer" prop:interval="0"></anvil-component>
+    </div>
+  </anvil-block>
+</anvil-form>

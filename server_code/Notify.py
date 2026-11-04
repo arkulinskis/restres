@@ -82,7 +82,7 @@ def origin():
 
 def _send(to, subject, text, html, r=None):
     import anvil.email
-    kw = {"to": to, "subject": subject, "text": text, "html": html, "from_name": (r["name"] if r is not None else "PlanPlate")}
+    kw: dict = {"to": to, "subject": subject, "text": text, "html": html, "from_name": (r["name"] if r is not None else "PlanPlate")}
     if r is not None and r["email"]:
         kw["reply_to"] = r["email"]
     anvil.email.send(**kw)

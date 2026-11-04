@@ -1,0 +1,13 @@
+<div class="ui-card pp-edsec">
+  <div class="pp-edsec-hd">
+    <anvil-component type="Label" name="title_label" prop:role='["card-title"]' bind:text="self.item['title']"></anvil-component>
+    <span class="ui-spacer"></span>
+    <anvil-component type="Button" name="up_button" prop:text="Move up" prop:role='["btn", "btn-ghost", "btn-icon", "ic-chevron", "pp-up"]'></anvil-component>
+    <anvil-component type="Button" name="down_button" prop:text="Move down" prop:role='["btn", "btn-ghost", "btn-icon", "ic-chevron"]'></anvil-component>
+    <anvil-component type="Button" name="edit_button" prop:text="Edit" prop:role='["btn", "btn-ghost", "btn-sm", "ic-edit"]'></anvil-component>
+    <anvil-component type="Button" name="delete_button" prop:text="Delete section" prop:role='["btn", "btn-ghost", "btn-icon", "ic-trash"]'></anvil-component>
+    <anvil-component type="Label" name="desc_label" prop:role='["muted", "small", "pp-full"]'></anvil-component>
+  </div>
+  <anvil-component type="RepeatingPanel" name="dishes_panel" prop:item_template="PlanPlate_2_0.Items.EdDish"></anvil-component>
+  <div class="pp-add-dish"><anvil-component type="Button" name="add_button" prop:text="Add a dish" prop:role='["btn", "btn-ghost", "btn-sm", "ic-plus"]'></anvil-component></div>
+</div>

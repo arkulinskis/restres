@@ -1,0 +1,12 @@
+<div class="ui-card pp-jc">
+  <div class="ui-row">
+    <anvil-component type="Label" name="name_label" prop:role='["card-title"]'></anvil-component>
+    <anvil-component type="Label" name="seats_badge" prop:role='["badge"]'></anvil-component>
+    <span class="ui-spacer"></span>
+    <anvil-component type="Button" name="delete_button" prop:text="Split for good" prop:role='["btn", "btn-ghost", "btn-sm", "btn-danger", "ic-split"]'></anvil-component>
+  </div>
+  <div class="pp-lbl">Joined at these hours (click to split or join an hour)</div>
+  <anvil-component type="RepeatingPanel" name="hours_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips"]'></anvil-component>
+  <div class="pp-lbl">On these days</div>
+  <anvil-component type="RepeatingPanel" name="days_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips"]'></anvil-component>
+</div>

@@ -1,0 +1,20 @@
+<div class="pp-sf">
+  <anvil-component type="Label" name="cap" prop:role='["field-cap"]'></anvil-component>
+  <div class="pp-prefix" anvil:name="prefix_box"><anvil-component type="Label" name="prefix_label" prop:role='["pp-prefix-l"]'></anvil-component><anvil-component type="TextBox" name="prefix_text"></anvil-component></div>
+  <anvil-component type="TextBox" name="text_box"></anvil-component>
+  <anvil-component type="TextArea" name="area_box"></anvil-component>
+  <anvil-component type="CheckBox" name="check_box"></anvil-component>
+  <div class="pp-showrow" anvil:name="show_row"><anvil-component type="CheckBox" name="show_box"></anvil-component></div>
+  <anvil-component type="PlanPlate_2_0.Components.PhotoField" name="photo_field"></anvil-component>
+  <div class="pp-info" anvil:name="info_box"><anvil-component type="Label" name="info_label"></anvil-component><span class="ui-spacer"></span><a class="ui-btn sm" anvil:name="go_link" href="#"></a></div>
+  <div class="pp-pals" anvil:name="pals_box"><anvil-component type="RepeatingPanel" name="pals_panel" prop:item_template="PlanPlate_2_0.Items.PaletteChip" prop:role='["contents"]'></anvil-component></div>
+  <div class="ui-row" anvil:name="accent_row"><anvil-component type="CheckBox" name="accent_box" prop:text="Use my own accent colour (for buttons and highlights, e.g. your logo's colour)"></anvil-component>
+    <input type="color" anvil:name="accent_in" anvil:on-dom:input="self.accent_input"></div>
+  <anvil-component type="DropDown" name="drop"></anvil-component>
+  <anvil-component type="RepeatingPanel" name="chips_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips"]'></anvil-component>
+  <div anvil:name="list_box" class="pp-slist">
+    <anvil-component type="RepeatingPanel" name="list_panel" prop:item_template="PlanPlate_2_0.Items.SiteListRow"></anvil-component>
+    <anvil-component type="Button" name="add_button" prop:role='["btn", "btn-sm", "ic-plus"]'></anvil-component>
+  </div>
+  <anvil-component type="Label" name="hint" prop:role='["hint"]'></anvil-component>
+</div>

@@ -1,0 +1,6 @@
+<div class="pp-rule">
+  <div><anvil-component type="Label" name="title_label" prop:role='["strong"]' bind:text="self.item['title']"></anvil-component>
+    <anvil-component type="Label" name="desc_label" prop:role='["muted", "small"]' bind:text="self.item['desc']"></anvil-component></div>
+  <div class="pp-unit"><anvil-component type="TextBox" name="value_box" prop:type="number" writeback:text="self.item['value']"></anvil-component>
+    <anvil-component type="Label" name="unit_label" prop:role='["pp-unit-l"]' bind:text="self.item['unit']"></anvil-component></div>
+</div>

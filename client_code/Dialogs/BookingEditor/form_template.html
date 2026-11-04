@@ -1,0 +1,56 @@
+<div class="ui pp pp-dlg pp-ed">
+  <anvil-component type="Label" name="eyebrow" prop:role='["eyebrow-label"]'></anvil-component>
+  <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]'></anvil-component>
+  <anvil-component type="Label" name="reason_label" prop:role='["msg-note"]' prop:visible="false"></anvil-component>
+  <div class="pp-ed-guest" anvil:name="guest_box">
+    <i class="ic ic-heart"></i><anvil-component type="Label" name="guest_label"></anvil-component>
+  </div>
+  <div class="ui-stack">
+    <div class="pp-grid3">
+      <label class="ui-field"><span>Date</span><anvil-component type="DatePicker" name="date_picker" prop:format="D MMM YYYY"></anvil-component></label>
+      <label class="ui-field"><span>Time</span><anvil-component type="TextBox" name="time_box"></anvil-component></label>
+      <label class="ui-field"><span>Guests</span><anvil-component type="TextBox" name="party_box" prop:type="number"></anvil-component></label>
+    </div>
+    <div class="pp-split">
+      <label class="ui-field"><span>Stays for</span><anvil-component type="DropDown" name="duration_drop"></anvil-component></label>
+      <div class="ui-field"><span>Table</span><anvil-component type="DropDown" name="table_mode" prop:items='[["Best free table", "auto"], ["Choose tables…", "manual"]]'></anvil-component>
+        <anvil-component type="Label" name="options_label" prop:role='["hint"]'></anvil-component></div>
+    </div>
+    <div class="pp-tables-pick" anvil:name="manual_box">
+      <anvil-component type="RepeatingPanel" name="tables_panel" prop:item_template="PlanPlate_2_0.Items.TablePick" prop:role='["contents"]'></anvil-component>
+    </div>
+    <div class="pp-split">
+      <label class="ui-field"><span>Guest name</span><anvil-component type="TextBox" name="name_box"></anvil-component></label>
+      <label class="ui-field"><span>Phone</span><anvil-component type="TextBox" name="phone_box" prop:type="tel"></anvil-component></label>
+    </div>
+    <div class="pp-split">
+      <label class="ui-field"><span>Email</span><anvil-component type="TextBox" name="email_box" prop:type="email"></anvil-component></label>
+      <label class="ui-field"><span>Taken by</span><anvil-component type="DropDown" name="source_drop" prop:items='[["Phone", "phone"], ["Walk-in", "walk_in"], ["Online", "online"], ["Staff", "staff"]]'></anvil-component></label>
+    </div>
+    <label class="ui-field"><span>Guest's requests</span><anvil-component type="TextArea" name="notes_box" prop:height="60"></anvil-component></label>
+    <label class="ui-field"><span>Staff note <em>(guests never see this)</em></span><anvil-component type="TextArea" name="staff_box" prop:height="60"></anvil-component></label>
+    <anvil-component type="CheckBox" name="notify_box"></anvil-component>
+    <div class="pp-linkbox" anvil:name="link_box"><anvil-component type="Label" name="link_label" prop:role='["pp-code"]'></anvil-component>
+      <anvil-component type="Button" name="copy_button" prop:text="Guest link" prop:role='["btn", "btn-sm", "ic-copy"]'></anvil-component></div>
+    <div anvil:name="msg_box" class="pp-ed-msg">
+      <anvil-component type="Label" name="message"></anvil-component>
+      <anvil-component type="Button" name="force_button" prop:text="Save anyway" prop:role='["btn", "btn-sm"]' prop:visible="false"></anvil-component>
+    </div>
+  </div>
+  <div class="ui-row pp-ed-foot">
+    <anvil-component type="Button" name="approve_button" prop:text="Approve" prop:role='["btn", "btn-good", "ic-check"]' prop:visible="false"></anvil-component>
+    <anvil-component type="Button" name="decline_button" prop:text="Decline" prop:role='["btn", "btn-danger"]' prop:visible="false"></anvil-component>
+    <anvil-component type="Button" name="seat_button" prop:text="Seat now" prop:role='["btn", "ic-users"]' prop:visible="false"></anvil-component>
+    <anvil-component type="Button" name="done_button" prop:text="Finished" prop:role='["btn", "ic-check"]' prop:visible="false"></anvil-component>
+    <anvil-component type="Button" name="noshow_button" prop:text="No-show" prop:role='["btn", "btn-danger"]' prop:visible="false"></anvil-component>
+    <anvil-component type="Button" name="cancel_res_button" prop:text="Cancel booking" prop:role='["btn", "btn-danger"]' prop:visible="false"></anvil-component>
+    <anvil-component type="Button" name="restore_button" prop:text="Restore booking" prop:role='["btn"]' prop:visible="false"></anvil-component>
+    <span class="ui-spacer"></span>
+    <anvil-component type="Button" name="close_button" prop:text="Close" prop:role='["btn"]'></anvil-component>
+    <anvil-component type="Button" name="save_button" prop:text="Save changes" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+  <details class="pp-ed-hist" anvil:name="hist_box"><summary>History</summary>
+    <anvil-component type="Label" name="hist_label" prop:role='["small", "pp-pre"]'></anvil-component>
+  </details>
+  <anvil-component type="Label" name="consent_label" prop:role='["hint"]' prop:visible="false"></anvil-component>
+</div>

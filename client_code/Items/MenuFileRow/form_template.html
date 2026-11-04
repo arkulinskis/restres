@@ -1,0 +1,8 @@
+<div class="pp-mfrow">
+  <i class="ic ic-list"></i>
+  <div class="pp-grow"><anvil-component type="Label" name="title_label" prop:role='["strong"]' bind:text="self.item['title']"></anvil-component>
+    <anvil-component type="Label" name="meta_label" prop:role='["muted", "small"]'></anvil-component></div>
+  <a class="ui-btn ghost sm" anvil:name="open_link" href="#" target="_blank" rel="noopener"><i class="ic ic-external"></i>Open</a>
+  <anvil-component type="FileLoader" name="upload_loader" prop:text="Upload the file" prop:file_types=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*" prop:role='["btn", "btn-primary", "btn-sm", "ic-upload"]'></anvil-component>
+  <anvil-component type="Button" name="delete_button" prop:text="Delete" prop:role='["btn", "btn-ghost", "btn-icon", "btn-danger", "ic-trash"]'></anvil-component>
+</div>

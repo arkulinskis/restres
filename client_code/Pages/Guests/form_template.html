@@ -1,0 +1,20 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-guests">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="guests"></anvil-component>
+      <div class="pp-guest-head">
+        <div><h2 style="margin:0">Guest book</h2>
+          <anvil-component type="Label" name="summary_label" prop:role='["muted", "small"]'></anvil-component></div>
+        <span class="ui-spacer"></span>
+        <anvil-component type="TextBox" name="search_box" prop:type="search" prop:placeholder="Search a name, email, phone or tag"></anvil-component>
+        <anvil-component type="DropDown" name="sort_drop" prop:items='[["Most recent", "recent"], ["Most visits", "visits"], ["Name", "name"]]'></anvil-component>
+      </div>
+      <p class="pp-intro">Everyone who has booked, matched across visits by email (or phone). Visits count when a guest was seated or their booking date has passed; no-shows are the bookings marked so on the Reservations page. Notes and tags are for your team only.</p>
+      <div class="ui-card pp-glist" anvil:name="list_card">
+        <div class="pp-grow-row pp-ghead"><span>Guest</span><span>Visits</span><span>Last</span><span>Next</span><span>Tags</span></div>
+        <anvil-component type="RepeatingPanel" name="guests_panel" prop:item_template="PlanPlate_2_0.Items.GuestRow" prop:role='["contents"]'></anvil-component>
+      </div>
+      <div class="ui-empty" anvil:name="empty">No guests yet. They appear here after their first booking.</div>
+    </div>
+  </anvil-block>
+</anvil-form>

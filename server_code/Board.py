@@ -183,12 +183,12 @@ def quick_hours(rid, action, hours=None, label=None):
             row.delete()
         return dict(_today(r), ok=True, message="Back to the regular hours today.")
     if action == "close":
-        fields = {"label": str(label or "").strip()[:60] or "Closed today", "closed": True, "hours": []}
+        fields: dict = {"label": str(label or "").strip()[:60] or "Closed today", "closed": True, "hours": []}
     elif action == "hours":
         iv = B.intervals_text(B.clean_intervals(hours))
         if not iv:
             return {"ok": False, "error": "Add at least one opening time, like 12:00 to 22:00."}
-        fields = {"label": str(label or "").strip()[:60] or "Changed hours today", "closed": False, "hours": iv}
+        fields: dict = {"label": str(label or "").strip()[:60] or "Changed hours today", "closed": False, "hours": iv}
     else:
         return {"ok": False, "error": "Unknown action."}
     if row is None:

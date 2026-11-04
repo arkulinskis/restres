@@ -1,0 +1,9 @@
+<div class="pp-dish">
+  <div class="pp-dish-line">
+    <anvil-component type="Label" name="name_label" prop:role='["pp-dish-name"]' bind:text="self.item['name']"></anvil-component>
+    <anvil-component type="Label" name="tags_label" prop:role='["pp-dish-tags"]'></anvil-component>
+    <span class="pp-dots"></span>
+    <anvil-component type="Label" name="price_label" prop:role='["pp-dish-price"]' bind:text="self.item['price']"></anvil-component>
+  </div>
+  <anvil-component type="Label" name="desc_label" prop:role='["muted", "small"]'></anvil-component>
+</div>

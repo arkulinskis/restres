@@ -50,7 +50,7 @@ def save_section(rid, data):
     title = str(data.get("title") or "").strip()[:80]
     if not title:
         return {"ok": False, "error": "Give the section a title, e.g. Starters."}
-    fields = {"title": title, "description": str(data.get("description") or "").strip()[:300]}
+    fields: dict = {"title": title, "description": str(data.get("description") or "").strip()[:300]}
     if data.get("id"):
         _child(app_tables.menu_sections, r, data["id"]).update(**fields)
     else:
@@ -75,7 +75,7 @@ def save_item(rid, data):
     name = str(data.get("name") or "").strip()[:120]
     if not name:
         return {"ok": False, "error": "Give the dish a name."}
-    fields = {"name": name, "description": str(data.get("description") or "").strip()[:500],
+    fields: dict = {"name": name, "description": str(data.get("description") or "").strip()[:500],
               "price": str(data.get("price") or "").strip()[:30],
               "tags": [t for t in (data.get("tags") or []) if t in TAGS]}
     if "available" in data:
@@ -126,10 +126,15 @@ def _find(slug):
 
 @anvil.server.callable
 def get_menu(slug):
+    from .Public import _demo
+    _demo(slug)
     r = _find(slug)
     if r is None:
         return {"ok": False, "error": "We couldn't find this restaurant."}
-    return {"ok": True, "restaurant": B.public_restaurant(r), "sections": _menu(r), "tags": TAGS}
+    from . import Legacy
+    files = [dict(Legacy._file_view(f, r), language=f["language"] or "") for f in Legacy.files_of(r) if f["file"] is not None]
+    return {"ok": True, "restaurant": B.public_restaurant(r), "sections": _menu(r), "tags": TAGS,
+            "files": [{"title": f["title"], "url": f["url"], "type": f["type"], "language": f["language"]} for f in files]}
 
 
 def hours_feed(r, days=7):

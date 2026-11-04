@@ -1,0 +1,31 @@
+<div class="ui pp pp-dlg">
+  <anvil-component type="Label" name="eyebrow" prop:role='["eyebrow-label"]'></anvil-component>
+  <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]'></anvil-component>
+  <div class="ui-stack">
+    <div class="pp-split">
+      <label class="ui-field"><span>Dish</span><anvil-component type="TextBox" name="name_box" prop:placeholder="e.g. Bouillabaisse"></anvil-component></label>
+      <label class="ui-field"><span>Price</span><anvil-component type="TextBox" name="price_box" prop:placeholder="e.g. $38"></anvil-component></label>
+    </div>
+    <label class="ui-field"><span>Description <em>(optional)</em></span><anvil-component type="TextBox" name="desc_box"></anvil-component></label>
+    <anvil-component type="PlanPlate_2_0.Components.PhotoField" name="photo_field" prop:label="Photo (optional)"></anvil-component>
+    <div class="ui-field"><span>When</span>
+      <div class="ui-seg" role="group">
+        <button type="button" anvil:name="w_today" data-w="today" anvil:on-dom:click="self.when_click">Today only</button>
+        <button type="button" anvil:name="w_dates" data-w="dates" anvil:on-dom:click="self.when_click">Dates</button>
+        <button type="button" anvil:name="w_always" data-w="always" anvil:on-dom:click="self.when_click">Ongoing</button>
+      </div></div>
+    <div class="pp-split" anvil:name="dates_part">
+      <label class="ui-field"><span>From</span><anvil-component type="DatePicker" name="start_picker" prop:format="D MMM YYYY"></anvil-component></label>
+      <label class="ui-field"><span>Until</span><anvil-component type="DatePicker" name="end_picker" prop:format="D MMM YYYY"></anvil-component></label>
+    </div>
+    <div class="ui-field" anvil:name="days_part"><span>Only on these days <em>(none = every day)</em></span>
+      <anvil-component type="RepeatingPanel" name="days_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips"]'></anvil-component></div>
+    <anvil-component type="Label" name="message" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+  </div>
+  <div class="ui-row end">
+    <anvil-component type="Button" name="delete_button" prop:text="Delete" prop:role='["btn", "btn-danger"]'></anvil-component>
+    <span class="ui-spacer"></span>
+    <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn"]'></anvil-component>
+    <anvil-component type="Button" name="save_button" prop:text="Save special" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+</div>

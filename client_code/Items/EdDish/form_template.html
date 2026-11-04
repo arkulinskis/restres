@@ -1,0 +1,15 @@
+<div class="pp-eddish">
+  <div class="pp-grow">
+    <div class="ui-row" style="gap:6px"><anvil-component type="Label" name="name_label" prop:role='["strong"]' bind:text="self.item['name']"></anvil-component>
+      <anvil-component type="Label" name="tags_label" prop:role='["badge"]'></anvil-component>
+      <anvil-component type="Label" name="off_badge" prop:role='["badge", "badge-bad"]' prop:text="Sold out"></anvil-component></div>
+    <anvil-component type="Label" name="desc_label" prop:role='["muted", "small"]'></anvil-component>
+  </div>
+  <anvil-component type="Label" name="price_label" prop:role='["pp-dish-price"]' bind:text="self.item['price']"></anvil-component>
+  <div class="pp-eddish-acts">
+    <anvil-component type="Button" name="toggle_button" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component>
+    <anvil-component type="Button" name="up_button" prop:text="Move up" prop:role='["btn", "btn-ghost", "btn-icon", "ic-chevron", "pp-up"]'></anvil-component>
+    <anvil-component type="Button" name="down_button" prop:text="Move down" prop:role='["btn", "btn-ghost", "btn-icon", "ic-chevron"]'></anvil-component>
+    <anvil-component type="Button" name="edit_button" prop:text="Edit" prop:role='["btn", "btn-ghost", "btn-icon", "ic-edit"]'></anvil-component>
+  </div>
+</div>

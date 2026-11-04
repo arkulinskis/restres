@@ -1,0 +1,23 @@
+<div class="ui pp pp-dlg pp-pe">
+  <anvil-component type="Label" name="eyebrow" prop:role='["eyebrow-label"]'></anvil-component>
+  <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]'></anvil-component>
+  <div class="ui-stack">
+    <label class="ui-field"><span>Name</span><anvil-component type="TextBox" name="name_box" prop:placeholder="e.g. Summer 2026"></anvil-component></label>
+    <div class="pp-split">
+      <label class="ui-field"><span>From</span><anvil-component type="DatePicker" name="start_picker" prop:format="D MMM YYYY"></anvil-component></label>
+      <label class="ui-field"><span>Until</span><anvil-component type="DatePicker" name="end_picker" prop:format="D MMM YYYY"></anvil-component></label>
+    </div>
+    <span class="ui-hint">Leave both empty for hours that always apply.</span>
+    <div>
+      <div class="ui-row"><b class="small">Weekly hours</b><span class="ui-spacer"></span>
+        <anvil-component type="Button" name="copy_button" prop:text="Copy Monday to every day" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component></div>
+      <anvil-component type="RepeatingPanel" name="days_panel" prop:item_template="PlanPlate_2_0.Items.DayHours"></anvil-component>
+      <span class="ui-hint">A closing time of 00:00 means midnight.</span>
+    </div>
+    <anvil-component type="Label" name="message" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+  </div>
+  <div class="ui-row end">
+    <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn"]'></anvil-component>
+    <anvil-component type="Button" name="save_button" prop:text="Save hours" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+</div>

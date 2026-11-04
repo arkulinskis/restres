@@ -68,8 +68,16 @@ def _slot_state(ctx, d, t, party, exclude=None):
 
 
 # ---------------------------------------------------------------- the booking form
+def _demo(slug):
+    """The demo restaurant (DemoData) appears the first time someone opens its booking form or menu."""
+    if slug == "maison-lumiere":
+        from . import DemoData
+        DemoData.ensure_loaded()
+
+
 @anvil.server.callable
 def get_booking_form(slug, lang=None):
+    _demo(slug)
     r = _find(slug)
     if r is None:
         return {"ok": False, "error": "We couldn't find this restaurant. Check the link and try again."}
