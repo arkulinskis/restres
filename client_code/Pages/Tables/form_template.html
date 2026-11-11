@@ -16,7 +16,6 @@
         <div class="ui-card pp-side">
           <!-- nothing selected: the summary -->
           <div anvil:name="summary_part" class="ui-stack">
-            <anvil-component type="Label" name="sum_eyebrow" prop:role='["eyebrow-label"]' prop:text="Floor plan"></anvil-component>
             <anvil-component type="Label" name="sum_title" prop:role='["card-title"]'></anvil-component>
             <anvil-component type="Label" name="sum_text" prop:role='["muted", "small"]'></anvil-component>
             <anvil-component type="Button" name="add_button" prop:text="Add a table" prop:role='["btn", "btn-primary", "btn-block", "ic-plus"]'></anvil-component>
@@ -24,7 +23,7 @@
           </div>
           <!-- a table is selected -->
           <div anvil:name="table_part" class="ui-stack">
-            <div class="ui-row"><anvil-component type="Label" name="t_eyebrow" prop:role='["eyebrow-label"]' prop:text="Table"></anvil-component><span class="ui-spacer"></span>
+            <div class="ui-row"><anvil-component type="Label" name="t_title" prop:role='["card-title"]' prop:text="Table"></anvil-component><span class="ui-spacer"></span>
               <anvil-component type="Button" name="deselect_button" prop:text="Close" prop:role='["btn", "btn-ghost", "btn-icon", "ic-x"]'></anvil-component></div>
             <div class="pp-split">
               <label class="ui-field"><span>Name</span><anvil-component type="TextBox" name="t_name"></anvil-component></label>
@@ -53,7 +52,6 @@
           </div>
           <!-- joining tables -->
           <div anvil:name="join_part" class="ui-stack">
-            <anvil-component type="Label" name="j_eyebrow" prop:role='["eyebrow-label"]' prop:text="Join tables"></anvil-component>
             <anvil-component type="Label" name="j_title" prop:role='["card-title"]'></anvil-component>
             <anvil-component type="Label" name="j_help" prop:role='["muted", "small"]' prop:text="Click two or more tables on the plan. Joined tables are booked as one table during the hours you choose."></anvil-component>
             <div anvil:name="j_form" class="ui-stack">

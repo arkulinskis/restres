@@ -13,7 +13,6 @@ class NewRestaurant(NewRestaurantTemplate):
         super().__init__(**properties)
         self.copy_of = copy_of
         if copy_of:
-            self.eyebrow.text = "Duplicate"
             self.title_label.text = "Copy " + copy_of["name"]
             self.intro.visible = True
             self.intro.text = ("The copy gets the same settings, opening hours, special days, tables and joins. "

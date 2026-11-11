@@ -11,7 +11,6 @@ class DishEditor(DishEditorTemplate):
         super().__init__(**properties)
         self.rid, self.dish, self.tags = rid, dish, data["tags"]
         d: dict = dish or {"name": "", "price": "", "description": "", "tags": [], "available": True}
-        self.eyebrow.text = "Edit dish" if dish else "New dish"
         self.title_label.text = d["name"] if dish else "Add a dish"
         self.name_box.text, self.price_box.text, self.desc_box.text = d["name"], d.get("price") or "", d.get("description") or ""
         self.section_drop.items = [(s["title"], s["id"]) for s in data["sections"]]

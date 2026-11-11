@@ -74,7 +74,7 @@ class Events(EventsTemplate):
 
     def _draw_setup(self, e):
         S: dict = self.setup
-        self.setup_eyebrow.text = "Room set-up · %s · %s–%s" % (pp.fmt_date(e["date"]), e["start"], e["end"])
+        self.setup_when.text = "Room set-up · %s · %s–%s" % (pp.fmt_date(e["date"]), e["start"], e["end"])
         self.setup_title.text = e["title"]
         self.setup_meta.text = " · ".join(x for x in [("%d guests expected" % e["guests"]) if e.get("guests") else "",
                                                        "Private event" if e["kind"] == "private" else "Public event", e.get("host") or ""] if x)

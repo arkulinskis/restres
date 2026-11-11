@@ -123,7 +123,7 @@ def _book(r, d, t, party, guest, consent_text, lang="en", pp=None):
     unit = B.find_unit(ctx, d, t, party, dur)
     if unit is None:
         return None, "Sorry, that time was just taken. Please pick another time."
-    status, reason, pct = B.check_rules(ctx, d, t, party, dur)
+    status, reason, pct = B.check_rules(ctx, d, t, party, dur, notes=guest["notes"])
     now = B.now_utc()
     res = app_tables.reservations.add_row(
         restaurant=r, token=B.new_token(), date=d, start_min=t, duration=dur, party=party,
@@ -241,7 +241,7 @@ def _change(res, d, t, party, guest):
         unit = B.find_unit(ctx, d, t, party, dur, exclude=res)
         if unit is None:
             return "Sorry, that time isn't available. Please pick another."
-        status, reason, pct = B.check_rules(ctx, d, t, party, dur, exclude=res)
+        status, reason, pct = B.check_rules(ctx, d, t, party, dur, exclude=res, notes=guest["notes"])
         if res["status"] == "pending":
             status = "pending"  # a change never skips an approval that is still waiting
             reason = reason or res["review_reason"]

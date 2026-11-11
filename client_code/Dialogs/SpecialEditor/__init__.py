@@ -15,8 +15,7 @@ class SpecialEditor(SpecialEditorTemplate):
         self.rid, self.D, self.special = rid, data, special
         is_new = special is None
         s: dict = special or {"date": date or data["today"], "label": "", "closed": True, "hours": [["12:00", "22:00"]]}
-        self.eyebrow.text = "Special day" if is_new else "Edit special day"
-        self.title_label.text = pp.fmt_date(s["date"])
+        self.title_label.text = "Add a special day" if is_new else pp.fmt_date(s["date"])
         self.date_picker.date = datetime.date.fromisoformat(s["date"])
         self.to_field.visible = is_new
         self.label_box.text = s.get("label") or ""

@@ -9,7 +9,8 @@ The server runs this folder's app files (no build step): container "<key>-dev" o
 Docker volume "<key>-data" (accounts made by tests stay there; `docker volume rm <key>-data` to start clean).
 The app files are COPIED into the Docker volume "<key>-app" on every run (a Windows folder mounted into Docker made
 each request take 15-60 s when Docker's file sharing was busy). Client edits apply on the next run; server-code edits
-need the container restarted (--restart). --only flow.js|phone.js|admin.js|a11y.js runs one script.
+need the container restarted (--restart). --only flow.js|phone.js|admin.js|a11y.js|design.js runs one script
+(design.js = the rendered design check from APP_MAKER/design, at desktop and phone width).
 Needs Docker Desktop running and Chrome installed.
 """
 import json
@@ -124,10 +125,11 @@ def main():
     out = pathlib.Path(tempfile.mkdtemp(prefix=KEY + "-ui-"))
     failed = False
     only = args[args.index("--only") + 1] if "--only" in args else None  # e.g. --only admin.js
-    for script, window in (("flow.js", "1280,1000"), ("phone.js", "390,844"), ("admin.js", "1280,1000"), ("a11y.js", "1280,1000")):
+    for script, window in (("flow.js", "1280,1000"), ("phone.js", "390,844"), ("admin.js", "1280,1000"), ("a11y.js", "1280,1000"),
+                           ("design.js", "1280,1000"), ("design.js", "390,844")):
         if only and script != only:
             continue
-        text = drive(script, window, out / script.replace(".js", ""))
+        text = drive(script, window, out / (script.replace(".js", "") + ("-phone" if window.startswith("390") else "")))
         res = result(text)
         errors = [l for l in text.splitlines() if "[EXCEPTION]" in l or "Python exception" in l or "Error report" in l]
         print("==== %s (%s)" % (script, window))

@@ -1,5 +1,4 @@
 <div class="ui pp pp-dlg">
-  <anvil-component type="Label" name="eyebrow" prop:role='["eyebrow-label"]' prop:text="Guest"></anvil-component>
   <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]'></anvil-component>
   <anvil-component type="Label" name="contact_label" prop:role='["muted", "small"]'></anvil-component>
   <div class="pp-gstats">
@@ -14,7 +13,7 @@
     <anvil-component type="Label" name="readonly_label" prop:role='["hint"]' prop:text="Only managers and owners can change notes and tags." prop:visible="false"></anvil-component>
   </div>
   <h3 style="margin:22px 0 6px">Visits and bookings</h3>
-  <div class="ui-card pp-res-list">
+  <div class="ui-card pp-res-list pp-res-dated">
     <anvil-component type="RepeatingPanel" name="history_panel" prop:item_template="PlanPlate_2_0.Items.ResRow" prop:role='["contents"]'></anvil-component>
   </div>
   <div class="ui-row end">

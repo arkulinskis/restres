@@ -20,7 +20,6 @@ class PeriodEditor(PeriodEditorTemplate):
         is_new = period is None
         first = data["periods"][0]["week"] if data["periods"] else {}
         p: dict = period or {"name": "" if data["periods"] else "Regular hours", "start": None, "end": None, "week": first}
-        self.eyebrow.text = "New period" if is_new else "Edit period"
         self.title_label.text = "Add opening hours" if is_new else p["name"]
         self.name_box.text = p["name"]
         self.start_picker.date = datetime.date.fromisoformat(p["start"]) if p.get("start") else None

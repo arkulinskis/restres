@@ -950,6 +950,11 @@ db_schema:
         width: 260
       name: form_notes
       type: simpleObject
+    - admin_ui:
+        order: 42
+        width: 200
+      name: review_notes
+      type: bool
     indexes: []
     server: full
     title: Restaurants
@@ -1264,9 +1269,10 @@ db_schema:
     server: full
     title: Users
 metadata:
-  description: "Run bookings for all your restaurants: opening hours, a drag-and-drop floor plan, automatic approvals, menus, specials, events and a booking form for your website."
-  logo_img: "asset:icon-512.png"
-  title: "PlanPlate: restaurant reservations, floor plans and websites"
+  description: 'Run bookings for all your restaurants: opening hours, a drag-and-drop floor plan, automatic approvals, menus,
+    specials, events and a booking form for your website.'
+  logo_img: asset:icon-512.png
+  title: 'PlanPlate: restaurant reservations, floor plans and websites'
 name: PlanPlate
 native_deps:
   head_html: |
@@ -1297,6 +1303,7 @@ native_deps:
     <!-- seo:end -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- design-ok: overused-font (Cormorant Garamond + Inter is the pair chosen for PlanPlate; a facelift keeps the fonts) -->
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link id="ui-favicon" rel="icon" type="image/svg+xml" href="_/theme/icon.svg?v=ac8935c5cb">
     <link rel="apple-touch-icon" href="_/theme/icon-180.png?v=ff4535c220">
@@ -1319,9 +1326,9 @@ native_deps:
     <!-- Prepsto feedback panel: every "Submit feedback" link and button opens it (it is the only feedback channel). No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->
     <script src="https://prepsto.com/_/theme/widget.js" data-prepsto="3jhqeaj" data-button="false" data-label="Submit feedback" async></script>
     <link rel="stylesheet" href="_/theme/icons.css?v=dbadc7ab1d">
-    <link rel="stylesheet" href="_/theme/app.css?v=e8e3fa7575">
+    <link rel="stylesheet" href="_/theme/app.css?v=f1aae62135">
     <script src="_/theme/app-kit.js?v=9790718203"></script>
-    <script src="_/theme/pp-kit.js?v=113422e270"></script>
+    <script src="_/theme/pp-kit.js?v=859a7a4e56"></script>
     <script src="_/theme/pp-timeline.js?v=21a8c268cb"></script>
     <script src="_/theme/pp-floor.js?v=d70986d714"></script>
 package_name: PlanPlate_2_0

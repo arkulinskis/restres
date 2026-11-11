@@ -51,7 +51,7 @@ class Book(BookTemplate):
         self.langs_panel.items = [{"label": l.upper(), "value": l, "on": l == i18n.lang(), "title": i18n.NAMES.get(l, l),
                                    "aria": i18n.NAMES.get(l, l)} for l in langs]
         self.masthead.visible = ok
-        self.eyebrow.text = T("reserve")
+        self.kind_label.text = T("reserve")
         self.name_label.text = R.get("name") or ""
         self.desc_label.visible = bool(R.get("description"))
         self.desc_label.text = R.get("description") or ""

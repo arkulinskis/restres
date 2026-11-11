@@ -33,7 +33,7 @@
         <anvil-component type="RepeatingPanel" name="feedback_panel" prop:item_template="PlanPlate_2_0.Items.FeedbackRow" prop:role='["ad-fb"]'></anvil-component>
         <div class="ui-empty" anvil:name="no_feedback">
           <i class="ic ic-inbox"></i>
-          <h3>No messages here</h3>
+          <h2 class="h3">No messages here</h2>
           <p>New feedback goes to Prepsto (prepsto.com). Older messages and requests from the app show up here.</p>
         </div>
       </div>
@@ -50,7 +50,7 @@
 
       <div anvil:name="import_part">
         <div class="ui-card ui-narrow ad-import ui-stack">
-          <h3>Bring in the old PlanPlate</h3>
+          <h2 class="h3">Bring in the old PlanPlate</h2>
           <p class="muted">Moves restaurants, opening hours, tables, bookings, staff, sign-ins (people keep their passwords), gallery photos and menu-file names from restaurant.planplate.com into this app. Each restaurant keeps its old ID, so its website code and printed QR codes keep working.</p>
           <ol class="ad-steps">
             <li>Open the old <b>restaurant.planplate.com</b> app in Anvil, then <b>Data</b>.</li>
@@ -74,7 +74,7 @@
 
       <div anvil:name="news_part">
         <div class="ui-card ui-narrow ad-news ui-stack">
-          <h3>PlanPlate news list</h3>
+          <h2 class="h3">PlanPlate news list</h2>
           <p class="muted">Guests who ticked the optional box on a booking form ("PlanPlate may also email me now and then with news and offers"). It's PlanPlate's own list, kept apart from the restaurants' guest data. Email only these people, about PlanPlate, and put each person's stop link in every email you send (it's in the CSV). People who stopped stay out for good.</p>
           <div class="ad-stats ad-news-stats">
             <div class="ui-card ui-stat ad-stat"><anvil-component type="Label" name="n_yes" prop:role='["stat-num"]'></anvil-component><span>said yes</span></div>
@@ -89,7 +89,7 @@
 
       <div anvil:name="demo_part">
         <div class="ui-card ui-narrow ad-demo">
-          <h3>Demo data</h3>
+          <h2 class="h3">Demo data</h2>
           <p class="muted">Maison Lumière, a made-up bistro with bookings, guests, a menu and a website, so PlanPlate never looks empty. It belongs to a demo owner, so removing it never touches real restaurants. Once removed, it stays removed until you load it again.</p>
           <anvil-component type="Label" name="demo_status"></anvil-component>
           <div class="ui-row">

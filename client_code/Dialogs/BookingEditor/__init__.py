@@ -22,8 +22,21 @@ class BookingEditor(BookingEditorTemplate):
         r: dict = res or dict({"name": "", "phone": "", "email": "", "date": day["date"], "time": "19:00", "duration": s["duration_min"],
                          "party": 2, "notes": "", "staff_note": "", "status": "confirmed", "source": "phone", "tables": []}, **(preset or {}))
         self.res = r
-        self.eyebrow.text = "New booking" if self.is_new else pp.STATUS.get(r["status"], r["status"])
-        self.title_label.text = "Add a booking" if self.is_new else r["name"]
+        walk_in = self.is_new and r.get("source") == "walk_in"
+        self.title_label.text = ("Seat a walk-in" if walk_in else "Add a booking") if self.is_new else r["name"]
+        self.status_badge.visible = not self.is_new
+        self.status_badge.text = pp.STATUS.get(r["status"], r["status"])
+        self.status_badge.role = ["badge", pp.STATUS_ROLE.get(r["status"], "badge")]
+        # one tap to ring or write to the guest (the host stand's phone or tablet)
+        phone, email = (r.get("phone") or "").strip(), (r.get("email") or "").strip()
+        dial = ("+" if phone.startswith("+") else "") + "".join(ch for ch in phone if ch.isdigit())
+        self.contact_box.visible = not self.is_new and bool(dial or email)
+        self.call_link.visible = bool(dial)
+        self.call_label.text = "Call " + phone
+        state.set_attr(self.call_link, "href", "tel:" + dial)
+        self.mail_link.visible = bool(email)
+        self.mail_label.text = "Email " + email
+        state.set_attr(self.mail_link, "href", "mailto:" + email)
         self.reason_label.visible = r["status"] == "pending" and bool(r.get("review_reason"))
         self.reason_label.text = r.get("review_reason") or ""
         g: dict = r.get("guest") or {}
@@ -58,7 +71,7 @@ class BookingEditor(BookingEditorTemplate):
         self.link_box.visible = not self.is_new
         if not self.is_new:
             self.link_label.text = pp.manage_url(r["token"])
-        self.save_button.text = "Add booking" if self.is_new else "Save changes"
+        self.save_button.text = ("Seat them" if walk_in else "Add booking") if self.is_new else "Save changes"
         st = r["status"]
         old = not self.is_new
         self.approve_button.visible = old and st == "pending"

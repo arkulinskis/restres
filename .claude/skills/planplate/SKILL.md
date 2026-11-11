@@ -34,7 +34,8 @@ details and deploys. Guest texts in English, French and Latvian.
 3. `python tools/check.py` -> **ALL CHECKS PASSED** (anvil validate, JS syntax, asset hashes, server tests).
 4. `python -I tools/ui_test.py` (Docker Desktop running) -> **ALL UI TESTS PASSED**. Server edits: `--restart`.
    It includes tools/ui/a11y.js: axe-core (WCAG 2.2 AA) on every page in light + dark, and keyboard checks on the
-   booking form and the Privacy page. `--only a11y.js` runs just that.
+   booking form and the Privacy page. `--only a11y.js` runs just that. It ends with tools/ui/design.js (the rendered
+   design check, desktop + phone): bans and fails must be zero.
    `--shots DIR` = every page, desktop + phone, light + dark, guest + member. The local App Server runs with
    `--auto-migrate`, so new tables/columns appear locally by themselves.
    Member pages sign in as arkulinskis@gmail.com **on the local server only** (password in the git-ignored
@@ -60,7 +61,7 @@ client_code/
   Pages/            Landing Auth Dashboard Today Reservations Guests Hours Tables Events Dishes Gallery Website Share
                     Settings Profile Admin + guest pages Book Manage PublicMenu
   Items/            RepeatingPanel rows (Chip is the generic pill: {label, value, on, disabled, group} -> x-chip)
-  Dialogs/          BookingEditor DaySheet NewRestaurant PeriodEditor SpecialEditor QuickHours SpecialDish PostPhoto
+  Dialogs/          BookingEditor WalkIn DaySheet NewRestaurant PeriodEditor SpecialEditor QuickHours SpecialDish PostPhoto
                     PhotoPicker EventEditor DishEditor SectionEditor GuestCard
 theme/assets/       app.css (template tokens set to PlanPlate's look + --pp-* aliases + each page's styles),
                     pp-kit.js (window.PP: dates, time-zone search field, QR, Cloudinary upload, .ics), pp-timeline.js,
@@ -85,6 +86,43 @@ call in `__init__`, `_draw()` sets Labels/panels, dialogs return the page's new 
   send no guest email.
 - Guest book (Guests.py): guests matched by email, else phone digits, else name (`key_of`); stats are computed from
   reservations; the team's notes/tags/VIP live in the `guests` table. `get_day` adds a `guest` badge to every booking.
+
+- **Read requests first** (`restaurants.review_notes`, Settings -> Approvals; the old PlanPlate always did this): when
+  on, an online booking where the guest wrote a request waits as pending (`check_rules(..., notes=)`). Off for new
+  restaurants, switched on for restaurants imported from the old PlanPlate. Read yes/no columns with `B.flag(r, name)`:
+  it answers False while the live database doesn't have the column yet, so bookings never break on a pending schema change.
+
+## The host stand (Reservations and Today; audit against the old apps 2026-11-11)
+
+The old restaurant app's reservations list was what staff kept open on a tablet; these are its habits, kept on purpose:
+- **Live:** `Pages/Reservations` asks `get_day_stamp` every minute (`live_timer`, and at once when the tab or tablet
+  comes back: `visibilitychange`), reloads the day only when the stamp changed (`Portal._stamp`: bookings, rows,
+  pending, last change), and never redraws under an open dialog (`self._dialogs`, `PP.dialogOpen`).
+- **Chime:** a new booking or request plays two notes (`PP.chime` in pp-kit.js; browsers need one tap on the page
+  first). "Chime on/off" is remembered per browser (`resChime`).
+- **Awake:** `PP.wake(True)` on show / `False` on hide holds a screen wake lock while Reservations is open.
+- **One tap:** list rows (`Items/ResRow` with `_act`) carry the next step: Approve (pending), Seat (confirmed, today
+  only: `_today`), Finish (seated). Today -> Who's coming (`Items/Arrival`) has Seat / Finish too. Both raise
+  `x-status(res, status)`.
+- **Walk-in:** `Dialogs/WalkIn` = tap the party size (1-12) -> `quick_walk_in` seats them now at the best free table
+  (no table free: saved without one). "Add a name or a note" opens the full editor instead.
+- **Upcoming** (the old "All reservations"): third view, `get_upcoming` = every booking from today that holds a table.
+- **Contact:** the booking editor shows Call (tel:) and Email (mailto:) links for an existing booking.
+Old features deliberately not carried over: three Stripe plans (one flat plan now), the 20-photo and 1 MB menu-file
+limits, the back office "demo mode" without an account (the landing page's demo restaurant replaces it), the
+"Almost full" wording beside times (a dot marks times that need approval).
+
+## Design (facelift 2026-11-11, APP_MAKER/design)
+
+`python -I APP_MAKER/tools/design_check.py restres` -> DESIGN CHECK CLEAN; `python -I tools/ui_test.py --only design.js`
+checks the rendered pages (desktop + phone). The rules that bit here:
+- No small uppercase label above a heading (the old `eyebrow-label` role is gone). Dialogs have one title; a status
+  goes beside it as a badge (`.pp-dlg-head`); a date or place line goes under the heading as ordinary text.
+- No thick coloured side stripe: approval cards are tinted, opening-hours periods and calendar days carry a small
+  colour swatch (`.pp-pc-hd::before`, `.pp-day::after`, the legend's shape).
+- Nothing under 12 px (.75rem). Motion uses the kit's tokens (`--ease-out`, `--dur-fast`...); reduced motion keeps fades.
+- Deliberate exceptions are marked `design-ok: <rule>` with the reason: Inter + Cormorant (the chosen fonts), the
+  timeline's hour lines and hatching (they carry meaning), the landing's three numbered set-up steps.
 
 ## Demo restaurant
 

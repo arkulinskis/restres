@@ -28,7 +28,7 @@ class PublicMenu(PublicMenuTemplate):
         self.langs_panel.visible = ok and len(langs) > 1
         self.langs_panel.items = [{"label": l.upper(), "value": l, "on": l == i18n.lang(), "title": i18n.NAMES.get(l, l),
                                    "aria": i18n.NAMES.get(l, l)} for l in langs]
-        self.eyebrow.text = T("menu")
+        self.kind_label.text = T("menu")
         if not ok:
             self.name_label.text, self.desc_label.text = T("menuNotFound"), D.get("error") or ""
             self.sections_panel.items, self.cta.visible, self.legend_label.visible = [], False, False

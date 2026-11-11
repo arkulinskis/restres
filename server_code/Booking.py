@@ -120,6 +120,15 @@ def setting(r, name):
     return SETTINGS[name][0] if v is None else int(v)
 
 
+def flag(r, name):
+    """A yes/no setting kept in its own column. False while the column doesn't exist yet (new columns reach the live
+    database only when the owner accepts Anvil's schema change, and bookings must keep working until then)."""
+    try:
+        return bool(r[name])
+    except Exception:
+        return False
+
+
 def local_now(r):
     """The restaurant's wall-clock time, as a naive datetime."""
     try:
@@ -366,8 +375,9 @@ def start_times(ctx, d):
     return out
 
 
-def check_rules(ctx, d, t, party, dur, exclude=None):
-    """(status, reason, occupancy%) for a booking that has a free table: confirmed, or pending with the reason."""
+def check_rules(ctx, d, t, party, dur, exclude=None, notes=""):
+    """(status, reason, occupancy%) for a booking that has a free table: confirmed, or pending with the reason.
+    notes = what the guest wrote under "requests" (only matters when the restaurant reads requests before confirming)."""
     r = ctx.r
     pct = occupancy(ctx, d, t, dur, exclude)
     thr, max_auto = setting(r, "auto_threshold"), setting(r, "max_auto_party")
@@ -376,6 +386,8 @@ def check_rules(ctx, d, t, party, dur, exclude=None):
         reasons.append("The restaurant is %d%% booked at this time (auto-approval stops at %d%%)." % (pct, thr))
     if party > max_auto:
         reasons.append("A party of %d is above the auto-approval limit of %d." % (party, max_auto))
+    if str(notes or "").strip() and flag(r, "review_notes"):
+        reasons.append("The guest wrote a request. You asked to read requests before a booking is confirmed.")
     return ("pending" if reasons else "confirmed"), " ".join(reasons), pct
 
 

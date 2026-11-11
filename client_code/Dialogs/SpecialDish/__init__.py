@@ -20,7 +20,6 @@ class SpecialDish(SpecialDishTemplate):
             self.when = "today" if s["start"] == today else "dates"
         else:
             self.when = "always" if not s.get("start") and not s.get("end") else "dates"
-        self.eyebrow.text = "Edit special" if special else "New special"
         self.title_label.text = s["title"] if special else "Add a special"
         self.name_box.text, self.price_box.text, self.desc_box.text = s["title"], s.get("price") or "", s.get("description") or ""
         self.photo_field.rid = rid

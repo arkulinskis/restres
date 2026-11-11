@@ -7,6 +7,7 @@ from datetime import date, datetime, time, timedelta
 import anvil.server
 import anvil.users
 import anvil.tables as tables
+import anvil.tables.query as q
 from anvil.tables import app_tables
 
 from . import Booking as B
@@ -211,6 +212,8 @@ def duplicate_restaurant(rid, name=None):
     now = B.now_utc()
     r = app_tables.restaurants.add_row(owner=_user(), name=name, slug=B.unique_slug(name), created=now,
                                        position=len(_mine()), **{c: src[c] for c in copy_cols})
+    if B.flag(src, "review_notes"):
+        r["review_notes"] = True
     for p in app_tables.periods.search(restaurant=src):
         app_tables.periods.add_row(restaurant=r, name=p["name"], start=p["start"], end=p["end"], week=p["week"], created=p["created"] or now)
     for s in app_tables.special_days.search(restaurant=src):
@@ -265,7 +268,8 @@ def _settings_view(r):
     v = {k: r[k] or "" for k in TEXT_FIELDS}
     v.update({k: B.setting(r, k) for k in B.SETTINGS})
     v.update({"id": r.get_id(), "slug": r["slug"], "timezone": r["timezone"] or "UTC", "accepting": r["accepting"] is not False,
-              "over_capacity": r["over_capacity"] or "review", "default_privacy": B.DEFAULT_PRIVACY,
+              "over_capacity": r["over_capacity"] or "review", "review_notes": B.flag(r, "review_notes"),
+              "default_privacy": B.DEFAULT_PRIVACY,
               "emails_on": r["emails_on"] is not False, "language": B.language(r), "languages": B.languages(r),
               "owner_email": r["owner"]["email"] if r["owner"] else "", "legacy_id": r["legacy_id"] or "",
               "form_notes": {k: str(v) for k, v in dict(r["form_notes"] or {}).items() if k in B.LANGS}})
@@ -335,6 +339,12 @@ def save_settings(rid, data):
     if "over_capacity" in data:
         upd["over_capacity"] = data["over_capacity"] if data["over_capacity"] in B.OVER_CAPACITY else "review"
     r.update(**upd)
+    if "review_notes" in data and bool(data["review_notes"]) != B.flag(r, "review_notes"):
+        try:  # its own write: the column is new, and the other settings must save even before the database has it
+            r["review_notes"] = bool(data["review_notes"])
+        except Exception:
+            return {"ok": False, "error": "Your other settings are saved. “Read requests first” needs a database update: "
+                                          "open the app in the Anvil editor and accept the schema change, then try again."}
     return {"ok": True, "settings": _settings_view(r), "nav": _nav(r)}
 
 
@@ -673,12 +683,65 @@ def get_day(rid, day=None):
         "reservations": _with_guests(r, [B.reservation_view(x, ctx, staff=True) for x in rows]),
         "summary": {"bookings": len(live), "covers": sum(int(x["party"] or 0) for x in live), "peak": peak,
                     "pending_today": len([x for x in live if x["status"] == "pending"])},
-        "curve": curve, "pending": pending,
+        "curve": curve, "pending": pending, "stamp": _stamp(rows, _pending(r)),
         "events": [{"id": e.get_id(), "title": e["title"] or "", "start": B.hm(int(e["start_min"] or 0)), "end": B.hm(int(e["end_min"] or 0)),
                     "kind": e["kind"] or "public", "blocks": bool(e["blocks"]), "guests": int(e["guests"] or 0),
                     "setup": e["layout"] is not None} for e in B.events_on(ctx, d)],
         "settings": {"duration_min": B.setting(r, "duration_min"), "slot_min": step, "auto_threshold": B.setting(r, "auto_threshold")},
     }
+
+
+def _stamp(rows, pending):
+    """A fingerprint of a day's bookings plus everything waiting for approval. The Reservations page (the screen at
+    the host stand) asks for it once a minute and reloads, with a chime, only when it changed."""
+    stamps = [B.iso(x["updated"] or x["created"]) or "" for x in list(rows) + list(pending)]
+    return {"bookings": len([x for x in rows if x["status"] in B.ACTIVE or x["status"] == "done"]),
+            "pending": len(pending), "rows": len(rows), "last": max(stamps) if stamps else ""}
+
+
+@anvil.server.callable(require_user=True)
+def get_day_stamp(rid, day=None):
+    r = _rest(rid)
+    try:
+        d = B.parse_date(day) if day else B.local_now(r).date()
+    except ValueError:
+        d = B.local_now(r).date()
+    return _stamp(list(app_tables.reservations.search(restaurant=r, date=d)), _pending(r))
+
+
+@anvil.server.callable(require_user=True)
+def get_upcoming(rid, days=30):
+    """Every booking still to come (today onwards) that holds a table, soonest first: the Reservations page's
+    "Upcoming" list."""
+    r = _rest(rid)
+    ctx = B.Ctx(r)
+    today = B.local_now(r).date()
+    last = today + timedelta(days=_int(days, 1, 120, 30))
+    rows = [x for x in app_tables.reservations.search(restaurant=r, date=q.between(today, last, max_inclusive=True))
+            if x["status"] in B.ACTIVE]
+    rows.sort(key=lambda x: (x["date"], int(x["start_min"] or 0), B._created_key(x)))
+    more = len(rows) > 300
+    return {"today": today.isoformat(), "days": (last - today).days, "more": more,
+            "reservations": _with_guests(r, [B.reservation_view(x, ctx, staff=True) for x in rows[:300]])}
+
+
+@anvil.server.callable(require_user=True)
+def quick_walk_in(rid, party):
+    """One tap at the host stand: a party that just walked in is seated now, at the best free table (or without a
+    table when none fits; the editor can fix that later). Staff can do this."""
+    r = _rest(rid)
+    now = B.local_now(r)
+    step = max(5, B.setting(r, "slot_min"))
+    party = _int(party, 1, 200, 2)
+    data = {"date": now.date().isoformat(), "time": B.hm((now.hour * 60 + now.minute) // step * step), "party": party,
+            "name": "Walk-in", "source": "walk_in", "status": "seated", "tables": "auto", "force": True}
+    out = _save_reservation(r, data)
+    if out.get("ok"):
+        res = app_tables.reservations.get_by_id(out["id"])
+        ids = set((res["tables"] if res is not None else None) or [])
+        out["tables"] = [t["name"] for t in app_tables.dining_tables.search(restaurant=r) if t.get_id() in ids]
+        out["day"] = get_day(rid, data["date"])
+    return out
 
 
 @anvil.server.callable(require_user=True)

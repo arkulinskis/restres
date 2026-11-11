@@ -10,7 +10,6 @@ class SectionEditor(SectionEditorTemplate):
     def __init__(self, rid, section=None, **properties):
         super().__init__(**properties)
         self.rid, self.section = rid, section
-        self.eyebrow.text = "Edit section" if section else "New section"
         self.title_label.text = section["title"] if section else "Add a section"
         self.title_box.text = section["title"] if section else ""
         self.desc_box.text = (section or {}).get("description") or ""

@@ -15,7 +15,19 @@ class Today(TodayTemplate):
         self.D = anvil.server.call("get_today", self.rid)
         self.specials_panel.add_event_handler("x-edit", self._edit_special)
         self.specials_panel.add_event_handler("x-toggle", self._toggle_special)
+        self.arrivals_panel.add_event_handler("x-status", self._arrival_status)
         self._draw()
+
+    def _arrival_status(self, res, status, **event_args):
+        """One tap in Who's coming: Seat a guest who arrived, or Finish a table that left."""
+        r = state.call("set_status", self.rid, res["id"], status)
+        if r:
+            state.toast("Seated" if status == "seated" else "Finished", "ok")
+            self.D = anvil.server.call("get_today", self.rid)
+            self._draw()
+            shell = getattr(self, "layout", None)
+            if shell is not None and hasattr(shell, "refresh_alerts"):
+                shell.refresh_alerts()
 
     def _draw(self):
         D, rid = self.D, self.rid

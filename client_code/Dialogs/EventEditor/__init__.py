@@ -15,8 +15,7 @@ class EventEditor(EventEditorTemplate):
         self.rid, self.event = rid, event
         e: dict = event or {"title": "", "date": pp.add_days(data["today"], 7), "start": "19:00", "end": "23:00", "kind": "public", "guests": 0,
                       "host": "", "description": "", "notes": "", "photo": None, "blocks": False, "on_site": True}
-        self.eyebrow.text = "Edit event" if event else "Plan an event"
-        self.title_label.text = e["title"] if event else "What's happening?"
+        self.title_label.text = e["title"] if event else "Plan an event"
         self.name_box.text = e["title"]
         self.date_picker.date = datetime.date.fromisoformat(e["date"])
         self.start_box.text = e["start"]

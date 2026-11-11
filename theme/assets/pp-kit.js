@@ -94,6 +94,52 @@
   };
   PP.err = function (e) { return (e && (e.message || e.toString())) || 'Something went wrong.'; };
 
+  // The host stand (Reservations): a two-note chime when a booking arrives, and a screen that stays awake.
+  // Browsers only allow sound after the person has touched the page once, so the audio is unlocked on the first tap or key.
+  var audio = null;
+  function unlockAudio() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!audio && AC) audio = new AC();
+      if (audio && audio.state === 'suspended') audio.resume();
+    } catch (e) { audio = null; }
+  }
+  document.addEventListener('pointerdown', unlockAudio, true);
+  document.addEventListener('keydown', unlockAudio, true);
+  PP.chimes = 0;  // how many times a chime was asked for (the UI test reads it)
+  PP.chime = function () {
+    PP.chimes += 1;
+    if (!audio || audio.state !== 'running') return false;
+    var now = audio.currentTime;
+    [[700, 0], [900, 0.12]].forEach(function (n) {
+      var osc = audio.createOscillator(), gain = audio.createGain(), at = now + n[1];
+      osc.type = 'sine'; osc.frequency.setValueAtTime(n[0], at);
+      gain.gain.setValueAtTime(0.0001, at);
+      gain.gain.exponentialRampToValueAtTime(0.25, at + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.32);
+      osc.connect(gain); gain.connect(audio.destination); osc.start(at); osc.stop(at + 0.4);
+    });
+    return true;
+  };
+  var wakeLock = null, wakeWanted = false;
+  function wakeGrab() {
+    if (!wakeWanted || wakeLock || document.hidden || !navigator.wakeLock) return;
+    navigator.wakeLock.request('screen').then(function (lock) {
+      wakeLock = lock;
+      lock.addEventListener('release', function () { if (wakeLock === lock) wakeLock = null; });
+      if (!wakeWanted) lock.release();
+    }, function () { /* battery saver or an old browser: the screen sleeps as usual */ });
+  }
+  document.addEventListener('visibilitychange', wakeGrab);  // the browser drops the lock when the tab is hidden
+  PP.wake = function (on) {
+    wakeWanted = !!on;
+    if (wakeWanted) wakeGrab();
+    else if (wakeLock) { wakeLock.release(); wakeLock = null; }
+  };
+  PP.dialogOpen = function () {
+    return Array.prototype.some.call(document.querySelectorAll('.anvil-modal-content, .modal-content'), function (e) { return e.getBoundingClientRect().width > 0; });
+  };
+
   PP.appUrl = function () { return location.origin + location.pathname; };
   PP.menuUrl = function (slug) { return PP.appUrl() + '#menu/' + slug; };
 

@@ -49,6 +49,7 @@ class Settings(SettingsTemplate):
         self.rules_panel.items = [{"key": k, "title": t, "desc": d, "unit": u, "value": s[k]} for k, t, d, u in RULES]
         self.approval_panel.items = [{"key": k, "title": t, "desc": d, "unit": u, "value": s[k]} for k, t, d, u in APPROVAL]
         self.over_drop.selected_value = s["over_capacity"]
+        self.review_notes_box.checked = bool(s.get("review_notes"))
         self.privacy_box.text = s.get("privacy_text") or ""
         self.privacy_box.placeholder = s["default_privacy"]
         self.emails_box.checked = s["emails_on"]
@@ -77,6 +78,7 @@ class Settings(SettingsTemplate):
     def save_button_click(self, **event_args):
         v = {k: self._box(k).text or "" for k in TEXT}
         v.update(slug=self.slug_box.text or "", legacy_id=(self.legacy_box.text or "").strip(), accepting=self.accepting_box.checked, over_capacity=self.over_drop.selected_value,
+                 review_notes=bool(self.review_notes_box.checked),
                  privacy_text=self.privacy_box.text or "", emails_on=self.emails_box.checked, language=self.language_drop.selected_value,
                  languages=[l for l in ("en", "fr", "lv") if getattr(self, "lang_" + l).checked],
                  form_notes={l: getattr(self, "note_%s_box" % l).text or "" for l in ("en", "fr", "lv")

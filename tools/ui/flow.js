@@ -122,6 +122,48 @@
     $$('.ui-seg button').find((b) => b.textContent.trim() === 'List').click();
     await until(() => vis($('.pp-res-list')) || vis($$('.ui-empty').find(vis)), 'list view');
     ok(true, 'reservations: list view');
+    // the host stand: one-tap Seat / Finish on a row, a one-tap walk-in, the Upcoming list, the chime, the live check
+    const acts = (label) => $$('.pp-res-list .pp-res-act button').filter((b) => vis(b) && b.textContent.trim() === label);
+    const seat = await until(() => acts('Seat')[0], 'a Seat button on a confirmed booking of today');
+    const finishes = acts('Finish').length;
+    seat.click();
+    await until(() => acts('Finish').length === finishes + 1, 'seated', 40000);
+    ok(true, 'reservations: one tap seats a guest (the row then offers Finish)');
+    acts('Finish')[0].click();
+    await until(() => acts('Finish').length === finishes, 'finished', 40000);
+    ok(true, 'reservations: one tap finishes a table');
+    btn('.pp-res-tools', 'Walk-in').click();
+    await until(() => dialog() && /How many walked in/.test(dialog().textContent), 'walk-in dialog');
+    ok($$('.pp-walkin-grid button').filter(vis).length === 12, 'walk-in: twelve party sizes to tap');
+    $$('.pp-walkin-grid button').find((b) => b.textContent.trim() === '3').click();
+    await until(() => !dialog(), 'walk-in saved', 40000);
+    await until(() => $$('.pp-res-list .pp-res-row').some((r) => /Walk-in/.test(r.textContent) && /Finish/.test(r.textContent)), 'the walk-in is in the list, seated');
+    ok(true, 'walk-in: one tap on the party size seats them now');
+    const chimes = window.PP.chimes;
+    btn('.pp-res-tools', 'Chime on').click();
+    await until(() => btn('.pp-res-tools', 'Chime off'), 'chime off');
+    btn('.pp-res-tools', 'Chime off').click();
+    await until(() => btn('.pp-res-tools', 'Chime on') && window.PP.chimes === chimes + 1, 'chime back on (it plays once so they hear it)');
+    ok(btn('.pp-res-tools', 'Chime on').getAttribute('aria-pressed') === 'true', 'reservations: the chime can be switched off and on');
+    $$('.ui-seg button').find((b) => b.textContent.trim() === 'Upcoming').click();
+    await until(() => $$('.pp-res-dated .pp-res-row:not(.pp-res-head)').filter(vis).length >= 3, 'upcoming list', 40000);
+    ok(!vis($('.pp-daybar .anvil-role-pp-date')) && /booking/.test($('.pp-res').textContent), 'reservations: Upcoming lists every booking still to come');
+    $$('.ui-seg button').find((b) => b.textContent.trim() === 'List').click();
+    await until(() => vis($('.pp-res-list')), 'back to the list');
+    // someone else approves the last request (here: the same page in a frame); this screen notices by itself
+    const left = $$('.pp-ap').filter(vis).length;
+    ok(left >= 1, 'reservations: a request is still waiting (for the live check)');
+    const fr = document.createElement('iframe');
+    fr.style.cssText = 'position:fixed;left:0;top:0;width:1000px;height:700px;opacity:.01;pointer-events:none';
+    fr.src = location.href;
+    document.body.appendChild(fr);
+    const inner = () => Array.from(fr.contentDocument.querySelectorAll('.pp-ap button')).find((b) => b.textContent.trim() === 'Approve');
+    (await until(() => fr.contentWindow.UI_READY && inner(), 'the second screen', 90000)).click();
+    await until(() => fr.contentDocument.querySelectorAll('.pp-ap').length === left - 1, 'approved on the second screen', 40000);
+    fr.remove();
+    document.dispatchEvent(new Event('visibilitychange'));
+    await until(() => $$('.pp-ap').filter(vis).length === left - 1, 'this screen caught up', 40000);
+    ok(true, 'reservations: the page notices a change made elsewhere, without a reload');
 
     await page('#guests/' + rid, () => $$('.pp-grow-row').length > 1);
     ok(/lise Martin/.test($('.pp-glist').textContent), 'guests: the guest book lists regulars');

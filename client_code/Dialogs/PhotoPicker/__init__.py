@@ -15,7 +15,6 @@ class PhotoPicker(PhotoPickerTemplate):
         super().__init__(**properties)
         self.rid, self.kind, self.current, self.meta = rid, kind, current, meta or {}
         video = kind == "video"
-        self.eyebrow.text = "Video" if video else "Photo"
         self.title_label.text = title or ("Choose a video" if video else "Choose a photo")
         self.upload_button.text = "Upload a video" if video else "Upload a photo"
         self.photos_panel.add_event_handler("x-pick", self._pick)

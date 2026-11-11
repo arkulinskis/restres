@@ -50,6 +50,8 @@
             <anvil-component type="RepeatingPanel" name="approval_panel" prop:item_template="PlanPlate_2_0.Items.RuleRow"></anvil-component>
             <div class="pp-rule"><div><div class="t">When the limit is reached</div><div class="d">Take requests for you to approve, or stop online booking at that time and invite guests to walk in.</div></div>
               <anvil-component type="DropDown" name="over_drop" prop:items='[["Ask me to approve", "review"], ["Suggest walking in", "walk_in"]]'></anvil-component></div>
+            <div class="pp-rule"><div><div class="t">Read requests first</div><div class="d">When a guest writes a request (an allergy, a high chair, a birthday), the booking waits for your approval instead of confirming by itself.</div></div>
+              <anvil-component type="CheckBox" name="review_notes_box" prop:text="Wait for me"></anvil-component></div>
           </section>
 
           <section class="ui-card pp-sec" id="st-form"><h2>Booking form</h2><p class="pp-lead">Texts on the form your guests fill in.</p>

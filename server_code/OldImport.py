@@ -395,6 +395,10 @@ class Importer:
             r = app_tables.restaurants.add_row(owner=owner, slug=B.unique_slug(name), timezone=self.tz, created=B.now_utc(),
                                                position=len(list(app_tables.restaurants.search(owner=owner))), accepting=True,
                                                over_capacity="review", emails_on=True, **dict(defaults, **fields))
+            try:  # the old rule: a booking with a special request always waited for the restaurant
+                r["review_notes"] = True
+            except Exception:  # the column isn't in this database yet
+                self.warn("%s: turn on Settings -> Approvals -> “Read requests first” to keep the old rule." % name)
             self.count("restaurants added")
         else:
             r.update(**fields)

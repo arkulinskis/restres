@@ -839,6 +839,48 @@ except Exception:
     leaked = False
 assert not leaked, "someone else's guest book must be private"
 
+# ---------------------------------------------------------------------------------- the host stand (from the old PlanPlate):
+# "read requests first", the live stamp the Reservations page polls, one-tap walk-ins, the Upcoming list
+PUB = MODS["Public"]
+as_user(ana_pp)
+hid = ok(P.create_restaurant('Host Stand Bistro', 'UTC', True))['id']
+h = T.restaurants.get_by_id(hid)
+hday = next_weekday(4)
+g2 = {'name': 'Nina Note', 'email': 'nina@example.com', 'phone': '+371 2000 0000', 'consent': True, 'pp_consent': True}
+assert call('get_settings', hid)['settings']['review_notes'] is False
+as_user(None)
+hb = ok(PUB.book(h['slug'], dict(g2, notes='Nut allergy', date=hday.isoformat(), time='19:00', party=2)))
+assert hb['status'] == 'confirmed', 'by default a guest request does not hold the booking back'
+as_user(ana_pp)
+assert ok(call('save_settings', hid, {'review_notes': True}))['settings']['review_notes'] is True
+s0 = call('get_day_stamp', hid, hday.isoformat())
+assert s0 == P.get_day(hid, hday.isoformat())['stamp'] and s0['rows'] == 1 and s0['pending'] == 0, s0
+as_user(None)
+hb2 = ok(PUB.book(h['slug'], dict(g2, name='Olga Note', email='olga@example.com', notes='High chair please', date=hday.isoformat(), time='19:00', party=2)))
+assert hb2['status'] == 'pending' and 'request' in T.reservations.get(token=hb2['token'])['review_reason'], hb2
+hb3 = ok(PUB.book(h['slug'], dict(g2, name='Pia Plain', email='pia@example.com', notes='  ', date=hday.isoformat(), time='19:00', party=2)))
+assert hb3['status'] == 'confirmed', 'no request written: confirmed as before'
+as_user(ana_pp)
+s1 = call('get_day_stamp', hid, hday.isoformat())
+assert s1 != s0 and s1['rows'] == 3 and s1['pending'] == 1 and s1['last'] >= s0['last'], (s0, s1)
+assert call('get_day_stamp', hid, 'not a date')['rows'] == 0, 'a bad date falls back to today'
+up = call('get_upcoming', hid)
+assert [x['name'] for x in up['reservations']] == ['Nina Note', 'Olga Note', 'Pia Plain'] and all('guest' in x for x in up['reservations']), up
+assert up['today'] == B.local_now(h).date().isoformat() and up['more'] is False
+w = ok(call('quick_walk_in', hid, 4))
+wres = T.reservations.get_by_id(w['id'])
+assert (wres['status'], wres['source'], wres['party'], wres['name']) == ('seated', 'walk_in', 4, 'Walk-in'), dict(wres)
+assert w['day']['date'] == B.local_now(h).date().isoformat() and isinstance(w['tables'], list)
+assert int(wres['start_min']) % B.setting(h, 'slot_min') == 0, 'a walk-in starts on the current time slot'
+assert ok(call('quick_walk_in', hid, 'lots')) and T.reservations.get_by_id(call('quick_walk_in', hid, 500)['id'])['party'] == 200
+assert any(x['id'] == w['id'] for x in call('get_upcoming', hid)['reservations']), "today's seated walk-in is in Upcoming"
+hcopy = ok(P.duplicate_restaurant(hid))
+assert T.restaurants.get_by_id(hcopy['id'])['review_notes'] is True, 'a copy keeps "read requests first"'
+ok(call('save_settings', hid, {'review_notes': False}))
+assert B.flag(T.restaurants.get_by_id(hid), 'review_notes') is False and B.flag(h, 'no_such_column') is False
+as_user(bob_pp)
+assert denied('get_day_stamp', hid) and denied('get_upcoming', hid) and denied('quick_walk_in', hid, 2)
+
 # ---------------------------------------------------------------------------------- the demo restaurant (Maison Lumière)
 as_user(None)
 MODS["common"].set_setting("demo", "never")

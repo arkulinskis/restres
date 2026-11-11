@@ -13,7 +13,7 @@ class DaySheet(DaySheetTemplate):
     def __init__(self, day, **properties):
         super().__init__(**properties)
         rows = sorted([r for r in day["reservations"] if r["status"] in LIVE], key=lambda r: r["start_min"])
-        self.eyebrow.text = day["nav"]["restaurant"]["name"]
+        self.place_label.text = day["nav"]["restaurant"]["name"]
         self.title_label.text = pp.fmt_date(day["date"])
         s = day["summary"]
         self.summary.text = "%s · %s · %s" % (state.plural(s["bookings"], "booking"), state.plural(s["covers"], "guest"),

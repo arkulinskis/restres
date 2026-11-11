@@ -1,6 +1,12 @@
 <div class="ui pp pp-dlg pp-ed">
-  <anvil-component type="Label" name="eyebrow" prop:role='["eyebrow-label"]'></anvil-component>
-  <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]'></anvil-component>
+  <div class="pp-dlg-head">
+    <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]'></anvil-component>
+    <anvil-component type="Label" name="status_badge" prop:role='["badge"]' prop:visible="false"></anvil-component>
+  </div>
+  <div class="pp-ed-contact" anvil:name="contact_box">
+    <a anvil:name="call_link" href="tel:"><i class="ic ic-phone"></i><anvil-component type="Label" name="call_label"></anvil-component></a>
+    <a anvil:name="mail_link" href="mailto:"><i class="ic ic-mail"></i><anvil-component type="Label" name="mail_label"></anvil-component></a>
+  </div>
   <anvil-component type="Label" name="reason_label" prop:role='["msg-note"]' prop:visible="false"></anvil-component>
   <div class="pp-ed-guest" anvil:name="guest_box">
     <i class="ic ic-heart"></i><anvil-component type="Label" name="guest_label"></anvil-component>

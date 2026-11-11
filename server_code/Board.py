@@ -128,7 +128,7 @@ def _today(r):
         if end <= t:
             continue
         arrivals.append({"id": x.get_id(), "time": B.hm(start), "name": x["name"] or "", "party": int(x["party"] or 0),
-                         "status": x["status"], "seated": start <= t,
+                         "status": x["status"], "seated": x["status"] == "seated", "due": x["status"] == "confirmed" and start <= t,
                          "tables": [ctx.by_id[i]["name"] for i in (x["tables"] or []) if i in ctx.by_id]})
     busy = B.busy_ids(ctx, today, t, 1)
     week = []

@@ -10,28 +10,36 @@
         </div>
       </section>
 
-      <div class="pp-daybar">
-        <anvil-component type="Button" name="prev_button" prop:text="Previous day" prop:role='["btn", "btn-icon", "ic-left"]'></anvil-component>
-        <anvil-component type="Label" name="day_title" prop:role='["sec-title"]'></anvil-component>
-        <anvil-component type="Button" name="next_button" prop:text="Next day" prop:role='["btn", "btn-icon", "ic-right"]'></anvil-component>
-        <anvil-component type="Button" name="today_button" prop:text="Today" prop:role='["btn", "btn-sm"]'></anvil-component>
-        <anvil-component type="DatePicker" name="date_picker" prop:format="D MMM YYYY" prop:role='["pp-date"]'></anvil-component>
+      <div anvil:name="day_head">
+        <div class="pp-daybar">
+          <anvil-component type="Button" name="prev_button" prop:text="Previous day" prop:role='["btn", "btn-icon", "ic-left"]'></anvil-component>
+          <anvil-component type="Label" name="day_title" prop:role='["sec-title"]'></anvil-component>
+          <anvil-component type="Button" name="next_button" prop:text="Next day" prop:role='["btn", "btn-icon", "ic-right"]'></anvil-component>
+          <anvil-component type="Button" name="today_button" prop:text="Today" prop:role='["btn", "btn-sm"]'></anvil-component>
+          <anvil-component type="DatePicker" name="date_picker" prop:format="D MMM YYYY" prop:role='["pp-date"]'></anvil-component>
+        </div>
+        <div class="pp-daymeta">
+          <span><i class="ic ic-clock"></i><anvil-component type="Label" name="hours_label"></anvil-component></span>
+          <anvil-component type="Label" name="count_label"></anvil-component>
+          <anvil-component type="Label" name="covers_label"></anvil-component>
+          <anvil-component type="Label" name="peak_label"></anvil-component>
+        </div>
+        <anvil-component type="RepeatingPanel" name="events_panel" prop:item_template="PlanPlate_2_0.Items.DayEvent"></anvil-component>
       </div>
-      <div class="pp-daymeta">
-        <span><i class="ic ic-clock"></i><anvil-component type="Label" name="hours_label"></anvil-component></span>
-        <anvil-component type="Label" name="count_label"></anvil-component>
-        <anvil-component type="Label" name="covers_label"></anvil-component>
-        <anvil-component type="Label" name="peak_label"></anvil-component>
+      <div class="pp-daybar" anvil:name="upcoming_head">
+        <anvil-component type="Label" name="upcoming_title" prop:role='["sec-title"]' prop:text="Upcoming bookings"></anvil-component>
+        <anvil-component type="Label" name="upcoming_count" prop:role='["muted", "small"]'></anvil-component>
       </div>
-      <anvil-component type="RepeatingPanel" name="events_panel" prop:item_template="PlanPlate_2_0.Items.DayEvent"></anvil-component>
 
       <div class="pp-res-tools">
         <div class="ui-seg" role="group" aria-label="View">
           <button type="button" anvil:name="view_timeline" data-v="timeline" anvil:on-dom:click="self.view_click">Timeline</button>
           <button type="button" anvil:name="view_list" data-v="list" anvil:on-dom:click="self.view_click">List</button>
+          <button type="button" anvil:name="view_upcoming" data-v="upcoming" anvil:on-dom:click="self.view_click">Upcoming</button>
         </div>
+        <anvil-component type="Button" name="chime_button" prop:text="Chime on" prop:role='["btn", "btn-ghost", "btn-sm", "ic-volume"]' prop:tooltip="Play a sound when a new booking or request comes in"></anvil-component>
         <span class="ui-spacer"></span>
-        <anvil-component type="Button" name="print_button" prop:text="Day sheet" prop:role='["btn", "btn-ghost", "ic-print"]' prop:tooltip="Print today's bookings for the host stand"></anvil-component>
+        <anvil-component type="Button" name="print_button" prop:text="Day sheet" prop:role='["btn", "btn-ghost", "ic-print", "pp-hide-m"]' prop:tooltip="Print the day's bookings for the host stand"></anvil-component>
         <anvil-component type="Button" name="walkin_button" prop:text="Walk-in" prop:role='["btn", "ic-users"]' prop:tooltip="Seat someone who just walked in"></anvil-component>
         <anvil-component type="Button" name="new_button" prop:text="New booking" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
       </div>
@@ -42,11 +50,22 @@
       </div>
       <div anvil:name="list_part">
         <div class="ui-card pp-res-list" anvil:name="list_card">
-          <div class="pp-res-row pp-res-head"><span>Time</span><span>Guest</span><span>Guests</span><span>Table</span><span>Status</span><span>Source</span></div>
+          <div class="pp-res-row pp-res-head"><div class="pp-res-main"><span>Time</span><span>Guest</span><span>Guests</span><span>Table</span><span>Status</span><span>Source</span></div><span class="pp-res-act"></span></div>
           <anvil-component type="RepeatingPanel" name="list_panel" prop:item_template="PlanPlate_2_0.Items.ResRow" prop:role='["contents"]'></anvil-component>
         </div>
-        <div class="ui-empty" anvil:name="list_empty">No reservations on this day yet.</div>
+        <div class="ui-empty" anvil:name="list_empty">No reservations on this day yet. Add one with New booking, or seat a Walk-in.</div>
       </div>
+      <div anvil:name="upcoming_part">
+        <div class="ui-card pp-res-list pp-res-dated" anvil:name="upcoming_card">
+          <div class="pp-res-row pp-res-head"><div class="pp-res-main"><span>When</span><span>Guest</span><span>Guests</span><span>Table</span><span>Status</span><span>Source</span></div><span class="pp-res-act"></span></div>
+          <anvil-component type="RepeatingPanel" name="upcoming_panel" prop:item_template="PlanPlate_2_0.Items.ResRow" prop:role='["contents"]'></anvil-component>
+        </div>
+        <div class="ui-empty" anvil:name="upcoming_empty">Nothing booked for the coming weeks yet. New bookings appear here by themselves.</div>
+        <anvil-component type="Label" name="upcoming_more" prop:role='["hint"]' prop:visible="false" prop:text="Showing the first 300. Pick a day to see the rest."></anvil-component>
+      </div>
+      <p class="ui-hint pp-live-hint" anvil:name="live_hint">This page checks for new bookings every minute and keeps the screen awake while it is open.</p>
+      <anvil-component type="Label" name="live_status" prop:role='["sr"]'></anvil-component>
+      <anvil-component type="Timer" name="live_timer" prop:interval="60"></anvil-component>
     </div>
   </anvil-block>
 </anvil-form>
