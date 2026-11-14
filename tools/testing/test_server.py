@@ -1219,7 +1219,7 @@ as_user(None)
 
 # ---------------------------------------------------------------------------------- every callable is covered by a permission check
 # A callable that changes data without require_user / a C.require_* check is a security hole. List the public ones here.
-PUBLIC = {"get_me", "submit_feedback", "legal_state", "legal_accept", "get_pricing",
+PUBLIC = {"session_ping", "get_me", "submit_feedback", "legal_state", "legal_accept", "get_pricing",
           "get_booking_form", "get_slots", "book", "get_reservation", "change_reservation", "cancel_reservation", "get_menu",
           "set_guest_news"}
 for name, (f, need) in sorted(anvil.server.CALLABLES.items()):
