@@ -24,6 +24,8 @@ os.environ["ANVIL_APP_YAML"] = str(PROJECT / "anvil.yaml")  # the mock's tables 
 sys.path[:0] = [str(HERE / "mock"), str(_tmp)]
 import anvil.server  # noqa: E402
 import anvil.users  # noqa: E402
+import anvil.secrets  # noqa: E402
+anvil.secrets.SECRETS["admin_emails"] = "admin@example.com"  # the App Secret, faked
 from anvil.tables import app_tables as T  # noqa: E402
 
 MODS = {p.stem: importlib.import_module("app." + p.stem) for p in sorted((PROJECT / "server_code").glob("*.py"))}
@@ -722,7 +724,7 @@ def bad(r, msg=""):
 
 
 # ---------------------------------------------------------------------------------- accounts
-admin = person("arkulinskis@gmail.com", "The Admin")
+admin = person("admin@example.com", "The Admin")
 ana = person("anna@example.com", "Ana")
 bob = person("bobby@example.com")
 
@@ -887,7 +889,7 @@ MODS["common"].set_setting("demo", "never")
 form = ok(call("get_booking_form", "maison-lumiere"))
 assert form["restaurant"]["name"] == "Maison Lumière", "the demo appears the first time its booking form opens"
 demo = T.restaurants.get(slug="maison-lumiere")
-assert demo["owner"]["is_demo"] and T.members.search(restaurant=demo, email="arkulinskis@gmail.com"), "admins can manage the demo"
+assert demo["owner"]["is_demo"] and T.members.search(restaurant=demo, email="admin@example.com"), "admins can manage the demo"
 assert len(T.reservations.search(restaurant=demo)) >= 10 and T.guests.search(restaurant=demo)
 assert any(x["status"] == "pending" for x in T.reservations.search(restaurant=demo)), "two requests wait for approval"
 assert ok(call("get_menu", "maison-lumiere"))["sections"], "its menu"
@@ -1219,7 +1221,7 @@ as_user(None)
 
 # ---------------------------------------------------------------------------------- every callable is covered by a permission check
 # A callable that changes data without require_user / a C.require_* check is a security hole. List the public ones here.
-PUBLIC = {"session_ping", "get_me", "submit_feedback", "legal_state", "legal_accept", "get_pricing",
+PUBLIC = {"log_client_error", "session_ping", "get_me", "submit_feedback", "legal_state", "legal_accept", "get_pricing",
           "get_booking_form", "get_slots", "book", "get_reservation", "change_reservation", "cancel_reservation", "get_menu",
           "set_guest_news"}
 for name, (f, need) in sorted(anvil.server.CALLABLES.items()):

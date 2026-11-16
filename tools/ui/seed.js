@@ -14,7 +14,7 @@
     input.focus(); input.value = value;
     input.dispatchEvent(new Event('input', { bubbles: true })); input.dispatchEvent(new Event('change', { bubbles: true }));
   }
-  const EMAIL = 'arkulinskis@gmail.com', PW = '$TEST_PASSWORD';
+  const EMAIL = 'admin@example.com', PW = '$TEST_PASSWORD';
   async function form(hash) {
     if (location.hash !== hash) window.UI_READY = false;
     location.hash = hash;

@@ -38,7 +38,7 @@ details and deploys. Guest texts in English, French and Latvian.
    design check, desktop + phone): bans and fails must be zero.
    `--shots DIR` = every page, desktop + phone, light + dark, guest + member. The local App Server runs with
    `--auto-migrate`, so new tables/columns appear locally by themselves.
-   Member pages sign in as arkulinskis@gmail.com **on the local server only** (password in the git-ignored
+   Member pages sign in as your admin email (App Secret `admin_emails`) **on the local server only** (password in the git-ignored
    `tools/live/.test-account-password.txt`); that address is a manager of the demo restaurant.
 5. `python tools/assets.py` after changing theme assets or head_html.
 6. Commit as arkulinskis with the Co-Authored-By line; push. New tables/columns: the user accepts the **Schema Mismatch**.
