@@ -19,7 +19,7 @@ APPROVAL = [("auto_threshold", "Auto-confirm until", "Once this share of seats i
 
 class Settings(SettingsTemplate):
     """#settings/<rid>: the restaurant's details, booking rules, approvals, the booking form's texts, emails, languages,
-    the team (owner only) and deleting it (owner only). Sharing and QR codes are on #share."""
+    the team (owner and managers) and deleting it (owner only). Sharing and QR codes are on #share."""
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
@@ -63,10 +63,11 @@ class Settings(SettingsTemplate):
             getattr(self, "note_%s_box" % l).text = notes.get(l) or ""
             getattr(self, "note_%s_field" % l).visible = l != s["language"]
         owner = D.get("role") == "owner"
-        self.team_lead.text = ("Give managers and staff their own sign-in. Managers can change everything except the team; staff see and "
-                               "manage reservations and the guest book only.") if owner else "Only the owner can change the team."
-        self.team_panel.items = [dict(m, _owner_view=owner) for m in D.get("team") or []]
-        self.invite_row.visible = self.invite_hint.visible = owner
+        team_edit = pp.can(D.get("role"), "manager")
+        self.team_lead.text = ("Give each person their own sign-in. Managers can change every setting and the team. Staff (waiters, "
+                               "hosts) run the room: Today, reservations, walk-ins, seating and the guest book, but no settings.")
+        self.team_panel.items = [dict(m, _owner_view=team_edit) for m in D.get("team") or []]
+        self.invite_row.visible = self.invite_hint.visible = team_edit
         self.danger.visible = self.toc_danger.visible = owner
         self.delete_button.text = "Delete " + s["name"]
 

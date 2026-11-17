@@ -5,7 +5,7 @@ from ... import pp
 
 
 class TeamRow(TeamRowTemplate):
-    """A team member (Settings -> Team). item = {id, email, name, role, joined, _owner_view}."""
+    """A team member (Settings -> Team). item = {id, email, name, role, joined, me, _owner_view}."""
 
     def __init__(self, **properties):
         super().__init__(**properties)
@@ -14,7 +14,7 @@ class TeamRow(TeamRowTemplate):
         self.email_label.visible = bool(m.get("name"))
         self.email_label.text = m["email"]
         self.invited_badge.visible = not m.get("joined")
-        can_edit = bool(m.get("_owner_view")) and m["role"] != "owner"
+        can_edit = bool(m.get("_owner_view")) and m["role"] != "owner" and not m.get("me")
         self.role_drop.visible = self.remove_button.visible = can_edit
         self.role_badge.visible = not can_edit
         self.role_badge.text = pp.ROLE.get(m["role"], m["role"])

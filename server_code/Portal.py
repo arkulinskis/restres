@@ -864,13 +864,21 @@ def set_status(rid, res_id, status, day=None):
 
 # ---------------------------------------------------------------- team (owners, managers, staff)
 def _team(r):
-    owner = r["owner"]
+    owner, me = r["owner"], anvil.users.get_user()
     rows = [{"id": None, "email": owner["email"] if owner else "", "name": (owner["display_name"] or "") if owner else "",
-             "role": "owner", "joined": True}]
+             "role": "owner", "joined": True, "me": owner is not None and owner == me}]
     for m in sorted(app_tables.members.search(restaurant=r), key=B._created_key):
         rows.append({"id": m.get_id(), "email": m["email"] or "", "name": (m["user"]["display_name"] or "") if m["user"] else "",
-                     "role": m["role"], "joined": m["user"] is not None})
+                     "role": m["role"], "joined": m["user"] is not None, "me": m["user"] is not None and m["user"] == me})
     return rows
+
+
+def _other_member(r, mid):
+    """A team row a manager or owner may change: anyone's but their own (nobody locks themselves out)."""
+    m = _child(app_tables.members, r, mid)
+    if m["user"] is not None and m["user"] == _user():
+        raise anvil.server.PermissionDenied("You can't change your own access. Ask the owner or another manager.")
+    return m
 
 
 @anvil.server.callable(require_user=True)
@@ -880,8 +888,9 @@ def get_team(rid):
 
 @anvil.server.callable(require_user=True)
 def invite_member(rid, email, role="staff"):
-    """Give someone access by email. They see the restaurant when they sign in with that address."""
-    r = _rest(rid, "owner")
+    """Give someone access by email. They see the restaurant when they sign in with that address.
+    Owners and managers can invite; staff (waiters, hosts) get the floor only: Today, Reservations, Guests."""
+    r = _rest(rid, "manager")
     email = str(email or "").strip().lower()
     if not EMAIL_RE.match(email):
         return {"ok": False, "error": "Enter a valid email address."}
@@ -906,15 +915,15 @@ def invite_member(rid, email, role="staff"):
 
 @anvil.server.callable(require_user=True)
 def set_member_role(rid, mid, role):
-    r = _rest(rid, "owner")
+    r = _rest(rid, "manager")
     if role not in ("manager", "staff"):
         return {"ok": False, "error": "Pick a role."}
-    _child(app_tables.members, r, mid)["role"] = role
+    _other_member(r, mid)["role"] = role
     return {"ok": True, "team": _team(r)}
 
 
 @anvil.server.callable(require_user=True)
 def remove_member(rid, mid):
-    r = _rest(rid, "owner")
-    _child(app_tables.members, r, mid).delete()
+    r = _rest(rid, "manager")
+    _other_member(r, mid).delete()
     return {"ok": True, "team": _team(r)}

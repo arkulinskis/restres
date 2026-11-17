@@ -457,6 +457,16 @@ for fn, args in ((P.delete_restaurant, (rid, 'Le Petit Jardin')), (P.remove_memb
         fn(*args); raise AssertionError('manager reached %s' % fn.__name__)
     except anvil.server.PermissionDenied:
         pass
+# managers give access too: invite a waiter by email, change their role, remove them; never their own row
+tm = ok(P.invite_member(rid, 'dave@example.com', 'staff'))
+dave = [m for m in tm['team'] if m['email'] == 'dave@example.com'][0]
+assert [m['me'] for m in tm['team'] if m['id'] == bob_id] == [True] and not dave['me']
+ok(P.set_member_role(rid, dave['id'], 'manager')); ok(P.set_member_role(rid, dave['id'], 'staff'))
+ok(P.remove_member(rid, dave['id']))
+try:
+    P.set_member_role(rid, bob_id, 'staff'); raise AssertionError('manager changed own role')
+except anvil.server.PermissionDenied:
+    pass
 carol = T.users.add_row(email='carol@example.com', signed_up=now)
 anvil.users.CURRENT[0] = carol
 assert [x['role'] for x in P.get_dashboard()['restaurants']] == ['manager'], 'invite claimed on first sign-in'
