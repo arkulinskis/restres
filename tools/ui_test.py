@@ -59,9 +59,14 @@ def start(restart=False):
     if not running():
         sh("docker", "rm", "-f", NAME, check=False)
         sh("docker", "volume", "rm", KEY + "-app", check=False)  # fresh copy: no files left over from old versions
+        # A rehearsal can use its own database and extra app secrets (tools/rehearsal.py): env UI_TEST_DATA=<name> and
+        # UI_TEST_SECRETS="name=value;name=value". Without them: the normal local test database.
+        import os
+        data = KEY + "-data" + ("-" + os.environ["UI_TEST_DATA"] if os.environ.get("UI_TEST_DATA") else "")
+        extra = [x for s in (os.environ.get("UI_TEST_SECRETS") or "").split(";") if "=" in s for x in ("--secret", s.strip())]
         sh("docker", "create", "--name", NAME, "-p", "%d:%d" % (PORT, PORT), "-v", KEY + "-app:/apps/MainApp",
-           "-v", KEY + "-data:/anvil-data", IMAGE, "--app", "MainApp", "--origin", URL,
-           "--auto-migrate", "--secret", "admin_emails=admin@example.com")  # new tables/columns apply to the local database (--ignore-invalid-schema would block that)
+           "-v", data + ":/anvil-data", IMAGE, "--app", "MainApp", "--origin", URL,
+           "--auto-migrate", "--secret", "admin_emails=admin@example.com", *extra)  # new tables/columns apply to the local database (--ignore-invalid-schema would block that)
         copy_app()
         sh("docker", "start", NAME)
         print("starting the App Server ...")

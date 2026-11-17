@@ -41,6 +41,8 @@ from anvil.tables import app_tables
 from . import Booking as B
 from . import common as C
 
+OLD_CLIENT = "https://client.planplate.com"  # the old guest app: its public menu links give the menu files to copy
+
 TABLES = {  # columns that identify each old table's CSV
     "users": {"email", "password_hash"},
     "new_staff_access": {"restaurant_id", "user_id", "type_id"},
@@ -558,16 +560,44 @@ class Importer:
             key = _s(row.get("menu_id")).lower()
             if r is None or not UUID_RE.match(key):
                 continue
-            if app_tables.menu_files.get(key=key) is not None:
+            f = app_tables.menu_files.get(key=key)
+            if f is None:
+                lang = _s(row.get("language")).lower()
+                f = app_tables.menu_files.add_row(restaurant=r, key=key, title=(_s(row.get("file_description")) or "Menu")[:60],
+                                                  language=lang if lang in B.LANGS else "", file=None, content_type="",
+                                                  position=len(list(app_tables.menu_files.search(restaurant=r))), created=B.now_utc())
+            if f["file"] is not None:
                 continue
-            lang = _s(row.get("language")).lower()
-            app_tables.menu_files.add_row(restaurant=r, key=key, title=(_s(row.get("file_description")) or "Menu")[:60],
-                                          language=lang if lang in B.LANGS else "", file=None, content_type="",
-                                          position=len(list(app_tables.menu_files.search(restaurant=r))), created=B.now_utc())
-            self.count("menu files waiting for their file")
+            media = self.fetch_menu(_s(row.get("restaurant")).lower(), key)
+            if media is not None:
+                f.update(file=media, content_type=(media.content_type or "").lower())
+                self.count("menu files copied from the old PlanPlate")
+            else:
+                self.count("menu files waiting for their file")
         if self.n.get("menu files waiting for their file"):
-            self.warn("CSV files can't carry the menu PDFs/photos: upload each one again on the Menu page (Menu files). "
-                      "Old links to them work again as soon as they're uploaded.")
+            self.warn("Some menu files couldn't be fetched from the old PlanPlate (CSV files can't carry the PDFs/photos): "
+                      "upload each one again on the Menu page (Menu files). Old links to them work again as soon as they're uploaded.")
+
+    def fetch_menu(self, old_rest, key):
+        """The menu file itself, from the old app's public link. Works while client.planplate.com still points at the
+        old app, i.e. BEFORE the switch-over. None if it can't be had (then it waits for an upload, as before)."""
+        from . import Legacy
+        import anvil
+        import anvil.http
+        try:
+            media = anvil.http.request("%s/_/api/menu/%s/%s" % (OLD_CLIENT, old_rest, key), timeout=60)
+        except Exception as e:
+            print("menu file fetch failed:", key, e)
+            return None
+        if media is None or not hasattr(media, "get_bytes"):
+            return None
+        ctype = (getattr(media, "content_type", "") or "").split(";")[0].strip().lower()
+        raw = media.get_bytes()
+        ext = {"application/pdf": "pdf", "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}.get(ctype)
+        if not raw or not ext:
+            return None
+        media = anvil.BlobMedia(ctype, raw, name="menu-%s.%s" % (key[:8], ext))
+        return None if Legacy._check_file(media) else media
 
     def gallery(self):
         from . import Media

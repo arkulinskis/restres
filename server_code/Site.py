@@ -292,7 +292,7 @@ def _view(r, s):
 def _reply(r, s):
     today = B.local_now(r).date()
     return {"ok": True, "nav": _nav(r), "site": _view(r, s), "palettes": PALETTES, "photos": [MD.view(p) for p in MD.all_photos(r)],
-            "storage": "cloudinary" if MD.cloudinary() else "planplate", "origin": anvil.server.get_app_origin(),
+            "storage": MD._storage(), "origin": anvil.server.get_app_origin(),
             "counts": {"menu": len(list(app_tables.menu_items.search(restaurant=r))), "gallery": len(MD.gallery_photos(r)),
                        "specials": len(BD.specials_on(r, today)), "events": len(BD.public_events(r, today)),
                        "post": BD.latest_post(r, today) is not None},
@@ -609,7 +609,7 @@ class Render(object):
     def src(self, row, which="url"):
         if row is None:
             return ""
-        if self.mode == "download" and row["provider"] != "cloudinary":
+        if self.mode == "download" and row["provider"] not in ("cloudinary", "cloudflare"):
             self.used[row["key"]] = row
             if which == "poster_url" and (row["key"] + ":poster") in self.local:
                 return self.local[row["key"] + ":poster"]
@@ -1143,8 +1143,8 @@ def load_demo_site(rid):
     keys = {}
     origin = anvil.server.get_app_origin()
     for name, caption, gallery in DEMO_PHOTOS:
-        # With the Cloudinary account connected the demo's photos live there, like every restaurant's uploads.
-        row = MD.upload_remote(r, "%s/_/theme/%s" % (origin, name), caption, gallery) if MD.cloudinary() else None
+        # With Cloudflare (or Cloudinary) connected the demo's photos live there, like every restaurant's uploads.
+        row = MD.upload_remote(r, "%s/_/theme/%s" % (origin, name), caption, gallery) if MD.remote() else None
         if row is None:
             row = have.get(name) or MD._new_row(r, kind="image", provider="example", url=name, caption=caption, in_gallery=gallery,
                                                 format="webp", width=1600.0, height=1067.0)

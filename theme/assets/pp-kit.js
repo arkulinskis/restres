@@ -1,7 +1,7 @@
 /* pp-kit.js: PlanPlate's browser helpers, reached from Python as window.PP (client_code/pp.py wraps them).
    Dates as "YYYY-MM-DD" strings in the restaurant's local time, the time-zone search field (PP.tzField: wired once
-   on document), QR codes (qrcode-generator from cdnjs), clipboard, and photo/video uploads (Cloudinary signed direct
-   upload, or shrunk on the device and sent to PlanPlate). The pages themselves are Anvil Forms. */
+   on document), QR codes (qrcode-generator from cdnjs), clipboard, and photo/video uploads (Cloudflare or Cloudinary
+   signed direct upload, or shrunk on the device and sent to PlanPlate). The pages themselves are Anvil Forms. */
 (function () {
   if (window.PP && window.PP.__v) return;
   var PP = window.PP = { __v: 2 };
@@ -319,8 +319,8 @@
   // ---------- Photos and videos (gallery, website, specials, photo of the day, events)
   // PP.upload(file, emit, meta) → Promise of the saved photo {key, url, thumb_url, ...}.
   // The page's form answers the media_* events (pp_ui.mount does it when given the restaurant id):
-  //   media_ticket {kind} → where to upload: Cloudinary (signed form) or PlanPlate
-  //   media_register {info, meta} (after a Cloudinary upload)   media_upload {image, thumb, ...}   media_video {poster, ...} (+ PP._file)
+  //   media_ticket {kind} → where to upload: Cloudflare (signed PUT links), Cloudinary (signed form) or PlanPlate
+  //   media_cf {key, kind, thumb, ...} (after a Cloudflare upload)   media_register {info, meta} (after a Cloudinary upload)   media_upload {image, thumb, ...}   media_video {poster, ...} (+ PP._file)
   //   media_list → {photos}
   PP.pickFiles = function (accept, multiple) {
     return new Promise(function (resolve) {
@@ -359,6 +359,13 @@
       });
     });
   };
+  function toBlob(dataUrl) {
+    var m = /^data:([^;]+);base64,(.*)$/.exec(dataUrl || '');
+    if (!m) return null;
+    var bin = atob(m[2]), out = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return new Blob([out], { type: m[1] });
+  }
   function videoPoster(file) {
     return new Promise(function (resolve) {
       var v = document.createElement('video'), url = URL.createObjectURL(file), done = false;
@@ -387,6 +394,34 @@
       if (!t || t.ok === false) throw new Error((t && t.error) || 'Upload failed.');
       var maxMb = video ? t.max_video_mb : t.max_image_mb;
       if (video && file.size > maxMb * 1048576) throw new Error('That video is ' + Math.round(file.size / 1048576) + ' MB; the limit is ' + maxMb + ' MB. Shorten it, or use a YouTube link.');
+      if (t.provider === 'cloudflare') {
+        // PUT straight to the media Worker with the signed links: the file (photos shrunk to 2000px) + a preview
+        // (600px, or the video's poster frame), then the server checks they arrived (register_cloudflare).
+        var put = function (url, blob) {
+          return fetch(url, { method: 'PUT', body: blob, headers: { 'Content-Type': blob.type } }).then(function (r) {
+            return r.json().catch(function () { return {}; }).then(function (j) {
+              if (!r.ok || !j.ok) throw new Error(j.error || 'The photo host refused that file.');
+              return j;
+            });
+          });
+        };
+        var main, thumb, dims;
+        if (video) {
+          main = Promise.resolve(file);
+          thumb = videoPoster(file).then(function (pv) { dims = pv; return pv.dataUrl ? toBlob(pv.dataUrl) : null; });
+        } else {
+          main = PP.shrinkImage(file, 2000, 0.86).then(function (s) { dims = s; return s.blob || toBlob(s.dataUrl); });
+          thumb = PP.shrinkImage(file, 600, 0.8).then(function (s) { return s.blob || toBlob(s.dataUrl); });
+        }
+        return Promise.all([main, thumb]).then(function (b) {
+          var preview = b[1] ? put(t.thumb_put, b[1]).then(function () { return true; }, function () { return false; }) : false;
+          return Promise.all([put(t.put, b[0]), preview]);
+        }).then(function (done) {
+          dims = dims || {};
+          return emit('media_cf', Object.assign({ key: t.key, kind: video ? 'video' : 'image', thumb: done[1] === true,
+                                                  width: dims.w || null, height: dims.h || null }, meta));
+        });
+      }
       if (t.provider === 'cloudinary') {
         var body = video ? Promise.resolve(file) : PP.shrinkImage(file, 2000, 0.88).then(function (s) { return s.blob || file; });
         return body.then(function (blob) {

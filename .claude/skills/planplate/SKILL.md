@@ -51,7 +51,7 @@ client_code/
   router.py         PAGES / NAV / PUBLIC (#book #r #menu: no app chrome) / RESTAURANT (#<page>/<restaurant id>[/more])
   state.py, auth.py the template's helpers (call, toast, store, set_attr, sign in/up/Google)
   pp.py             TABS + roles (can), dates, links (book_url, menu_url, manage_url), QR (qr_svg, qr_png), copy,
-                    time_input (browser time picker on a TextBox), html_class, upload() (Cloudinary or PlanPlate)
+                    time_input (browser time picker on a TextBox), html_class, upload() (Cloudflare, Cloudinary or PlanPlate)
   i18n.py           every guest text in en/fr/lv: T(key, **vars), set_lang
   site_model.py     the website builder's form data (Model.get/set by dotted path) and its sections
   Layouts/Shell     header (Restaurants, approvals bell polled by a Timer, account menu), footer, guest footer
@@ -64,10 +64,10 @@ client_code/
   Dialogs/          BookingEditor WalkIn DaySheet NewRestaurant PeriodEditor SpecialEditor QuickHours SpecialDish PostPhoto
                     PhotoPicker EventEditor DishEditor SectionEditor GuestCard
 theme/assets/       app.css (template tokens set to PlanPlate's look + --pp-* aliases + each page's styles),
-                    pp-kit.js (window.PP: dates, time-zone search field, QR, Cloudinary upload, .ics), pp-timeline.js,
+                    pp-kit.js (window.PP: dates, time-zone search field, QR, Cloudflare/Cloudinary upload, .ics), pp-timeline.js,
                     pp-floor.js, planplate-gallery.js (the <planplate-gallery> web component), photos, icons
 server_code/        Booking (rules engine), Portal (manager callables), Public (guest callables, /embed.js),
-                    Menu, Board (Today, specials, posts, events), Media (Cloudinary or Anvil media, /photo, /gallery feed),
+                    Menu, Board (Today, specials, posts, events), Media (Cloudflare R2, Cloudinary or Anvil media, /photo, /gallery feed),
                     Site (website builder, /_/api/site/<path>), Notify (emails), Guests (guest book), GuestNews
                     (PlanPlate's own booking tick + optional news list, /_/api/news/stop/<token>), DemoData (Maison
                     Lumière), Legacy (old PlanPlate endpoints + menu files), Accounts/Admin/Feedback/common (template),
@@ -153,6 +153,17 @@ restaurant's Settings has its **Old PlanPlate ID** (the old uuid, column `legacy
   were loaded from. Test page: `maison-lumiere-site/old-code.html`.
 - Gallery feed `/_/api/gallery/<id>`; Cloudinary uploads go to `restaurants/<id>/`. Media.cloudinary() reads
   `cloudinary_url` or the old three secrets `cloudinary_cloud` + `cloudinary_api` + `cloudinary_secret`.
+- **Photos on Cloudflare (Nov 17 2026):** with the app secret `cloudflare_media` (value in ~/.planplate/cloudflare_media.txt,
+  `https://<signing key>@planplate-media.addanapp.workers.dev`) new uploads go to R2 bucket `planplate-media` through the
+  Worker `tools/cloudflare/worker.js` (deploy + live test: `python -I tools/cloudflare/deploy.py`). The browser shrinks
+  photos (2000px + 600px preview; videos + poster frame, up to 90 MB) and PUTs them with HMAC-signed links from
+  `media_ticket`; `register_cloudflare` checks they arrived (`?meta`). Rows: provider `cloudflare`, url = public address,
+  version `t` = preview at url + "-thumb", public_id kept (old gallery ids). With Cloudflare on, Cloudinary is NEVER written
+  to or deleted from (the old apps + dilettante.lv still use it). Admin -> Photos & email: "Move photos to Cloudflare"
+  (`media_move`, copies at today's Cloudinary sizes; PlanPlate-stored files are uploaded and dropped from the table),
+  "Put back on Cloudinary" (`media_unmove`, from app_settings `cloudinary_backup`), and a test email (Anvil email).
+- dilettante.lv uses BOTH old hosts: client.planplate.com (booking iframe + postMessage origin check, hours, menus) and
+  restaurant.planplate.com (`planplate-gallery.js` + `/_/api/gallery/<id>` feed).
 Old behaviours ported: special day "open, no online bookings" (`special_days.no_online`), guest note per language
 (`restaurants.form_notes`). The demo has the made-up old id 4d2c1f0a-9b7e-4c3d-8a6f-2e5b7c9d1a30.
 **Moving the old data (the user chose CSV, Nov 2026):** Admin -> Old PlanPlate (`server_code/OldImport.py`). The

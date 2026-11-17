@@ -44,7 +44,7 @@ class Gallery(GalleryTemplate):
     def _draw(self):
         D = self.D
         self.rnav.show(D["nav"])
-        self.storage_badge.text = "Stored on Cloudinary" if D["storage"] == "cloudinary" else "Stored by PlanPlate"
+        self.storage_badge.text = {"cloudflare": "Stored on Cloudflare", "cloudinary": "Stored on Cloudinary"}.get(D["storage"], "Stored by PlanPlate")
         g = self._in()
         o = [p for p in D["photos"] if p not in g]
         self.count_label.text = state.plural(len(g), "photo") + " · in this order"
