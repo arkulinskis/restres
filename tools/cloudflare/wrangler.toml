@@ -1,0 +1,10 @@
+# The planplate-media Worker: PlanPlate's photos and videos in the R2 bucket "planplate-media".
+# Deploy with tools/cloudflare/deploy.py (it runs `wrangler deploy` here). The secret SIGNING_KEY is set by deploy.py.
+name = "planplate-media"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "planplate-media"

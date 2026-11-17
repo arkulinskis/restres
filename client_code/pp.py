@@ -145,12 +145,14 @@ def _call(name, *args):
 
 
 def media_emitter(rid):
-    """The function pp-kit.js's PP.upload calls for each step (media_ticket, media_register, media_upload, media_video)."""
+    """The function pp-kit.js's PP.upload calls for each step (media_ticket, media_cf, media_register, media_upload, media_video)."""
 
     def emit(event, payload_json):
         p = json.loads(payload_json) if payload_json else {}
         if event == "media_ticket":
             return _call("media_ticket", rid, p.get("kind") or "image")
+        if event == "media_cf":
+            return _call("register_cloudflare", rid, p)
         if event == "media_register":
             return _call("register_upload", rid, p.get("info"), p.get("meta"))
         if event == "media_upload":
@@ -165,7 +167,7 @@ def media_emitter(rid):
 
 
 def upload(rid, accept="image/*", multiple=False, meta=None, progress=None):
-    """Let the person pick photo(s) or a video and upload them (Cloudinary when set up, else PlanPlate).
+    """Let the person pick photo(s) or a video and upload them (Cloudflare or Cloudinary when set up, else PlanPlate).
     Returns a list of {ok, photo | error, name} (empty if they cancelled). Blocks until done."""
     on_each = None
     if progress is not None:

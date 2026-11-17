@@ -9,6 +9,8 @@ Add tests for every new server function: the happy path, bad input, and someone 
 import datetime as dt
 import importlib
 import json
+import re
+import time
 import os
 import pathlib
 import shutil
@@ -576,6 +578,89 @@ assert not MD.register_upload(rid, dict(good, secure_url='https://evil.example/x
 del anvil.http.CALLS[:]
 ok(MD.delete_photo(rid, cl['id']))
 assert anvil.http.CALLS and anvil.http.CALLS[0]['url'].endswith('/demo-cloud/image/destroy') and anvil.http.CALLS[0]['data']['public_id'] == pid
+# Cloudflare wins over Cloudinary: signed PUT links, files checked in the bucket, Cloudinary never deleted from
+import hmac as _hmac, urllib.parse as _up
+CF_KEY = 'ab' * 32
+BUCKET = {}
+def _fake_worker(url, method, data):
+    u = _up.urlparse(url); q = dict(_up.parse_qsl(u.query)); obj = u.path[1:]
+    if method == 'GET' and 'meta' in q:
+        if obj not in BUCKET:
+            return anvil.http.HttpError(404, '{"ok": false}')
+        return {'ok': True, 'size': BUCKET[obj]['size'], 'type': BUCKET[obj]['type']}
+    extra = {'PUT': [q.get('max'), q.get('kind')], 'POST': [q.get('max'), q.get('from')], 'DELETE': ['']}[method]
+    want = _hmac.new(CF_KEY.encode(), '\n'.join([method, obj, q['exp']] + extra).encode(), hashlib.sha256).hexdigest()
+    if want != q.get('sig') or int(q['exp']) < time.time():
+        return anvil.http.HttpError(403, 'bad signature')
+    if method == 'DELETE':
+        BUCKET.pop(obj, None); return {'ok': True}
+    if method == 'POST':
+        t = 'video/mp4' if '/video/' in q['from'] and not obj.endswith('-thumb') else ('image/jpeg' if obj.endswith('-thumb') else 'image/webp')
+        BUCKET[obj] = {'size': 321, 'type': t, 'from': q['from']}
+        return {'ok': True, 'size': 321, 'type': t}
+    BUCKET[obj] = {'size': len(data.get_bytes()), 'type': data.content_type}
+    return {'ok': True, 'size': BUCKET[obj]['size'], 'type': data.content_type}
+anvil.http.REPLIES['https://planplate-media.test/'] = _fake_worker
+anvil.secrets.SECRETS['cloudflare_media'] = 'https://%s@planplate-media.test' % CF_KEY
+t = ok(MD.media_ticket(rid, 'image'))
+assert t['provider'] == 'cloudflare' and re.match(r'^[0-9a-f]{32}$', t['key']) and t['put'].startswith('https://planplate-media.test/')
+assert ok(MD.get_gallery(rid))['storage'] == 'cloudflare' and ok(MD.get_gallery(rid))['limits']['video_mb'] == 90
+def _browser_put(link, ctype, body):  # what pp-kit.js does: PUT the bytes to the signed link
+    r = _fake_worker(link, 'PUT', anvil.BlobMedia(ctype, body))
+    assert not isinstance(r, anvil.http.HttpError), r
+_browser_put(t['put'], 'image/jpeg', b'j' * 900)
+_browser_put(t['thumb_put'], 'image/jpeg', b't' * 90)
+assert isinstance(_fake_worker(t['put'].replace(t['key'], 'f' * 32), 'PUT', anvil.BlobMedia('image/jpeg', b'x')), anvil.http.HttpError), 'a link is for its own file only'
+assert not MD.register_cloudflare(rid, {'key': 'f' * 32, 'kind': 'image'})['ok'], 'nothing uploaded under that key'
+cf = ok(MD.register_cloudflare(rid, {'key': t['key'], 'kind': 'image', 'thumb': True, 'width': 2000, 'height': 1333, 'caption': 'Bar', 'in_gallery': True}))['photo']
+assert cf['provider'] == 'cloudflare' and cf['url'].startswith('https://planplate-media.test/planplate/r') and cf['thumb_url'] == cf['url'] + '-thumb' and cf['size'] == 900
+assert not MD.register_cloudflare(rid, {'key': t['key'], 'kind': 'image'})['ok'], 'registered twice'
+assert any(x['url'] == cf['url'] for x in MD.feed(T.restaurants.get_by_id(rid))), 'the website gallery feed shows it'
+tv = ok(MD.media_ticket(rid, 'video'))
+_browser_put(tv['put'], 'video/mp4', b'v' * 2000)
+assert not MD.register_cloudflare(rid, {'key': tv['key'], 'kind': 'image'})['ok'], 'a video is not a photo'
+cv = ok(MD.register_cloudflare(rid, {'key': tv['key'], 'kind': 'video', 'thumb': True}))['photo']
+assert cv['kind'] == 'video' and cv['thumb_url'] == '' and cv['poster_url'] == '', 'no poster uploaded: no preview link'
+ok(MD.delete_photo(rid, cf['id']))
+assert not [k for k in BUCKET if t['key'] in k], 'deleting removes the file and its preview from the bucket'
+# moving: Cloudinary rows are copied (Cloudinary itself untouched), PlanPlate-stored rows uploaded, undo puts Cloudinary back
+mid = ok(P.create_restaurant('Move Test', 'UTC', False))['id']
+pcl = MD._new_row(T.restaurants.get_by_id(mid), kind='image', provider='cloudinary', public_id='restaurants/x/pic1', version='1784556836', format='jpg',
+                  url='https://res.cloudinary.com/demo-cloud/image/upload/v1784556836/restaurants/x/pic1.jpg', in_gallery=True)
+ppl = ok(MD.upload_photo(mid, {'image': PNG, 'thumb': PNG, 'width': 10, 'height': 10}))['photo']
+for fn in (MD.media_storage, MD.media_move, MD.media_unmove):
+    try:
+        fn(); raise AssertionError('not admin: %s' % fn.__name__)
+    except anvil.server.PermissionDenied:
+        pass
+was_admin = ana['is_admin']; ana['is_admin'] = True
+st = ok(MD.media_storage())
+assert st['storage'] == 'cloudflare' and st['counts'].get('cloudinary') == 1
+del anvil.http.CALLS[:]
+mv = ok(MD.media_move(25, mid))
+assert mv['left'] == 0 and not mv['errors'], mv
+assert not [c for c in anvil.http.CALLS if 'cloudinary.com/v1_1' in c['url']], 'nothing is sent to Cloudinary'
+pcl = T.photos.get(key=pcl['key'])
+assert pcl['provider'] == 'cloudflare' and pcl['version'] == 't' and pcl['public_id'] == 'restaurants/x/pic1', 'the feed keeps the old public_id'
+src = BUCKET[MD._cf_obj_of(pcl, MD.cloudflare())]['from']
+assert 'c_limit,w_1600,q_auto,f_auto' in src and BUCKET[MD._cf_obj_of(pcl, MD.cloudflare()) + '-thumb']['from'].count('c_fill,w_480'), 'copied at the sizes shown today'
+pp_row = T.photos.get(key=ppl['key'])
+assert pp_row['provider'] == 'cloudflare' and pp_row['media'] is None and pp_row['version'] == 't'
+ok(MD.delete_photo(mid, pcl.get_id()))  # a moved Cloudinary photo: only the Cloudflare copy goes
+assert not [c for c in anvil.http.CALLS if 'destroy' in c['url']]
+pcl2 = MD._new_row(T.restaurants.get_by_id(mid), kind='image', provider='cloudinary', public_id='restaurants/x/pic2', version='1', format='png',
+                   url='https://res.cloudinary.com/demo-cloud/image/upload/v1/restaurants/x/pic2.png')
+ok(MD.media_move(25, mid))
+assert T.photos.get(key=pcl2['key'])['provider'] == 'cloudflare'
+un = ok(MD.media_unmove())
+assert un['restored'] == 1 and un['left'] == 0
+back = T.photos.get(key=pcl2['key'])
+assert back['provider'] == 'cloudinary' and back['url'].endswith('/v1/restaurants/x/pic2.png') and back['format'] == 'png' and back['version'] == '1'
+ok(MD.delete_photo(mid, back.get_id()))
+assert not [c for c in anvil.http.CALLS if 'destroy' in c['url']], 'with Cloudflare on, Cloudinary is never deleted from'
+ok(MD.delete_photo(mid, pp_row.get_id())); ok(MD.delete_photo(rid, cv['id']))
+ana['is_admin'] = was_admin
+del anvil.secrets.SECRETS['cloudflare_media']
 del anvil.secrets.SECRETS['cloudinary_url']
 assert MD.media_ticket(rid)['provider'] == 'planplate'
 
@@ -1007,6 +1092,8 @@ def run_import(files, tz="Europe/Riga", only=None):
 
 
 OLD = "859d82ac-39b7-467c-ba3e-c1f60bdfb10f"
+# the old guest app still serves its menu files publicly: the import copies them (only Food is served here)
+anvil.http.REPLIES["https://client.planplate.com/_/api/menu/%s/ffffffff-bbbb-cccc-dddd-eeeeeeeeeeee" % OLD] = anvil.BlobMedia("application/pdf", b"%PDF-1.4 food", name="x")
 future = (TODAY + dt.timedelta(days=9)).isoformat()
 past = (TODAY - dt.timedelta(days=30)).isoformat()
 d12, d14 = TODAY + dt.timedelta(days=12), TODAY + dt.timedelta(days=14)
@@ -1031,7 +1118,7 @@ old_files = [
               [OLD, "3", "", "Ēriks", "", "eriks@example.com", future, "20:00", "", "False", "False", "False", "31111111-2222-3333-4444-555555555555", "", "", "deleted"],
               ["00000000-0000-0000-0000-000000000000", "2", "", "Nobody", "", "", future, "19:00", "", "", "", "", "41111111-2222-3333-4444-555555555555", "", "", ""]]),
     csv_file("menu_files.csv", ["restaurant", "menu_id", "file_description", "menu_file", "language"],
-             [[OLD, "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "Dzērieni", "", "lv"]]),
+             [[OLD, "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "Dzērieni", "", "lv"], [OLD, "ffffffff-bbbb-cccc-dddd-eeeeeeeeeeee", "Food", "", "en"]]),
     csv_file("gallery_flags.csv", ["restaurant_id", "public_id", "secure_url"],
              [[OLD, "restaurants/%s/terrace" % OLD, "https://res.cloudinary.com/dzqa1mwom/image/upload/v1/restaurants/%s/terrace.jpg" % OLD]]),
     csv_file("cloudinary_related.csv", ["resto_id", "gallery_title", "secondary_color", "theme", "framing", "background_options", "bg_color", "image_size", "motion_on_scroll"],
@@ -1139,6 +1226,7 @@ assert T.reservations.get(token="aaaa1111bbbb4ccc8ddd000000000001")["status"] ==
 as_user(dad)
 mf_rows = call("get_menu_files", dil.get_id())["files"]
 assert mf_rows[0]["missing"] is True
+assert [f for f in mf_rows if f["title"] == "Food"][0]["missing"] is False, "a menu file the old app still serves is copied by the import"
 ok(call("replace_menu_file", dil.get_id(), mf_rows[0]["id"], anvil.BlobMedia("application/pdf", b"%PDF-1.4 drinks", name="dzerieni.pdf")))
 assert anvil.server.ENDPOINTS["/menu/:ref/:key"](ref=OLD, key="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee").status == 200
 assert "Dzērieni" in anvil.server.ENDPOINTS["/menus/:ref/:lang"](ref=OLD, lang="lv").body

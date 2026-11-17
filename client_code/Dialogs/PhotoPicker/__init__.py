@@ -4,7 +4,7 @@ import anvil.server
 from ._anvil_designer import PhotoPickerTemplate
 from ... import pp, state
 
-STORAGE = {"cloudinary": "Stored on Cloudinary", "planplate": "Stored in PlanPlate"}
+STORAGE = {"cloudflare": "Stored on Cloudflare", "cloudinary": "Stored on Cloudinary", "planplate": "Stored in PlanPlate"}
 
 
 class PhotoPicker(PhotoPickerTemplate):

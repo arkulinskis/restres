@@ -9,6 +9,7 @@
         <a href="#admin/demo" anvil:name="tab_demo"><i class="ic ic-database"></i>Demo data</a>
         <a href="#admin/import" anvil:name="tab_import"><i class="ic ic-upload"></i>Old PlanPlate</a>
         <a href="#admin/news" anvil:name="tab_news"><i class="ic ic-mail"></i>News list</a>
+        <a href="#admin/storage" anvil:name="tab_storage"><i class="ic ic-image"></i>Photos &amp; email</a>
       </nav>
 
       <div anvil:name="overview_part">
@@ -84,6 +85,29 @@
             <anvil-component type="Button" name="news_csv_button" prop:text="Download the list (CSV)" prop:role='["btn", "btn-primary", "ic-download"]'></anvil-component>
           </div>
           <anvil-component type="Label" name="news_recent" prop:role='["ad-pre"]'></anvil-component>
+        </div>
+      </div>
+
+      <div anvil:name="storage_part">
+        <div class="ui-stack">
+          <div class="ui-card ui-narrow ad-storage ui-stack">
+            <h2 class="h3">Photo storage</h2>
+            <p class="muted">New photos and videos go to Cloudflare once the app secret <b>cloudflare_media</b> is set. Moving copies the existing ones there too; the files on Cloudinary are left exactly as they are (the old PlanPlate still shows them), and "Put back" points the moved Cloudinary photos at Cloudinary again.</p>
+            <anvil-component type="Label" name="storage_status" prop:role='["ad-pre"]'></anvil-component>
+            <div class="ui-row">
+              <anvil-component type="Button" name="move_button" prop:text="Move photos to Cloudflare" prop:role='["btn", "btn-primary", "ic-upload"]'></anvil-component>
+              <anvil-component type="Button" name="unmove_button" prop:text="Put back on Cloudinary" prop:role='["btn", "ic-refresh"]'></anvil-component>
+            </div>
+            <anvil-component type="Label" name="move_report" prop:role='["ad-pre"]' prop:visible="false"></anvil-component>
+          </div>
+          <div class="ui-card ui-narrow ad-email ui-stack">
+            <h2 class="h3">Email</h2>
+            <p class="muted">Booking emails (confirmations, changes, staff alerts, invites) go out through Anvil's email service. Send yourself a test to see how one arrives and whether it lands in spam. Anvil's plans include a set number of emails a month (Anvil -> Settings -> Email shows the use and the sending address).</p>
+            <div class="ui-row">
+              <anvil-component type="TextBox" name="test_email_box" prop:placeholder="you@example.com" prop:type="email"></anvil-component>
+              <anvil-component type="Button" name="test_email_button" prop:text="Send a test email" prop:role='["btn", "ic-mail"]'></anvil-component>
+            </div>
+          </div>
         </div>
       </div>
 

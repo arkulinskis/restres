@@ -70,6 +70,20 @@ def set_enabled(user_id, flag):
 
 
 @anvil.server.callable(require_user=True)
+def admin_test_email(to):
+    """Send one test email through Anvil's email service (Admin -> Photos & email), the same way booking emails go."""
+    C.require_admin()
+    to = str(to or "").strip()
+    if "@" not in to or len(to) > 200:
+        raise ValueError("That isn't an email address.")
+    from . import Notify
+    html = Notify._page("PlanPlate test email", ["This is a test from PlanPlate's Admin page.",
+                                                 "Booking confirmations, changes, staff alerts and invites go out the same way."])
+    Notify._send(to, "PlanPlate test email", "This is a test from PlanPlate's Admin page.", html)
+    return True
+
+
+@anvil.server.callable(require_user=True)
 def demo_load():
     C.require_admin()
     DemoData.load()

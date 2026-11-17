@@ -6,7 +6,7 @@ import anvil.media
 from ._anvil_designer import AdminTemplate
 from ... import pp, state
 
-TABS = ["overview", "feedback", "users", "demo", "import", "news"]
+TABS = ["overview", "feedback", "users", "demo", "import", "news", "storage"]
 
 
 class Admin(AdminTemplate):
@@ -18,9 +18,11 @@ class Admin(AdminTemplate):
         self.tab = args[0] if args and args[0] in TABS else "overview"
         self._filter = "new"
         parts = {"overview": self.overview_part, "feedback": self.feedback_part,
-                 "users": self.users_part, "demo": self.demo_part, "import": self.import_part, "news": self.news_part}
+                 "users": self.users_part, "demo": self.demo_part, "import": self.import_part, "news": self.news_part,
+                 "storage": self.storage_part}
         tabs = {"overview": self.tab_overview, "feedback": self.tab_feedback,
-                "users": self.tab_users, "demo": self.tab_demo, "import": self.tab_import, "news": self.tab_news}
+                "users": self.tab_users, "demo": self.tab_demo, "import": self.tab_import, "news": self.tab_news,
+                "storage": self.tab_storage}
         for name in TABS:
             parts[name].visible = name == self.tab
             tabs[name].classes["on"] = name == self.tab
@@ -102,6 +104,71 @@ class Admin(AdminTemplate):
         media = state.call("admin_news_csv")
         if media:
             anvil.media.download(media)
+
+    # ---- photo storage (Media.media_storage / media_move / media_unmove) + a test email
+    NAMES = {"cloudflare": "Cloudflare", "cloudinary": "Cloudinary", "planplate": "PlanPlate's own tables", "example": "built-in examples"}
+
+    def _storage(self):
+        d = state.call("media_storage")
+        if not d:
+            return
+        counts = ", ".join("%s on %s" % (n, self.NAMES.get(k, k)) for k, n in sorted(d["counts"].items())) or "no photos yet"
+        lines = ["New uploads go to: %s" % self.NAMES.get(d["storage"], d["storage"]), "Photos now: %s" % counts]
+        if d["cloudflare"]:
+            lines.append("Cloudflare address: %s" % d["cloudflare"])
+        self.storage_status.text = "\n".join(lines)
+        movable = d["counts"].get("cloudinary", 0) + d["counts"].get("planplate", 0)
+        self.move_button.enabled = bool(d["cloudflare"]) and movable > 0
+        self.unmove_button.visible = d["can_undo"] > 0
+
+    @handle("move_button", "click")
+    def move_button_click(self, **event_args):
+        if not confirm("Each photo and video is copied to Cloudflare and the app shows that copy from now on. Nothing is deleted on "
+                       "Cloudinary.", title="Move the photos to Cloudflare?", buttons=[("Cancel", False), ("Move", True)], role="app-dialog"):
+            return
+        self.move_button.enabled = False
+        self.move_report.visible = True
+        moved, errors = 0, []
+        while True:  # a few photos per server call (each call has a time limit), until none are left
+            r = state.call("media_move", 8)
+            if not r:
+                break
+            moved += r["moved"]
+            errors += r["errors"]
+            self.move_report.text = "Moving… %d done, %d to go" % (moved, r["left"])
+            if r["left"] == 0 or r["stuck"]:
+                break
+        lines = ["Moved %s." % state.plural(moved, "photo", "photos")]
+        if errors:
+            lines += ["", "Couldn't move (they keep working where they are; try again later):"] + ["  - " + e for e in errors[:20]]
+        self.move_report.text = "\n".join(lines)
+        self._storage()
+
+    @handle("unmove_button", "click")
+    def unmove_button_click(self, **event_args):
+        if not confirm("The photos that came from Cloudinary are shown from Cloudinary again (their Cloudflare copies stay, unused).",
+                       title="Put them back on Cloudinary?", buttons=[("Cancel", False), ("Put back", True)], role="app-dialog"):
+            return
+        n = 0
+        while True:
+            r = state.call("media_unmove", 100)
+            if not r:
+                break
+            n += r["restored"]
+            if r["left"] == 0:
+                break
+        self.move_report.visible = True
+        self.move_report.text = "Put back %s." % state.plural(n, "photo", "photos")
+        self._storage()
+
+    @handle("test_email_button", "click")
+    def test_email_button_click(self, **event_args):
+        to = (self.test_email_box.text or "").strip()
+        if "@" not in to:
+            state.toast("Type an email address first", "error")
+            return
+        if state.call("admin_test_email", to):
+            state.toast("Sent to %s. Check the inbox (and spam)." % to, "ok")
 
     # ---- demo data
     def _demo(self):

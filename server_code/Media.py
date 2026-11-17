@@ -1,6 +1,13 @@
 # Media — Server Module. Photos and videos for the gallery, the website, specials, photo of the day and events.
 #
 # Where the files live:
+#   - Cloudflare R2 (provider "cloudflare"), when the app secret "cloudflare_media" is set
+#     (https://<signing key>@planplate-media.<subdomain>.workers.dev; the Worker is tools/cloudflare/worker.js).
+#     The browser shrinks a photo (2000px + a 600px preview, or a video + its poster frame) and uploads straight to the
+#     Worker with links signed here (media_ticket); register_cloudflare checks the files arrived. Rows keep the public
+#     address in url; version "t" = there's a preview at url + "-thumb". It wins over Cloudinary for NEW uploads, and
+#     Cloudinary is then never written to or deleted from (the old PlanPlate and dilettante.lv still show those files):
+#     Admin -> Photo storage copies existing photos across (media_move) and can put them back (media_unmove).
 #   - Cloudinary (the image host behind dilettante.lv's gallery), when the app secret "cloudinary_url" is set
 #     (cloudinary://API_KEY:API_SECRET@CLOUD_NAME). The browser uploads straight to Cloudinary with a signature
 #     made here (media_ticket), then tells us what it uploaded (register_upload); we check Cloudinary's signature.
@@ -29,6 +36,7 @@ VIDEO_TYPES = {"video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov
 MAX_IMAGE = 6 * 1024 * 1024
 MAX_THUMB = 800 * 1024
 MAX_VIDEO = 40 * 1024 * 1024       # stored in PlanPlate; Cloudinary's free plan takes up to 100 MB
+MAX_VIDEO_CF = 90 * 1024 * 1024    # Cloudflare: the Worker takes requests up to 100 MB
 MAX_PHOTOS = 500                   # per restaurant
 
 GALLERY_CHOICES = {
@@ -65,6 +73,72 @@ def cloudinary():
     return None
 
 
+def cloudflare():
+    """{"base": "https://planplate-media.x.workers.dev", "key": signing key} from the app secret "cloudflare_media", or None."""
+    m = re.match(r"^(https://)([0-9a-f]{32,128})@([\w.-]+)/?$", _secret("cloudflare_media"))
+    return {"base": m.group(1) + m.group(3), "key": m.group(2)} if m else None
+
+
+def remote():
+    """True when uploads go to a photo host (Cloudflare or Cloudinary) rather than into PlanPlate's own tables."""
+    return bool(cloudflare() or cloudinary())
+
+
+def cf_link(cf, method, obj, ttl=900, **extra):
+    """A signed address on the media Worker: PUT (extra max + kind), POST copy (max + from) or DELETE (none)."""
+    import hmac
+    import urllib.parse
+    exp = int(time.time()) + ttl
+    parts = {"PUT": ["max", "kind"], "POST": ["max", "from"], "DELETE": []}[method]
+    text = "\n".join([method, obj, str(exp)] + [str(extra[p]) for p in parts]) if parts else "\n".join([method, obj, str(exp), ""])
+    sig = hmac.new(cf["key"].encode(), text.encode(), hashlib.sha256).hexdigest()
+    q = dict(((p, extra[p]) for p in parts), exp=exp, sig=sig)
+    return "%s/%s?%s" % (cf["base"], obj, urllib.parse.urlencode(q))
+
+
+def cf_object(r, key):
+    return "%s/%s" % (folder(r), key)
+
+
+def _cf_obj_of(row, cf):
+    """The bucket key of a cloudflare row (its url without the Worker's address), or ''."""
+    u = row["url"] or ""
+    return u[len(cf["base"]) + 1:] if cf and u.startswith(cf["base"] + "/") else ""
+
+
+def _cf_meta(cf, obj):
+    """{size, type} of a file in the bucket, or None if it isn't there."""
+    import anvil.http
+    try:
+        m = anvil.http.request("%s/%s?meta=1" % (cf["base"], obj), json=True)
+    except Exception:
+        return None
+    return m if isinstance(m, dict) and m.get("ok") else None
+
+
+def _cf_delete(cf, obj):
+    import anvil.http
+    try:
+        anvil.http.request(cf_link(cf, "DELETE", obj), method="DELETE", json=True)
+        return True
+    except Exception as e:
+        print("cloudflare delete failed:", obj, e)
+        return False
+
+
+def _cf_copy(cf, obj, source_url, limit):
+    """The Worker fetches source_url into obj. Returns {size, type} or raises."""
+    import anvil.http
+    return anvil.http.request(cf_link(cf, "POST", obj, max=limit, **{"from": source_url}), method="POST", json=True)
+
+
+def _cf_put(cf, obj, media, kind, limit):
+    """Upload bytes we hold (a photo stored in PlanPlate) to obj. Returns {size, type} or raises."""
+    import anvil.http
+    return anvil.http.request(cf_link(cf, "PUT", obj, max=limit, kind=kind), method="PUT", data=media,
+                              headers={"Content-Type": media.content_type}, json=True)
+
+
 def sign(params, secret):
     """Cloudinary's request signature: the parameters sorted by name, joined with &, then the secret, SHA-1."""
     text = "&".join("%s=%s" % (k, params[k]) for k in sorted(params) if params[k] not in (None, ""))
@@ -86,6 +160,10 @@ def urls(row, origin=None):
     """Where a photo or video can be seen: url (full size), thumb_url (square-ish preview), poster_url (videos)."""
     origin = origin or anvil.server.get_app_origin()
     p, video = row["provider"], row["kind"] == "video"
+    if p == "cloudflare":
+        u = row["url"] or ""
+        thumb = u + "-thumb" if row["version"] == "t" else ("" if video else u)
+        return {"url": u, "thumb_url": thumb, "poster_url": thumb if video else ""}
     if p == "cloudinary":
         u = row["url"] or ""
         if video:
@@ -133,7 +211,8 @@ def _new_row(r, **fields):
     last = max([int(p["position"] or 0) for p in app_tables.photos.search(restaurant=r)] or [-1])
     u = anvil.users.get_user()
     fields.setdefault("in_gallery", False)
-    return app_tables.photos.add_row(restaurant=r, key=uuid.uuid4().hex, position=last + 1, created=B.now_utc(), by=u, **fields)
+    key = fields.pop("key", None) or uuid.uuid4().hex
+    return app_tables.photos.add_row(restaurant=r, key=key, position=last + 1, created=B.now_utc(), by=u, **fields)
 
 
 def _clean_caption(text):
@@ -199,7 +278,11 @@ def clean_style(data, old=None):
 
 # ---------------------------------------------------------------- manager callables
 def _storage():
-    return "cloudinary" if cloudinary() else "planplate"
+    return "cloudflare" if cloudflare() else ("cloudinary" if cloudinary() else "planplate")
+
+
+def _video_mb():
+    return (MAX_VIDEO_CF if cloudflare() else (100 * 1048576 if cloudinary() else MAX_VIDEO)) // 1048576
 
 
 @anvil.server.callable(require_user=True)
@@ -217,13 +300,21 @@ def get_gallery(rid):
     return {"ok": True, "nav": _nav(r), "photos": [view(p) for p in all_photos(r)], "storage": _storage(),
             "style": gallery_style(s), "slug": r["slug"], "origin": origin,
             "feed_url": origin + "/_/api/gallery/" + r["slug"], "script_url": origin + "/_/theme/planplate-gallery.js",
-            "limits": {"image_mb": MAX_IMAGE // 1048576, "video_mb": MAX_VIDEO // 1048576 if not cloudinary() else 100}}
+            "limits": {"image_mb": MAX_IMAGE // 1048576, "video_mb": _video_mb()}}
 
 
 @anvil.server.callable(require_user=True)
 def media_ticket(rid, kind="image"):
-    """How the browser should upload: straight to Cloudinary (with a signed form), or to PlanPlate."""
+    """How the browser should upload: straight to Cloudflare or Cloudinary (signed), or to PlanPlate."""
     r = _rest(rid)
+    cf = cloudflare()
+    if cf is not None:
+        key, video = uuid.uuid4().hex, kind == "video"
+        obj = cf_object(r, key)
+        return {"ok": True, "provider": "cloudflare", "key": key,
+                "put": cf_link(cf, "PUT", obj, max=MAX_VIDEO_CF if video else MAX_IMAGE, kind="video" if video else "image"),
+                "thumb_put": cf_link(cf, "PUT", obj + "-thumb", max=MAX_THUMB * 2, kind="image"),
+                "max_video_mb": MAX_VIDEO_CF // 1048576, "max_image_mb": MAX_IMAGE // 1048576}
     cl = cloudinary()
     if cl is None:
         return {"ok": True, "provider": "planplate", "max_video_mb": MAX_VIDEO // 1048576, "max_image_mb": MAX_IMAGE // 1048576}
@@ -235,8 +326,22 @@ def media_ticket(rid, kind="image"):
 
 
 def upload_remote(r, source_url, caption="", in_gallery=False):
-    """Copy a picture that is online (e.g. one of the app's own theme pictures) into the restaurant's Cloudinary folder,
-    server-side (Cloudinary fetches it). Returns the new photo row, or None when Cloudinary isn't set up or refuses."""
+    """Copy a picture that is online (e.g. one of the app's own theme pictures) into the restaurant's Cloudflare or
+    Cloudinary folder, server-side (the host fetches it). Returns the new photo row, or None when neither is set up or
+    the copy fails."""
+    cf = cloudflare()
+    if cf is not None:
+        key = uuid.uuid4().hex
+        try:
+            info = _cf_copy(cf, cf_object(r, key), source_url, MAX_IMAGE)
+        except Exception as e:
+            print("cloudflare copy failed:", source_url, e)
+            return None
+        if not isinstance(info, dict) or str(info.get("type") or "") not in IMAGE_TYPES:
+            return None
+        return _new_row(r, key=key, kind="image", provider="cloudflare", url="%s/%s" % (cf["base"], cf_object(r, key)),
+                        format=IMAGE_TYPES[info["type"]], version="", caption=_clean_caption(caption),
+                        in_gallery=bool(in_gallery), size=_num(info.get("size")))
     cl = cloudinary()
     if cl is None:
         return None
@@ -283,6 +388,38 @@ def register_upload(rid, info, meta=None):
                        in_gallery=bool(meta.get("in_gallery")) and kind == "image",
                        width=_num(info.get("width")), height=_num(info.get("height")), size=_num(info.get("bytes")))
     except ValueError as e:
+        return {"ok": False, "error": str(e)}
+    return {"ok": True, "photo": view(row)}
+
+
+@anvil.server.callable(require_user=True)
+def register_cloudflare(rid, data):
+    """Record a file the browser uploaded to Cloudflare with media_ticket's links: {key, kind, thumb, width, height,
+    caption, in_gallery}. We look the file up in the bucket (so nothing that didn't arrive gets a row)."""
+    r = _rest(rid)
+    cf = cloudflare()
+    data = dict(data or {})
+    if cf is None:
+        return {"ok": False, "error": "Cloudflare isn't set up for this app."}
+    key = str(data.get("key") or "")
+    if not re.match(r"^[0-9a-f]{32}$", key) or app_tables.photos.get(key=key) is not None:
+        return {"ok": False, "error": "That upload couldn't be checked. Please try again."}
+    video = data.get("kind") == "video"
+    obj = cf_object(r, key)
+    meta = _cf_meta(cf, obj)
+    types = VIDEO_TYPES if video else IMAGE_TYPES
+    if meta is None or meta.get("type") not in types:
+        return {"ok": False, "error": "That upload couldn't be checked. Please try again."}
+    thumb = bool(data.get("thumb")) and _cf_meta(cf, obj + "-thumb") is not None
+    try:
+        row = _new_row(r, key=key, kind="video" if video else "image", provider="cloudflare", url="%s/%s" % (cf["base"], obj),
+                       format=types[meta["type"]], version="t" if thumb else "", caption=_clean_caption(data.get("caption")),
+                       in_gallery=bool(data.get("in_gallery")) and not video, width=_num(data.get("width")),
+                       height=_num(data.get("height")), size=_num(meta.get("size")))
+    except ValueError as e:
+        _cf_delete(cf, obj)
+        if thumb:
+            _cf_delete(cf, obj + "-thumb")
         return {"ok": False, "error": str(e)}
     return {"ok": True, "photo": view(row)}
 
@@ -376,7 +513,14 @@ def delete_photo(rid, pid):
     for table in (app_tables.specials, app_tables.posts, app_tables.events):
         for x in table.search(restaurant=r, photo=row):
             x["photo"] = None
-    if row["provider"] == "cloudinary":
+    cf = cloudflare()
+    if row["provider"] == "cloudflare" and cf is not None:
+        obj = _cf_obj_of(row, cf)
+        if obj:
+            _cf_delete(cf, obj)
+            if row["version"] == "t":
+                _cf_delete(cf, obj + "-thumb")
+    elif row["provider"] == "cloudinary" and cf is None:  # with Cloudflare on, Cloudinary is a read-only archive
         _destroy(row)
     row.delete()
     return {"ok": True, "photos": [view(p) for p in all_photos(r)]}
@@ -405,6 +549,105 @@ def save_gallery_style(rid, style):
     s = site_row(r)
     s["gallery"] = clean_style(dict(style or {}), gallery_style(s))
     return {"ok": True, "style": gallery_style(s)}
+
+
+# ---------------------------------------------------------------- admin: moving photos to Cloudflare (and back)
+BACKUP = "cloudinary_backup"   # app_settings: {photo key: {"url", "version", "format", "size"}} of every moved Cloudinary row
+
+
+def _admin():
+    from . import common
+    common.require_admin()
+
+
+def _movable(row):
+    return row["provider"] in ("cloudinary", "planplate")
+
+
+@anvil.server.callable(require_user=True)
+def media_storage():
+    """Admin -> Photo storage: where new uploads go and how many photos sit where."""
+    _admin()
+    from . import common
+    counts = {}
+    for p in app_tables.photos.search():
+        counts[p["provider"] or "planplate"] = counts.get(p["provider"] or "planplate", 0) + 1
+    cf = cloudflare()
+    return {"ok": True, "storage": _storage(), "counts": counts, "cloudflare": cf["base"] if cf else "",
+            "cloudinary": bool(cloudinary()), "can_undo": len(common.get_setting(BACKUP) or {})}
+
+
+def _move_one(row, cf):
+    """Copy one photo/video (Cloudinary or stored in PlanPlate) into the bucket, then point the row there."""
+    r, video = row["restaurant"], row["kind"] == "video"
+    obj = cf_object(r, row["key"])
+    limit = MAX_VIDEO_CF if video else MAX_IMAGE
+    if row["provider"] == "cloudinary":
+        u = urls(row)  # the same sizes the website shows today (1600px, square 480 preview, video poster)
+        info = _cf_copy(cf, obj, u["url"], limit)
+        thumb = bool(u["thumb_url"]) and _cf_copy(cf, obj + "-thumb", u["thumb_url"], MAX_THUMB * 4) is not None
+    else:
+        if row["media"] is None:
+            raise ValueError("no file stored")
+        info = _cf_put(cf, obj, row["media"], "video" if video else "image", limit)
+        thumb = row["thumb"] is not None and _cf_put(cf, obj + "-thumb", row["thumb"], "image", MAX_THUMB * 4) is not None
+    t = str((info or {}).get("type") or "")
+    fmt = (VIDEO_TYPES if video else IMAGE_TYPES).get(t)
+    if not fmt:
+        raise ValueError("unexpected file type %r" % t)
+    upd = {"provider": "cloudflare", "url": "%s/%s" % (cf["base"], obj), "version": "t" if thumb else "", "format": fmt,
+           "size": _num(info.get("size"))}
+    if row["provider"] == "planplate":
+        upd.update(media=None, thumb=None)  # the copy is checked; PlanPlate's own copy isn't needed any more
+    return upd
+
+
+@anvil.server.callable(require_user=True)
+def media_move(limit=10, rid=None):
+    """Move up to `limit` photos (of one restaurant when rid is given) to Cloudflare (the Admin page calls this again until nothing is left). Cloudinary's
+    files stay where they are (the old PlanPlate still shows them); their addresses are kept for media_unmove."""
+    _admin()
+    from . import common
+    cf = cloudflare()
+    if cf is None:
+        return {"ok": False, "error": "Add the app secret cloudflare_media first."}
+    backup = dict(common.get_setting(BACKUP) or {})
+    only = {"restaurant": app_tables.restaurants.get_by_id(rid)} if rid else {}
+    todo = [p for p in app_tables.photos.search(**only) if _movable(p)]
+    moved, errors = 0, []
+    for row in todo[:max(1, min(int(limit or 10), 25))]:
+        try:
+            old = {"url": row["url"], "version": row["version"], "format": row["format"], "size": row["size"]}
+            upd = _move_one(row, cf)
+            if row["provider"] == "cloudinary":
+                backup[row["key"]] = old
+                common.set_setting(BACKUP, backup)
+            row.update(**upd)
+            moved += 1
+        except Exception as e:
+            errors.append("%s (%s): %s" % (row["caption"] or row["key"][:8], row["restaurant"]["name"] if row["restaurant"] else "?", e))
+            print("media_move failed:", row["key"], e)
+    left = len([p for p in app_tables.photos.search(**only) if _movable(p)])
+    return {"ok": True, "moved": moved, "left": left, "errors": errors, "stuck": bool(errors) and moved == 0}
+
+
+@anvil.server.callable(require_user=True)
+def media_unmove(limit=50):
+    """Undo media_move for photos that came from Cloudinary: point them at their Cloudinary files again (the copies in
+    Cloudflare are left alone). Photos that were stored in PlanPlate stay on Cloudflare."""
+    _admin()
+    from . import common
+    backup = dict(common.get_setting(BACKUP) or {})
+    done = 0
+    for key in list(backup)[:max(1, int(limit or 50))]:
+        row = app_tables.photos.get(key=key)
+        old = backup.pop(key)
+        if row is not None and row["provider"] == "cloudflare":
+            row.update(provider="cloudinary", url=old.get("url"), version=old.get("version"), format=old.get("format"),
+                       size=old.get("size"))
+            done += 1
+    common.set_setting(BACKUP, backup)
+    return {"ok": True, "restored": done, "left": len(backup)}
 
 
 # ---------------------------------------------------------------- public endpoints
