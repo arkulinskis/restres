@@ -7,3 +7,6 @@ Workflow, design rules and product knowledge: `.claude/skills/planplate/SKILL.md
 After a change, refresh the map: `python -I C:/Users/arkvi/Documents/CLAUDE/APP_MAKER/standard/app_map.py restres`.
 The app standard every app follows: C:/Users/arkvi/Documents/CLAUDE/APP_MAKER/standard/README.md.
 <!-- /app-standard -->
+
+**How-to guide** (for restaurant managers and staff, with screenshots): `docs/howto/`. After a change to a page, run
+`python -I tools/howto/howto.py stale` and update only the sections it names (steps in `docs/howto/README.md`).

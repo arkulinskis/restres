@@ -1,6 +1,6 @@
 // Drive headless Chrome over the DevTools protocol: load a URL, run steps, log console + exceptions.
 // node tools/live/drive.mjs <url> <steps.json> <outdir>   (outdir gets log.txt, screenshots and a fresh Chrome profile)
-// steps: [{wait: ms} | {eval: "js"} | {shot: "name", full: true} | {waitFor: "js expr", timeout: ms}]
+// steps: [{wait: ms} | {eval: "js"} | {shot: "name", full: true} | {shot: "name", selector: "css", pad: 12} | {waitFor: "js expr", timeout: ms}]
 // env WINDOW="390,844" sets the window size (default 1280,1000); SCALE=2 takes full-page shots at 2x pixels.
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
@@ -68,7 +68,13 @@ try {
     if (st.eval) say(`[eval] ${JSON.stringify(await evaluate(st.eval))}`.slice(0, 60000));
     if (st.shot) {
       let opts = { format: 'png' };
-      if (st.full) {
+      if (st.selector) {  // {shot, selector}: just that element (plus `pad` px), scrolled into view first
+        const box = await evaluate(`(() => { const e = Array.from(document.querySelectorAll(${JSON.stringify(st.selector)})).find(x => x.getBoundingClientRect().width > 0);
+          if (!e) return null; e.scrollIntoView({block: 'center'}); const r = e.getBoundingClientRect(), p = ${Number(st.pad ?? 12)};
+          return {x: Math.max(0, r.left + scrollX - p), y: Math.max(0, r.top + scrollY - p), width: Math.min(innerWidth, r.width + 2 * p), height: r.height + 2 * p}; })()`);
+        if (box && box.width) { await sleep(300); opts = { format: 'png', captureBeyondViewport: true, clip: { ...box, scale: 1 } }; }
+        else say(`[shot] ${st.shot}: selector not found, whole window instead`);
+      } else if (st.full) {
         const m = await send('Page.getLayoutMetrics');
         const [w] = (process.env.MOBILE || process.env.WINDOW || '1280,1000').split(',').map(Number);
         const h = Math.min(6000, Math.ceil(m.cssContentSize.height));

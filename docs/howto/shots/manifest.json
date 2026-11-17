@@ -1,0 +1,162 @@
+{
+ "book-editor": {
+  "section": "bookings",
+  "taken": "2026-11-17T13:30:42-05:00",
+  "commit": "fa78ed4"
+ },
+ "book-walkin": {
+  "section": "bookings",
+  "taken": "2026-11-17T13:30:42-05:00",
+  "commit": "fa78ed4"
+ },
+ "events-page": {
+  "section": "events",
+  "taken": "2026-11-17T13:27:55-05:00",
+  "commit": "fa78ed4"
+ },
+ "gallery-page": {
+  "section": "gallery",
+  "taken": "2026-11-17T13:27:55-05:00",
+  "commit": "fa78ed4"
+ },
+ "guest-book": {
+  "section": "guest-side",
+  "taken": "2026-11-17T13:31:26-05:00",
+  "commit": "fa78ed4"
+ },
+ "guest-menu": {
+  "section": "guest-side",
+  "taken": "2026-11-17T13:28:46-05:00",
+  "commit": "fa78ed4"
+ },
+ "guests-card": {
+  "section": "guests",
+  "taken": "2026-11-17T13:27:54-05:00",
+  "commit": "fa78ed4"
+ },
+ "guests-list": {
+  "section": "guests",
+  "taken": "2026-11-17T13:27:53-05:00",
+  "commit": "fa78ed4"
+ },
+ "hours-page": {
+  "section": "hours",
+  "taken": "2026-11-17T13:27:54-05:00",
+  "commit": "fa78ed4"
+ },
+ "hours-special": {
+  "section": "hours",
+  "taken": "2026-11-17T13:27:54-05:00",
+  "commit": "fa78ed4"
+ },
+ "menu-page": {
+  "section": "menu",
+  "taken": "2026-11-17T13:27:55-05:00",
+  "commit": "fa78ed4"
+ },
+ "phone-reservations": {
+  "section": "phone",
+  "taken": "2026-11-17T13:31:20-05:00",
+  "commit": "fa78ed4"
+ },
+ "phone-walkin": {
+  "section": "phone",
+  "taken": "2026-11-17T13:31:20-05:00",
+  "commit": "fa78ed4"
+ },
+ "profile-page": {
+  "section": "profile",
+  "taken": "2026-11-17T13:31:01-05:00",
+  "commit": "fa78ed4"
+ },
+ "res-approvals": {
+  "section": "reservations",
+  "taken": "2026-11-17T13:27:53-05:00",
+  "commit": "fa78ed4"
+ },
+ "res-list": {
+  "section": "reservations",
+  "taken": "2026-11-17T13:27:53-05:00",
+  "commit": "fa78ed4"
+ },
+ "res-timeline": {
+  "section": "reservations",
+  "taken": "2026-11-17T13:30:42-05:00",
+  "commit": "fa78ed4"
+ },
+ "res-upcoming": {
+  "section": "reservations",
+  "taken": "2026-11-17T13:27:53-05:00",
+  "commit": "fa78ed4"
+ },
+ "roles-tabs-manager": {
+  "section": "roles",
+  "taken": "2026-11-17T13:27:52-05:00",
+  "commit": "fa78ed4"
+ },
+ "roles-tabs-staff": {
+  "section": "roles",
+  "taken": "2026-11-17T13:28:17-05:00",
+  "commit": "fa78ed4"
+ },
+ "settings-approvals": {
+  "section": "settings",
+  "taken": "2026-11-17T13:27:56-05:00",
+  "commit": "fa78ed4"
+ },
+ "settings-page": {
+  "section": "settings",
+  "taken": "2026-11-17T13:27:56-05:00",
+  "commit": "fa78ed4"
+ },
+ "share-page": {
+  "section": "share",
+  "taken": "2026-11-17T13:30:42-05:00",
+  "commit": "fa78ed4"
+ },
+ "staff-dashboard": {
+  "section": "staff-view",
+  "taken": "2026-11-17T13:31:01-05:00",
+  "commit": "fa78ed4"
+ },
+ "staff-reservations": {
+  "section": "staff-view",
+  "taken": "2026-11-17T13:31:01-05:00",
+  "commit": "fa78ed4"
+ },
+ "start-dashboard": {
+  "section": "getting-started",
+  "taken": "2026-11-17T13:27:52-05:00",
+  "commit": "fa78ed4"
+ },
+ "start-landing": {
+  "section": "getting-started",
+  "taken": "2026-11-17T13:28:46-05:00",
+  "commit": "fa78ed4"
+ },
+ "start-signup": {
+  "section": "getting-started",
+  "taken": "2026-11-17T13:28:46-05:00",
+  "commit": "fa78ed4"
+ },
+ "tables-plan": {
+  "section": "tables",
+  "taken": "2026-11-17T13:27:55-05:00",
+  "commit": "fa78ed4"
+ },
+ "team-invite": {
+  "section": "team",
+  "taken": "2026-11-17T13:27:52-05:00",
+  "commit": "fa78ed4"
+ },
+ "today-page": {
+  "section": "today",
+  "taken": "2026-11-17T13:27:52-05:00",
+  "commit": "fa78ed4"
+ },
+ "website-page": {
+  "section": "website",
+  "taken": "2026-11-17T13:30:42-05:00",
+  "commit": "fa78ed4"
+ }
+}

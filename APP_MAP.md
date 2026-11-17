@@ -34,6 +34,8 @@ around them with an offset instead of whole files.
   `r[name]`, so the live app keeps working until the owner accepts the schema change.
 - **Design:** no eyebrow labels, no side stripes, nothing under 12 px; deliberate exceptions carry `design-ok: <rule>`.
   The checks: `APP_MAKER/tools/design_check.py restres` and `tools/ui_test.py --only design.js`.
+- **How-to guide** for users: `docs/howto/` (guide.json + sections/*.md + shots/), tool `tools/howto/howto.py` (stale / shoot <section> / build).
+  Update only the sections `stale` names; README there has the steps and the artifact URL.
 <!-- /NOTES -->
 
 ## Pages (`client_code/router.py`)

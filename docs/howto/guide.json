@@ -1,0 +1,442 @@
+{
+  "title": "PlanPlate how-to guide",
+  "subtitle": "Run bookings, the room and your restaurant's website: a guide for managers and staff.",
+  "live_origin": "https://planplate-test.anvil.app",
+  "readme": "Edit with docs/howto/README.md open. Order of sections = order in the guide. A shot: name (file docs/howto/shots/<name>.webp, used in the text as ![caption](shot:<name>)), as = guest | manager | staff, go = address ({rid} = the demo restaurant's id), optional do = JS run after the page is ready (async; H = tools/howto/helpers.js), selector = crop to that element, pad, full = whole page, window = phone, wait = extra ms. sources = the app files the section describes: `howto.py stale` flags the section when they change. live_origin replaces the local server's address in every shot.",
+  "sections": [
+    {
+      "id": "getting-started",
+      "title": "Getting started",
+      "who": "Everyone",
+      "sources": [
+        "client_code/Pages/Landing",
+        "client_code/Pages/Auth",
+        "client_code/Components/AuthBox",
+        "client_code/Pages/Dashboard",
+        "client_code/Items/RestaurantCard"
+      ],
+      "shots": [
+        {
+          "name": "start-landing",
+          "as": "guest",
+          "go": "#landing"
+        },
+        {
+          "name": "start-signup",
+          "as": "guest",
+          "go": "#auth/signup",
+          "selector": ".au-card",
+          "pad": 24
+        },
+        {
+          "name": "start-dashboard",
+          "as": "manager",
+          "go": "#dashboard"
+        }
+      ]
+    },
+    {
+      "id": "roles",
+      "title": "Who can do what",
+      "who": "Owners and managers",
+      "sources": [
+        "client_code/pp.py",
+        "client_code/Components/RestaurantNav",
+        "server_code/Portal.py"
+      ],
+      "shots": [
+        {
+          "name": "roles-tabs-manager",
+          "as": "manager",
+          "go": "#today/{rid}",
+          "selector": ".pp-subnav",
+          "pad": 8
+        },
+        {
+          "name": "roles-tabs-staff",
+          "as": "staff",
+          "go": "#today/{rid}",
+          "selector": ".pp-subnav",
+          "pad": 8
+        }
+      ]
+    },
+    {
+      "id": "team",
+      "title": "Give someone access by email",
+      "who": "Owners and managers",
+      "sources": [
+        "client_code/Pages/Settings",
+        "client_code/Items/TeamRow",
+        "server_code/Portal.py",
+        "server_code/Notify.py"
+      ],
+      "shots": [
+        {
+          "name": "team-invite",
+          "as": "manager",
+          "go": "#settings/{rid}",
+          "selector": "#st-team",
+          "do": "const box = H.$$('#st-team input').find(H.vis); H.type(box, 'sam@yourrestaurant.com');"
+        }
+      ]
+    },
+    {
+      "id": "today",
+      "title": "Today",
+      "who": "Everyone",
+      "sources": [
+        "client_code/Pages/Today",
+        "client_code/Items/Arrival",
+        "client_code/Dialogs/QuickHours",
+        "client_code/Dialogs/SpecialDish",
+        "client_code/Dialogs/PostPhoto",
+        "server_code/Board.py"
+      ],
+      "shots": [
+        {
+          "name": "today-page",
+          "as": "manager",
+          "go": "#today/{rid}"
+        }
+      ]
+    },
+    {
+      "id": "reservations",
+      "title": "Reservations: the host stand",
+      "who": "Everyone",
+      "sources": [
+        "client_code/Pages/Reservations",
+        "client_code/Components/Timeline",
+        "client_code/Items/ResRow",
+        "client_code/Items/ApprovalCard",
+        "client_code/Dialogs/DaySheet"
+      ],
+      "shots": [
+        {
+          "name": "res-timeline",
+          "as": "manager",
+          "go": "#reservations/{rid}",
+          "do": "await H.view('Timeline'); await H.scrollTo('.pp-res-tools');"
+        },
+        {
+          "name": "res-approvals",
+          "as": "manager",
+          "go": "#reservations/{rid}",
+          "selector": ".pp-approvals"
+        },
+        {
+          "name": "res-list",
+          "as": "manager",
+          "go": "#reservations/{rid}",
+          "do": "await H.view('List'); await H.scrollTo('.pp-res-tools');"
+        },
+        {
+          "name": "res-upcoming",
+          "as": "manager",
+          "go": "#reservations/{rid}",
+          "do": "await H.view('Upcoming'); await H.sleep(1500);"
+        }
+      ]
+    },
+    {
+      "id": "bookings",
+      "title": "Add a booking or a walk-in",
+      "who": "Everyone",
+      "sources": [
+        "client_code/Dialogs/BookingEditor",
+        "client_code/Dialogs/WalkIn",
+        "client_code/Components/SlotPicker",
+        "client_code/Items/TablePick",
+        "server_code/Portal.py"
+      ],
+      "shots": [
+        {
+          "name": "book-editor",
+          "as": "manager",
+          "go": "#reservations/{rid}",
+          "do": "await H.view('List'); await H.click('New booking', '.pp-res-tools'); await H.opened(/Add a booking/);"
+        },
+        {
+          "name": "book-walkin",
+          "as": "manager",
+          "go": "#reservations/{rid}",
+          "do": "await H.view('List'); await H.click('Walk-in', '.pp-res-tools'); await H.opened(/How many walked in/);"
+        }
+      ]
+    },
+    {
+      "id": "guests",
+      "title": "The guest book",
+      "who": "Everyone",
+      "sources": [
+        "client_code/Pages/Guests",
+        "client_code/Items/GuestRow",
+        "client_code/Dialogs/GuestCard",
+        "server_code/Guests.py"
+      ],
+      "shots": [
+        {
+          "name": "guests-list",
+          "as": "manager",
+          "go": "#guests/{rid}"
+        },
+        {
+          "name": "guests-card",
+          "as": "manager",
+          "go": "#guests/{rid}",
+          "do": "(await H.until(() => H.$$('button.pp-grow-row').find((r) => /lise Martin/.test(r.textContent)), 'a regular')).click(); await H.opened(/Visits and bookings/);"
+        }
+      ]
+    },
+    {
+      "id": "hours",
+      "title": "Opening hours and special days",
+      "who": "Managers",
+      "sources": [
+        "client_code/Pages/Hours",
+        "client_code/Items/PeriodCard",
+        "client_code/Dialogs/PeriodEditor",
+        "client_code/Dialogs/SpecialEditor"
+      ],
+      "shots": [
+        {
+          "name": "hours-page",
+          "as": "manager",
+          "go": "#hours/{rid}"
+        },
+        {
+          "name": "hours-special",
+          "as": "manager",
+          "go": "#hours/{rid}",
+          "do": "await H.click('Add a special day'); await H.opened();"
+        }
+      ]
+    },
+    {
+      "id": "tables",
+      "title": "Tables and the floor plan",
+      "who": "Managers",
+      "sources": [
+        "client_code/Pages/Tables",
+        "client_code/Components/FloorPlan",
+        "client_code/Items/GroupRow"
+      ],
+      "shots": [
+        {
+          "name": "tables-plan",
+          "as": "manager",
+          "go": "#tables/{rid}",
+          "wait": 800
+        }
+      ]
+    },
+    {
+      "id": "events",
+      "title": "Events",
+      "who": "Managers",
+      "sources": [
+        "client_code/Pages/Events",
+        "client_code/Dialogs/EventEditor",
+        "client_code/Items/EventCard"
+      ],
+      "shots": [
+        {
+          "name": "events-page",
+          "as": "manager",
+          "go": "#events/{rid}"
+        }
+      ]
+    },
+    {
+      "id": "menu",
+      "title": "Menu and specials",
+      "who": "Managers",
+      "sources": [
+        "client_code/Pages/Dishes",
+        "client_code/Dialogs/DishEditor",
+        "client_code/Dialogs/SectionEditor",
+        "client_code/Items/EdDish",
+        "client_code/Items/EdSection",
+        "client_code/Items/MenuFileRow"
+      ],
+      "shots": [
+        {
+          "name": "menu-page",
+          "as": "manager",
+          "go": "#dishes/{rid}"
+        }
+      ]
+    },
+    {
+      "id": "gallery",
+      "title": "Gallery",
+      "who": "Managers",
+      "sources": [
+        "client_code/Pages/Gallery",
+        "client_code/Items/PhotoTile",
+        "client_code/Dialogs/PhotoPicker"
+      ],
+      "shots": [
+        {
+          "name": "gallery-page",
+          "as": "manager",
+          "go": "#gallery/{rid}",
+          "wait": 1500
+        }
+      ]
+    },
+    {
+      "id": "website",
+      "title": "Your restaurant's website",
+      "who": "Managers",
+      "sources": [
+        "client_code/Pages/Website",
+        "client_code/site_model.py",
+        "server_code/Site.py"
+      ],
+      "shots": [
+        {
+          "name": "website-page",
+          "as": "manager",
+          "go": "#website/{rid}",
+          "wait": 2500
+        }
+      ]
+    },
+    {
+      "id": "share",
+      "title": "Share links and QR codes",
+      "who": "Managers",
+      "sources": [
+        "client_code/Pages/Share"
+      ],
+      "shots": [
+        {
+          "name": "share-page",
+          "as": "manager",
+          "go": "#share/{rid}",
+          "wait": 1000
+        }
+      ]
+    },
+    {
+      "id": "settings",
+      "title": "Settings: booking rules, approvals, emails",
+      "who": "Managers",
+      "sources": [
+        "client_code/Pages/Settings",
+        "client_code/Items/RuleRow",
+        "server_code/Portal.py",
+        "server_code/Booking.py"
+      ],
+      "shots": [
+        {
+          "name": "settings-page",
+          "as": "manager",
+          "go": "#settings/{rid}"
+        },
+        {
+          "name": "settings-approvals",
+          "as": "manager",
+          "go": "#settings/{rid}",
+          "selector": "#st-approval"
+        }
+      ]
+    },
+    {
+      "id": "staff-view",
+      "title": "The waiter's view (Staff)",
+      "who": "Staff",
+      "sources": [
+        "client_code/pp.py",
+        "client_code/Pages/Today",
+        "client_code/Pages/Reservations",
+        "client_code/Pages/Guests",
+        "server_code/Portal.py"
+      ],
+      "shots": [
+        {
+          "name": "staff-dashboard",
+          "as": "staff",
+          "go": "#dashboard"
+        },
+        {
+          "name": "staff-reservations",
+          "as": "staff",
+          "go": "#reservations/{rid}",
+          "do": "await H.view('List'); await H.scrollTo('.pp-res-tools');"
+        }
+      ]
+    },
+    {
+      "id": "phone",
+      "title": "On a phone or tablet",
+      "who": "Staff",
+      "sources": [
+        "client_code/Pages/Reservations",
+        "client_code/Dialogs/WalkIn",
+        "theme/assets/app.css"
+      ],
+      "shots": [
+        {
+          "name": "phone-reservations",
+          "as": "staff",
+          "window": "phone",
+          "go": "#reservations/{rid}",
+          "do": "await H.view('List'); await H.scrollTo('.pp-res-tools');"
+        },
+        {
+          "name": "phone-walkin",
+          "as": "staff",
+          "window": "phone",
+          "go": "#reservations/{rid}",
+          "do": "await H.view('List'); await H.click('Walk-in'); await H.opened(/How many walked in/);"
+        }
+      ]
+    },
+    {
+      "id": "guest-side",
+      "title": "What your guests see",
+      "who": "Everyone",
+      "sources": [
+        "client_code/Pages/Book",
+        "client_code/Pages/Manage",
+        "client_code/Pages/PublicMenu",
+        "server_code/Public.py",
+        "server_code/Notify.py"
+      ],
+      "shots": [
+        {
+          "name": "guest-book",
+          "as": "guest",
+          "go": "#book/maison-lumiere",
+          "wait": 1500,
+          "do": "(await H.until(() => H.$$('.pp-pd').find((d) => !d.disabled && !d.classList.contains('wd') && !d.classList.contains('out')), 'an open day')).click(); await H.until(() => H.$$('.anvil-role-pp-times .anvil-role-chip button').length, 'times', 40000); await H.scrollTo('.anvil-role-pp-times'); window.scrollBy(0, -260);"
+        },
+        {
+          "name": "guest-menu",
+          "as": "guest",
+          "go": "#menu/maison-lumiere"
+        }
+      ]
+    },
+    {
+      "id": "profile",
+      "title": "Your profile",
+      "who": "Everyone",
+      "sources": [
+        "client_code/Pages/Profile",
+        "server_code/Billing.py",
+        "server_code/Accounts.py"
+      ],
+      "shots": [
+        {
+          "name": "profile-page",
+          "as": "staff",
+          "go": "#profile"
+        }
+      ]
+    }
+  ]
+}
