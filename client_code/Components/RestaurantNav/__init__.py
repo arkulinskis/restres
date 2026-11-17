@@ -3,6 +3,11 @@ from anvil import *
 from ._anvil_designer import RestaurantNavTemplate
 from ... import pp, router, state
 
+# the how-to guide's section for each tab (docs/howto/guide.json ids; staff land on their own section for Today)
+HELP = {"today": "today", "reservations": "reservations", "guests": "guests", "hours": "hours", "tables": "tables",
+        "events": "events", "dishes": "menu", "gallery": "gallery", "website": "website", "share": "share",
+        "settings": "settings"}
+
 
 class RestaurantNav(RestaurantNavTemplate):
     """The restaurant sub-menu (see the help text in form_template.html)."""
@@ -25,6 +30,8 @@ class RestaurantNav(RestaurantNavTemplate):
         if len(others) > 1:
             self.switcher.selected_value = r["id"]
         state.set_attr(self.book_link, "href", pp.book_url(r["slug"]))
+        section = "staff-view" if role == "staff" and self.tab == "today" else HELP.get(self.tab, "")
+        state.set_attr(self.help_link, "href", router.href("howto", section))
         self.tabs_panel.items = [{"href": router.href(page, r["id"]), "label": label, "icon": icon, "on": page == self.tab,
                                   "count": r.get("pending") if page == "reservations" else 0}
                                  for page, label, icon, need in pp.TABS if pp.can(role, need)]

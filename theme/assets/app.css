@@ -1435,3 +1435,45 @@ a.anvil-file-loader.anvil-component[class*="anvil-role-ic-"] label i.anvil-compo
 /* opening hours: the swatch sits on the period title's line; every weekday's hours start at the same place */
 .pp-pc-hd::before { margin-top: 13px; }
 .anvil-role-pp-wk { tab-size: 14; -moz-tab-size: 14; }
+
+/* ---- How to (#howto, Pages/HowTo): the guide generated from docs/howto, contents column + one reading column */
+.pp-howto-head { display: grid; gap: 12px; justify-items: start; padding-bottom: 24px; border-bottom: 1px solid var(--c-line); margin-bottom: 32px; }
+.pp-howto-head h1 { margin: 0; }
+.pp-howto-head .pp-lead { margin: 0; max-width: 60ch; }
+.pp-howto-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 48px; align-items: start; }
+.pp-howto-toc { position: sticky; top: calc(var(--header-h) + 16px); max-height: calc(100vh - var(--header-h) - 32px); overflow: auto; font-size: .92rem; }
+.pp-howto-toc h2 { font: 600 .75rem/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--c-muted); margin: 0 0 10px; }
+.pp-howto-toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.pp-howto-toc a { display: block; padding: 6px 10px; border-radius: var(--radius-sm); color: var(--c-ink); text-decoration: none; }
+.pp-howto-toc a:hover, .pp-howto-toc a:focus-visible { background: var(--c-surface-2); }
+.pp-howto-body { display: grid; gap: 64px; min-width: 0; }
+.pp-howto-sec { display: grid; gap: 14px; scroll-margin-top: calc(var(--header-h) + 16px); }
+.pp-howto-sec > * { margin: 0; }
+.pp-howto-sec > :is(p, ul, ol, aside, h3, h4) { max-width: 68ch; }
+.pp-howto-sec-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.pp-howto-sec-head h2 { margin: 0; }
+.pp-howto-sec h3 { font: 600 1.05rem/1.3 var(--font-body); margin-top: 10px; }
+.pp-howto-sec ul, .pp-howto-sec ol { padding-left: 1.3em; display: grid; gap: 6px; }
+.pp-howto-sec ol.steps { list-style: none; padding: 0; counter-reset: s; gap: 10px; }
+.pp-howto-sec ol.steps li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: baseline; }
+.pp-howto-sec ol.steps li::before { content: counter(s); width: 24px; height: 24px; border-radius: 50%; background: var(--c-brand); color: var(--c-brand-ink);
+  font-size: .78rem; font-weight: 600; display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+.pp-howto-sec aside.tip { background: var(--c-good-soft); color: var(--c-ink); border-radius: var(--radius-sm); padding: 12px 16px; font-size: .95rem; }
+.pp-howto-sec figure.shot { margin: 6px 0 2px; display: grid; gap: 8px; }
+.pp-howto-sec figure.shot img { width: 100%; height: auto; border-radius: var(--radius-sm); border: 1px solid var(--c-line); box-shadow: var(--shadow); background: var(--c-surface); }
+.pp-howto-sec figure.shot.phone { max-width: 300px; }
+.pp-howto-sec figcaption { color: var(--c-muted); font-size: .85rem; }
+.pp-howto-sec .figs { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.pp-howto-sec .figs > figure.phone { flex: 0 1 280px; }
+.pp-howto-sec .table { overflow-x: auto; max-width: 100%; }
+.pp-howto-sec table { border-collapse: collapse; font-size: .92rem; min-width: 480px; background: var(--c-surface); border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow); }
+.pp-howto-sec :is(th, td) { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--c-line); vertical-align: top; }
+.pp-howto-sec th { font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--c-muted); font-weight: 600; background: var(--c-surface-2); }
+.pp-howto-sec tr:last-child td { border-bottom: 0; }
+.pp-howto-sec code { font-size: .88em; background: var(--c-surface-2); padding: 1px 5px; border-radius: 5px; }
+@media (max-width: 860px) {
+  .pp-howto-layout { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .pp-howto-toc { position: static; max-height: none; background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--radius); padding: 14px; }
+  .pp-howto-toc ol { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .pp-howto-body { gap: 52px; }
+}

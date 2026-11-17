@@ -10,7 +10,7 @@ toolbox_item:
   group: PlanPlate
 help_text: |
   The top of every restaurant page: "All restaurants", the restaurant's name, a switcher when the person runs several,
-  a link to the public booking page, and the tabs this person's role may open. Call show(nav) with the "nav" every
+  a link to the public booking page, a How to link to this page's part of the guide, and the tabs this person's role may open. Call show(nav) with the "nav" every
   restaurant server call returns.
 ---
 <div class="pp-subnav">
@@ -22,6 +22,7 @@ help_text: |
     <span class="ui-spacer"></span>
     <anvil-component type="Label" name="role_badge" prop:role='["badge"]' prop:visible="false"></anvil-component>
     <anvil-component type="DropDown" name="switcher" prop:role='["pp-switch"]' prop:visible="false" prop:tooltip="Switch restaurant"></anvil-component>
+    <a class="ui-btn sm ghost" anvil:name="help_link" href="#howto"><i class="ic ic-book"></i>How to</a>
     <a class="ui-btn sm" anvil:name="book_link" target="_blank" rel="noopener" href="#"><i class="ic ic-external"></i>Booking page</a>
   </div>
   <nav class="pp-tabs" aria-label="Restaurant">

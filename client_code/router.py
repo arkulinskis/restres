@@ -31,12 +31,13 @@ PAGES = {
     "share": ("user", "Share & QR codes"),
     "settings": ("user", "Settings"),
     "profile": ("user", "Your profile"),
+    "howto": (None, "How to use PlanPlate"),
     "admin": ("admin", "Admin"),
     "book": (None, "Book a table"),
     "r": (None, "Your reservation"),
     "menu": (None, "Menu"),
 }
-NAV = [("dashboard", "Restaurants", "grid")]
+NAV = [("dashboard", "Restaurants", "grid"), ("howto", "How to", "book")]
 PUBLIC = ("book", "r", "menu")
 RESTAURANT = ("today", "reservations", "guests", "hours", "tables", "events", "dishes", "gallery", "website", "share", "settings")
 APP_NAME = "PlanPlate"
@@ -90,6 +91,9 @@ def _form(name):
     if name == "profile":
         from .Pages.Profile import Profile
         return Profile
+    if name == "howto":
+        from .Pages.HowTo import HowTo
+        return HowTo
     if name == "book":
         from .Pages.Book import Book
         return Book

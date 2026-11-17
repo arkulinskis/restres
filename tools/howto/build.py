@@ -25,15 +25,19 @@ def _inline(text):
     return t
 
 
-def _figure(caption, name, shots_dir, sizes):
+def _data_uri(name, path):
+    return "data:image/webp;base64," + base64.b64encode(path.read_bytes()).decode()
+
+
+def _figure(caption, name, shots_dir, sizes, src=None):
+    """src(name, path) -> the image URL: a data: URI for the standalone page, a theme asset for the app."""
     f = shots_dir / (name + ".webp")
     if not f.exists():
         return '<p class="missing">Missing screenshot: %s</p>' % html.escape(name)
     w, h = sizes.setdefault(name, _size(f))
-    data = base64.b64encode(f.read_bytes()).decode()
     cls = "shot phone" if w < PHONE_MAX else "shot"
-    return ('<figure class="%s"><img src="data:image/webp;base64,%s" width="%d" height="%d" alt="%s" loading="lazy">'
-            '<figcaption>%s</figcaption></figure>') % (cls, data, w, h, html.escape(caption), _inline(caption))
+    return ('<figure class="%s"><img src="%s" width="%d" height="%d" alt="%s" loading="lazy">'
+            '<figcaption>%s</figcaption></figure>') % (cls, (src or _data_uri)(name, f), w, h, html.escape(caption), _inline(caption))
 
 
 def _size(path):
@@ -47,7 +51,7 @@ def _size(path):
     return int.from_bytes(b[26:28], "little") & 0x3FFF, int.from_bytes(b[28:30], "little") & 0x3FFF
 
 
-def markdown(text, shots_dir, sizes):
+def markdown(text, shots_dir, sizes, src=None):
     out = []
     for block in re.split(r"\n\s*\n", text.strip()):
         lines = block.strip().splitlines()
@@ -60,7 +64,7 @@ def markdown(text, shots_dir, sizes):
             out.append('<aside class="tip">%s</aside>' % "<br>".join(_inline(l[2:]) for l in lines))
         elif all(re.match(r"\s*!\[[^\]]*\]\(shot:[\w-]+\)\s*$", l) or not l.strip() for l in lines) or re.fullmatch(r"(\s*!\[[^\]]*\]\(shot:[\w-]+\)\s*)+", block):
             figs = re.findall(r"!\[([^\]]*)\]\(shot:([\w-]+)\)", block)
-            inner = "".join(_figure(c, n, shots_dir, sizes) for c, n in figs)
+            inner = "".join(_figure(c, n, shots_dir, sizes, src) for c, n in figs)
             out.append('<div class="figs">%s</div>' % inner if len(figs) > 1 else inner)
         elif first.startswith("|"):
             rows = [[c.strip() for c in l.strip().strip("|").split("|")] for l in lines if not re.match(r"^\|[\s:|-]+\|$", l.strip())]
@@ -76,7 +80,7 @@ def markdown(text, shots_dir, sizes):
                     cur = [m.group(1)]; items.append(cur)
                 elif cur is not None:
                     cur.append(l.strip())
-            out.append('<ol class="steps">%s</ol>' % "".join("<li>%s</li>" % _inline(" ".join(i)) for i in items))
+            out.append('<ol class="steps">%s</ol>' % "".join("<li><span>%s</span></li>" % _inline(" ".join(i)) for i in items))
         elif first.startswith("- "):
             items, cur = [], None
             for l in lines:
@@ -199,6 +203,7 @@ def build_html(guide, docs, shots_dir):
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="%(sub)s">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- design-ok: overused-font (Inter with Cormorant Garamond is PlanPlate's chosen pair, same as the app) -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap">
 <style>%(css)s</style>
 <div class="wrap">
@@ -213,3 +218,47 @@ def build_html(guide, docs, shots_dir):
 <script>%(js)s</script>
 """ % {"title": html.escape(title), "sub": html.escape(guide.get("subtitle", "")), "css": CSS, "logo": LOGO, "when": when,
        "toc": "".join(toc), "body": "\n".join(body), "js": JS}
+
+
+# ---------------------------------------------------------------- the in-app copy (#howto page)
+APP_PREFIX = "howto-"  # theme/assets/howto-<shot>.webp, served at _/theme/howto-<shot>.webp
+
+
+def build_app(guide, docs, shots_dir, root):
+    """The app's How to page reads client_code/howto_content.py (generated here) and shows the screenshots from
+    theme/assets/howto-*.webp. Returns (screenshots copied, screenshots removed)."""
+    import hashlib
+    assets = root / "theme" / "assets"
+    wanted, copied, removed = set(), 0, 0
+    for s in guide["sections"]:
+        for x in s["shots"]:
+            f = shots_dir / (x["name"] + ".webp")
+            if not f.exists():
+                continue
+            dest = assets / (APP_PREFIX + x["name"] + ".webp")
+            wanted.add(dest.name)
+            if not dest.exists() or dest.read_bytes() != f.read_bytes():
+                dest.write_bytes(f.read_bytes())
+                copied += 1
+    for old in assets.glob(APP_PREFIX + "*.webp"):
+        if old.name not in wanted:
+            old.unlink()
+            removed += 1
+
+    def src(name, path):  # ?v= changes with the picture, so browsers never show an old screenshot
+        return "_/theme/%s%s.webp?v=%s" % (APP_PREFIX, name, hashlib.sha1(path.read_bytes()).hexdigest()[:8])
+
+    sizes, sections = {}, []
+    for s in guide["sections"]:
+        md = docs / "sections" / (s["id"] + ".md")
+        text = md.read_text(encoding="utf-8") if md.exists() else ""
+        sections.append({"id": s["id"], "title": s["title"], "who": s["who"], "html": markdown(text, shots_dir, sizes, src)})
+    lines = ['"""The How to page\'s content. GENERATED by `python -I tools/howto/howto.py build` from docs/howto:',
+             'never edit this file; edit docs/howto/sections/<id>.md (and guide.json for titles and order), then build."""',
+             "", "TITLE = %r" % guide["title"], "SUBTITLE = %r" % guide.get("subtitle", ""), "", "SECTIONS = ["]
+    for s in sections:
+        lines.append("    {%r: %r, %r: %r, %r: %r," % ("id", s["id"], "title", s["title"], "who", s["who"]))
+        lines.append("     'html': %r}," % s["html"])
+    lines.append("]")
+    (root / "client_code" / "howto_content.py").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return copied, removed

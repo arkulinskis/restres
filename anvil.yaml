@@ -1,36 +1,5 @@
 allow_embedding: true
 db_schema:
-  error_log:
-    client: none
-    columns:
-    - admin_ui: {order: 0, width: 200}
-      name: when
-      type: datetime
-    - admin_ui: {order: 1, width: 120}
-      name: source
-      type: string
-    - admin_ui: {order: 2, width: 160}
-      name: kind
-      type: string
-    - admin_ui: {order: 3, width: 300}
-      name: message
-      type: string
-    - admin_ui: {order: 4, width: 300}
-      name: traceback
-      type: string
-    - admin_ui: {order: 5, width: 200}
-      name: page
-      type: string
-    - admin_ui: {order: 6, width: 120}
-      name: session
-      type: string
-    - admin_ui: {order: 7, width: 200}
-      name: user
-      target: users
-      type: link_single
-    indexes: []
-    server: full
-    title: Error log
   app_settings:
     client: none
     columns:
@@ -104,6 +73,53 @@ db_schema:
     indexes: []
     server: full
     title: Dining tables
+  error_log:
+    client: none
+    columns:
+    - admin_ui:
+        order: 0
+        width: 200
+      name: when
+      type: datetime
+    - admin_ui:
+        order: 1
+        width: 120
+      name: source
+      type: string
+    - admin_ui:
+        order: 2
+        width: 160
+      name: kind
+      type: string
+    - admin_ui:
+        order: 3
+        width: 300
+      name: message
+      type: string
+    - admin_ui:
+        order: 4
+        width: 300
+      name: traceback
+      type: string
+    - admin_ui:
+        order: 5
+        width: 200
+      name: page
+      type: string
+    - admin_ui:
+        order: 6
+        width: 120
+      name: session
+      type: string
+    - admin_ui:
+        order: 7
+        width: 200
+      name: user
+      target: users
+      type: link_single
+    indexes: []
+    server: full
+    title: Error log
   events:
     client: none
     columns:
@@ -1300,9 +1316,10 @@ db_schema:
     server: full
     title: Users
 metadata:
-  description: "Run bookings for all your restaurants: opening hours, a drag-and-drop floor plan, automatic approvals, menus, specials, events and a booking form for your website."
-  logo_img: "asset:icon-512.png"
-  title: "PlanPlate: restaurant reservations, floor plans and websites"
+  description: 'Run bookings for all your restaurants: opening hours, a drag-and-drop floor plan, automatic approvals, menus,
+    specials, events and a booking form for your website.'
+  logo_img: asset:icon-512.png
+  title: 'PlanPlate: restaurant reservations, floor plans and websites'
 name: PlanPlate
 native_deps:
   head_html: |
@@ -1366,7 +1383,7 @@ native_deps:
     <!-- Prepsto feedback panel: every "Submit feedback" link and button opens it (it is the only feedback channel). No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->
     <script src="https://prepsto.com/_/theme/widget.js" data-prepsto="3jhqeaj" data-button="false" data-label="Submit feedback" async></script>
     <link rel="stylesheet" href="_/theme/icons.css?v=dbadc7ab1d">
-    <link rel="stylesheet" href="_/theme/app.css?v=f1aae62135">
+    <link rel="stylesheet" href="_/theme/app.css?v=4a32816cdc">
     <script src="_/theme/app-kit.js?v=9790718203"></script>
     <script src="_/theme/pp-kit.js?v=859a7a4e56"></script>
     <script src="_/theme/pp-timeline.js?v=21a8c268cb"></script>

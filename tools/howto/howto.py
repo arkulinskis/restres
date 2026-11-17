@@ -4,7 +4,8 @@
     python -I tools/howto/howto.py stale                 sections whose app files changed after their screenshots
     python -I tools/howto/howto.py shoot                 every screenshot (reloads the demo restaurant first)
     python -I tools/howto/howto.py shoot team today      only these sections' screenshots (or shot names)
-    python -I tools/howto/howto.py build                 docs/howto/PlanPlate-how-to.html (self-contained)
+    python -I tools/howto/howto.py build                 docs/howto/PlanPlate-how-to.html (self-contained) AND the app's
+                                                         How to page (client_code/howto_content.py + theme/assets/howto-*.webp)
     python -I tools/howto/howto.py check                 every picture in the text exists, every shot is used
 
 Everything lives in docs/howto/: guide.json (sections, order, shots, sources), sections/<id>.md (the words),
@@ -209,10 +210,12 @@ def cmd_shoot(args):
 
 # ---------------------------------------------------------------- build
 def cmd_build(_):
-    from build import build_html  # tools/howto/build.py
+    from build import build_html, build_app  # tools/howto/build.py
     page = build_html(guide(), DOCS, SHOTS)
     OUT.write_text(page, encoding="utf-8")
     print("built %s (%d KB)" % (OUT.relative_to(ROOT), len(page.encode("utf-8")) // 1024))
+    copied, removed = build_app(guide(), DOCS, SHOTS, ROOT)  # the app's own How to page (#howto)
+    print("in the app: client_code/howto_content.py, %d screenshot(s) copied to theme/assets, %d removed" % (copied, removed))
 
 
 def main():

@@ -1,0 +1,19 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-howto">
+      <header class="pp-howto-head">
+        <h1>How to use PlanPlate</h1>
+        <p class="pp-lead" anvil:dom-node="lead"></p>
+        <div class="ui-seg" role="group" aria-label="Show the parts for">
+          <button type="button" anvil:name="who_all" data-who="all" anvil:on-dom:click="self.who_click">Everything</button>
+          <button type="button" anvil:name="who_manager" data-who="manager" anvil:on-dom:click="self.who_click">Managers</button>
+          <button type="button" anvil:name="who_staff" data-who="staff" anvil:on-dom:click="self.who_click">Waiters &amp; hosts</button>
+        </div>
+      </header>
+      <div class="pp-howto-layout">
+        <nav class="pp-howto-toc" aria-label="Contents" anvil:dom-node="toc"></nav>
+        <div class="pp-howto-body" anvil:dom-node="body"></div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

@@ -10,7 +10,8 @@ the app files it describes.
 | The words, one file per section (small Markdown subset, see `tools/howto/build.py`) | `sections/<id>.md` |
 | The screenshots, and when / at which commit each was taken | `shots/<name>.webp`, `shots/manifest.json` |
 | The built guide (self-contained, ~1.3 MB, also published as a claude.ai artifact) | `PlanPlate-how-to.html` |
-| The tool | `tools/howto/howto.py` (+ `helpers.js` for the screenshot steps, `build.py` for the page) |
+| The app's own How to page (`#howto`, header tab + a How to link on every restaurant page) | `client_code/Pages/HowTo` reads the GENERATED `client_code/howto_content.py`; pictures `theme/assets/howto-*.webp` |
+| The tool | `tools/howto/howto.py` (+ `helpers.js` for the screenshot steps, `build.py` for both pages) |
 
 Published copy (private claude.ai artifact; republish to the same URL with `url`): https://claude.ai/artifact/UpMCg7fHJnDq8WufZSgNHX
 
@@ -22,8 +23,12 @@ Published copy (private claude.ai artifact; republish to the same URL with `url`
    running; the local App Server starts by itself; add `--restart` after server-code changes).
 3. Look at the new shots, then edit only `sections/<section>.md`. Read only the app files listed in that section's
    `sources` if you need to check a fact.
-4. `python -I tools/howto/howto.py check` then `python -I tools/howto/howto.py build`.
-5. Republish the artifact from `docs/howto/PlanPlate-how-to.html` to the same URL, and commit.
+4. `python -I tools/howto/howto.py check` then `python -I tools/howto/howto.py build`. This rebuilds BOTH the standalone
+   page and the app's How to page (never edit `client_code/howto_content.py` by hand).
+5. Commit and push (that deploys the app's page), and republish the artifact from `docs/howto/PlanPlate-how-to.html`
+   to the same URL.
+
+A new restaurant tab needs its section in `HELP` in `client_code/Components/RestaurantNav/__init__.py` (tab -> section id).
 
 ## Add a section or a screenshot
 
