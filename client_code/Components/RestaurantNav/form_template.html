@@ -1,17 +1,17 @@
 ---
 custom_component: true
-help_text: |-
+properties:
+  - name: tab
+    type: string
+    default_value: today
+    description: Which tab is open (today, reservations, guests, hours, tables, events, dishes, gallery, website, share, settings)
+toolbox_item:
+  title: Restaurant sub-menu
+  group: PlanPlate
+help_text: |
   The top of every restaurant page: "All restaurants", the restaurant's name, a switcher when the person runs several,
   a link to the public booking page, a How to link to this page's part of the guide, and the tabs this person's role may open. Call show(nav) with the "nav" every
   restaurant server call returns.
-properties:
-- default_value: today
-  description: Which tab is open (today, reservations, guests, hours, tables, events, dishes, gallery, website, share, settings)
-  name: tab
-  type: string
-toolbox_item:
-  group: PlanPlate
-  title: Restaurant sub-menu
 ---
 <div class="pp-subnav">
   <div class="pp-subnav-top">
