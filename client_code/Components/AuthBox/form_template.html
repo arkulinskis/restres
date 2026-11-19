@@ -1,17 +1,20 @@
 ---
 custom_component: true
-properties:
-  - name: mode
-    type: string
-    options: [login, signup, reset]
-    default_value: login
-    description: Which form shows first
-toolbox_item:
-  title: Sign-in box
-  group: PlanPlate
-help_text: |
+help_text: |-
   Sign in / Create account / Reset password, with Continue with Google and the Privacy & Terms tick box on sign-up.
   Used in the landing page's hero and on #auth. After signing in it goes where the person was heading (router.after_sign_in).
+properties:
+- default_value: login
+  description: Which form shows first
+  name: mode
+  options:
+  - login
+  - signup
+  - reset
+  type: string
+toolbox_item:
+  group: PlanPlate
+  title: Sign-in box
 ---
 <div class="pp-authbox">
   <div class="pp-auth-tabs" role="group" aria-label="Sign in or create an account" anvil:name="mode_tabs">

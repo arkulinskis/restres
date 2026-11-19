@@ -3,14 +3,10 @@ db_schema:
   app_settings:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: key
       type: string
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: value
       type: simpleObject
     indexes: []
@@ -19,60 +15,38 @@ db_schema:
   dining_tables:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: name
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: seats
       type: number
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: min_party
       type: number
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: shape
       type: string
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: area
       type: string
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: x
       type: number
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: y
       type: number
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       name: position
       type: number
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       name: active
       type: bool
-    - admin_ui:
-        order: 10
-        width: 200
+    - admin_ui: {order: 10, width: 200}
       name: joinable
       type: bool
     indexes: []
@@ -81,44 +55,28 @@ db_schema:
   error_log:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: when
       type: datetime
-    - admin_ui:
-        order: 1
-        width: 120
+    - admin_ui: {order: 1, width: 120}
       name: source
       type: string
-    - admin_ui:
-        order: 2
-        width: 160
+    - admin_ui: {order: 2, width: 160}
       name: kind
       type: string
-    - admin_ui:
-        order: 3
-        width: 300
+    - admin_ui: {order: 3, width: 300}
       name: message
       type: string
-    - admin_ui:
-        order: 4
-        width: 300
+    - admin_ui: {order: 4, width: 300}
       name: traceback
       type: string
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: page
       type: string
-    - admin_ui:
-        order: 6
-        width: 120
+    - admin_ui: {order: 6, width: 120}
       name: session
       type: string
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: user
       target: users
       type: link_single
@@ -128,91 +86,57 @@ db_schema:
   events:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: title
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: date
       type: date
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: start_min
       type: number
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: end_min
       type: number
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: kind
       type: string
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: description
       type: string
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: photo
       target: photos
       type: link_single
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       name: guests
       type: number
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       name: host
       type: string
-    - admin_ui:
-        order: 10
-        width: 200
+    - admin_ui: {order: 10, width: 200}
       name: notes
       type: string
-    - admin_ui:
-        order: 11
-        width: 200
+    - admin_ui: {order: 11, width: 200}
       name: layout
       type: simpleObject
-    - admin_ui:
-        order: 12
-        width: 200
+    - admin_ui: {order: 12, width: 200}
       name: groups
       type: simpleObject
-    - admin_ui:
-        order: 13
-        width: 200
+    - admin_ui: {order: 13, width: 200}
       name: removed
       type: simpleObject
-    - admin_ui:
-        order: 14
-        width: 200
+    - admin_ui: {order: 14, width: 200}
       name: blocks
       type: bool
-    - admin_ui:
-        order: 15
-        width: 200
+    - admin_ui: {order: 15, width: 200}
       name: on_site
       type: bool
-    - admin_ui:
-        order: 16
-        width: 200
+    - admin_ui: {order: 16, width: 200}
       name: created
       type: datetime
     indexes: []
@@ -221,50 +145,32 @@ db_schema:
   feedback:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: user
       target: users
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: name
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: email
       type: string
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: kind
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: message
       type: string
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: context
       type: simpleObject
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: status
       type: string
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: note
       type: string
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       name: created
       type: datetime
     indexes: []
@@ -273,35 +179,23 @@ db_schema:
   guests:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: key
       type: string
-    - admin_ui:
-        order: 2
-        width: 300
+    - admin_ui: {order: 2, width: 300}
       name: note
       type: string
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: tags
       type: simpleObject
-    - admin_ui:
-        order: 4
-        width: 80
+    - admin_ui: {order: 4, width: 80}
       name: vip
       type: bool
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: updated
       type: datetime
     server: full
@@ -309,37 +203,25 @@ db_schema:
   members:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: email
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: user
       target: users
       type: link_single
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: role
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: invited_by
       target: users
       type: link_single
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: created
       type: datetime
     indexes: []
@@ -348,45 +230,29 @@ db_schema:
   menu_files:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: key
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: title
       type: string
-    - admin_ui:
-        order: 3
-        width: 80
+    - admin_ui: {order: 3, width: 80}
       name: language
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: file
       type: media
-    - admin_ui:
-        order: 5
-        width: 160
+    - admin_ui: {order: 5, width: 160}
       name: content_type
       type: string
-    - admin_ui:
-        order: 6
-        width: 80
+    - admin_ui: {order: 6, width: 80}
       name: position
       type: number
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: created
       type: datetime
     server: full
@@ -394,46 +260,30 @@ db_schema:
   menu_items:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: section
       target: menu_sections
       type: link_single
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: name
       type: string
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: description
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: price
       type: string
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: tags
       type: simpleObject
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: position
       type: number
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: available
       type: bool
     indexes: []
@@ -442,25 +292,17 @@ db_schema:
   menu_sections:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: title
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: description
       type: string
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: position
       type: number
     indexes: []
@@ -469,35 +311,23 @@ db_schema:
   periods:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: name
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: start
       type: date
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: end
       type: date
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: week
       type: simpleObject
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: created
       type: datetime
     indexes: []
@@ -506,95 +336,59 @@ db_schema:
   photos:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: key
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: kind
       type: string
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: provider
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: media
       type: media
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: thumb
       type: media
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: url
       type: string
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: public_id
       type: string
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       name: version
       type: string
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       name: format
       type: string
-    - admin_ui:
-        order: 10
-        width: 200
+    - admin_ui: {order: 10, width: 200}
       name: caption
       type: string
-    - admin_ui:
-        order: 11
-        width: 200
+    - admin_ui: {order: 11, width: 200}
       name: in_gallery
       type: bool
-    - admin_ui:
-        order: 12
-        width: 200
+    - admin_ui: {order: 12, width: 200}
       name: position
       type: number
-    - admin_ui:
-        order: 13
-        width: 200
+    - admin_ui: {order: 13, width: 200}
       name: width
       type: number
-    - admin_ui:
-        order: 14
-        width: 200
+    - admin_ui: {order: 14, width: 200}
       name: height
       type: number
-    - admin_ui:
-        order: 15
-        width: 200
+    - admin_ui: {order: 15, width: 200}
       name: size
       type: number
-    - admin_ui:
-        order: 16
-        width: 200
+    - admin_ui: {order: 16, width: 200}
       name: created
       type: datetime
-    - admin_ui:
-        order: 17
-        width: 200
+    - admin_ui: {order: 17, width: 200}
       name: by
       target: users
       type: link_single
@@ -604,36 +398,24 @@ db_schema:
   posts:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: date
       type: date
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: photo
       target: photos
       type: link_single
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: text
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: created
       type: datetime
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: by
       target: users
       type: link_single
@@ -643,54 +425,34 @@ db_schema:
   pp_contacts:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: email
       type: string
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: name
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: language
       type: string
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: restaurant_name
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: subscribed
       type: bool
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: consent_text
       type: string
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: consent_at
       type: datetime
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: stopped_at
       type: datetime
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       name: token
       type: string
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       name: updated
       type: datetime
     indexes: []
@@ -699,145 +461,89 @@ db_schema:
   reservations:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: token
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: date
       type: date
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: start_min
       type: number
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: duration
       type: number
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: party
       type: number
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: name
       type: string
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: email
       type: string
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       name: phone
       type: string
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       name: notes
       type: string
-    - admin_ui:
-        order: 10
-        width: 200
+    - admin_ui: {order: 10, width: 200}
       name: staff_note
       type: string
-    - admin_ui:
-        order: 11
-        width: 200
+    - admin_ui: {order: 11, width: 200}
       name: status
       type: string
-    - admin_ui:
-        order: 12
-        width: 200
+    - admin_ui: {order: 12, width: 200}
       name: source
       type: string
-    - admin_ui:
-        order: 13
-        width: 200
+    - admin_ui: {order: 13, width: 200}
       name: tables
       type: simpleObject
-    - admin_ui:
-        order: 14
-        width: 200
+    - admin_ui: {order: 14, width: 200}
       name: review_reason
       type: string
-    - admin_ui:
-        order: 15
-        width: 200
+    - admin_ui: {order: 15, width: 200}
       name: capacity_pct
       type: number
-    - admin_ui:
-        order: 16
-        width: 200
+    - admin_ui: {order: 16, width: 200}
       name: consent
       type: bool
-    - admin_ui:
-        order: 17
-        width: 200
+    - admin_ui: {order: 17, width: 200}
       name: consent_text
       type: string
-    - admin_ui:
-        order: 18
-        width: 200
+    - admin_ui: {order: 18, width: 200}
       name: consent_at
       type: datetime
-    - admin_ui:
-        order: 19
-        width: 200
+    - admin_ui: {order: 19, width: 200}
       name: created
       type: datetime
-    - admin_ui:
-        order: 20
-        width: 200
+    - admin_ui: {order: 20, width: 200}
       name: updated
       type: datetime
-    - admin_ui:
-        order: 21
-        width: 200
+    - admin_ui: {order: 21, width: 200}
       name: history
       type: simpleObject
-    - admin_ui:
-        order: 22
-        width: 200
+    - admin_ui: {order: 22, width: 200}
       name: language
       type: string
-    - admin_ui:
-        order: 23
-        width: 200
+    - admin_ui: {order: 23, width: 200}
       name: pp_consent
       type: bool
-    - admin_ui:
-        order: 24
-        width: 200
+    - admin_ui: {order: 24, width: 200}
       name: pp_consent_text
       type: string
-    - admin_ui:
-        order: 25
-        width: 200
+    - admin_ui: {order: 25, width: 200}
       name: pp_consent_at
       type: datetime
-    - admin_ui:
-        order: 26
-        width: 200
+    - admin_ui: {order: 26, width: 200}
       name: pp_news
       type: bool
-    - admin_ui:
-        order: 27
-        width: 200
+    - admin_ui: {order: 27, width: 200}
       name: table_plan
       type: simpleObject
     indexes: []
@@ -846,170 +552,104 @@ db_schema:
   restaurants:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: owner
       target: users
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: name
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: slug
       type: string
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: description
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: address
       type: string
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: phone
       type: string
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: email
       type: string
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: website
       type: string
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       name: timezone
       type: string
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       name: duration_min
       type: number
-    - admin_ui:
-        order: 10
-        width: 200
+    - admin_ui: {order: 10, width: 200}
       name: slot_min
       type: number
-    - admin_ui:
-        order: 11
-        width: 200
+    - admin_ui: {order: 11, width: 200}
       name: last_booking_min
       type: number
-    - admin_ui:
-        order: 12
-        width: 200
+    - admin_ui: {order: 12, width: 200}
       name: lead_min
       type: number
-    - admin_ui:
-        order: 13
-        width: 200
+    - admin_ui: {order: 13, width: 200}
       name: window_days
       type: number
-    - admin_ui:
-        order: 14
-        width: 200
+    - admin_ui: {order: 14, width: 200}
       name: max_party
       type: number
-    - admin_ui:
-        order: 15
-        width: 200
+    - admin_ui: {order: 15, width: 200}
       name: auto_threshold
       type: number
-    - admin_ui:
-        order: 16
-        width: 200
+    - admin_ui: {order: 16, width: 200}
       name: max_auto_party
       type: number
-    - admin_ui:
-        order: 17
-        width: 200
+    - admin_ui: {order: 17, width: 200}
       name: over_capacity
       type: string
-    - admin_ui:
-        order: 18
-        width: 200
+    - admin_ui: {order: 18, width: 200}
       name: accepting
       type: bool
-    - admin_ui:
-        order: 19
-        width: 200
+    - admin_ui: {order: 19, width: 200}
       name: form_note
       type: string
-    - admin_ui:
-        order: 20
-        width: 200
+    - admin_ui: {order: 20, width: 200}
       name: privacy_text
       type: string
-    - admin_ui:
-        order: 21
-        width: 200
+    - admin_ui: {order: 21, width: 200}
       name: position
       type: number
-    - admin_ui:
-        order: 22
-        width: 200
+    - admin_ui: {order: 22, width: 200}
       name: created
       type: datetime
-    - admin_ui:
-        order: 23
-        width: 200
+    - admin_ui: {order: 23, width: 200}
       name: notify_email
       type: string
-    - admin_ui:
-        order: 24
-        width: 200
+    - admin_ui: {order: 24, width: 200}
       name: emails_on
       type: bool
-    - admin_ui:
-        order: 25
-        width: 200
+    - admin_ui: {order: 25, width: 200}
       name: msg_confirmed
       type: string
-    - admin_ui:
-        order: 26
-        width: 200
+    - admin_ui: {order: 26, width: 200}
       name: msg_pending
       type: string
-    - admin_ui:
-        order: 27
-        width: 200
+    - admin_ui: {order: 27, width: 200}
       name: msg_declined
       type: string
-    - admin_ui:
-        order: 28
-        width: 200
+    - admin_ui: {order: 28, width: 200}
       name: language
       type: string
-    - admin_ui:
-        order: 29
-        width: 200
+    - admin_ui: {order: 29, width: 200}
       name: languages
       type: simpleObject
-    - admin_ui:
-        order: 40
-        width: 260
+    - admin_ui: {order: 40, width: 260}
       name: legacy_id
       type: string
-    - admin_ui:
-        order: 41
-        width: 260
+    - admin_ui: {order: 41, width: 260}
       name: form_notes
       type: simpleObject
-    - admin_ui:
-        order: 42
-        width: 200
+    - admin_ui: {order: 42, width: 200}
       name: review_notes
       type: bool
     indexes: []
@@ -1018,65 +658,41 @@ db_schema:
   sites:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: path
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: published
       type: bool
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: palette
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: accent
       type: string
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: language
       type: string
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: content
       type: simpleObject
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: gallery
       type: simpleObject
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       name: updated
       type: datetime
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       name: published_at
       type: datetime
-    - admin_ui:
-        order: 10
-        width: 200
+    - admin_ui: {order: 10, width: 200}
       name: views
       type: number
-    - admin_ui:
-        order: 11
-        width: 200
+    - admin_ui: {order: 11, width: 200}
       name: visits
       type: simpleObject
     indexes: []
@@ -1085,35 +701,23 @@ db_schema:
   special_days:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: date
       type: date
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: label
       type: string
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: closed
       type: bool
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: hours
       type: simpleObject
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: no_online
       type: bool
     indexes: []
@@ -1122,61 +726,39 @@ db_schema:
   specials:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: title
       type: string
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: description
       type: string
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: price
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: photo
       target: photos
       type: link_single
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: start
       type: date
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: end
       type: date
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       name: days
       type: simpleObject
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       name: active
       type: bool
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       name: position
       type: number
-    - admin_ui:
-        order: 10
-        width: 200
+    - admin_ui: {order: 10, width: 200}
       name: created
       type: datetime
     indexes: []
@@ -1185,40 +767,26 @@ db_schema:
   table_joins:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       name: restaurant
       target: restaurants
       type: link_single
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       name: tables
       type: simpleObject
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       name: seats
       type: number
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       name: label
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       name: hours
       type: simpleObject
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       name: days
       type: simpleObject
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       name: created
       type: datetime
     indexes: []
@@ -1227,109 +795,73 @@ db_schema:
   users:
     client: none
     columns:
-    - admin_ui:
-        order: 0
-        width: 200
+    - admin_ui: {order: 0, width: 200}
       client_hidden: false
       name: email
       type: string
-    - admin_ui:
-        order: 1
-        width: 200
+    - admin_ui: {order: 1, width: 200}
       client_hidden: true
       name: enabled
       type: bool
-    - admin_ui:
-        order: 2
-        width: 200
+    - admin_ui: {order: 2, width: 200}
       client_hidden: true
       name: last_login
       type: datetime
-    - admin_ui:
-        order: 3
-        width: 200
+    - admin_ui: {order: 3, width: 200}
       client_hidden: true
       name: password_hash
       type: string
-    - admin_ui:
-        order: 4
-        width: 200
+    - admin_ui: {order: 4, width: 200}
       client_hidden: true
       name: n_password_failures
       type: number
-    - admin_ui:
-        order: 5
-        width: 200
+    - admin_ui: {order: 5, width: 200}
       client_hidden: true
       name: confirmed_email
       type: bool
-    - admin_ui:
-        order: 6
-        width: 200
+    - admin_ui: {order: 6, width: 200}
       client_hidden: true
       name: signed_up
       type: datetime
-    - admin_ui:
-        order: 7
-        width: 200
+    - admin_ui: {order: 7, width: 200}
       client_hidden: false
       name: display_name
       type: string
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       client_hidden: false
       name: legal_version
       type: string
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       client_hidden: false
       name: legal_accepted_at
       type: datetime
-    - admin_ui:
-        order: 10
-        width: 200
+    - admin_ui: {order: 10, width: 200}
       client_hidden: false
       name: legal_source
       type: string
-    - admin_ui:
-        order: 8
-        width: 200
+    - admin_ui: {order: 8, width: 200}
       client_hidden: false
       name: is_admin
       type: bool
-    - admin_ui:
-        order: 9
-        width: 200
+    - admin_ui: {order: 9, width: 200}
       client_hidden: false
       name: is_demo
       type: bool
-    - admin_ui:
-        order: 10
-        width: 200
+    - admin_ui: {order: 10, width: 200}
       client_hidden: false
       name: last_seen
       type: datetime
-    - admin_ui:
-        order: 14
-        width: 200
+    - admin_ui: {order: 14, width: 200}
       client_hidden: true
       name: remembered_logins
       type: simpleObject
-    - admin_ui:
-        order: 15
-        width: 120
+    - admin_ui: {order: 15, width: 120}
       name: plan_free
       type: bool
     indexes: []
     server: full
     title: Users
-metadata:
-  description: 'Run bookings for all your restaurants: opening hours, a drag-and-drop floor plan, automatic approvals, menus,
-    specials, events and a booking form for your website.'
-  logo_img: asset:icon-512.png
-  title: 'PlanPlate: restaurant reservations, floor plans and websites'
+metadata: {description: 'Run bookings for all your restaurants: opening hours, a drag-and-drop floor plan, automatic approvals, menus, specials, events and a booking form for your website.', logo_img: 'asset:icon-512.png', title: 'PlanPlate: restaurant reservations, floor plans and websites'}
 name: PlanPlate
 native_deps:
   head_html: |
@@ -1401,25 +933,14 @@ native_deps:
 package_name: PlanPlate_2_0
 runtime_options:
   client_version: '3'
-  server_spec:
-    base: python314
+  server_spec: {base: python314}
   version: 3
 services:
-- client_config:
-    enable_v2: true
+- client_config: {enable_v2: true}
   server_config: {}
   source: /runtime/services/tables.yml
-- client_config:
-    allow_remember_me: true
-    allow_signup: true
-    confirm_email: false
-    enable_automatically: true
-    remember_me_days: 30
-    require_secure_passwords: true
-    use_email: true
-    use_google: true
-  server_config:
-    user_table: users
+- client_config: {allow_remember_me: true, allow_signup: true, confirm_email: false, enable_automatically: true, remember_me_days: 30, require_secure_passwords: true, use_email: true, use_google: true}
+  server_config: {user_table: users}
   source: /runtime/services/anvil/users.yml
 - client_config: {}
   server_config: {}
@@ -1430,6 +951,4 @@ services:
 - client_config: {}
   server_config: {}
   source: /runtime/services/google.yml
-startup:
-  module: startup
-  type: module
+startup: {module: startup, type: module}

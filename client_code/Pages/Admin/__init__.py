@@ -171,6 +171,46 @@ class Admin(AdminTemplate):
             self.from_box.text = r["from"]
             state.toast("Emails now come from " + (r["from"] or "Anvil's own address"), "ok")
 
+    @handle("move_button", "click")
+    def move_button_click(self, **event_args):
+        if not confirm("Each photo and video is copied to Cloudflare and the app shows that copy from now on. Nothing is deleted on "
+                       "Cloudinary.", title="Move the photos to Cloudflare?", buttons=[("Cancel", False), ("Move", True)], role="app-dialog"):
+            return
+        self.move_button.enabled = False
+        self.move_report.visible = True
+        moved, errors = 0, []
+        while True:  # a few photos per server call (each call has a time limit), until none are left
+            r = state.call("media_move", 8)
+            if not r:
+                break
+            moved += r["moved"]
+            errors += r["errors"]
+            self.move_report.text = "Moving… %d done, %d to go" % (moved, r["left"])
+            if r["left"] == 0 or r["stuck"]:
+                break
+        lines = ["Moved %s." % state.plural(moved, "photo", "photos")]
+        if errors:
+            lines += ["", "Couldn't move (they keep working where they are; try again later):"] + ["  - " + e for e in errors[:20]]
+        self.move_report.text = "\n".join(lines)
+        self._storage()
+
+    @handle("unmove_button", "click")
+    def unmove_button_click(self, **event_args):
+        if not confirm("The photos that came from Cloudinary are shown from Cloudinary again (their Cloudflare copies stay, unused).",
+                       title="Put them back on Cloudinary?", buttons=[("Cancel", False), ("Put back", True)], role="app-dialog"):
+            return
+        n = 0
+        while True:
+            r = state.call("media_unmove", 100)
+            if not r:
+                break
+            n += r["restored"]
+            if r["left"] == 0:
+                break
+        self.move_report.visible = True
+        self.move_report.text = "Put back %s." % state.plural(n, "photo", "photos")
+        self._storage()
+
     @handle("test_email_button", "click")
     def test_email_button_click(self, **event_args):
         to = (self.test_email_box.text or "").strip()

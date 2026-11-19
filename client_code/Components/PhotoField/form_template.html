@@ -1,24 +1,26 @@
 ---
 custom_component: true
-properties:
-  - name: label
-    type: string
-    default_value: Photo (optional)
-    description: The line next to the thumbnail
-  - name: kind
-    type: string
-    options: [image, video]
-    default_value: image
-    description: Photos or videos
 events:
-  - name: change
-    description: A photo was chosen or removed (read .photo)
-toolbox_item:
-  title: Photo field
-  group: PlanPlate
-help_text: |
+- description: A photo was chosen or removed (read .photo)
+  name: change
+help_text: |-
   A thumbnail with Choose / Remove for forms (specials, events, the website builder). Set .rid first; .photo is the
   photo view (or None).
+properties:
+- default_value: Photo (optional)
+  description: The line next to the thumbnail
+  name: label
+  type: string
+- default_value: image
+  description: Photos or videos
+  name: kind
+  options:
+  - image
+  - video
+  type: string
+toolbox_item:
+  group: PlanPlate
+  title: Photo field
 ---
 <div class="pp-pf">
   <button type="button" class="pp-pf-th" anvil:on-dom:click="self.thumb_click"><img anvil:name="img" alt=""><span class="pp-ptile-ph" anvil:name="ph"><i class="ic ic-image"></i></span></button>

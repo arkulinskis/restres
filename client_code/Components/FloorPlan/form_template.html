@@ -1,14 +1,13 @@
 ---
 custom_component: true
 events:
-  - name: pick
-    description: A table was tapped (event arg id)
-  - name: move
-    description: A table was dragged (event args id, x, y in % of the floor)
+- description: A table was tapped (event arg id)
+  name: pick
+- description: A table was dragged (event args id, x, y in % of the floor)
+  name: move
+help_text: Tables on a dotted floor, drawn by theme/assets/pp-floor.js. Call draw(plan); see the plan shape in that file.
 toolbox_item:
-  title: Floor plan
   group: PlanPlate
-help_text: |
-  Tables on a dotted floor, drawn by theme/assets/pp-floor.js. Call draw(plan); see the plan shape in that file.
+  title: Floor plan
 ---
 <div class="pp-floor-host" anvil:dom-node="host"></div>
