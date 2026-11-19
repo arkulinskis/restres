@@ -38,6 +38,8 @@
           <button type="button" anvil:name="view_upcoming" data-v="upcoming" anvil:on-dom:click="self.view_click">Upcoming</button>
         </div>
         <anvil-component type="Button" name="chime_button" prop:text="Chime on" prop:role='["btn", "btn-ghost", "btn-sm", "ic-volume"]' prop:tooltip="Play a sound when a new booking or request comes in"></anvil-component>
+        <anvil-component type="Button" name="refresh_button" prop:text="Refresh" prop:role='["btn", "btn-ghost", "btn-sm", "ic-refresh"]' prop:tooltip="Load the latest bookings now (the page also checks by itself every minute)"></anvil-component>
+        <anvil-component type="Label" name="updated_label" prop:role='["muted", "small", "pp-updated"]'></anvil-component>
         <span class="ui-spacer"></span>
         <anvil-component type="Button" name="print_button" prop:text="Day sheet" prop:role='["btn", "btn-ghost", "ic-print", "pp-hide-m"]' prop:tooltip="Print the day's bookings for the host stand"></anvil-component>
         <anvil-component type="Button" name="walkin_button" prop:text="Walk-in" prop:role='["btn", "ic-users"]' prop:tooltip="Seat someone who just walked in"></anvil-component>

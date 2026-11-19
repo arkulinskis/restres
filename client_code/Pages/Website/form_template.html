@@ -28,7 +28,8 @@
 
       <div class="pp-site-layout" anvil:name="builder">
         <div>
-          <anvil-component type="RepeatingPanel" name="sections_panel" prop:item_template="PlanPlate_2_0.Items.SiteSection"></anvil-component>
+          <p class="ui-hint pp-drag-hint">Drag a section by its grip to change where it sits on your page.</p>
+          <div anvil:dom-node="sec_list"><anvil-component type="RepeatingPanel" name="sections_panel" prop:item_template="PlanPlate_2_0.Items.SiteSection"></anvil-component></div>
           <p class="small muted">Not sure? <a href="javascript:void(0)" anvil:on-dom:click="self.example_click">Load the Dilettante example</a> to see a finished site.</p>
         </div>
         <div class="pp-pvwrap">

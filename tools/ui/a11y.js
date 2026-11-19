@@ -90,7 +90,7 @@
     const kills = appRules.filter((r) => /:focus/.test(r.selectorText) && /outline:\s*(none|0)/.test(r.cssText) && (() => { try { return tick.matches(r.selectorText); } catch (e) { return false; } })());
     const rings = appRules.filter((r) => /input:focus-visible|\s:focus-visible/.test(r.selectorText) && /outline:\s*\d/.test(r.cssText));
     ok(!kills.length && rings.length, 'booking: tick boxes keep a focus ring (' + (kills.map((r) => r.selectorText).join(', ') || rings.length + ' ring rules') + ')');
-    ok($$('.pp-consent input[type=checkbox]').filter((c) => c.getAttribute('aria-required') === 'true').length === 2, 'booking: the two required ticks say so');
+    ok($$('.pp-book input[aria-required=true]').filter((c) => c.getBoundingClientRect().width > 2).length === 3, 'booking: name, email and phone say they are required');
     $$('.pp-book .anvil-role-btn-primary button').filter((b) => b.getBoundingClientRect().width > 0).pop().click();  // empty form
     await until(() => $$('.pp-book .anvil-role-msg-error').some((e) => e.getBoundingClientRect().width > 0), 'the error');
     const err = $$('.pp-book .anvil-role-msg-error').find((e) => e.getBoundingClientRect().width > 0);
@@ -111,7 +111,7 @@
     if (!seed || !seed.rid) throw new Error('could not sign in: ' + JSON.stringify(seed));
     const rid = encodeURIComponent(seed.rid);
     await scan('#dashboard');
-    for (const p of ['today', 'reservations', 'guests', 'hours', 'tables', 'events', 'dishes', 'gallery', 'website', 'share', 'settings']) await scan('#' + p + '/' + rid);
+    for (const p of ['today', 'reservations', 'guests', 'hours', 'tables', 'events', 'dishes', 'gallery', 'website', 'elements', 'share', 'settings']) await scan('#' + p + '/' + rid);
     await scan('#profile');
     log.push(bad.length ? 'PROBLEMS: ' + bad.join(' | ') : 'PASSED');
     return { ok: !bad.length, log: log };

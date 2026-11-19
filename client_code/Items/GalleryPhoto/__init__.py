@@ -18,7 +18,9 @@ class GalleryPhoto(GalleryPhotoTemplate):
             state.set_attr(self.img, "src", src)
         self.video_badge.visible = p.get("kind") == "video"
         self.caption_box.text = p.get("caption") or ""
-        self.left_button.visible = self.right_button.visible = self.n_label.visible = gallery
+        self.left_button.visible = self.right_button.visible = self.n_label.visible = self.grip.visible = gallery
+        if gallery:  # the Gallery page's drag-to-reorder (PP.sortable) finds the photos by this
+            state.set_attr(self, "data-sort-id", p["id"])
         if gallery:
             self.left_button.enabled = not p["_first"]
             self.right_button.enabled = not p["_last"]

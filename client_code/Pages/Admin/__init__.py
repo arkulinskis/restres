@@ -120,6 +120,9 @@ class Admin(AdminTemplate):
         movable = d["counts"].get("cloudinary", 0) + d["counts"].get("planplate", 0)
         self.move_button.enabled = bool(d["cloudflare"]) and movable > 0
         self.unmove_button.visible = d["can_undo"] > 0
+        f = state.call_quiet("admin_email_from")
+        if f:
+            self.from_box.text = f.get("from") or ""
 
     @handle("move_button", "click")
     def move_button_click(self, **event_args):
@@ -160,6 +163,13 @@ class Admin(AdminTemplate):
         self.move_report.visible = True
         self.move_report.text = "Put back %s." % state.plural(n, "photo", "photos")
         self._storage()
+
+    @handle("from_button", "click")
+    def from_button_click(self, **event_args):
+        r = state.call("admin_email_from", (self.from_box.text or "").strip())
+        if r:
+            self.from_box.text = r["from"]
+            state.toast("Emails now come from " + (r["from"] or "Anvil's own address"), "ok")
 
     @handle("test_email_button", "click")
     def test_email_button_click(self, **event_args):

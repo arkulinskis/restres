@@ -17,6 +17,11 @@
       <label class="ui-field"><span>Time</span><anvil-component type="TextBox" name="time_box"></anvil-component></label>
       <label class="ui-field"><span>Guests</span><anvil-component type="TextBox" name="party_box" prop:type="number"></anvil-component></label>
     </div>
+    <div class="pp-ed-times" anvil:name="times_box">
+      <div class="pp-lbl">Times that day</div>
+      <anvil-component type="RepeatingPanel" name="times_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips", "pp-ed-tchips"]'></anvil-component>
+      <span class="ui-hint">Tap a time to use it. “+” means tables get pushed together; greyed out = no room.</span>
+    </div>
     <div class="pp-split">
       <label class="ui-field"><span>Stays for</span><anvil-component type="DropDown" name="duration_drop"></anvil-component></label>
       <div class="ui-field"><span>Table</span><anvil-component type="DropDown" name="table_mode" prop:items='[["Best free table", "auto"], ["Choose tables…", "manual"]]'></anvil-component>

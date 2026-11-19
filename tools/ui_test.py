@@ -149,7 +149,7 @@ def main():
         guest = [("landing", "#landing"), ("auth", "#auth/signup"), ("book", "#book/maison-lumiere"), ("menu", "#menu/maison-lumiere")]
         member = [("dashboard", "#dashboard")] + [(p, "'#%s/' + encodeURIComponent(window.SEED.rid)" % p) for p in
                                                   ("today", "reservations", "guests", "hours", "tables", "events", "dishes", "gallery",
-                                                   "website", "share", "settings")]
+                                                   "website", "elements", "share", "settings")]
         for window, tag in (("1280,1000", ""), ("390,844", "_phone")):
             for theme in ("light", "dark"):
                 js = "UI.setTheme(%s)" % json.dumps(theme)

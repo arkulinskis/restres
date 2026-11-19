@@ -19,7 +19,21 @@
             <anvil-component type="Label" name="sum_title" prop:role='["card-title"]'></anvil-component>
             <anvil-component type="Label" name="sum_text" prop:role='["muted", "small"]'></anvil-component>
             <anvil-component type="Button" name="add_button" prop:text="Add a table" prop:role='["btn", "btn-primary", "btn-block", "ic-plus"]'></anvil-component>
-            <anvil-component type="Button" name="join_mode_button" prop:text="Join tables" prop:role='["btn", "btn-block", "ic-join"]'></anvil-component>
+            <div class="pp-bigparty">
+              <h3 class="pp-bp-h">Big parties</h3>
+              <anvil-component type="Label" name="bp_text" prop:role='["muted", "small"]'></anvil-component>
+              <div class="pp-grid3 pp-bp-form">
+                <label class="ui-field"><span>Guests</span><anvil-component type="TextBox" name="bp_party" prop:type="number" prop:text="8"></anvil-component></label>
+                <label class="ui-field"><span>Day</span><anvil-component type="DatePicker" name="bp_date" prop:format="D MMM"></anvil-component></label>
+                <label class="ui-field"><span>Time</span><anvil-component type="TextBox" name="bp_time" prop:text="19:00"></anvil-component></label>
+              </div>
+              <div class="ui-row">
+                <anvil-component type="Button" name="try_button" prop:text="Try a big party" prop:role='["btn", "btn-sm", "ic-users"]'></anvil-component>
+                <anvil-component type="Button" name="try_clear_button" prop:text="Clear" prop:role='["btn", "btn-ghost", "btn-sm"]' prop:visible="false"></anvil-component>
+              </div>
+              <anvil-component type="Label" name="try_result" prop:role='["msg-note"]' prop:visible="false"></anvil-component>
+            </div>
+            <anvil-component type="Button" name="join_mode_button" prop:text="Always join some tables…" prop:role='["btn", "btn-ghost", "btn-block", "ic-join"]'></anvil-component>
           </div>
           <!-- a table is selected -->
           <div anvil:name="table_part" class="ui-stack">
@@ -35,6 +49,10 @@
             </div>
             <label class="ui-field"><span>Area</span><anvil-component type="TextBox" name="t_area" prop:placeholder="e.g. Terrace"></anvil-component></label>
             <anvil-component type="CheckBox" name="t_active" prop:text="Available for bookings"></anvil-component>
+            <div class="pp-joinable">
+              <anvil-component type="CheckBox" name="t_joinable" prop:text="Joinable: staff can move it and push it against other tables"></anvil-component>
+              <span class="ui-hint">Untick booths, bar seats and tables fixed to the floor. For a party no single table fits, PlanPlate pushes joinable tables that stand next to each other (same area) together, and asks you to approve.</span>
+            </div>
             <div class="pp-join-note" anvil:name="join_note">
               <anvil-component type="Label" name="join_note_label"></anvil-component>
               <div class="ui-row">
@@ -66,9 +84,20 @@
         </div>
       </div>
 
-      <div class="pp-sec-head"><h2>Joined tables</h2><span class="muted small">Tables pushed together are booked as one</span></div>
+      <div class="ui-card pp-howjoin">
+        <h2>How PlanPlate seats a big party</h2>
+        <ol>
+          <li><b>One table that fits</b> (or tables you always join, below): booked straight away.</li>
+          <li><b>Joinable tables side by side</b>: free tables in the same area, close together on the plan, are pushed together. Online, the booking waits for your approval.</li>
+          <li><b>Make room</b>: if another party sits where the join is needed, PlanPlate suggests moving them to another free table. Approving the booking moves them for you.</li>
+          <li><b>No room</b>: the time shows as full. Take the party by phone and place them by hand.</li>
+        </ol>
+        <p class="ui-hint">Fixed tables (booths, bar) are never moved. Drag tables on the plan so neighbours really stand next to each other.</p>
+      </div>
+
+      <div class="pp-sec-head"><h2>Always joined</h2><span class="muted small">Tables you keep pushed together at set hours, booked as one</span></div>
       <anvil-component type="RepeatingPanel" name="joins_panel" prop:item_template="PlanPlate_2_0.Items.JoinCard"></anvil-component>
-      <div class="ui-empty" anvil:name="joins_empty">No joined tables. Use <b>Join tables</b> to push tables together at busy times, or to keep a large table split into smaller ones at quiet times.</div>
+      <div class="ui-empty" anvil:name="joins_empty">None. You only need this for tables that stay together at busy times, or a large table you split at quiet times. Big parties are joined for you.</div>
     </div>
   </anvil-block>
 </anvil-form>

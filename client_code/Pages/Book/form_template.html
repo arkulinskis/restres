@@ -2,13 +2,18 @@
   <anvil-block slot="content">
     <div class="pp-book">
       <div class="pp-sheet">
-        <div class="pp-embed-close" anvil:name="close_row"><anvil-component type="Button" name="close_button" prop:text="Close" prop:role='["btn", "btn-ghost", "btn-sm", "ic-x"]'></anvil-component></div>
-        <anvil-component type="RepeatingPanel" name="langs_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["pp-langs"]'></anvil-component>
-        <div class="pp-masthead" anvil:name="masthead">
-          <svg class="mark" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor"><circle cx="16" cy="16" r="14" stroke-width="1.4"/><circle cx="16" cy="16" r="9" stroke-width="1"/><path d="M16 10.5v11" stroke-width="1.4" stroke-linecap="round"/></svg>
-          <anvil-component type="Label" name="name_label" prop:role='["pp-mast-name"]'></anvil-component>
-          <anvil-component type="Label" name="kind_label" prop:role='["pp-mast-kind"]'></anvil-component>
-          <anvil-component type="Label" name="desc_label" prop:role='["muted"]'></anvil-component>
+        <div class="pp-bhead" anvil:name="masthead">
+          <div class="pp-bhead-main">
+            <anvil-component type="Label" name="name_label" prop:role='["pp-bhead-name"]'></anvil-component>
+            <div class="pp-bhead-sub">
+              <anvil-component type="Label" name="kind_label" prop:role='["pp-bhead-kind"]'></anvil-component>
+              <anvil-component type="Label" name="desc_label" prop:role='["pp-bhead-desc"]'></anvil-component>
+            </div>
+          </div>
+          <div class="pp-bhead-side">
+            <anvil-component type="RepeatingPanel" name="langs_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["pp-langs"]'></anvil-component>
+            <span class="pp-bhead-mark" title="Bookings by PlanPlate"><svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor"><circle cx="16" cy="16" r="14" stroke-width="1.6"/><circle cx="16" cy="16" r="9" stroke-width="1.2"/><path d="M16 10.5v11" stroke-width="1.6" stroke-linecap="round"/></svg><span>PlanPlate</span></span>
+          </div>
         </div>
 
         <div class="ui-card pp-panel" anvil:name="problem_card">
@@ -29,28 +34,28 @@
           <div class="pp-summary"><i class="ic ic-calendar"></i><anvil-component type="Label" name="summary_label" prop:role='["strong"]'></anvil-component><span class="ui-spacer"></span>
             <anvil-component type="Button" name="back_button" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component></div>
           <div class="ui-stack">
-            <anvil-component type="Label" name="details_h" prop:role='["pp-step-h"]'></anvil-component>
-            <label class="ui-field"><anvil-component type="Label" name="name_cap" prop:role=\'["field-cap"]\'></anvil-component><anvil-component type="TextBox" name="name_box"></anvil-component></label>
+            <div class="pp-details-hd"><anvil-component type="Label" name="details_h" prop:role='["pp-step-h"]'></anvil-component>
+              <anvil-component type="Label" name="req_note" prop:role='["pp-req-note"]'></anvil-component></div>
+            <label class="ui-field"><anvil-component type="Label" name="name_cap" prop:role=\'["field-cap", "pp-req"]\'></anvil-component><anvil-component type="TextBox" name="name_box"></anvil-component></label>
             <div class="pp-split">
-              <label class="ui-field"><anvil-component type="Label" name="email_cap" prop:role=\'["field-cap"]\'></anvil-component><anvil-component type="TextBox" name="email_box" prop:type="email"></anvil-component></label>
-              <label class="ui-field"><anvil-component type="Label" name="phone_cap" prop:role=\'["field-cap"]\'></anvil-component><anvil-component type="TextBox" name="phone_box" prop:type="tel"></anvil-component></label>
+              <label class="ui-field"><anvil-component type="Label" name="email_cap" prop:role=\'["field-cap", "pp-req"]\'></anvil-component><anvil-component type="TextBox" name="email_box" prop:type="email"></anvil-component></label>
+              <label class="ui-field"><anvil-component type="Label" name="phone_cap" prop:role=\'["field-cap", "pp-req"]\'></anvil-component><anvil-component type="TextBox" name="phone_box" prop:type="tel"></anvil-component></label>
             </div>
             <label class="ui-field"><anvil-component type="Label" name="notes_cap" prop:role=\'["field-cap"]\'></anvil-component><anvil-component type="TextArea" name="notes_box" prop:height="70"></anvil-component></label>
             <div class="pp-hp" aria-hidden="true"><anvil-component type="TextBox" name="website_box"></anvil-component></div>
-            <div class="pp-consent">
-              <anvil-component type="CheckBox" name="consent_box"></anvil-component>
-              <anvil-component type="Link" name="privacy_link" prop:role='["small"]'></anvil-component>
-              <anvil-component type="Label" name="privacy_text" prop:role='["pp-privacy"]' prop:visible="false"></anvil-component>
-            </div>
-            <div class="pp-consent" anvil:name="pp_consent_row">
-              <anvil-component type="CheckBox" name="pp_consent_box"></anvil-component>
-              <anvil-component type="Link" name="pp_policy_link" prop:role='["small"]'></anvil-component>
-            </div>
             <div class="pp-consent pp-consent-opt" anvil:name="pp_news_row">
               <anvil-component type="CheckBox" name="pp_news_box"></anvil-component>
             </div>
             <anvil-component type="Label" name="error_label" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
             <anvil-component type="Button" name="submit_button" prop:role='["btn", "btn-primary", "btn-block", "btn-lg"]'></anvil-component>
+            <div class="pp-accept">
+              <anvil-component type="Label" name="accept_label" prop:role='["pp-accept-text"]'></anvil-component>
+              <div class="pp-accept-links">
+                <anvil-component type="Link" name="privacy_link" prop:role='["small"]'></anvil-component>
+                <anvil-component type="Link" name="pp_policy_link" prop:role='["small"]'></anvil-component>
+              </div>
+              <anvil-component type="Label" name="privacy_text" prop:role='["pp-privacy"]' prop:visible="false"></anvil-component>
+            </div>
           </div>
         </div>
 
@@ -73,7 +78,6 @@
         <div class="pp-bfoot">
           <a anvil:name="map_link" href="#" target="_blank" rel="noopener"><i class="ic ic-pin"></i><anvil-component type="Label" name="addr_label"></anvil-component></a>
           <a anvil:name="tel_link" href="#"><i class="ic ic-phone"></i><anvil-component type="Label" name="tel_label"></anvil-component></a>
-          <a anvil:name="menu_link" href="#"><i class="ic ic-list"></i><anvil-component type="Label" name="menu_label"></anvil-component></a>
         </div>
       </div>
     </div>

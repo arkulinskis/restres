@@ -369,12 +369,12 @@ GN = MODS['GuestNews']
 far = next_weekday(2, 16)  # a Wednesday nobody else books in these tests
 assert set(G.get_booking_form('le-petit-jardin')['pp']) == {'en', 'fr', 'lv'} and G.get_booking_form('le-petit-jardin')['pp']['fr']['consent'] == GN.TEXT['fr']['consent']
 no_pp = G.book('le-petit-jardin', dict(guest, consent=True, pp_consent=False, date=far.isoformat(), time='12:00', party=2))
-assert not no_pp['ok'] and 'required' in no_pp['error'], 'no PlanPlate tick, no booking'
+assert not no_pp['ok'] and 'accept' in no_pp['error'], 'not booked under the PlanPlate line, no booking'
 assert T.pp_contacts.get(email='nora@example.com') is None
 del OUT[:]
 n1 = ok(G.book('le-petit-jardin', dict(guest, name='Nora', email='Nora@Example.com', consent=True, pp_news=True, date=far.isoformat(), time='12:00', party=2, language='lv')))
 row = T.reservations.get(token=n1['token'])
-assert row['pp_consent'] and row['pp_consent_text'] == GN.TEXT['lv']['consent'] and row['pp_consent_at'] and row['pp_news'] is True
+assert row['pp_consent'] and row['pp_consent_text'] == GN.consent_text('lv', 'Le Petit Jardin') and 'Le Petit Jardin' in row['pp_consent_text'] and row['pp_consent_at'] and row['pp_news'] is True
 c = T.pp_contacts.get(email='nora@example.com')
 assert c is not None and c['subscribed'] and c['consent_text'] == GN.TEXT['lv']['news'] and c['restaurant_name'] == 'Le Petit Jardin' and len(c['token']) == 32
 assert c['language'] == 'lv' and c['consent_at'] and c['stopped_at'] is None
@@ -773,7 +773,24 @@ assert 'Le Petit Jardin' in html and 'French bistro' in html and 'Small plates &
 assert '--accent:#123456' in html and '#3f1219' in html, 'bordeaux palette with a custom accent'
 assert 'youtube-nocookie.com/embed/dQw4w9WgXcQ' in html and 'google.com/maps/embed?pb=!1m18abc' in html
 assert 'Truffle risotto' in html and 'Staff lunch was great' in html, 'specials and the newest photo of the day'
-assert '<planplate-gallery feed-url="https://planplate-test.anvil.app/_/api/gallery/le-petit-jardin" theme="cinematic"' in html
+assert '<planplate-showcase restaurant="le-petit-jardin" origin="https://planplate-test.anvil.app" no-heading>' in html and '/_/theme/pp-showcase.js' in html
+sc = json.loads(anvil.server.ENDPOINTS['/showcase/:ref'](ref='le-petit-jardin').body)
+assert sc['style']['layout'] in ('mosaic', 'spotlight') and sc['photos'] and 'url' in sc['photos'][0] and 'theme' not in sc['style'], sc['style']
+anvil.users.CURRENT[0] = ana
+ok(MD.save_gallery_style(rid, {'layout': 'polaroid', 'tone': 'custom', 'background': '#6b4f36', 'show': '9', 'layout_bad': 'x'}))
+sc = json.loads(anvil.server.ENDPOINTS['/showcase/:ref'](ref='le-petit-jardin').body)['style']
+assert sc['layout'] == 'polaroid' and sc['tone'] == 'custom' and sc['background'] == '#6b4f36' and sc['show'] == '9'
+assert not MD.save_gallery_style(rid, {'layout': '<script>'})['style']['layout'].startswith('<'), 'unknown layouts are ignored'
+assert anvil.server.ENDPOINTS['/showcase/:ref'](ref='nope').status == 404
+# the builder's sections dragged into a new order: the page and its menu follow
+cur = S.get_site(rid)['site']['content']
+hv = S.preview_site(rid, {'content': dict(cur, order=['gallery', 'about', 'bogus', 'gallery'])})['html']
+assert hv.index('id="gallery"') < hv.index('class="about') if 'class="about' in hv else hv.index('id="gallery"') < hv.index('id="menu"'), 'gallery moved up'
+assert S.clean_content(dict(cur, order=['gallery', 'about', 'bogus', 'gallery']), r)['order'] == ['gallery', 'about']
+hv2 = S.preview_site(rid, {'content': dict(cur, order=[])})['html']
+assert hv2.index('id="menu"') < hv2.index('id="gallery"'), 'no order = the classic order'
+
+anvil.users.CURRENT[0] = None
 assert '"@type": "Restaurant"' in html and 'Jazz night' in html and 'Wedding dinner' not in html, 'private events stay off the website'
 assert '#book/le-petit-jardin/' in html and 'javascript:' not in html
 assert T.sites.get(restaurant=r)['views'] == 1 and sum(T.sites.get(restaurant=r)['visits'].values()) == 1
@@ -1315,6 +1332,87 @@ nl = call('admin_news')
 assert nl['subscribed'] == 1 and nl['stopped'] == 1 and nl['recent'][0]['email'] == 'nora@example.com', nl
 csv_text = GN.admin_news_csv().get_bytes().decode('utf-8-sig')
 assert 'nora@example.com' in csv_text and 'gone@example.com' not in csv_text and '/news/stop/' in csv_text, csv_text
+as_user(None)
+
+# ---------------------------------------------------------------------------------- big parties: tables pushed together (2026-11-19)
+as_user(ana)
+JG = {'name': 'X', 'email': 'x@example.com', 'phone': '+371 2000 0000', 'notes': '', 'consent': True, 'pp_consent': True}
+jr = ok(P.create_restaurant('Join Test', 'UTC', False))['id']
+jrow = T.restaurants.get_by_id(jr)
+ok(P.save_period(jr, {'name': 'Every day', 'week': {str(i): [['12:00', '23:00']] for i in range(7)}}))
+ok(P.save_settings(jr, {'max_party': 12, 'max_auto_party': 12, 'auto_threshold': 100, 'lead_min': 0}))
+for name, seats, x, y, extra in (('A', 4, 10, 20, {}), ('B', 4, 24, 20, {}), ('Booth', 6, 70, 70, {'joinable': False}), ('C', 2, 90, 20, {})):
+    ok(P.save_table(jr, dict({'name': name, 'seats': seats, 'x': x, 'y': y}, **extra)))
+JT = {t['name']: t for t in P.get_tables(jr)['tables']}
+assert JT['Booth']['joinable'] is False and JT['A']['joinable'] is True, 'the joinable tick is saved and shown'
+jday = next_weekday(3, 20)
+jctx = B.Ctx(jrow)
+unit, plan = B.seat_party(jctx, jday, 19 * 60, 8, 120)
+assert unit is None and plan and set(plan['ids']) == {JT['A']['id'], JT['B']['id']} and plan['seats'] == 8 and not plan['moves'], plan
+assert B.seat_party(jctx, jday, 19 * 60, 6, 120)[0]['ids'] == [JT['Booth']['id']], 'a single table that fits always wins'
+slot = [s for s in call('get_slots', 'join-test', jday.isoformat(), 8)['slots'] if s['time'] == '19:00'][0]
+assert slot['state'] == 'open' and slot['review'] is True, 'a time that needs tables pushed together is offered, with approval'
+big = ok(call('book', 'join-test', dict(JG, name='Big Party', email='big@example.com', date=jday.isoformat(), time='19:00', party=8)))
+brow = T.reservations.get(token=big['token'])
+assert big['status'] == 'pending' and 'Push A + B together' in brow['review_reason'] and set(brow['tables']) == {JT['A']['id'], JT['B']['id']}
+assert brow['table_plan']['join'] == 'A + B'
+assert 'Push A + B' in [p for p in P.get_day(jr, jday.isoformat())['pending'] if p['id'] == brow.get_id()][0]['plan']
+ok(P.set_status(jr, brow.get_id(), 'declined', jday.isoformat()))
+# a couple sits at B: the party of 8 fits only after moving them to C
+couple = ok(P.save_reservation(jr, {'date': jday.isoformat(), 'time': '19:00', 'party': 2, 'name': 'Couple', 'tables': [JT['B']['id']]}))
+jctx = B.Ctx(jrow)
+unit, plan = B.seat_party(jctx, jday, 19 * 60, 8, 120)
+assert unit is None and plan and plan['moves'] and plan['moves'][0]['to'] == [JT['C']['id']] and 'Move Couple' in plan['text'], plan
+big2 = ok(call('book', 'join-test', dict(JG, name='Big Party 2', email='big2@example.com', date=jday.isoformat(), time='19:00', party=8)))
+assert big2['status'] == 'pending'
+b2 = T.reservations.get(token=big2['token'])
+ok(P.set_status(jr, b2.get_id(), 'confirmed', jday.isoformat()))
+crow = T.reservations.get_by_id(couple['id'])
+assert crow['tables'] == [JT['C']['id']] and 'Moved from B to C' in crow['history'][-1]['what'], 'approving does the move'
+assert 'Move Couple' in b2['staff_note'], 'the host stand sees what to do'
+tp = ok(P.test_party(jr, jday.isoformat(), '19:00', 10))
+assert tp['kind'] == 'none' and 'No room' in tp['text'], tp
+tp = ok(P.test_party(jr, (jday + dt.timedelta(days=7)).isoformat(), '19:00', 8))
+assert tp['kind'] == 'join' and set(tp['ids']) == {JT['A']['id'], JT['B']['id']}
+# staff bookings: the editor offers it and saving applies it; times in the past are refused
+o = ok(P.get_options(jr, (jday + dt.timedelta(days=7)).isoformat(), '19:00', 8, 120))
+assert not o['units'] and 'Push A + B' in o['plan'] and any(t['time'] == '19:00' and t['state'] == 'join' for t in o['times'])
+past = bad(P.save_reservation(jr, {'date': (TODAY - dt.timedelta(days=1)).isoformat(), 'time': '19:00', 'party': 2, 'name': 'Late'}))
+assert 'already passed' in past['error']
+ok(P.save_reservation(jr, {'date': (TODAY - dt.timedelta(days=1)).isoformat(), 'time': '19:00', 'party': 2, 'name': 'Was here', 'status': 'done', 'force': True}))
+assert P.get_options(jr, (TODAY - dt.timedelta(days=1)).isoformat(), '19:00', 2, 120)['past'] is True
+
+# ---- embed button: styles, own buttons, language; the menu widget lists the uploaded menu files
+js = anvil.server.ENDPOINTS['/embed.js'](r='join-test', style='brass', shape='rounded', size='lg').body
+assert '"style": "brass"' in js and '"shape": "rounded"' in js and '"size": "lg"' in js and 'pp-reserve' in js and '__ORIGIN__' not in js
+js = anvil.server.ENDPOINTS['/embed.js'](r='join-test', style='<script>', button='none', lang='fr').body
+assert '"style": "ink"' in js and '"button": "none"' in js and 'server une table' in js and '<script>' not in js.split('var me')[0]
+ok(MODS['Legacy'].add_menu_file(jr, anvil.BlobMedia('application/pdf', b'%PDF-1.4 menu', name='food.pdf'), 'Food'))
+mj = json.loads(anvil.server.ENDPOINTS['/menu'](r='join-test').body)
+assert mj['files'][0]['title'] == 'Food' and '/_/api/menu/' in mj['files'][0]['url'], mj
+assert 'pp-menu-file' in anvil.server.ENDPOINTS['/menu.js'](r='join-test').body and 'Food' in anvil.server.ENDPOINTS['/menu.js'](r='join-test').body
+as_user(None)
+
+# ---- Admin -> Email -> Send from: booking emails from the restaurant group's own domain (keeps them out of junk)
+as_user(bob)
+assert denied('admin_email_from', 'x@planplate.com')
+as_user(admin)
+assert call('admin_email_from')['from'] == ''
+bad(call('admin_email_from', 'not an address'))
+assert ok(call('admin_email_from', 'Reservations@PlanPlate.com'))['from'] == 'reservations@planplate.com'
+NT = MODS['Notify']
+NT._send('guest@example.com', 'Hi', 'text', '<p>html</p>', T.restaurants.get(slug='le-petit-jardin'))
+assert anvil.email.OUTBOX[-1]['from_address'] == 'reservations@planplate.com' and anvil.email.OUTBOX[-1]['from_name'] == 'Le Petit Jardin (PlanPlate)'
+_real_send = anvil.email.send
+def _picky(**kw):
+    if kw.get('from_address'):
+        raise anvil.email.SendFailure('not allowed')
+    _real_send(**kw)
+anvil.email.send = _picky
+NT._send('guest@example.com', 'Hi', 'text', '<p>html</p>')
+assert 'from_address' not in anvil.email.OUTBOX[-1], 'falls back to Anvil address when the SMTP set-up is missing'
+anvil.email.send = _real_send
+ok(call('admin_email_from', ''))
 as_user(None)
 
 # ---------------------------------------------------------------------------------- every callable is covered by a permission check

@@ -220,7 +220,9 @@
       "sources": [
         "client_code/Pages/Tables",
         "client_code/Components/FloorPlan",
-        "client_code/Items/GroupRow"
+        "client_code/Items/GroupRow",
+        "theme/assets/pp-floor.js",
+        "server_code/Booking.py"
       ],
       "shots": [
         {
@@ -228,6 +230,13 @@
           "as": "manager",
           "go": "#tables/{rid}",
           "wait": 800
+        },
+        {
+          "name": "tables-bigparty",
+          "as": "manager",
+          "go": "#tables/{rid}",
+          "wait": 800,
+          "do": "await H.click('Try a big party', '.pp-side'); await H.until(() => H.$('.pp-bigparty .anvil-role-msg-note, .pp-bigparty .anvil-role-msg-error') && H.$('.pp-bigparty .anvil-role-msg-note, .pp-bigparty .anvil-role-msg-error').getBoundingClientRect().width > 0, 'the answer', 40000); await H.scrollTo('.pp-bigparty'); window.scrollBy(0, -120);"
         }
       ]
     },
@@ -274,8 +283,10 @@
       "who": "Managers",
       "sources": [
         "client_code/Pages/Gallery",
-        "client_code/Items/PhotoTile",
-        "client_code/Dialogs/PhotoPicker"
+        "client_code/Items/GalleryPhoto",
+        "client_code/Items/LayoutCard",
+        "client_code/Items/OptionRow",
+        "theme/assets/pp-showcase.js"
       ],
       "shots": [
         {
@@ -283,6 +294,13 @@
           "as": "manager",
           "go": "#gallery/{rid}",
           "wait": 1500
+        },
+        {
+          "name": "gallery-look",
+          "as": "manager",
+          "go": "#gallery/{rid}",
+          "wait": 2500,
+          "do": "await H.scrollTo('.pp-look-head');"
         }
       ]
     },
@@ -301,6 +319,33 @@
           "as": "manager",
           "go": "#website/{rid}",
           "wait": 2500
+        }
+      ]
+    },
+    {
+      "id": "elements",
+      "title": "Website elements: the Reserve button, menu, hours, gallery",
+      "who": "Managers",
+      "sources": [
+        "client_code/Pages/Elements",
+        "server_code/Public.py",
+        "server_code/Menu.py"
+      ],
+      "shots": [
+        {
+          "name": "elements-button",
+          "as": "manager",
+          "go": "#elements/{rid}",
+          "wait": 2000,
+          "selector": ".pp-el-hero",
+          "pad": 12
+        },
+        {
+          "name": "elements-codes",
+          "as": "manager",
+          "go": "#elements/{rid}",
+          "wait": 1500,
+          "do": "await H.scrollTo('#el-menu');"
         }
       ]
     },

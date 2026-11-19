@@ -70,6 +70,11 @@ db_schema:
         width: 200
       name: active
       type: bool
+    - admin_ui:
+        order: 10
+        width: 200
+      name: joinable
+      type: bool
     indexes: []
     server: full
     title: Dining tables
@@ -830,6 +835,11 @@ db_schema:
         width: 200
       name: pp_news
       type: bool
+    - admin_ui:
+        order: 27
+        width: 200
+      name: table_plan
+      type: simpleObject
     indexes: []
     server: full
     title: Reservations
@@ -1323,7 +1333,7 @@ metadata:
 name: PlanPlate
 native_deps:
   head_html: |
-    <script src="_/theme/legal-kit.js?v=2f3be3981e"></script>
+    <script src="_/theme/legal-kit.js?v=18737ef100"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#f6f3ee">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1383,11 +1393,11 @@ native_deps:
     <!-- Prepsto feedback panel: every "Submit feedback" link and button opens it (it is the only feedback channel). No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->
     <script src="https://prepsto.com/_/theme/widget.js" data-prepsto="3jhqeaj" data-button="false" data-label="Submit feedback" async></script>
     <link rel="stylesheet" href="_/theme/icons.css?v=dbadc7ab1d">
-    <link rel="stylesheet" href="_/theme/app.css?v=4a32816cdc">
+    <link rel="stylesheet" href="_/theme/app.css?v=5a98f5eb24">
     <script src="_/theme/app-kit.js?v=9790718203"></script>
-    <script src="_/theme/pp-kit.js?v=82d32c4671"></script>
+    <script src="_/theme/pp-kit.js?v=6e4702eeb1"></script>
     <script src="_/theme/pp-timeline.js?v=21a8c268cb"></script>
-    <script src="_/theme/pp-floor.js?v=d70986d714"></script>
+    <script src="_/theme/pp-floor.js?v=4c48b53605"></script>
 package_name: PlanPlate_2_0
 runtime_options:
   client_version: '3'

@@ -28,6 +28,7 @@ PAGES = {
     "dishes": ("user", "Menu"),
     "gallery": ("user", "Gallery"),
     "website": ("user", "Website"),
+    "elements": ("user", "Website elements"),
     "share": ("user", "Share & QR codes"),
     "settings": ("user", "Settings"),
     "profile": ("user", "Your profile"),
@@ -39,7 +40,7 @@ PAGES = {
 }
 NAV = [("dashboard", "Restaurants", "grid"), ("howto", "How to", "book")]
 PUBLIC = ("book", "r", "menu")
-RESTAURANT = ("today", "reservations", "guests", "hours", "tables", "events", "dishes", "gallery", "website", "share", "settings")
+RESTAURANT = ("today", "reservations", "guests", "hours", "tables", "events", "dishes", "gallery", "website", "elements", "share", "settings")
 APP_NAME = "PlanPlate"
 _r: dict = {"after": "", "listening": False, "page": ""}
 
@@ -82,6 +83,9 @@ def _form(name):
     if name == "website":
         from .Pages.Website import Website
         return Website
+    if name == "elements":
+        from .Pages.Elements import Elements
+        return Elements
     if name == "share":
         from .Pages.Share import Share
         return Share

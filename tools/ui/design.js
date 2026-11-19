@@ -11,7 +11,7 @@
    Resolves to {ok, log}. Keep log lines ASCII (the Windows console). */
 (async function () {
   const PUBLIC = ['#landing', '#auth/signup', '#book/maison-lumiere', '#menu/maison-lumiere'];
-  const RESTAURANT = ['today', 'reservations', 'guests', 'hours', 'tables', 'events', 'dishes', 'gallery', 'website', 'share', 'settings'];
+  const RESTAURANT = ['today', 'reservations', 'guests', 'hours', 'tables', 'events', 'dishes', 'gallery', 'website', 'elements', 'share', 'settings'];
   const OVERUSED = ['inter', 'roboto', 'plus jakarta sans', 'geist', 'space grotesk', 'fraunces'];
   const phone = window.innerWidth < 600;
   const log = [], bad = [];

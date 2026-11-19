@@ -173,12 +173,19 @@ def _missing():
                                      headers={"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"})
 
 
+def menu_files(r):
+    """The uploaded menu files (PDFs, photos) with their public links, for the website feeds."""
+    from . import Legacy
+    return [{"title": f["title"] or "Menu", "url": Legacy._file_view(f, r)["url"], "type": f["content_type"] or "",
+             "language": f["language"] or ""} for f in Legacy.files_of(r) if f["file"] is not None]
+
+
 @anvil.server.http_endpoint("/menu")
 def menu_json(r=None, **kw):
     rest = _find(r)
     if rest is None:
         return _missing()
-    return _json({"restaurant": rest["name"], "sections": _menu(rest), "tags": TAGS})
+    return _json({"restaurant": rest["name"], "sections": _menu(rest), "files": menu_files(rest), "tags": TAGS})
 
 
 @anvil.server.http_endpoint("/hours")
@@ -190,11 +197,25 @@ def hours_json(r=None, **kw):
 
 
 # The widgets draw plain, unstyled-but-tidy HTML that takes the website's own fonts and colours.
+# The menu widget shows the uploaded menu files (PDFs, photos) as links first, then the dishes typed into PlanPlate.
 WIDGET_JS = r"""(function(){
   var DATA=%(data)s, KIND=%(kind)s;
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  var DOC='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>';
+  function files(){
+    var f=DATA.files||[];
+    if(!f.length)return '';
+    var langs={};f.forEach(function(x){if(x.language)langs[x.language]=1;});
+    var many=Object.keys(langs).length>1;
+    return '<ul class="pp-menu-files" style="list-style:none;padding:0;margin:0 0 1.6em;display:flex;flex-wrap:wrap;gap:.6em">'+
+      f.map(function(x){
+        return '<li style="margin:0"><a class="pp-menu-file" href="'+esc(x.url)+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.55em;padding:.7em 1.15em;border:1px solid rgba(127,127,127,.45);border-radius:999px;color:inherit;text-decoration:none;font-weight:500">'+
+          DOC+'<span>'+esc(x.title)+'</span>'+(many&&x.language?'<small style="opacity:.6;letter-spacing:.08em">'+esc(x.language.toUpperCase())+'</small>':'')+
+          '<small style="opacity:.55">'+(String(x.type).indexOf('pdf')>=0?'PDF':'')+'</small></a></li>';
+      }).join('')+'</ul>';
+  }
   function menu(){
-    return DATA.sections.map(function(s){
+    return files()+DATA.sections.map(function(s){
       return '<section class="pp-menu-section" style="margin:0 0 1.6em"><h3 style="margin:0 0 .2em">'+esc(s.title)+'</h3>'+
         (s.description?'<p style="margin:0 0 .8em;opacity:.7">'+esc(s.description)+'</p>':'')+
         s.items.map(function(i){
@@ -222,7 +243,7 @@ def menu_js(r=None, **kw):
     rest = _find(r)
     if rest is None:
         return _missing()
-    return _js(WIDGET_JS % {"data": json.dumps({"sections": _menu(rest)}), "kind": json.dumps("menu")})
+    return _js(WIDGET_JS % {"data": json.dumps({"sections": _menu(rest), "files": menu_files(rest)}), "kind": json.dumps("menu")})
 
 
 @anvil.server.http_endpoint("/hours.js")

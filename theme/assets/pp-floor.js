@@ -1,8 +1,10 @@
 /* pp-floor.js: the floor plan (Tables & layout, and each event's room set-up). Drawing + dragging only; the
    Components/FloorPlan Python component wraps it.
    PP.floor(el, plan, handler)
-     plan = { tables: [{id, name, seats, shape, x, y, active}], groups: [{tables: [ids], tag}],   (joined / pushed together)
-              selected: [ids], out: [ids] (taken out: dashed), draggable: bool, empty: "text when there are no tables" }
+     plan = { tables: [{id, name, seats, shape, x, y, active, joinable}], groups: [{tables: [ids], tag}],   (joined / pushed together)
+              selected: [ids], out: [ids] (taken out: dashed), draggable: bool, empty: "text when there are no tables",
+              suggest: [ids] (Tables -> Try a big party: the tables PlanPlate would push together), busy: [ids] (booked then) }
+     A table with joinable false (a booth, a fixed table) carries a small lock.
      handler(kind, payload): "pick" {id} (a tap or Enter) | "move" {id, x, y} (a drag ended; x/y in % of the floor) */
 (function () {
   'use strict';
@@ -38,17 +40,19 @@
       for (var i = 1; i < ts.length; i++) seg += '<line x1="' + ts[i - 1].x + '%" y1="' + ts[i - 1].y + '%" x2="' + ts[i].x + '%" y2="' + ts[i].y + '%"/>';
       return seg;
     }).join('');
-    var sel = P.selected || [], out = P.out || [];
+    var sel = P.selected || [], out = P.out || [], sug = P.suggest || [], busy = P.busy || [];
     return '<div class="pp-floor' + (P.draggable ? ' can-drag' : '') + '"><svg class="links">' + lines + '</svg>' +
       (P.tables.length ? '' : '<div class="hint-empty">' + esc(P.empty || 'Add your first table to start the floor plan.') + '</div>') +
       P.tables.map(function (t) {
         var sz = size(t), g = inGroup[t.id];
-        var cls = 'tb ' + t.shape + (g ? ' joined' : '') + (t.active === false || out.indexOf(t.id) >= 0 ? ' off' : '') + (sel.indexOf(t.id) >= 0 ? ' sel' : '');
+        var cls = 'tb ' + t.shape + (g ? ' joined' : '') + (t.active === false || out.indexOf(t.id) >= 0 ? ' off' : '') + (sel.indexOf(t.id) >= 0 ? ' sel' : '') +
+          (t.joinable === false ? ' fixed' : '') + (sug.indexOf(t.id) >= 0 ? ' sug' : '') + (busy.indexOf(t.id) >= 0 && sug.indexOf(t.id) < 0 ? ' busy' : '');
         var tag = '', gk = g ? g.tables.join() : '';
         if (g && g.tag && !tagged[gk]) { tagged[gk] = 1; tag = '<span class="jtag">' + esc(g.tag) + '</span>'; }
-        return '<div class="' + cls + '" data-t="' + esc(t.id) + '" tabindex="0" role="button" aria-label="' + esc(t.name + ', ' + t.seats + ' seats' + (g ? ', joined' : '')) +
+        return '<div class="' + cls + '" data-t="' + esc(t.id) + '" tabindex="0" role="button" aria-label="' + esc(t.name + ', ' + t.seats + ' seats' + (g ? ', joined' : '') + (t.joinable === false ? ', fixed in place' : '')) +
           '" style="left:' + t.x + '%;top:' + t.y + '%;width:' + (sz[0] + 18) + 'px;height:' + (sz[1] + 18) + 'px">' + chairs(t, sz[0], sz[1]) + tag +
-          '<div class="top" style="width:' + sz[0] + 'px;height:' + sz[1] + 'px"><div><b>' + esc(t.name) + '</b><span>' + t.seats + '</span></div></div></div>';
+          '<div class="top" style="width:' + sz[0] + 'px;height:' + sz[1] + 'px">' + (t.joinable === false ? '<i class="ic ic-lock lk" aria-hidden="true"></i>' : '') +
+          '<div><b>' + esc(t.name) + '</b><span>' + t.seats + '</span></div></div></div>';
       }).join('') + '</div>';
   }
 

@@ -313,11 +313,12 @@ def units_at(ctx, d, t):
     return units
 
 
-def busy_ids(ctx, d, t, dur, exclude=None):
-    """Table ids held by reservations that overlap [t, t+dur) on date d."""
+def busy_ids(ctx, d, t, dur, exclude=None, also=None):
+    """Table ids held by reservations that overlap [t, t+dur) on date d (leaving out `exclude` and the rows in `also`)."""
     out = set()
+    skip = [x for x in ([exclude] + list(also or [])) if x is not None]
     for x in ctx.reservations(d):
-        if exclude is not None and x == exclude:
+        if any(x == y for y in skip):
             continue
         s = int(x["start_min"] or 0)
         e = s + int(x["duration"] or 0)
@@ -351,6 +352,157 @@ def free_units(ctx, d, t, party, dur, exclude=None):
 def find_unit(ctx, d, t, party, dur, exclude=None):
     fits = free_units(ctx, d, t, party, dur, exclude)
     return fits[0] if fits else None
+
+
+# ---------------------------------------------------------------- big parties: pushing tables together
+# When no table (or fixed join) fits a party, PlanPlate looks for joinable tables that stand near each other on the
+# floor plan (same area) and are free for the whole stay, and pushes them together. If none are free, it tries once
+# more after moving ONE other booking (not seated yet, at a single table) to another free table. Online bookings that
+# need this always wait for a manager's approval (the plan is in the reason and in reservations.table_plan); staff
+# bookings apply it straight away. Approving applies the move.
+MAX_JOIN = 4     # at most this many tables pushed together
+NEAR = 34.0      # tables further apart than this (in % of the floor plan) are not "next to each other"
+
+
+def joinable(t):
+    """Can staff move this table and push it against another one? (A booth or a fixed table can't.) Tables saved
+    before the tick existed (or while the column is missing in the live database) count as joinable."""
+    try:
+        v = t["joinable"]
+    except Exception:
+        v = None
+    return True if v is None else bool(v)
+
+
+def _gap(a, b):
+    return ((float(a["x"] or 0) - float(b["x"] or 0)) ** 2 + (float(a["y"] or 0) - float(b["y"] or 0)) ** 2) ** 0.5
+
+
+def _area(t):
+    return (t["area"] or "").strip().lower()
+
+
+def combos(ctx, d, t, party, busy):
+    """Free joinable tables near each other that seat the party together, best first (fewest spare seats, then
+    fewest tables, then closest): [{ids, seats, label, spread}]. busy = table ids that are taken."""
+    singles = [ctx.by_id[u["ids"][0]] for u in units_at(ctx, d, t) if len(u["ids"]) == 1 and u["ids"][0] in ctx.by_id]
+    free = [x for x in singles if x.get_id() not in busy and joinable(x) and int(x["seats"] or 0) > 0]
+    found = {}
+    for seed in free:
+        group, seats = [seed], int(seed["seats"] or 0)
+        while seats < party and len(group) < MAX_JOIN:
+            near = [x for x in free if x not in group and _area(x) == _area(seed)]
+            if not near:
+                break
+            nxt = min(near, key=lambda x: min(_gap(x, g) for g in group))
+            if min(_gap(nxt, g) for g in group) > NEAR:
+                break
+            group.append(nxt)
+            seats += int(nxt["seats"] or 0)
+        if seats >= party and len(group) >= 2:
+            key = tuple(sorted(x.get_id() for x in group))
+            if key not in found:
+                spread = sum(min(_gap(a, b) for b in group if b is not a) for a in group)
+                order = sorted(group, key=lambda x: int(x["position"] or 0))
+                found[key] = {"ids": [x.get_id() for x in order], "seats": seats, "spread": spread,
+                              "label": " + ".join(x["name"] for x in order)}
+    return sorted(found.values(), key=lambda c: (c["seats"] - party, len(c["ids"]), c["spread"]))
+
+
+def _names(ctx, ids):
+    return " + ".join(ctx.by_id[i]["name"] for i in ids if i in ctx.by_id) or "no table"
+
+
+def plan_for(ctx, d, t, party, dur, exclude=None):
+    """How to seat a party that no free table fits, or None:
+    {"ids": tables for the party, "seats", "join": label, "moves": [{"res", "name", "party", "time", "from", "to",
+    "from_label", "to_label"}], "text": what staff do}."""
+    busy = busy_ids(ctx, d, t, dur, exclude)
+    found = combos(ctx, d, t, party, busy)
+    if found:
+        return _plan(found[0], [])
+    best = None
+    overlapping = [x for x in ctx.reservations(d) if (exclude is None or x != exclude) and x["status"] != "seated"
+                   and int(x["start_min"] or 0) < t + dur and t < int(x["start_min"] or 0) + int(x["duration"] or 0)
+                   and len(x["tables"] or []) == 1]
+    for x in overlapping[:15]:
+        held = set(x["tables"] or [])
+        for c in combos(ctx, d, t, party, busy_ids(ctx, d, t, dur, exclude, also=[x]))[:4]:
+            if not held & set(c["ids"]):
+                continue
+            xs, xd, xp = int(x["start_min"] or 0), int(x["duration"] or 0), int(x["party"] or 0)
+            taken = busy_ids(ctx, d, xs, xd, exclude, also=[x]) | set(c["ids"])
+            dest = [u for u in units_at(ctx, d, xs) if u["seats"] >= xp and u["min"] <= xp and not set(u["ids"]) & taken]
+            if not dest:
+                continue
+            dest.sort(key=lambda u: (u["seats"], len(u["ids"])))
+            score = (c["seats"] - party, len(c["ids"]), c["spread"])
+            if best is None or score < best[0]:
+                move = {"res": x.get_id(), "name": x["name"] or "", "party": xp, "time": hm(xs), "from": sorted(held),
+                        "to": dest[0]["ids"], "from_label": _names(ctx, held), "to_label": dest[0]["label"]}
+                best = (score, c, move)
+        if best is not None and best[0][0] == 0:
+            break
+    return _plan(best[1], [best[2]]) if best else None
+
+
+def _plan(combo, moves):
+    text = "Push %s together (%d seats)." % (combo["label"], combo["seats"])
+    if moves:
+        m = moves[0]
+        text = "Move %s (%d at %s) from %s to %s, then push %s together (%d seats)." % (
+            m["name"] or "the other booking", m["party"], m["time"], m["from_label"], m["to_label"], combo["label"], combo["seats"])
+    return {"ids": combo["ids"], "seats": combo["seats"], "join": combo["label"], "moves": moves, "text": text}
+
+
+def seat_party(ctx, d, t, party, dur, exclude=None):
+    """(unit or None, plan or None): a free table or join that fits, else a plan to push tables together."""
+    unit = find_unit(ctx, d, t, party, dur, exclude)
+    if unit is not None:
+        return unit, None
+    return None, plan_for(ctx, d, t, party, dur, exclude)
+
+
+def apply_moves(ctx, plan, who="staff"):
+    """Carry out a plan's moves (the other bookings change table). Returns an error text, or None when done.
+    A move whose destination got taken meanwhile looks for another free table for that booking."""
+    for m in (plan or {}).get("moves") or []:
+        try:
+            x = app_tables.reservations.get_by_id(m["res"])
+        except Exception:
+            x = None
+        if x is None or x["restaurant"] != ctx.r or x["status"] not in ACTIVE:
+            continue
+        if set(x["tables"] or []) != set(m["from"]):
+            continue  # someone already moved it
+        xs, xd, xp = int(x["start_min"] or 0), int(x["duration"] or 0), int(x["party"] or 0)
+        taken = busy_ids(ctx, x["date"], xs, xd, x) | set(plan.get("ids") or [])
+        to = m["to"] if not set(m["to"]) & taken else None
+        if to is None:
+            dest = [u for u in units_at(ctx, x["date"], xs) if u["seats"] >= xp and u["min"] <= xp and not set(u["ids"]) & taken]
+            if not dest:
+                return "%s can't be moved any more: no other table fits them. Change the bookings by hand." % (x["name"] or "A booking")
+            to = sorted(dest, key=lambda u: (u["seats"], len(u["ids"])))[0]["ids"]
+        x.update(tables=list(to), updated=now_utc())
+        add_history(x, who, "Moved from %s to %s to make room for a bigger party." % (_names(ctx, m["from"]), _names(ctx, to)))
+        ctx.forget(x["date"])
+    return None
+
+
+def plan_of(res):
+    """The saved table plan of a reservation (None while the column doesn't exist yet)."""
+    try:
+        return res["table_plan"]
+    except Exception:
+        return None
+
+
+def save_plan(res, plan):
+    """Keep the plan on the reservation (skipped while the live database lacks the column)."""
+    try:
+        res["table_plan"] = plan
+    except Exception as e:
+        print("table_plan not saved:", e)
 
 
 # ---------------------------------------------------------------- what guests can book
@@ -411,15 +563,15 @@ def guest_slots(ctx, d, party, exclude=None):
         if no_online:
             out.append({"time": hm(t), "state": "walk_in"})
             continue
-        unit = find_unit(ctx, d, t, party, dur, exclude)
-        if unit is None:
+        unit, plan = seat_party(ctx, d, t, party, dur, exclude)
+        if unit is None and plan is None:
             out.append({"time": hm(t), "state": "full"})
             continue
         status, reason, pct = check_rules(ctx, d, t, party, dur, exclude)
         if walk_in_mode and pct >= setting(r, "auto_threshold"):
             out.append({"time": hm(t), "state": "walk_in"})
-        else:
-            out.append({"time": hm(t), "state": "open", "review": status == "pending"})
+        else:  # tables pushed together always wait for a manager
+            out.append({"time": hm(t), "state": "open", "review": status == "pending" or plan is not None})
     return out
 
 
@@ -442,6 +594,7 @@ def reservation_view(res, ctx=None, staff=False):
             "review_reason": res["review_reason"] or "", "capacity_pct": res["capacity_pct"],
             "created": iso(res["created"]), "updated": iso(res["updated"]), "history": list(res["history"] or []),
             "consent": bool(res["consent"]), "consent_at": iso(res["consent_at"]),
+            "plan": (plan_of(res) or {}).get("text") or "",
         })
     return v
 
@@ -449,7 +602,7 @@ def reservation_view(res, ctx=None, staff=False):
 def table_view(t):
     return {"id": t.get_id(), "name": t["name"], "seats": int(t["seats"] or 0), "min_party": int(t["min_party"] or 1),
             "area": t["area"] or "", "shape": t["shape"] or "square", "x": t["x"] if t["x"] is not None else 10,
-            "y": t["y"] if t["y"] is not None else 10, "active": t["active"] is not False}
+            "y": t["y"] if t["y"] is not None else 10, "active": t["active"] is not False, "joinable": joinable(t)}
 
 
 def join_view(j):

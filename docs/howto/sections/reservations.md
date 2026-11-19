@@ -1,8 +1,8 @@
-**Reservations** is the page to keep open on the host-stand tablet. It checks for new bookings every minute and keeps the screen awake. With **Chime on** it plays a short sound when a booking or request arrives. Tap the page once first, because browsers only play sound after a tap.
+**Reservations** is the page to keep open on the host-stand tablet. It checks for new bookings every minute and keeps the screen awake; **Refresh** loads the latest at once, and the time beside it says when the page last updated. With **Chime on** it plays a short sound when a booking or request arrives. Tap the page once first, because browsers only play sound after a tap.
 
 ### Requests waiting for approval
 
-Bookings that need a decision appear at the top: for example, the restaurant was nearly full at that time, or the party is large. Each card says why it is waiting and how full you would be if you accept.
+Bookings that need a decision appear at the top: for example, the restaurant was nearly full at that time, the party is large, or tables have to be pushed together. Each card says why it is waiting and how full you would be if you accept. When tables must be pushed together (or another party moved first), the card says exactly what to do, and **Approve** does the move for you.
 
 - **Approve** confirms the booking and emails the guest.
 - **Decline** turns it down and emails the guest.

@@ -27,7 +27,7 @@
     if (!seed || !seed.rid) throw new Error('could not sign in: ' + JSON.stringify(seed));
     const rid = encodeURIComponent(seed.rid);
     await check('#dashboard');
-    for (const p of ['today', 'reservations', 'guests', 'hours', 'tables', 'events', 'dishes', 'gallery', 'website', 'share', 'settings']) await check('#' + p + '/' + rid);
+    for (const p of ['today', 'reservations', 'guests', 'hours', 'tables', 'events', 'dishes', 'gallery', 'website', 'elements', 'share', 'settings']) await check('#' + p + '/' + rid);
     await check('#profile');
     log.push(bad.length ? 'PROBLEMS: ' + bad.join(' | ') : 'PASSED');
     return { ok: !bad.length, log: log };

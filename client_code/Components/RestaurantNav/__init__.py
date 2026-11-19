@@ -5,7 +5,7 @@ from ... import pp, router, state
 
 # the how-to guide's section for each tab (docs/howto/guide.json ids; staff land on their own section for Today)
 HELP = {"today": "today", "reservations": "reservations", "guests": "guests", "hours": "hours", "tables": "tables",
-        "events": "events", "dishes": "menu", "gallery": "gallery", "website": "website", "share": "share",
+        "events": "events", "dishes": "menu", "gallery": "gallery", "website": "website", "elements": "elements", "share": "share",
         "settings": "settings"}
 
 

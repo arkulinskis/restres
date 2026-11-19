@@ -1,0 +1,70 @@
+<anvil-form layout="PlanPlate_2_0.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap pp-elements">
+      <anvil-component type="PlanPlate_2_0.Components.RestaurantNav" name="rnav" prop:tab="elements"></anvil-component>
+      <div class="pp-el-intro">
+        <h2>Website elements</h2>
+        <p class="pp-lead">Pieces of PlanPlate to paste into your own website: in WordPress a “Custom HTML” block, in Wix “Embed code”, in Squarespace a “Code” block. They always show what is in PlanPlate right now, so you paste each one once.</p>
+        <nav class="pp-el-toc" aria-label="Element types">
+          <a href="#" anvil:name="toc_booking" data-t="el-booking" anvil:on-dom:click="self.toc_click">Booking</a>
+          <a href="#" anvil:name="toc_menu" data-t="el-menu" anvil:on-dom:click="self.toc_click">Menu</a>
+          <a href="#" anvil:name="toc_hours" data-t="el-hours" anvil:on-dom:click="self.toc_click">Opening hours</a>
+          <a href="#" anvil:name="toc_photos" data-t="el-photos" anvil:on-dom:click="self.toc_click">Photos</a>
+          <a href="#" anvil:name="toc_dev" data-t="el-dev" anvil:on-dom:click="self.toc_click">For developers</a>
+        </nav>
+      </div>
+
+      <section class="ui-card pp-el-group" id="el-booking">
+        <div class="pp-el-gh"><i class="ic ic-calendar"></i><h2>Booking</h2></div>
+        <div class="pp-el-item pp-el-hero">
+          <div class="pp-el-ih"><h3>Reserve button</h3><span class="badge badge-good">Recommended</span></div>
+          <p class="muted small">PlanPlate's own button. Guests tap it and the booking form opens in a window over your page, so they never leave your site. Pick a style that suits your site, then copy the code. Paste it <b>once</b>, where the button should appear.</p>
+          <div class="pp-rb">
+            <div class="pp-rb-opts">
+              <anvil-component type="RepeatingPanel" name="button_opts" prop:item_template="PlanPlate_2_0.Items.OptionRow"></anvil-component>
+              <label class="ui-field"><span>Button words <em>(optional)</em></span><anvil-component type="TextBox" name="label_box" prop:placeholder="Reserve a table"></anvil-component></label>
+            </div>
+            <div class="pp-rb-prev-col">
+              <div class="pp-rb-bar"><span class="muted small">Preview: try it, it opens your real booking form</span><span class="ui-spacer"></span>
+                <div class="ui-seg" role="group" aria-label="Preview background">
+                  <button type="button" anvil:name="bg_light" data-b="light" anvil:on-dom:click="self.bg_click">Light site</button>
+                  <button type="button" anvil:name="bg_dark" data-b="dark" anvil:on-dom:click="self.bg_click">Dark site</button>
+                </div></div>
+              <div class="pp-rb-prev" anvil:name="button_prev"><div anvil:dom-node="button_slot"></div></div>
+            </div>
+          </div>
+          <div class="pp-code"><anvil-component type="Label" name="button_code" prop:role='["pp-pre-code"]'></anvil-component>
+            <anvil-component type="Button" name="button_copy" prop:text="Copy" prop:role='["btn", "btn-sm", "btn-primary", "ic-copy"]'></anvil-component></div>
+        </div>
+        <anvil-component type="RepeatingPanel" name="booking_panel" prop:item_template="PlanPlate_2_0.Items.CodeBlock"></anvil-component>
+        <details class="pp-el-more">
+          <summary>Use your own button instead (advanced)</summary>
+          <p class="muted small">Only if your site already has a button or link you want to keep. Paste this <b>instead of</b> the Reserve button above, not as well: your own element opens the same booking window.</p>
+          <anvil-component type="RepeatingPanel" name="own_panel" prop:item_template="PlanPlate_2_0.Items.CodeBlock"></anvil-component>
+        </details>
+      </section>
+
+      <section class="ui-card pp-el-group" id="el-menu">
+        <div class="pp-el-gh"><i class="ic ic-list"></i><h2>Menu</h2><anvil-component type="Label" name="menu_count" prop:role='["muted", "small"]'></anvil-component></div>
+        <anvil-component type="RepeatingPanel" name="menu_panel" prop:item_template="PlanPlate_2_0.Items.CodeBlock"></anvil-component>
+      </section>
+
+      <section class="ui-card pp-el-group" id="el-hours">
+        <div class="pp-el-gh"><i class="ic ic-clock"></i><h2>Opening hours</h2></div>
+        <anvil-component type="RepeatingPanel" name="hours_panel" prop:item_template="PlanPlate_2_0.Items.CodeBlock"></anvil-component>
+      </section>
+
+      <section class="ui-card pp-el-group" id="el-photos">
+        <div class="pp-el-gh"><i class="ic ic-image"></i><h2>Photos</h2><anvil-component type="Label" name="photo_count" prop:role='["muted", "small"]'></anvil-component></div>
+        <anvil-component type="RepeatingPanel" name="photos_panel" prop:item_template="PlanPlate_2_0.Items.CodeBlock"></anvil-component>
+        <a class="ui-btn sm" anvil:name="gallery_link" href="#"><i class="ic ic-brush"></i><span>Change the gallery's look</span></a>
+      </section>
+
+      <section class="ui-card pp-el-group" id="el-dev">
+        <div class="pp-el-gh"><i class="ic ic-database"></i><h2>For developers</h2></div>
+        <anvil-component type="RepeatingPanel" name="dev_panel" prop:item_template="PlanPlate_2_0.Items.CodeBlock"></anvil-component>
+      </section>
+      <p class="ui-hint">QR codes for table cards, the window and flyers are on the <a anvil:name="share_link" href="#">Share &amp; QR</a> tab.</p>
+    </div>
+  </anvil-block>
+</anvil-form>

@@ -68,6 +68,7 @@ class Reservations(ReservationsTemplate):
         self.print_button.visible = view != "upcoming"
         self.chime_button.text = "Chime on" if self.chime else "Chime off"
         state.set_control_attr(self.chime_button, "aria-pressed", "true" if self.chime else "false")
+        self._stamp_label()
         if view == "timeline":
             self.timeline.draw(D)
         elif view == "list":
@@ -104,6 +105,25 @@ class Reservations(ReservationsTemplate):
         self.U = None
         router.replace("reservations", self.rid, self.D["date"])
         self._draw()
+
+    def _stamp_label(self):
+        now = datetime.datetime.now()
+        self.updated_label.text = "Updated %02d:%02d" % (now.hour, now.minute)
+
+    @handle("refresh_button", "click")
+    def refresh_button_click(self, **event_args):
+        """Fetch the day and the approvals now (the page also checks by itself every minute)."""
+        self.refresh_button.enabled = False
+        self.updated_label.text = "Updating…"
+        try:
+            day = state.call("get_day", self.rid, self.D["date"])
+        finally:
+            self.refresh_button.enabled = True
+        if day:
+            self._show(day)
+            state.toast("Up to date", "ok")
+        else:
+            self._stamp_label()
 
     def _find(self, res_id):
         for r in self.D["reservations"] + self.D["pending"]:

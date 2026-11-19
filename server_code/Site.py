@@ -52,6 +52,9 @@ PALETTES = [
 ]
 PALETTE = {p["key"]: p for p in PALETTES}
 SECTIONS = ["today", "about", "specials", "menu", "events", "location", "gallery", "reviews", "highlights", "contact"]
+# The builder's movable blocks (client_code/site_model.MOVABLE), in the order the manager dragged them (content.order).
+# "live" = today strip + specials + events. No saved order = the classic order below (today, about, specials, menu...).
+ORDERABLE = ["about", "menu", "live", "location", "gallery", "reviews", "highlights", "contact"]
 SOCIAL = ["facebook", "instagram", "tripadvisor", "google", "tiktok", "youtube"]
 URL_RE = re.compile(r"^https?://[^\s<>\"']{3,500}$")
 HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -257,6 +260,7 @@ def clean_content(data, r):
         "highlights_heading": _s(d.get("highlights_heading"), 80), "highlights": highlights,
         "contact": {"whatsapp": bool(dict(d.get("contact") or {}).get("whatsapp"))},
         "social": social, "sections": sections, "seo": _s(d.get("seo"), 300),
+        "order": [x for x in dict.fromkeys(d.get("order") or []) if x in ORDERABLE],
     }
 
 
@@ -650,6 +654,21 @@ class Render(object):
                  "--accent-ink:%(accent_ink)s;--accent-text:%(accent_text)s;--deep:%(deep)s;--deep-ink:%(deep_ink)s;" % p)
         return ":root{%s%s}%s" % (vars_, "color-scheme:dark;" if p["key"] == "noir" else "", CSS)
 
+    def order(self):
+        """The page's blocks in the manager's order (content.order); without one, the classic order."""
+        saved = [x for x in (self.c.get("order") or []) if x in ORDERABLE]
+        if not saved:
+            return ["today", "about", "specials", "menu", "events", "location", "gallery", "reviews", "highlights", "contact"]
+        out = []
+        for k in saved + [x for x in ORDERABLE if x not in saved]:
+            out += ["today", "specials", "events"] if k == "live" else [k]
+        return out
+
+    def part(self, key):
+        return {"today": self.today_part, "about": self.about, "specials": self.specials_part, "menu": self.menu_part,
+                "events": self.events_part, "location": self.location, "gallery": self.gallery, "reviews": self.reviews,
+                "highlights": self.highlights, "contact": self.contact}[key]()
+
     def header(self):
         logo = self.photo(self.c.get("logo"))
         brand = ('<img src="%s" alt="%s"%s>' % (esc(self.src(logo)), esc(self.name), ' class="inv"' if (self.palette["key"] == "noir") else "")
@@ -665,6 +684,8 @@ class Render(object):
             links.append(("#gallery", self.L["gallery"]))
         if self.on.get("contact"):
             links.append(("#contact", self.L["contact"]))
+        place = {k: i for i, k in enumerate(self.order())}  # the menu follows the page's order
+        links.sort(key=lambda x: place.get(x[0][1:], 99))
         nav = "".join('<a href="%s">%s</a>' % (h, esc(t)) for h, t in links)
         return ('<header class="hd" data-hd><div class="wrap in"><a class="brand" href="#top">%s</a><nav class="nav" id="pp-nav">%s</nav>'
                 '%s<button class="burger" type="button" aria-controls="pp-nav" aria-expanded="false" aria-label="%s">%s</button></div></header>'
@@ -836,10 +857,9 @@ class Render(object):
             return ""
         g = MD.gallery_style(self.s)
         heading = (self.c.get("gallery") or {}).get("heading") or g.get("heading") or self.L["gallery"]
-        return ('<section class="gallery" id="gallery"><div class="wrap"><h2>%s</h2></div><planplate-gallery feed-url="%s" theme="%s" bg-style="%s" '
-                'picture-style="%s" size="%s" motion="%s" mobile-layout="%s" accent-color="%s" background-color="%s"></planplate-gallery></section>' % (
-                    esc(heading), esc(self.origin + "/_/api/gallery/" + self.r["slug"]), g["theme"], g["bg_style"], g["picture_style"], g["size"],
-                    g["motion"], g["mobile_layout"], esc(self.accent or g["accent"]), esc(self.palette["deep"])))
+        # <planplate-showcase> (theme/assets/pp-showcase.js) draws the look chosen on the Gallery page; the heading is ours
+        return ('<section class="gallery" id="gallery"><div class="wrap"><h2>%s</h2><planplate-showcase restaurant="%s" origin="%s" no-heading>'
+                '</planplate-showcase></div></section>' % (esc(heading), esc(self.r["slug"]), esc(self.origin)))
 
     def reviews(self):
         rv = self.c.get("reviews") or []
@@ -924,8 +944,7 @@ class Render(object):
         logo = self.photo(self.c.get("logo"))
         canonical = site_url(self.s, self.origin) if self.mode == "hosted" else ""
         live = (self.origin + "/_/api/site/" + self.s["path"] + "?live=1") if self.mode == "download" else ""
-        main = "".join([self.hero(), self.today_part(), self.about(), self.specials_part(), self.menu_part(), self.events_part(),
-                        self.location(), self.gallery(), self.reviews(), self.highlights(), self.contact()])
+        main = self.hero() + "".join(self.part(k) for k in self.order())
         head = ['<!doctype html>', '<html lang="%s">' % self.lang, "<head>", '<meta charset="utf-8">',
                 '<meta name="viewport" content="width=device-width, initial-scale=1">', "<title>%s</title>" % esc(title),
                 '<meta name="description" content="%s">' % esc(desc), '<meta name="generator" content="PlanPlate">',
@@ -942,7 +961,7 @@ class Render(object):
                  '<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">',
                  "<style>%s</style>" % self.css(), '<script type="application/ld+json">%s</script>' % self.jsonld()]
         if self.on.get("gallery") and MD.gallery_photos(self.r):
-            head.append('<script src="%s/_/theme/planplate-gallery.js" defer></script>' % esc(self.origin))
+            head.append('<script src="%s/_/theme/pp-showcase.js" defer></script>' % esc(self.origin))
         head.append("</head>")
         body = ['<body><a class="skip" href="#main">%s</a>' % esc(self.L["skip"]), self.header(), '<main id="main">%s</main>' % main, self.footer(),
                 "<script>%s</script>" % (SITE_JS.replace("__BOOK__", json.dumps(self.book_url)).replace("__LIVE__", json.dumps(live))
@@ -1089,7 +1108,7 @@ section{padding:clamp(56px,8vw,104px) 0}
 .map iframe{width:100%;height:100%;min-height:380px;border:0}
 .gallery{background:var(--deep);color:var(--deep-ink);padding-bottom:clamp(40px,6vw,80px)}
 .gallery h2{text-align:center;margin-bottom:24px}
-planplate-gallery{display:block}
+planplate-showcase{display:block;min-height:120px}
 .rv{margin:0;padding:24px}.stars{display:flex;gap:2px;margin-bottom:12px}.stars .ic{width:18px;height:18px;color:var(--line)}
 .stars .ic.on{color:var(--accent);fill:var(--accent)}
 .rv blockquote{margin:0 0 16px;font:italic 1.08rem/1.6 Lora,Georgia,serif}.rv figcaption{color:var(--muted);font-size:.9rem}.rv figcaption b{color:var(--ink)}

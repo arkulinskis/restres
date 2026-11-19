@@ -88,7 +88,19 @@ class BookingEditor(BookingEditorTemplate):
         self.consent_label.text = "The guest agreed to the privacy notice on %s." % state.short_date(r.get("consent_at") or "")
         self._say(None)
         pp.time_input(self.time_box)
-        self._options()
+        if self.is_new:  # new bookings can't go into the past (walk-ins are seated "now")
+            self.date_picker.min_date = datetime.date.fromisoformat(day["today"])
+        self.times_panel.add_event_handler("x-chip", self._pick_time)
+        self.options_label.text = "Checking the tables…"
+        self.times_box.visible = False
+        self._loaded = False
+
+    @handle("", "show")
+    def form_show(self, **event_args):
+        """The dialog opens at once with what the page already knows; the table check runs right after it shows."""
+        if not self._loaded:
+            self._loaded = True
+            self._options()
 
     # ---------------------------------------------------------------- live hints: is a table free?
     def _values(self):
@@ -105,12 +117,35 @@ class BookingEditor(BookingEditorTemplate):
             self.options_label.text = (o or {}).get("error") or ""
             return
         best = o["units"][0] if o["units"] else None
-        self.options_label.text = (("" if o["open"] else "Closed at this time. ") +
-                                   ("Best fit: %s (%s)" % (best["label"], best["seats"]) if best else "No free table fits.") + " · %d%% booked" % o["pct"])
+        if best:
+            fit = "Best fit: %s (%s)" % (best["label"], best["seats"])
+        elif o.get("plan"):
+            fit = "No single table fits. " + o["plan"]
+        else:
+            fit = "No free table fits."
+        self.options_label.text = (("Already passed. " if o.get("past") and self.is_new else "") + ("" if o["open"] else "Closed at this time. ") +
+                                   fit + " · %d%% booked" % o["pct"])
+        self.options_label.role = ["hint", "pp-warn-text"] if (o.get("past") and self.is_new) or not (best or o.get("plan")) else ["hint"]
+        self._times = o.get("times") or []
+        self._draw_times()
+
+    def _draw_times(self):
+        """The day's times as chips: free ones to tap, 'push tables together' ones marked, full ones greyed out."""
+        cur = (self.time_box.text or "")[:5]
+        self.times_box.visible = bool(self._times)
+        self.times_panel.items = [{"label": t["time"] + (" +" if t["state"] == "join" else ""), "value": t["time"], "group": "t",
+                                   "on": t["time"] == cur, "disabled": t["state"] == "full",
+                                   "title": {"free": "A table is free", "join": "Tables pushed together", "full": "No room"}[t["state"]],
+                                   "aria": "%s, %s" % (t["time"], {"free": "free", "join": "tables pushed together", "full": "no room"}[t["state"]])}
+                                  for t in self._times]
+
+    def _pick_time(self, value, **event_args):
+        self.time_box.text = value
+        self._options()
 
     @handle("date_picker", "change")
     def date_picker_change(self, **event_args):
-        self._options()
+        self._options()  # new day: its free times too
 
     @handle("time_box", "lost_focus")
     def time_box_lost_focus(self, **event_args):

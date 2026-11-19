@@ -22,8 +22,8 @@ class Book(BookTemplate):
         self.result: dict = {}
         i18n.set_lang(self.D.get("lang") or self.R.get("language") or "en")
         self.langs_panel.add_event_handler("x-chip", self._lang)
-        self.embedded = window.self != window.top
-        self.close_row.visible = self.embedded
+        self.embedded = window.self != window.top  # inside a website's iframe or the Reserve button's window (it has the only Close)
+        pp.html_class("pp-embedded", self.embedded)
         self._a11y()
         if self.D.get("ok") and self.R.get("accepting"):
             self.picker.setup(self.slug, self.D["days"], self.D.get("today"), self.R.get("max_party"))
@@ -32,10 +32,10 @@ class Book(BookTemplate):
     def _a11y(self):
         """What the screen reader and the browser's autofill need (WCAG AA)."""
         state.heading(self.name_label, 1)  # the restaurant's name is the page's main heading
+        for cap in (self.name_cap, self.email_cap, self.phone_cap):  # required fields get a star (CSS .anvil-role-pp-req)
+            cap.role = ["field-cap", "pp-req"]
         for box, kind in ((self.name_box, "name"), (self.email_box, "email"), (self.phone_box, "tel")):
             state.set_control_attr(box, "autocomplete", kind)
-            state.set_control_attr(box, "aria-required", "true")
-        for box in (self.consent_box, self.pp_consent_box):
             state.set_control_attr(box, "aria-required", "true")
         # the hidden anti-spam box: out of the Tab order and away from autofill (a filled box blocks the booking)
         state.set_control_attr(self.website_box, "tabindex", "-1")
@@ -55,6 +55,7 @@ class Book(BookTemplate):
         self.name_label.text = R.get("name") or ""
         self.desc_label.visible = bool(R.get("description"))
         self.desc_label.text = R.get("description") or ""
+        self.desc_label.tooltip = R.get("description") or ""  # the header shows one line of it
         self.problem_card.visible = not accepting
         if not ok:
             self.problem_title.text, self.problem_text.text = T("notFound"), self.D.get("error") or ""
@@ -76,18 +77,13 @@ class Book(BookTemplate):
             self._draw_details()
         if self.step == "done":
             self._draw_done()
-        # footer: address (map), phone, the menu
+        # footer: address (map) and phone (no menu link here: the form is for booking)
         self.map_link.visible = bool(R.get("address"))
         self.addr_label.text = R.get("address") or ""
         state.set_attr(self.map_link, "href", "https://www.openstreetmap.org/search?query=" + window.encodeURIComponent(R.get("address") or ""))
         self.tel_link.visible = bool(R.get("phone"))
         self.tel_label.text = R.get("phone") or ""
         state.set_attr(self.tel_link, "href", "tel:" + (R.get("phone") or ""))
-        self.menu_link.visible = ok
-        self.menu_label.text = T("menu")
-        state.set_attr(self.menu_link, "href", pp.menu_url(self.slug))
-        if self.embedded:
-            state.set_attr(self.menu_link, "target", "_blank")
         if ok:
             window.document.title = T("reserve") + " · " + (R.get("name") or "")
 
@@ -96,17 +92,18 @@ class Book(BookTemplate):
         self.summary_label.text = "%s · %s · %d %s" % (pp.fmt_date(p.date), p.time, p.party, T("guest") if p.party == 1 else T("guestsN"))
         self.back_button.text = T("change")
         self.details_h.text = T("details")
+        self.req_note.text = "* " + T("required")
         self.name_cap.text, self.email_cap.text, self.phone_cap.text = T("name"), T("email"), T("phone")
         self.notes_cap.text = "%s (%s)" % (T("notes"), T("optional"))
         self.notes_box.placeholder = T("notesPh")
-        consent = T("consent", link=T("privacyLink"), r=self.R.get("name") or "")
-        self.consent_box.text = consent
-        self.privacy_link.text = T("privacyLink")
-        self.privacy_text.text = self.R.get("privacy_text") or ""
+        name = self.R.get("name") or ""
         ppt = self._pp()
-        self.pp_consent_box.text = ppt.get("consent") or ""
+        # one line instead of two required ticks (2026-11-19): a booking needs the guest informed, not a tick
+        self.accept_label.text = (ppt.get("consent") or "").replace("{r}", name)
+        self.privacy_link.text = (ppt.get("notice") or T("privacyLink")).replace("{r}", name)
+        self.privacy_text.text = self.R.get("privacy_text") or ""
         self.pp_policy_link.text = ppt.get("policy") or ""
-        self.pp_news_box.text = ppt.get("news") or ""
+        self.pp_news_box.text = ppt.get("news") or ""  # optional and never pre-ticked (EU law)
         self.submit_button.text = T("submitReview") if p.review else T("submit")
 
     def _pp(self):
@@ -178,10 +175,6 @@ class Book(BookTemplate):
         if missing:
             problem = T("fillIn", f=", ".join(label for _, label in missing))
             missing[0][0].focus()
-        elif not self.consent_box.checked:
-            problem = T("consent", link=T("privacyLink"), r=self.R.get("name") or "")
-        elif not self.pp_consent_box.checked:
-            problem = self._pp().get("need") or ""
         if problem:
             self.error_label.visible, self.error_label.text = True, problem
             return
@@ -208,12 +201,6 @@ class Book(BookTemplate):
             self.picker.setup(self.slug, self.D["days"], self.D.get("today"), self.R.get("max_party"), p.party, p.date)
             self._draw()
             self.pick_error.visible, self.pick_error.text = True, err  # the details card is hidden now: say it here
-
-    @handle("close_button", "click")
-    def close_button_click(self, **event_args):
-        """Inside a website's pop-up: ask the page to close it (the old PlanPlate pop-up listens for "close_div")."""
-        window.parent.postMessage("close_div", "*")
-        window.parent.postMessage({"planplate": "close"}, "*")
 
     @handle("copy_button", "click")
     def copy_button_click(self, **event_args):

@@ -1,7 +1,9 @@
 # GuestNews — Server Module. PlanPlate's own agreement with the guests who book through its form (EU rules, Nov 2026).
-#   Required tick (no tick, no booking): PlanPlate, the booking service, keeps a record of the booking and emails the
-#     guest about it. Stored on the reservation: pp_consent, pp_consent_text (the exact words), pp_consent_at.
-#   Optional tick, never pre-ticked: PlanPlate may email news and offers. Stored in pp_contacts (one row per email
+#   The line above the Book button (no tick since 2026-11-19, the user's choice: a booking runs on the contract, so
+#     it needs information, not consent): "By booking, you accept <restaurant>'s privacy notice and PlanPlate's
+#     Privacy Policy..." Stored on the reservation: pp_consent, pp_consent_text (the exact words), pp_consent_at.
+#   Optional tick, NEVER pre-ticked (CJEU Planet49, GDPR Recital 32): PlanPlate may email news and offers, which may
+#     include discounts on future bookings (never this one). Stored in pp_contacts (one row per email
 #     address, PlanPlate's own list, kept apart from the restaurants' data) and reservations.pp_news.
 #     Guests stop it on their booking page (#r/<token>) or with the stop link (/_/api/news/stop/<token>);
 #     a stopped address keeps its row (subscribed False + stopped_at) so it is never emailed again.
@@ -20,11 +22,12 @@ from . import common as C
 
 TEXT = {
     "en": {
-        "consent": "I agree that PlanPlate, the booking service this restaurant uses, keeps a record of my booking and emails me about it.",
-        "news": "PlanPlate may also email me now and then with news and offers. Optional: I can stop any time.",
-        "manage": "Send me PlanPlate news and offers by email (I can stop any time).",
+        "consent": "By booking, you accept {r}'s privacy notice and PlanPlate's Privacy Policy. PlanPlate, the booking service {r} uses, keeps a record of your booking and emails you about it.",
+        "news": "Yes, email me PlanPlate news and offers now and then. They may include discounts on future bookings (not this one). Optional, and I can stop any time.",
+        "manage": "Email me PlanPlate news and offers, which may include discounts on future bookings (I can stop any time).",
         "policy": "PlanPlate's Privacy Policy",
-        "need": "Please tick the two required boxes: we need them to take your reservation.",
+        "notice": "{r}'s privacy notice",
+        "need": "Please accept the privacy notices to book.",
         "saved": "Saved",
         "stop_title": "Stop PlanPlate news",
         "stop_q": "Stop PlanPlate's news and offers emails to {e}?",
@@ -34,11 +37,12 @@ TEXT = {
         "email_line": "You chose to get PlanPlate news and offers. Stop them any time: {u}",
     },
     "fr": {
-        "consent": "J'accepte que PlanPlate, le service de réservation utilisé par ce restaurant, conserve une trace de ma réservation et m'écrive à son sujet.",
-        "news": "PlanPlate peut aussi m'envoyer de temps en temps des nouvelles et des offres par e-mail. Facultatif : je peux arrêter à tout moment.",
-        "manage": "M'envoyer les nouvelles et les offres de PlanPlate par e-mail (je peux arrêter à tout moment).",
+        "consent": "En réservant, vous acceptez la politique de confidentialité de {r} et celle de PlanPlate. PlanPlate, le service de réservation utilisé par {r}, conserve une trace de votre réservation et vous écrit à son sujet.",
+        "news": "Oui, envoyez-moi de temps en temps les nouvelles et les offres de PlanPlate. Elles peuvent inclure des réductions sur de futures réservations (pas sur celle-ci). Facultatif : je peux arrêter à tout moment.",
+        "manage": "M'envoyer les nouvelles et les offres de PlanPlate, qui peuvent inclure des réductions sur de futures réservations (je peux arrêter à tout moment).",
         "policy": "Politique de confidentialité de PlanPlate",
-        "need": "Veuillez cocher les deux cases obligatoires : elles sont nécessaires pour prendre votre réservation.",
+        "notice": "Politique de confidentialité de {r}",
+        "need": "Veuillez accepter les politiques de confidentialité pour réserver.",
         "saved": "Enregistré",
         "stop_title": "Arrêter les nouvelles de PlanPlate",
         "stop_q": "Arrêter les e-mails de nouvelles et d'offres de PlanPlate envoyés à {e} ?",
@@ -48,11 +52,12 @@ TEXT = {
         "email_line": "Vous avez choisi de recevoir les nouvelles et les offres de PlanPlate. Pour les arrêter à tout moment : {u}",
     },
     "lv": {
-        "consent": "Piekrītu, ka PlanPlate – rezervāciju serviss, ko izmanto šis restorāns, – saglabā manas rezervācijas datus un sūta man e-pastus par to.",
-        "news": "PlanPlate var man laiku pa laikam sūtīt jaunumus un piedāvājumus pa e-pastu. Nav obligāti: varu atteikties jebkurā laikā.",
-        "manage": "Sūtīt man PlanPlate jaunumus un piedāvājumus pa e-pastu (varu atteikties jebkurā laikā).",
+        "consent": "Rezervējot jūs piekrītat {r} privātuma paziņojumam un PlanPlate privātuma politikai. PlanPlate – rezervāciju serviss, ko izmanto {r}, – saglabā jūsu rezervācijas datus un sūta jums e-pastus par to.",
+        "news": "Jā, laiku pa laikam sūtiet man PlanPlate jaunumus un piedāvājumus. Tie var ietvert atlaides nākamajām rezervācijām (ne šai). Nav obligāti, un varu atteikties jebkurā laikā.",
+        "manage": "Sūtīt man PlanPlate jaunumus un piedāvājumus, kas var ietvert atlaides nākamajām rezervācijām (varu atteikties jebkurā laikā).",
         "policy": "PlanPlate privātuma politika",
-        "need": "Lūdzu, atzīmējiet abas obligātās rūtiņas: tās ir nepieciešamas, lai pieņemtu jūsu rezervāciju.",
+        "notice": "{r} privātuma paziņojums",
+        "need": "Lūdzu, piekrītiet privātuma paziņojumiem, lai rezervētu.",
         "saved": "Saglabāts",
         "stop_title": "Atteikties no PlanPlate jaunumiem",
         "stop_q": "Pārtraukt PlanPlate jaunumu un piedāvājumu e-pastus uz {e}?",
@@ -62,7 +67,12 @@ TEXT = {
         "email_line": "Jūs izvēlējāties saņemt PlanPlate jaunumus un piedāvājumus. Atteikties var jebkurā laikā: {u}",
     },
 }
-FORM_KEYS = ("consent", "news", "manage", "policy", "need", "saved")
+FORM_KEYS = ("consent", "news", "manage", "policy", "notice", "need", "saved")
+
+
+def consent_text(lang, restaurant_name):
+    """The line above the Book button, exactly as the guest saw it (stored with the booking)."""
+    return t(lang)["consent"].replace("{r}", restaurant_name or "")
 
 
 def t(lang):

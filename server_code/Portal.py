@@ -285,12 +285,16 @@ def get_settings(rid):
 
 @anvil.server.callable(require_user=True)
 def get_share(rid):
-    """The Share & QR page: links and codes for the booking form, the menu and the restaurant's website."""
+    """The Share & QR page and the Elements page: links, QR codes and the codes to paste into a website."""
     r = _rest(rid, "manager")
     site = app_tables.sites.get(restaurant=r)
     origin = anvil.server.get_app_origin()
     url = "%s/_/api/site/%s" % (origin, site["path"]) if site is not None and site["published"] and site["path"] else ""
-    return {"nav": _nav(r), "settings": _settings_view(r), "origin": origin, "site_url": url}
+    files = len([f for f in app_tables.menu_files.search(restaurant=r) if f["file"] is not None])
+    dishes = len([i for i in app_tables.menu_items.search(restaurant=r) if i["available"] is not False])
+    photos = len([p for p in app_tables.photos.search(restaurant=r) if p["in_gallery"] and (p["kind"] or "image") == "image"])
+    return {"nav": _nav(r), "settings": _settings_view(r), "origin": origin, "site_url": url, "languages": B.languages(r),
+            "counts": {"files": files, "dishes": dishes, "photos": photos}}
 
 
 @anvil.server.callable(require_user=True)
@@ -527,6 +531,8 @@ def save_table(rid, data):
         fields["area"] = str(data.get("area") or "").strip()[:40]
     if "active" in data:
         fields["active"] = bool(data["active"])
+    if "joinable" in data:
+        fields["joinable"] = bool(data["joinable"])
     for k in ("x", "y"):
         if k in data:
             fields[k] = float(max(0, min(100, float(data[k] or 0))))
@@ -622,6 +628,38 @@ def delete_join(rid, jid):
     return _tables_reply(r)
 
 
+@anvil.server.callable(require_user=True)
+def test_party(rid, day, time_text, party):
+    """Tables & layout -> "Try a big party": what PlanPlate would do with a party of N on that day and time, with the
+    bookings already made. {kind: "table" | "join" | "move" | "none" | "closed", text, ids, moves}."""
+    r = _rest(rid, "manager")
+    ctx = B.Ctx(r)
+    try:
+        d, t = B.parse_date(day), B.parse_hm(time_text)
+    except ValueError:
+        return {"ok": False, "error": "Pick a date and a time."}
+    party = _int(party, 1, 200, 8)
+    dur = B.setting(r, "duration_min")
+    unit, plan = B.seat_party(ctx, d, t, party, dur)
+    closed = not B.is_open_at(ctx, d, t)
+    if unit is not None:
+        out = {"kind": "table", "ids": unit["ids"], "moves": [],
+               "text": "%s fits %d guests (%d seats). The booking confirms itself unless your approval rules say otherwise." % (unit["label"], party, unit["seats"])}
+    elif plan is not None:
+        out = {"kind": "move" if plan["moves"] else "join", "ids": plan["ids"], "moves": plan["moves"],
+               "text": plan["text"] + " Online, this booking waits for your approval; approving it does the move for you." if plan["moves"]
+               else plan["text"] + " Online, this booking waits for your approval."}
+    else:
+        out = {"kind": "none", "ids": [], "moves": [],
+               "text": "No room for %d at %s: no free table fits, and no free joinable tables stand next to each other. "
+                       "Tick more tables as joinable, move them closer on the plan, or take this party by phone." % (party, B.hm(t))}
+    out.update(ok=True, closed=closed, busy=sorted(B.busy_ids(ctx, d, t, dur)), bookings=len([x for x in ctx.reservations(d)
+               if int(x["start_min"] or 0) < t + dur and t < int(x["start_min"] or 0) + int(x["duration"] or 0)]))
+    if closed:
+        out["text"] = "Closed at that time. " + out["text"]
+    return out
+
+
 # ---------------------------------------------------------------- reservations
 def _analysis(ctx, x):
     """What a manager needs to decide on a pending request."""
@@ -629,7 +667,8 @@ def _analysis(ctx, x):
     pct_without = B.occupancy(ctx, d, t, dur, exclude=x)
     alts = B.free_units(ctx, d, t, party, dur, exclude=x)
     return {"pct_without": pct_without, "pct_with": B.occupancy(ctx, d, t, dur), "free_units": len(alts),
-            "threshold": B.setting(ctx.r, "auto_threshold"), "max_auto_party": B.setting(ctx.r, "max_auto_party")}
+            "threshold": B.setting(ctx.r, "auto_threshold"), "max_auto_party": B.setting(ctx.r, "max_auto_party"),
+            "plan": (B.plan_of(x) or {}).get("text") or ""}
 
 
 def _with_guests(r, views):
@@ -757,9 +796,33 @@ def get_options(rid, day, time_text, party, duration, res_id=None):
     dur = _int(duration, 15, 720, B.setting(r, "duration_min"))
     exclude = _child(app_tables.reservations, r, res_id) if res_id else None
     units = B.free_units(ctx, d, t, party, dur, exclude)
+    plan = None if units else B.plan_for(ctx, d, t, party, dur, exclude)
     return {"ok": True, "open": B.is_open_at(ctx, d, t), "pct": B.occupancy(ctx, d, t, dur, exclude),
             "units": [{"ids": u["ids"], "label": u["label"], "seats": u["seats"]} for u in units],
-            "best": units[0]["ids"] if units else None}
+            "best": units[0]["ids"] if units else None, "plan": plan["text"] if plan else "",
+            "past": _is_past(r, d, t), "times": _free_times(ctx, d, party, dur, exclude)}
+
+
+def _is_past(r, d, t):
+    """True when date d at minute t is already over (a slot's worth of grace, for the party walking in right now)."""
+    now = B.local_now(r)
+    start = datetime.combine(d, datetime.min.time()) + timedelta(minutes=int(t))
+    return start < now - timedelta(minutes=max(15, B.setting(r, "slot_min")))
+
+
+def _free_times(ctx, d, party, dur, exclude=None):
+    """The day's start times for the booking editor, each "free" (a table fits), "join" (tables pushed together) or
+    "full"; times already over are left out."""
+    now = B.local_now(ctx.r)
+    if d < now.date():
+        return []
+    out = []
+    for t in B.start_times(ctx, d):
+        if d == now.date() and t < now.hour * 60 + now.minute - 15:
+            continue
+        unit, plan = B.seat_party(ctx, d, t, party, dur, exclude)
+        out.append({"time": B.hm(t), "state": "free" if unit else ("join" if plan else "full")})
+    return out
 
 
 @tables.in_transaction
@@ -777,15 +840,23 @@ def _save_reservation(r, data):
         return {"ok": False, "error": "Enter the guest's name."}
     force = bool(data.get("force"))
     warnings = []
+    status_in = data.get("status") if data.get("status") in B.STATUSES else None
+    moved = res is None or res["date"] != d or int(res["start_min"] or 0) != t
+    after_visit = (status_in or (res["status"] if res is not None else "")) in ("seated", "done", "no_show")
+    if moved and not after_visit and data.get("source") != "walk_in" and _is_past(r, d, t):
+        return {"ok": False, "error": "%s at %s has already passed. Pick a time that is still to come." % (d.isoformat(), B.hm(t))}
     if not B.is_open_at(ctx, d, t):
         warnings.append("The restaurant is closed at %s on %s." % (B.hm(t), d.isoformat()))
     chosen = data.get("tables")
+    plan = None
     if chosen in (None, "auto", []):
-        unit = B.find_unit(ctx, d, t, party, dur, exclude=res)
-        if unit is None:
+        unit, plan = B.seat_party(ctx, d, t, party, dur, exclude=res)
+        if unit is None and plan is None:
             if not force:
-                return {"ok": False, "conflict": True, "error": "No free table fits %d guests at %s." % (party, B.hm(t))}
+                return {"ok": False, "conflict": True, "error": "No free table fits %d guests at %s, and no free tables can be pushed together." % (party, B.hm(t))}
             ids = []
+        elif unit is None:
+            ids = plan["ids"]
         else:
             ids = unit["ids"]
     else:
@@ -807,6 +878,12 @@ def _save_reservation(r, data):
               "status": status, "source": source, "updated": B.now_utc()}
     if status != "pending":
         fields["review_reason"] = ""
+    if plan is not None:
+        err = B.apply_moves(ctx, plan)  # staff decide on the spot: the other booking moves now
+        if err:
+            return {"ok": False, "error": err}
+    if plan is not None and plan["text"] not in fields["staff_note"]:
+        fields["staff_note"] = (plan["text"] + " " + fields["staff_note"]).strip()[:1000]
     if res is None:
         res = app_tables.reservations.add_row(restaurant=r, token=B.new_token(), created=B.now_utc(), history=[],
                                               consent=False, capacity_pct=B.occupancy(ctx, d, t, dur), **fields)
@@ -815,7 +892,9 @@ def _save_reservation(r, data):
         before = res["status"]
         res.update(**fields)
         B.add_history(res, "staff", "Edited by staff." + (" Status: %s → %s." % (before, status) if before != status else ""))
-    return {"ok": True, "id": res.get_id(), "warnings": warnings}
+    if plan is not None:
+        B.save_plan(res, plan)
+    return {"ok": True, "id": res.get_id(), "warnings": warnings, "plan": plan["text"] if plan else ""}
 
 
 @anvil.server.callable(require_user=True)
@@ -842,6 +921,13 @@ def set_status(rid, res_id, status, day=None):
         return {"ok": False, "error": "Unknown status."}
     res = _child(app_tables.reservations, r, res_id)
     before = res["status"]
+    plan = B.plan_of(res)
+    if before == "pending" and status == "confirmed" and plan and plan.get("moves"):
+        err = B.apply_moves(B.Ctx(r), plan)  # approving does the move the plan needs
+        if err:
+            return {"ok": False, "error": err}
+    if before == "pending" and status == "confirmed" and plan and plan.get("text") and plan["text"] not in (res["staff_note"] or ""):
+        res["staff_note"] = (plan["text"] + " " + (res["staff_note"] or "")).strip()[:1000]  # the host stand sees it
     if status in B.ACTIVE and before not in B.ACTIVE:
         ctx = B.Ctx(r)
         clash = set(res["tables"] or []) & B.busy_ids(ctx, res["date"], int(res["start_min"]), int(res["duration"] or 0), exclude=res)

@@ -2,7 +2,9 @@ It helps to know what your guests see, so you can answer their questions.
 
 ### The booking form
 
-Guests reach it from your website, the **Book a table** QR code or the link on the Share page. They pick the number of guests, a day and a free time, then enter their name, email and phone. The form offers only times when you are open and have a table free. They can switch language at the top.
+Guests reach it from your website, the **Book a table** QR code or the link on the Share page. They pick the number of guests, a day and a free time, then enter their name, email and phone (the fields marked with a star are required). The form offers only times when you are open and have a table free, including big parties that fit when tables are pushed together (those wait for your approval). They can switch language at the top.
+
+There is one optional box: PlanPlate news and offers, which may include discounts on future bookings (never on the booking being made). EU law doesn't allow it to be ticked in advance. Above the **Book** button a short line tells guests that by booking they accept your privacy notice and PlanPlate's, with links to both.
 
 ![The booking form: guests, day and free times](shot:guest-book)
 

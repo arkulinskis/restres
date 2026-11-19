@@ -107,6 +107,12 @@
               <anvil-component type="TextBox" name="test_email_box" prop:placeholder="you@example.com" prop:type="email"></anvil-component>
               <anvil-component type="Button" name="test_email_button" prop:text="Send a test email" prop:role='["btn", "ic-mail"]'></anvil-component>
             </div>
+            <h3 class="h4">Send from (keeps emails out of junk)</h3>
+            <p class="muted small">Empty = Anvil's own no-reply address, which spam filters trust less. To send from your domain (for example reservations@planplate.com, the address the old PlanPlate used through MailerSend): first in Anvil, App -> Email service -> "Use custom SMTP server" with your MailerSend SMTP details, then type the address here and send a test. If sending from it fails, emails fall back to Anvil's address.</p>
+            <div class="ui-row">
+              <anvil-component type="TextBox" name="from_box" prop:placeholder="reservations@planplate.com" prop:type="email"></anvil-component>
+              <anvil-component type="Button" name="from_button" prop:text="Save" prop:role='["btn"]'></anvil-component>
+            </div>
           </div>
         </div>
       </div>

@@ -22,6 +22,8 @@ class Website(WebsiteTemplate):
         self.sections_panel.add_event_handler("x-redraw", self._redraw_event)
         self.sections_panel.add_event_handler("x-toggle-open", self._open_event)
         self._resize = anvil.js.report_exceptions(lambda e: self._fit())
+        window.PP.sortable(self.dom_nodes["sec_list"], {"item": "[data-sort-id]", "handle": ".pp-drag",
+                                                        "onEnd": anvil.js.report_exceptions(self._reorder)})
         self._draw()
 
     # ---------------------------------------------------------------- drawing
@@ -62,6 +64,12 @@ class Website(WebsiteTemplate):
     def _redraw_event(self, **event_args):
         self._sections()
         self._changed("")
+
+    def _reorder(self, ids):
+        """A section was dragged (or moved with the arrow keys on its grip): that is the page's new order."""
+        self.m.set("content.order", [str(i) for i in ids if str(i) in site_model.MOVABLE])
+        self._sections()
+        state.toast("Section moved: save to keep the new order", "ok")
 
     def _open_event(self, sid, is_open, **event_args):
         self.open[sid] = is_open

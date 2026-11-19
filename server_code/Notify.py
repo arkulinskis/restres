@@ -80,11 +80,30 @@ def origin():
         return ""
 
 
+def from_address():
+    """The address emails come from (Admin -> Email -> Send from; app_settings "email_from"), or "" for Anvil's own
+    no-reply address. A real domain with SPF/DKIM (planplate.com through MailerSend, as the old apps did) keeps booking
+    emails out of junk folders; it needs the Anvil Email service set to that SMTP server first."""
+    try:
+        from . import common as C
+        return str(C.get_setting("email_from") or "").strip()
+    except Exception:
+        return ""
+
+
 def _send(to, subject, text, html, r=None):
     import anvil.email
-    kw: dict = {"to": to, "subject": subject, "text": text, "html": html, "from_name": (r["name"] if r is not None else "PlanPlate")}
+    kw: dict = {"to": to, "subject": subject, "text": text, "html": html,
+                "from_name": ("%s (PlanPlate)" % r["name"]) if r is not None else "PlanPlate"}
     if r is not None and r["email"]:
         kw["reply_to"] = r["email"]
+    sender = from_address()
+    if sender:
+        try:
+            anvil.email.send(from_address=sender, **kw)
+            return
+        except Exception as e:  # the Email service isn't set up for that address yet: Anvil's own address still works
+            print("sending from %s failed, using Anvil's address: %s" % (sender, e))
     anvil.email.send(**kw)
 
 

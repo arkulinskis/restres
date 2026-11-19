@@ -3,12 +3,12 @@ import anvil.server
 from anvil.js import window
 
 from ._anvil_designer import ShareTemplate
-from ... import pp
+from ... import pp, router, state
 
 
 class Share(ShareTemplate):
-    """#share/<rid>: QR codes (booking, menu, website) with print-size PNGs and printable table cards, plus every way to
-    put the booking form on a website (link, Reserve button, own button, iframe, live menu and hours widgets, JSON)."""
+    """#share/<rid>: QR codes (booking, menu, website) with print-size PNGs, printable table cards and the plain links.
+    Everything to paste into a website moved to the Elements page (2026-11-19)."""
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
@@ -25,24 +25,11 @@ class Share(ShareTemplate):
         if self.site:
             self.dom_nodes["qr_site"].innerHTML = pp.qr_svg(self.site, 170)
             self.site_url_label.text = self.site
-        origin = self.D.get("origin") or pp.app_url().rstrip("/")
-        slug, name = s["slug"], s["name"]
-        js = "</" + "script>"
+        state.set_attr(self.elements_link, "href", router.href("elements", self.rid))
         self.codes_panel.items = [
-            {"title": "Booking link", "text": "Share it anywhere: social media, Google Business Profile, email signatures.", "code": self.book, "open": self.book},
-            {"title": "“Reserve a table” button", "text": "Paste this where the button should appear on your website. It opens the booking form in a window over your page.",
-             "code": '<script src="%s/_/api/embed.js?r=%s">%s' % (origin, slug, js)},
-            {"title": "Use your own button or link", "text": "Give any element the attribute data-planplate-open and include the script once.",
-             "code": '<a href="#" data-planplate-open>Book a table</a>\n<script src="%s/_/api/embed.js?r=%s">%s' % (origin, slug, js)},
-            {"title": "Embed the form in a page", "text": "The whole booking form inside your page.",
-             "code": '<iframe src="%s" title="Reserve a table at %s" style="width:100%%;max-width:560px;height:860px;border:0"></iframe>' % (self.book, name)},
-            {"title": "Live menu on your website", "text": "Always shows the menu as it is in PlanPlate.",
-             "code": '<div data-planplate-menu></div>\n<script src="%s/_/api/menu.js?r=%s">%s' % (origin, slug, js)},
-            {"title": "Live opening hours on your website", "text": "Follows your periods and special days.",
-             "code": '<div data-planplate-hours></div>\n<script src="%s/_/api/hours.js?r=%s">%s' % (origin, slug, js)},
-            {"title": "For developers", "text": "The same data as JSON.",
-             "code": "%s/_/api/menu?r=%s\n%s/_/api/hours?r=%s" % (origin, slug, origin, slug)},
-        ]
+            {"title": "Booking link", "text": "Opens your booking form.", "code": self.book, "open": self.book},
+            {"title": "Menu link", "text": "Opens your menu (the page the menu QR code shows).", "code": self.menu, "open": self.menu},
+        ] + ([{"title": "Website link", "text": "Your PlanPlate website.", "code": self.site, "open": self.site}] if self.site else [])
 
     @handle("book_png", "click")
     def book_png_click(self, **event_args):

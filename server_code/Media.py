@@ -47,8 +47,25 @@ GALLERY_CHOICES = {
     "motion": ["none", "fade", "rise", "slide", "zoom", "stagger"],
     "mobile_layout": ["bleed", "inset", "carousel", "stack"],
 }
+# The showcase (theme/assets/pp-showcase.js, <planplate-showcase>, Nov 19 2026) replaces the old component on PlanPlate
+# websites and new embeds. Its look: the keys below + size, motion, accent, background, heading. The old keys above stay
+# for <planplate-gallery> embeds already on restaurants' sites (dilettante.lv).
+GALLERY_CHOICES.update({
+    "layout": ["mosaic", "masonry", "spotlight", "slideshow", "carousel", "editorial", "grid", "polaroid"],
+    "tone": ["page", "light", "dark", "custom"],
+    "gap": ["none", "tight", "airy"],
+    "corners": ["square", "soft", "round"],
+    "frame": ["none", "shadow", "matte"],
+    "captions": ["off", "hover", "below"],
+    "hover": ["zoom", "lift", "none"],
+    "show": ["all", "6", "9", "12"],
+    "lightbox": ["on", "off"],
+    "autoplay": ["on", "off"],
+})
 GALLERY_DEFAULT = {"theme": "bento", "bg_style": "gradient", "picture_style": "none", "size": "md", "motion": "rise",
-                   "mobile_layout": "bleed", "accent": "#c9a56a", "background": "#1d1b18", "heading": "Our favourites"}
+                   "mobile_layout": "bleed", "accent": "#c9a56a", "background": "#1d1b18", "heading": "Our favourites",
+                   "layout": "mosaic", "tone": "page", "gap": "tight", "corners": "soft", "frame": "none", "captions": "hover",
+                   "hover": "zoom", "show": "all", "lightbox": "on", "autoplay": "on"}
 HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
 
@@ -300,6 +317,7 @@ def get_gallery(rid):
     return {"ok": True, "nav": _nav(r), "photos": [view(p) for p in all_photos(r)], "storage": _storage(),
             "style": gallery_style(s), "slug": r["slug"], "origin": origin,
             "feed_url": origin + "/_/api/gallery/" + r["slug"], "script_url": origin + "/_/theme/planplate-gallery.js",
+            "showcase_url": origin + "/_/theme/pp-showcase.js",
             "limits": {"image_mb": MAX_IMAGE // 1048576, "video_mb": _video_mb()}}
 
 
@@ -714,6 +732,25 @@ def feed(r, origin=None):
             item.update(width=int(p["width"]), height=int(p["height"]))
         out.append(item)
     return out
+
+
+SHOWCASE_KEYS = ("layout", "tone", "gap", "corners", "frame", "captions", "hover", "show", "lightbox", "autoplay", "size", "motion",
+                 "accent", "background", "heading")
+
+
+@anvil.server.http_endpoint("/showcase/:ref")
+def showcase_feed(ref, **kw):
+    """What <planplate-showcase> draws: the look chosen on the Gallery page and the photos, so a change there shows on
+    every website at once (the pasted code never changes)."""
+    r = find_restaurant(ref)
+    if r is None:
+        return anvil.server.HttpResponse(404, json.dumps({"error": "No restaurant with that link."}),
+                                         headers={"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"})
+    s = site_row(r, create=False)
+    g = gallery_style(s) if s is not None else dict(GALLERY_DEFAULT)
+    body = {"restaurant": r["name"], "style": {k: g.get(k) for k in SHOWCASE_KEYS}, "photos": feed(r)}
+    return anvil.server.HttpResponse(200, json.dumps(body), headers={
+        "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*", "Cache-Control": "max-age=60"})
 
 
 @anvil.server.http_endpoint("/gallery/:ref")

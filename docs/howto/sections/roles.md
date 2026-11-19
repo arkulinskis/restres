@@ -5,7 +5,7 @@ Everyone signs in with their own email. What they see depends on their role at e
 | Today, Reservations, walk-ins, seating | Yes | Yes | Yes |
 | Approve or decline requests | Yes | Yes | Yes |
 | Guest book | Yes | Yes | Look up only |
-| Hours, tables, events, menu, gallery, website, QR codes | Yes | Yes | No |
+| Hours, tables, events, menu, gallery, website, website elements, QR codes | Yes | Yes | No |
 | Settings (booking rules, approvals, emails) | Yes | Yes | No |
 | Invite people and change their role | Yes | Yes | No |
 | Delete the restaurant | Yes | No | No |

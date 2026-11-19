@@ -1,7 +1,7 @@
 from anvil import *
 
 from ._anvil_designer import TeamRowTemplate
-from ... import pp
+from ... import pp, state
 
 
 class TeamRow(TeamRowTemplate):
@@ -20,6 +20,7 @@ class TeamRow(TeamRowTemplate):
         self.role_badge.text = pp.ROLE.get(m["role"], m["role"])
         if can_edit:
             self.role_drop.selected_value = m["role"]
+            state.set_control_attr(self.role_drop, "aria-label", "Role of " + (m.get("name") or m["email"]))
 
     @handle("role_drop", "change")
     def role_drop_change(self, **event_args):

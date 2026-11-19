@@ -13,7 +13,8 @@ TABS = [("today", "Today", "sun", "staff"), ("reservations", "Reservations", "ca
         ("guests", "Guests", "users", "staff"), ("hours", "Opening hours", "clock", "manager"),
         ("tables", "Tables & layout", "table", "manager"), ("events", "Events", "star", "manager"),
         ("dishes", "Menu", "list", "manager"), ("gallery", "Gallery", "image", "manager"),
-        ("website", "Website", "globe", "manager"), ("share", "Share & QR", "qr", "manager"),
+        ("website", "Website", "globe", "manager"), ("elements", "Elements", "link", "manager"),
+        ("share", "Share & QR", "qr", "manager"),
         ("settings", "Settings", "cog", "manager")]
 RANK = {"staff": 1, "manager": 2, "owner": 3}
 ROLE = {"owner": "Owner", "manager": "Manager", "staff": "Staff"}

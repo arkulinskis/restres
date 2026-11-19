@@ -6,11 +6,11 @@
         <anvil-component type="Label" name="storage_badge" prop:role='["badge"]'></anvil-component><span class="ui-spacer"></span>
         <anvil-component type="Button" name="video_button" prop:text="Add a video" prop:role='["btn", "ic-video"]'></anvil-component>
         <anvil-component type="Button" name="add_button" prop:text="Add photos" prop:role='["btn", "btn-primary", "ic-upload"]'></anvil-component></div>
-      <p class="pp-intro">Photos are shrunk on your device before uploading, so phone photos are quick to send. With a Cloudinary account connected they go straight to it; otherwise PlanPlate keeps them. The gallery shows on your PlanPlate website, and anywhere you paste the code below.</p>
+      <p class="pp-intro">Add many photos at once: they are shrunk on your device first, so phone photos upload quickly. Drag the grip on a photo (or use the arrows) to set the order; the first photos are the ones guests see first.</p>
       <anvil-component type="Label" name="progress_label" prop:role='["msg-note"]' prop:visible="false"></anvil-component>
 
       <div class="pp-sec-head" style="margin-top:6px"><h2>In the gallery</h2><anvil-component type="Label" name="count_label" prop:role='["muted", "small"]'></anvil-component></div>
-      <div class="pp-ggrid"><anvil-component type="RepeatingPanel" name="gallery_panel" prop:item_template="PlanPlate_2_0.Items.GalleryPhoto" prop:role='["contents"]'></anvil-component></div>
+      <div class="pp-ggrid" anvil:dom-node="ggrid"><anvil-component type="RepeatingPanel" name="gallery_panel" prop:item_template="PlanPlate_2_0.Items.GalleryPhoto" prop:role='["contents"]'></anvil-component></div>
       <div class="ui-empty" anvil:name="gallery_empty">No photos in the gallery yet. Add some: your best dishes, the room, the terrace, the team.</div>
 
       <div anvil:name="others_part">
@@ -18,24 +18,35 @@
         <div class="pp-ggrid"><anvil-component type="RepeatingPanel" name="others_panel" prop:item_template="PlanPlate_2_0.Items.GalleryPhoto" prop:role='["contents"]'></anvil-component></div>
       </div>
 
-      <div class="pp-sec-head"><h2>Gallery style</h2><span class="muted small">Changes show on your website at once</span></div>
+      <div class="pp-sec-head pp-look-head"><h2>How it looks</h2><span class="muted small">Every change shows on your PlanPlate website and on every site with the gallery code, at once</span></div>
+      <div class="pp-lays"><anvil-component type="RepeatingPanel" name="layouts_panel" prop:item_template="PlanPlate_2_0.Items.LayoutCard" prop:role='["contents"]'></anvil-component></div>
+
       <div class="pp-gstyle">
         <div class="ui-card pp-gopts">
-          <anvil-component type="RepeatingPanel" name="style_panel" prop:item_template="PlanPlate_2_0.Items.StyleField"></anvil-component>
+          <anvil-component type="RepeatingPanel" name="options_panel" prop:item_template="PlanPlate_2_0.Items.OptionRow"></anvil-component>
           <div class="pp-split">
-            <label class="ui-field"><span>Accent</span><input type="color" anvil:name="accent_in" anvil:on-dom:change="self.color_change" data-k="accent"></label>
-            <label class="ui-field"><span>Background</span><input type="color" anvil:name="background_in" anvil:on-dom:change="self.color_change" data-k="background"></label>
+            <label class="ui-field"><span>Buttons and highlights</span><input type="color" anvil:name="accent_in" anvil:on-dom:change="self.color_change" data-k="accent"></label>
+            <label class="ui-field" anvil:name="bg_field"><span>Own background</span><input type="color" anvil:name="background_in" anvil:on-dom:change="self.color_change" data-k="background"></label>
           </div>
-          <label class="ui-field"><span>Heading on your website</span><anvil-component type="TextBox" name="heading_box"></anvil-component></label>
+          <label class="ui-field"><span>Heading above the photos <em>(optional)</em></span><anvil-component type="TextBox" name="heading_box" prop:placeholder="Our favourites"></anvil-component></label>
+          <anvil-component type="Button" name="reset_button" prop:text="Back to the recommended look" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component>
         </div>
-        <div class="pp-gpreview" anvil:dom-node="preview"></div>
+        <div class="pp-gprev-col">
+          <div class="pp-gprev-bar">
+            <span class="muted small">Live preview</span><span class="ui-spacer"></span>
+            <div class="ui-seg" role="group" aria-label="Preview size">
+              <button type="button" anvil:name="dev_desktop" data-d="desktop" anvil:on-dom:click="self.device_click">Computer</button>
+              <button type="button" anvil:name="dev_phone" data-d="phone" anvil:on-dom:click="self.device_click">Phone</button>
+            </div>
+          </div>
+          <div class="pp-gpreview" anvil:name="preview_box"><div class="pp-gprev-in" anvil:dom-node="preview"></div></div>
+        </div>
       </div>
 
-      <div class="pp-sec-head"><h2>Put it on another website</h2></div>
-      <div class="ui-card pp-sec">
-        <p class="pp-lead">Paste this where the gallery should appear (in WordPress: a “Custom HTML” block). It always shows your latest photos.</p>
-        <anvil-component type="Label" name="code_label" prop:role='["pp-pre-code"]'></anvil-component>
-        <anvil-component type="Button" name="copy_button" prop:text="Copy the code" prop:role='["btn", "btn-sm", "ic-copy"]' style="margin-top:10px"></anvil-component>
+      <div class="ui-card pp-sec pp-gcode">
+        <div><h3>Put the gallery on another website</h3>
+          <p class="pp-lead">The code to paste (WordPress, Wix, Squarespace or your own site) is on the <b>Elements</b> tab, with every other piece you can paste.</p></div>
+        <a class="ui-btn" anvil:name="elements_link" href="#"><i class="ic ic-grid"></i><span>Open Elements</span></a>
       </div>
     </div>
   </anvil-block>

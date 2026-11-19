@@ -1,3 +1,5 @@
+import datetime
+
 from anvil import *
 import anvil.server
 
@@ -7,7 +9,9 @@ from ... import pp, state
 
 class Tables(TablesTemplate):
     """#tables/<rid>: the drag-and-drop floor plan. Pick a weekday and an hour to see the layout then; click a table to
-    edit it; join tables for chosen hours and days (and split them again)."""
+    edit it (seats, shape, area, joinable or fixed); "Try a big party" shows what PlanPlate would do for a party on a
+    day and time (Portal.test_party: one table, tables pushed together, a move, or no room) right on the plan; join
+    tables for chosen hours and days (and split them again)."""
 
     def __init__(self, args: tuple = (), **properties):
         super().__init__(**properties)
@@ -18,6 +22,9 @@ class Tables(TablesTemplate):
         self.hour = self.D["now_hour"] if self.D["now_hour"] in oh else (19 if 19 in oh else (oh[0] if oh else 19))
         self.mode, self.sel, self.picks = "arrange", None, []
         self.j_hours, self.j_days = [], []
+        self.trial = None  # the last "Try a big party" answer: its tables light up on the plan
+        self.bp_date.date = datetime.date.today()
+        pp.time_input(self.bp_time)
         for panel in (self.days_panel, self.hours_panel, self.j_hours_panel, self.j_days_panel):
             panel.add_event_handler("x-chip", self._chip)
         self.joins_panel.add_event_handler("x-save-join", self._save_join_event)
@@ -63,21 +70,28 @@ class Tables(TablesTemplate):
         self.hours_panel.items = [{"label": "%02d:00" % h, "value": h, "on": h == self.hour, "group": "hour"} for h in D["open_hours"]]
         joins, of = self._active_joins()
         sel = [self.sel] if self.mode == "arrange" and self.sel else (self.picks if self.mode == "join" else [])
+        trial: dict = self.trial or {}
         self.floor.draw({"tables": D["tables"], "draggable": self.mode == "arrange", "selected": sel,
-                         "groups": [{"tables": j["tables"], "tag": "Joined · %d" % j["seats"]} for j in joins]})
+                         "groups": [{"tables": j["tables"], "tag": "Joined · %d" % j["seats"]} for j in joins],
+                         "suggest": trial.get("ids") or [], "busy": trial.get("busy") or []})
         t = self._table(self.sel) if self.sel else None
         self.summary_part.visible = self.mode == "arrange" and t is None
         self.table_part.visible = self.mode == "arrange" and t is not None
         self.join_part.visible = self.mode == "join"
         if self.mode == "arrange" and t is None:
             units = len([x for x in D["tables"] if x["active"] and x["id"] not in of]) + len(joins)
+            live = [x for x in D["tables"] if x["active"]]
+            fixed = len([x for x in live if not x.get("joinable", True)])
             self.sum_title.text = "%s · %d seats" % (state.plural(len(D["tables"]), "table"), D["seats"])
             self.sum_text.text = ("Drag tables to arrange the room. Click one to edit it. On %s at %02d:00 guests can book %d separate tables."
                                   % (pp.DAYS[self.day], self.hour, units))
+            self.bp_text.text = ("%d of %d tables can be pushed together%s. Try a party size to see how PlanPlate would seat it."
+                                 % (len(live) - fixed, len(live), " (%d fixed: shown with a lock)" % fixed if fixed else ""))
             self.join_mode_button.enabled = len(D["tables"]) >= 2
         elif t is not None:
             self.t_name.text, self.t_seats.text, self.t_min.text = t["name"], str(t["seats"]), str(t["min_party"])
             self.t_shape.selected_value, self.t_area.text, self.t_active.checked = t["shape"], t.get("area") or "", t["active"]
+            self.t_joinable.checked = t.get("joinable", True)
             j = of.get(t["id"])
             self.join_note.visible = j is not None
             if j:
@@ -155,7 +169,28 @@ class Tables(TablesTemplate):
     def save_table_button_click(self, **event_args):
         self._apply(state.call("save_table", self.rid, {"id": self.sel, "name": self.t_name.text, "seats": self.t_seats.text,
                                                         "shape": self.t_shape.selected_value, "min_party": self.t_min.text,
-                                                        "area": self.t_area.text, "active": self.t_active.checked}), "Table saved")
+                                                        "area": self.t_area.text, "active": self.t_active.checked,
+                                                        "joinable": self.t_joinable.checked}), "Table saved")
+
+    # ---------------------------------------------------------------- try a big party
+    @handle("try_button", "click")
+    def try_button_click(self, **event_args):
+        day = self.bp_date.date or datetime.date.today()
+        r = state.call("test_party", self.rid, day.isoformat(), (self.bp_time.text or "19:00")[:5], self.bp_party.text or "8")
+        if not r:
+            return
+        self.trial = r
+        self.try_result.visible = True
+        self.try_result.text = r["text"] + (" (%s around then.)" % state.plural(r["bookings"], "other booking") if r.get("bookings") else "")
+        self.try_result.role = "msg-error" if r["kind"] == "none" else "msg-note"
+        self.try_clear_button.visible = True
+        self._draw()
+
+    @handle("try_clear_button", "click")
+    def try_clear_button_click(self, **event_args):
+        self.trial = None
+        self.try_result.visible = self.try_clear_button.visible = False
+        self._draw()
 
     @handle("delete_table_button", "click")
     def delete_table_button_click(self, **event_args):

@@ -455,6 +455,60 @@
     });
     return PP._scripts[src];
   };
+  // Drag to reorder (Website sections, Gallery photos). el = the list; opt = {item: selector of the rows (each carries
+  // data-sort-id), handle: selector of the drag grip inside a row, onEnd: function(ids in the new order)}.
+  // Pointer events, so it works with a mouse, a finger and a pen; the grip also moves its row with the arrow keys.
+  PP.sortable = function (el, opt) {
+    if (el.__ppSort) { el.__ppSort.opt = opt; return; }
+    var st = el.__ppSort = { opt: opt, drag: null };
+    function rows() { return Array.prototype.filter.call(el.querySelectorAll(st.opt.item), function (r) { return r.closest(st.opt.item) === r; }); }
+    function ids() { return rows().map(function (r) { return r.getAttribute('data-sort-id'); }); }
+    function done(changed) { if (changed && st.opt.onEnd) st.opt.onEnd(ids()); }
+    el.addEventListener('pointerdown', function (e) {
+      var h = e.target.closest(st.opt.handle);
+      if (!h || !el.contains(h) || e.button > 0) return;
+      var it = h.closest(st.opt.item);
+      if (!it) return;
+      e.preventDefault();
+      st.drag = { it: it, before: ids().join('|'), pid: e.pointerId };
+      try { h.setPointerCapture(e.pointerId); } catch (x) {}
+      it.classList.add('pp-sorting');
+      el.classList.add('pp-sort-on');
+    });
+    el.addEventListener('pointermove', function (e) {
+      var d = st.drag;
+      if (!d) return;
+      d.it.style.pointerEvents = 'none';
+      var under = document.elementFromPoint(e.clientX, e.clientY);
+      d.it.style.pointerEvents = '';
+      var t = under && under.closest(st.opt.item);
+      if (!t || t === d.it || !el.contains(t)) return;
+      var list = rows(), a = list.indexOf(d.it), b = list.indexOf(t);
+      if (a < 0 || b < 0) return;
+      t.parentNode.insertBefore(d.it, a < b ? t.nextSibling : t);
+    });
+    function end() {
+      var d = st.drag;
+      if (!d) return;
+      st.drag = null;
+      d.it.classList.remove('pp-sorting');
+      el.classList.remove('pp-sort-on');
+      done(ids().join('|') !== d.before);
+    }
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    el.addEventListener('keydown', function (e) {
+      var h = e.target.closest && e.target.closest(st.opt.handle);
+      if (!h || ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].indexOf(e.key) < 0) return;
+      var it = h.closest(st.opt.item), list = rows(), i = list.indexOf(it);
+      var j = i + (e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 1);
+      if (i < 0 || j < 0 || j >= list.length) return;
+      e.preventDefault();
+      it.parentNode.insertBefore(it, j > i ? list[j].nextSibling : list[j]);
+      h.focus();
+      done(true);
+    });
+  };
   PP.siteBase = function () { return PP.appUrl().replace(/\/$/, '') + '/_/api/site/'; };
 
 })();

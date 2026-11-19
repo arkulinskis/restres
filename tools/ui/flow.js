@@ -16,6 +16,7 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
   const vis = (e) => e && e.getBoundingClientRect().width > 0;
+  const ascii = (s) => String(s).normalize('NFD').replace(/[^ -~]/g, '');
   const btn = (scope, text) => $$(scope + ' button').find((b) => vis(b) && b.textContent.trim().replace(/\s+/g, ' ') === text);
   function type(input, value) {
     input.focus(); input.value = value;
@@ -39,7 +40,9 @@
     ok($('.lp-hero .pp-authbox') && $$('.lp-hero input').length >= 2, 'landing: the sign-in box sits in the hero');
 
     await page('#book/maison-lumiere', () => $$('.anvil-role-pp-times .anvil-role-chip button').length || $('.anvil-role-pp-times') , 'booking form');
-    ok(/Maison Lumi/.test($('.anvil-role-pp-mast-name').textContent), 'booking form: the demo restaurant');
+    ok(/Maison Lumi/.test($('.anvil-role-pp-bhead-name').textContent), 'booking form: the demo restaurant');
+    ok($('.pp-bhead').getBoundingClientRect().height < 110, 'booking form: a thin header (' + Math.round($('.pp-bhead').getBoundingClientRect().height) + 'px)');
+    ok(!$$('.pp-bfoot a').some((a) => /#menu\//.test(a.getAttribute('href') || '')) && !$$('.pp-book button').some((b) => b.textContent.trim() === 'Close'), 'booking form: no menu link and no Close button of its own');
     const day = await until(() => $$('.pp-pd').find((d) => !d.disabled && !d.classList.contains('wd') && !d.classList.contains('out')), 'an open day');
     const firstTime = await until(() => $$('.anvil-role-pp-times .anvil-role-chip button').find((b) => !b.disabled), 'a free time', 40000);
     firstTime.click();
@@ -49,14 +52,12 @@
     const f = $$('.pp-panel input').filter(vis);
     type(f[0], 'Flow Tester'); type(f[1], 'flow.tester@example.com'); type(f[2], '+1 514 555 0199');
     const ticks = $$('.pp-consent input[type=checkbox]').filter(vis);
-    ok(ticks.length === 3 && ticks.every((x) => !x.checked), 'booking form: three unticked boxes (restaurant, PlanPlate, optional news)');
-    ok(/PlanPlate/.test($$('.pp-consent')[1].textContent) && /Optional/.test($('.pp-consent-opt').textContent), 'booking form: the PlanPlate box and the optional news box');
+    ok(ticks.length === 1 && !ticks[0].checked, 'booking form: one tick box, the optional news, not pre-ticked');
+    ok(/future bookings/.test($('.pp-consent-opt').textContent) && /Optional/.test($('.pp-consent-opt').textContent), 'booking form: the news box says discounts are for future bookings');
+    ok(/By booking/.test($('.anvil-role-pp-accept-text').textContent) && $$('.pp-accept-links a').length === 2, 'booking form: the "By booking you accept" line with both privacy links');
+    ok($$('.anvil-role-pp-req').filter(vis).length === 3 && /Required/.test($('.anvil-role-pp-req-note').textContent), 'booking form: the three required fields carry a star');
     const submit = () => (btn('.pp-panel', 'Book table') || btn('.pp-panel', 'Send request')).click();
     ticks[0].click();
-    submit();
-    await until(() => vis($$('.pp-panel .anvil-role-msg-error').find(vis)), 'the PlanPlate tick is required');
-    ok(/required boxes/.test($$('.pp-panel .anvil-role-msg-error').find(vis).textContent) && vis($('.pp-summary')), 'booking form: no booking without the PlanPlate tick');
-    ticks[1].click(); ticks[2].click();
     submit();
     await until(() => vis($('.pp-done')), 'booked', 40000);
     ok(/booked|received/i.test($('.pp-done').textContent), 'booking form: a guest books a table');
@@ -113,12 +114,23 @@
     const nameBox = inputs.find((i) => i.closest('label') && /Guest name/.test(i.closest('label').textContent));
     type(nameBox, 'Phone Booking Test');
     const timeBox = inputs.find((i) => i.type === 'time');
-    type(timeBox, '19:00');
+    await until(() => !/Checking the tables/.test(d.textContent), 'the table check (runs after the editor opens)', 30000);
+    ok(/Best fit|No single table|No free table|passed/.test(d.textContent), 'booking editor: opens at once, then says which table fits');
+    const chip = await until(() => Array.from(d.querySelectorAll('.anvil-role-pp-ed-tchips button')).find((b) => vis(b) && !b.disabled), 'a free time chip', 20000).catch(() => null);
+    if (chip) { chip.click(); await sleep(800); ok(timeBox.value === chip.textContent.trim().replace(' +', ''), 'booking editor: tapping a free time fills it in'); }
+    else type(timeBox, '23:45');
     Array.from(d.querySelectorAll('button')).find((b) => b.textContent.trim() === 'Add booking').click();
-    await until(() => !dialog() || /could not|anyway/i.test(dialog().textContent), 'saved', 40000);
+    await until(() => !dialog() || /could not|anyway|passed/i.test(dialog().textContent), 'saved', 40000);
+    if (dialog() && /passed/.test(dialog().textContent)) {
+      ok(true, 'booking editor: a time that has passed is refused');
+      Array.from(dialog().querySelectorAll('button')).find((b) => b.textContent.trim() === 'Close').click();
+    }
     if (dialog()) { const force = Array.from(dialog().querySelectorAll('button')).find((b) => /Save anyway/.test(b.textContent)); if (force) force.click(); }
     await until(() => !dialog(), 'editor closed', 40000);
     ok(true, 'reservations: a staff booking is added in the editor');
+    btn('.pp-res-tools', 'Refresh').click();
+    await until(() => /Updated \d\d:\d\d/.test($('.anvil-role-pp-updated').textContent), 'refreshed', 30000);
+    ok(true, 'reservations: the Refresh button reloads the day');
     $$('.ui-seg button').find((b) => b.textContent.trim() === 'List').click();
     await until(() => vis($('.pp-res-list')) || vis($$('.ui-empty').find(vis)), 'list view');
     ok(true, 'reservations: list view');
@@ -181,18 +193,43 @@
     $$('.pp-floor .tb')[0].dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 10, clientY: 10, pointerId: 1 }));
     await until(() => vis($$('.pp-side input').find(vis)), 'table form');
     ok(/T\d/.test($$('.pp-side input').find(vis).value), 'tables: tap a table to edit it');
+    ok($$('.pp-joinable input[type=checkbox]').filter(vis).length === 1, 'tables: a table has the joinable tick');
+    btn('.pp-side', 'Close').click();
+    await until(() => btn('.pp-side', 'Try a big party'), 'the big-party tester');
+    btn('.pp-side', 'Try a big party').click();
+    await until(() => vis($('.pp-bigparty .anvil-role-msg-note')) || vis($('.pp-bigparty .anvil-role-msg-error')), 'the answer', 40000);
+    ok(/fits|Push|Move|No room|Closed/.test($('.pp-bigparty').textContent), 'tables: "Try a big party" says how PlanPlate would seat 8');
     await page('#events/' + rid, () => $$('.pp-ec').length >= 1);
     btn('.pp-ec', 'Set up the room') ? btn('.pp-ec', 'Set up the room').click() : btn('.pp-ec', 'Room').click();
     await until(() => $$('.pp-setup .pp-floor .tb').length >= 9, 'room set-up');
     ok(true, 'events: an event room set-up opens on the floor plan');
     await page('#dishes/' + rid, () => $$('.pp-eddish').length > 5);
     ok(true, 'menu editor: sections and dishes');
-    await page('#gallery/' + rid, () => $('.pp-gallery'));
+    await page('#gallery/' + rid, () => $('.pp-gallery') && $$('.pp-lay').length);
     ok(/Stored/.test(document.body.textContent), 'gallery: the photo storage is shown');
+    ok($$('.pp-lay').length === 8, 'gallery: eight layouts to choose from');
+    $$('.pp-lay').find((b) => /Spotlight/.test(b.textContent)).click();
+    await until(() => $('.pp-lay.on') && /Spotlight/.test($('.pp-lay.on').textContent), 'spotlight chosen');
+    const sc = $('.pp-gpreview planplate-showcase');
+    if (sc) {
+      await until(() => sc.shadowRoot && sc.shadowRoot.querySelector('.l-spotlight .ps-stage'), 'the preview redraws as Spotlight', 30000);
+      ok(true, 'gallery: the live preview shows the chosen layout');
+    }
+    $$('.pp-lay').find((b) => /Mosaic/.test(b.textContent)).click();
+    await until(() => /Mosaic/.test($('.pp-lay.on').textContent), 'back to mosaic');
+    ok($$('.pp-ggrid .pp-drag').filter(vis).length >= 1 || !$$('.pp-gph').length, 'gallery: photos have a drag grip');
     await page('#website/' + rid, () => $('.pp-sbar'));
     ok(vis($('.pp-site-layout')) || vis($('.pp-welcome')), 'website: the builder');
+    if (vis($('.pp-site-layout'))) ok($$('.pp-ssec-grip').filter(vis).length === 8, 'website: the eight page sections can be dragged');
+    await page('#elements/' + rid, () => $('.pp-elements') && $('.pp-rb-prev .pp-reserve'));
+    ok(/menu\.js/.test(document.body.textContent) && /pp-showcase\.js/.test(document.body.textContent) && /hours\.js/.test(document.body.textContent), 'elements: menu, hours and gallery codes');
+    ok($('.pp-el-more') && !$('.pp-el-more').open, 'elements: the own-button code is tucked away (advanced)');
+    $$('.pp-rb-opts button').find((b) => b.textContent.trim() === 'Brass').click();
+    await until(() => $('.pp-rb-prev .pp-reserve.pp-brass') && /style=brass/.test($('.pp-el-hero .anvil-role-pp-pre-code').textContent), 'brass button');
+    ok(true, 'elements: the Reserve button style picker updates the preview and the code');
     await page('#share/' + rid, () => $$('.pp-qr svg').length >= 2);
-    ok(/embed\.js/.test(document.body.textContent), 'share: QR codes and the Reserve button code');
+    const shareText = ($('.pp-share') || document.body).textContent;
+    ok(/Links to share/.test(shareText) && !/embed\.js/.test(shareText), 'share: QR codes and links (codes moved to Elements): ' + ascii(shareText.replace(/\s+/g, ' ')).slice(0, 160));
     await page('#settings/' + rid, () => $('.pp-set'));
     ok($$('.pp-rule').length >= 6, 'settings: the booking rules');
     say('PASSED');

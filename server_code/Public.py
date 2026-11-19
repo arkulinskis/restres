@@ -120,17 +120,21 @@ def _book(r, d, t, party, guest, consent_text, lang="en", pp=None):
         return None, ("We're nearly full at that time, but walk-ins are welcome." if state == "walk_in"
                       else "Sorry, that time was just taken. Please pick another time.")
     dur = B.setting(r, "duration_min")
-    unit = B.find_unit(ctx, d, t, party, dur)
-    if unit is None:
+    unit, plan = B.seat_party(ctx, d, t, party, dur)
+    if unit is None and plan is None:
         return None, "Sorry, that time was just taken. Please pick another time."
     status, reason, pct = B.check_rules(ctx, d, t, party, dur, notes=guest["notes"])
+    if plan is not None:  # tables have to be pushed together (maybe after moving another booking): a manager decides
+        status, reason = "pending", ("No single table fits. " + plan["text"] + " " + reason).strip()
     now = B.now_utc()
     res = app_tables.reservations.add_row(
         restaurant=r, token=B.new_token(), date=d, start_min=t, duration=dur, party=party,
         name=guest["name"], email=guest["email"], phone=guest["phone"], notes=guest["notes"],
-        status=status, source="online", tables=unit["ids"], review_reason=reason, capacity_pct=pct,
+        status=status, source="online", tables=unit["ids"] if unit else plan["ids"], review_reason=reason, capacity_pct=pct,
         consent=True, consent_text=consent_text, consent_at=now, created=now, updated=now, history=[], language=lang,
         **(pp or {}))
+    if plan is not None:
+        B.save_plan(res, plan)
     B.add_history(res, "guest", "Booked online for %d on %s at %s%s." % (
         party, d.isoformat(), B.hm(t), "" if status == "confirmed" else " (awaiting approval)"))
     return res, None
@@ -157,11 +161,11 @@ def book(slug, data):
     if err:
         return {"ok": False, "error": err}
     lang = B.pick_language(r, data.get("language"))
-    if not data.get("pp_consent"):  # PlanPlate's own required tick (GuestNews)
+    if not data.get("pp_consent"):  # the guest booked under the "By booking you accept..." line (GuestNews)
         return {"ok": False, "error": GuestNews.t(lang)["need"]}
     consent_text = B.public_restaurant(r, lang)["privacy_text"]
     news = bool(data.get("pp_news"))
-    pp = {"pp_consent": True, "pp_consent_text": GuestNews.t(lang)["consent"], "pp_consent_at": B.now_utc(), "pp_news": news}
+    pp = {"pp_consent": True, "pp_consent_text": GuestNews.consent_text(lang, r["name"]), "pp_consent_at": B.now_utc(), "pp_news": news}
     res, err = _book(r, d, t, party, guest, consent_text, lang, pp)
     if err:
         return {"ok": False, "error": err}
@@ -302,42 +306,105 @@ def cancel_reservation(token):
 
 
 # ---------------------------------------------------------------- website embed
+# /_/api/embed.js?r=<slug> draws PlanPlate's "Reserve a table" button where the script tag stands (like a "Sign in with
+# Google" button: the restaurant can't restyle it by accident, but can pick a style), and opens the booking form in a
+# window over the page. Options in the address: style=ink|brass|light|outline, shape=pill|rounded, size=sm|md|lg,
+# lang=en|fr|lv, label=<own words>, button=none (no button: only elements with data-planplate-open open the form).
+# Elements with data-planplate-open always open it too. Loading the script twice never binds an element twice.
+EMBED_LABELS = {"en": "Reserve a table", "fr": "Réserver une table", "lv": "Rezervēt galdiņu"}
+EMBED_CLOSE = {"en": "Close", "fr": "Fermer", "lv": "Aizvērt"}
 EMBED_JS = r"""(function(){
-  var ORIGIN=%(origin)s, SLUG=%(slug)s, LABEL=%(label)s;
+  var ORIGIN=__ORIGIN__, SLUG=__SLUG__, LABEL=__LABEL__, OPT=__OPT__, CLOSE=__CLOSE__;
   var me=document.currentScript;
-  function open(){
-    var o=document.createElement('div');
-    o.setAttribute('style','position:fixed;inset:0;z-index:2147483000;background:rgba(20,18,15,.55);display:flex;align-items:center;justify-content:center;padding:16px');
-    var box=document.createElement('div');
-    box.setAttribute('style','position:relative;width:min(560px,100%%);height:min(820px,100%%);background:#faf8f4;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)');
-    var x=document.createElement('button');
-    x.setAttribute('aria-label','Close');x.innerHTML='&times;';
-    x.setAttribute('style','position:absolute;top:8px;right:10px;z-index:2;border:0;background:transparent;font:28px/1 Georgia,serif;color:#555;cursor:pointer');
-    var f=document.createElement('iframe');
-    f.src=ORIGIN+'/#book/'+SLUG;f.title='Reserve a table';
-    f.setAttribute('style','border:0;width:100%%;height:100%%');
-    function close(){o.remove();document.removeEventListener('keydown',esc);}
-    function esc(e){if(e.key==='Escape')close();}
-    x.onclick=close;o.onclick=function(e){if(e.target===o)close();};
-    document.addEventListener('keydown',esc);
-    box.appendChild(x);box.appendChild(f);o.appendChild(box);document.body.appendChild(o);
+  var MARK='<svg viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="16" cy="16" r="13" stroke-width="1.6"/><circle cx="16" cy="16" r="8.2" stroke-width="1.2"/><path d="M16 10.8v10.4" stroke-width="1.7" stroke-linecap="round"/></svg>';
+  function css(){
+    if(document.getElementById('pp-embed-css'))return;
+    var s=document.createElement('style');s.id='pp-embed-css';
+    s.textContent=[
+      '.pp-reserve{box-sizing:border-box;display:inline-flex;align-items:center;gap:10px;height:48px;margin:0;padding:0 22px 0 8px;border:1px solid transparent;border-radius:999px;font:600 15px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;letter-spacing:.01em;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(20,18,15,.14),0 6px 18px -6px rgba(20,18,15,.28);transition:transform .16s cubic-bezier(.2,.8,.2,1),box-shadow .16s cubic-bezier(.2,.8,.2,1),background-color .16s,filter .16s;white-space:nowrap}',
+      '.pp-reserve .pp-reserve-mark{display:inline-grid;place-items:center;flex:none;width:32px;height:32px;border-radius:999px}',
+      '.pp-reserve:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,18,15,.14),0 12px 26px -8px rgba(20,18,15,.34)}',
+      '.pp-reserve:active{transform:translateY(0) scale(.98);box-shadow:0 1px 2px rgba(20,18,15,.18)}',
+      '.pp-reserve:focus-visible{outline:3px solid #c9a56a;outline-offset:3px}',
+      '.pp-reserve.pp-ink{background:#1d1b18;color:#faf8f4}.pp-reserve.pp-ink .pp-reserve-mark{background:#faf8f4;color:#826638}',
+      '.pp-reserve.pp-brass{background:#826638;color:#fff}.pp-reserve.pp-brass .pp-reserve-mark{background:rgba(255,255,255,.16);color:#fff}',
+      '.pp-reserve.pp-light{background:#fff;color:#1d1b18;border-color:#dcd5c9}.pp-reserve.pp-light .pp-reserve-mark{background:#f3eee6;color:#826638}',
+      '.pp-reserve.pp-outline{background:transparent;color:inherit;border:1.5px solid currentColor;box-shadow:none}.pp-reserve.pp-outline .pp-reserve-mark{border:1.2px solid currentColor}',
+      '.pp-reserve.pp-outline:hover{box-shadow:none;filter:brightness(1.08)}',
+      '.pp-reserve.pp-rounded{border-radius:12px}.pp-reserve.pp-rounded .pp-reserve-mark{border-radius:8px}',
+      '.pp-reserve.pp-sm{height:40px;font-size:14px;padding-right:18px;padding-left:6px}.pp-reserve.pp-sm .pp-reserve-mark{width:28px;height:28px}',
+      '.pp-reserve.pp-lg{height:56px;font-size:16.5px;padding-right:26px;padding-left:10px;gap:12px}.pp-reserve.pp-lg .pp-reserve-mark{width:38px;height:38px}',
+      '.pp-modal{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(20,18,15,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:pp-fade .2s cubic-bezier(.2,.8,.2,1)}',
+      '.pp-modal-box{position:relative;width:min(560px,100%);height:min(860px,100%);background:#faf8f4;border-radius:18px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);animation:pp-rise .26s cubic-bezier(.2,.8,.2,1)}',
+      '.pp-modal iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}',
+      '.pp-modal-x{position:absolute;top:12px;right:12px;z-index:2;display:grid;place-items:center;width:36px;height:36px;margin:0;padding:0;border:1px solid rgba(29,27,24,.12);border-radius:999px;background:rgba(250,248,244,.92);color:#1d1b18;cursor:pointer;transition:background-color .16s,transform .16s}',
+      '.pp-modal-x:hover{background:#fff;transform:scale(1.05)}.pp-modal-x:focus-visible{outline:3px solid #c9a56a;outline-offset:2px}',
+      '.pp-modal-wait{position:absolute;inset:0;display:grid;place-items:center;color:#826638}.pp-modal-wait svg{width:38px;height:38px;animation:pp-spin 1.1s linear infinite}',
+      '@keyframes pp-fade{from{opacity:0}}@keyframes pp-rise{from{opacity:0;transform:translateY(14px) scale(.985)}}@keyframes pp-spin{to{transform:rotate(360deg)}}',
+      '@media (max-width:560px){.pp-modal{padding:0}.pp-modal-box{width:100%;height:100%;border-radius:0}}',
+      '@media (prefers-reduced-motion:reduce){.pp-reserve,.pp-modal,.pp-modal-box,.pp-modal-x{animation:none;transition:none}.pp-modal-wait svg{animation-duration:3s}}'
+    ].join('');
+    (document.head||document.documentElement).appendChild(s);
   }
-  var hooks=document.querySelectorAll('[data-planplate-open]');
-  if(hooks.length){hooks.forEach(function(h){h.addEventListener('click',function(e){e.preventDefault();open();});});}
-  else if(me){
-    var b=document.createElement('button');b.type='button';b.textContent=LABEL;
-    b.setAttribute('style','font:500 15px/1 system-ui,sans-serif;letter-spacing:.04em;padding:14px 26px;border-radius:999px;border:1px solid #1d1b18;background:#1d1b18;color:#faf8f4;cursor:pointer');
+  function open(ev){
+    css();
+    var opener=document.activeElement;
+    var o=document.createElement('div');o.className='pp-modal';
+    o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label',LABEL);
+    var box=document.createElement('div');box.className='pp-modal-box';
+    var wait=document.createElement('div');wait.className='pp-modal-wait';wait.innerHTML=MARK;
+    var x=document.createElement('button');x.type='button';x.className='pp-modal-x';x.setAttribute('aria-label',CLOSE);
+    x.innerHTML='<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+    var f=document.createElement('iframe');
+    f.src=ORIGIN+'/#book/'+encodeURIComponent(SLUG)+(OPT.lang?'/'+OPT.lang:'');f.title=LABEL;f.setAttribute('allow','clipboard-write');
+    f.addEventListener('load',function(){wait.style.display='none';});
+    var lock=document.documentElement.style.overflow;
+    function close(){o.remove();document.removeEventListener('keydown',esc);window.removeEventListener('message',msg);document.documentElement.style.overflow=lock;if(opener&&opener.focus)opener.focus();}
+    function esc(e){if(e.key==='Escape')close();}
+    function msg(e){if(e.origin===ORIGIN&&e.source===f.contentWindow&&(e.data==='close_div'||(e.data&&e.data.planplate==='close')))close();}
+    x.onclick=close;o.onclick=function(e){if(e.target===o)close();};
+    document.addEventListener('keydown',esc);window.addEventListener('message',msg);
+    box.appendChild(wait);box.appendChild(f);box.appendChild(x);o.appendChild(box);document.body.appendChild(o);
+    document.documentElement.style.overflow='hidden';
+    x.focus();
+  }
+  function bind(root){
+    (root||document).querySelectorAll('[data-planplate-open]').forEach(function(h){
+      if(h.__ppBound)return;h.__ppBound=true;
+      h.addEventListener('click',function(e){e.preventDefault();open();});
+    });
+  }
+  var hooks=document.querySelectorAll('[data-planplate-open]').length;
+  var wantButton=OPT.button==='none'?false:(OPT.button==='show'||!hooks);
+  if(wantButton&&me&&me.parentNode){
+    css();
+    var b=document.createElement('button');b.type='button';
+    b.className='pp-reserve pp-'+(OPT.style||'ink')+(OPT.shape==='rounded'?' pp-rounded':'')+(OPT.size&&OPT.size!=='md'?' pp-'+OPT.size:'');
+    b.innerHTML='<span class="pp-reserve-mark">'+MARK+'</span><span class="pp-reserve-text"></span>';
+    b.lastChild.textContent=LABEL;
     b.onclick=open;me.parentNode.insertBefore(b,me);
   }
-  window.PlanPlate={open:open};
+  bind();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){bind();});
+  window.PlanPlate=window.PlanPlate||{};window.PlanPlate.open=open;
 })();
 """
 
 
 @anvil.server.http_endpoint("/embed.js")
-def embed_js(r=None, label=None, **kw):
+def embed_js(r=None, label=None, style=None, shape=None, size=None, lang=None, button=None, **kw):
     slug = str(r or "").strip().lower()
-    body = EMBED_JS % {"origin": json.dumps(anvil.server.get_app_origin()), "slug": json.dumps(slug),
-                       "label": json.dumps(str(label or "Reserve a table")[:40])}
+    lang = lang if lang in B.LANGS else ""
+    rest = _find(slug)
+    if not lang and rest is not None:
+        lang = B.language(rest)
+    opt = {"style": style if style in ("ink", "brass", "light", "outline") else "ink",
+           "shape": "rounded" if shape == "rounded" else "pill", "size": size if size in ("sm", "md", "lg") else "md",
+           "lang": lang if lang and (rest is None or lang in B.languages(rest)) else "",
+           "button": button if button in ("none", "show") else ""}
+    text = str(label or "").strip()[:40] or EMBED_LABELS.get(lang or "en", EMBED_LABELS["en"])
+    body = (EMBED_JS.replace("__ORIGIN__", json.dumps(anvil.server.get_app_origin())).replace("__SLUG__", json.dumps(slug))
+            .replace("__LABEL__", json.dumps(text)).replace("__OPT__", json.dumps(opt))
+            .replace("__CLOSE__", json.dumps(EMBED_CLOSE.get(lang or "en", "Close"))))
     return anvil.server.HttpResponse(200, body, headers={"Content-Type": "application/javascript; charset=utf-8",
                                                          "Cache-Control": "max-age=300"})

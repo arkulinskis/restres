@@ -84,6 +84,18 @@ def admin_test_email(to):
 
 
 @anvil.server.callable(require_user=True)
+def admin_email_from(address=None):
+    """Admin -> Email -> Send from: read (address None) or set the address booking emails come from ("" = Anvil's own)."""
+    C.require_admin()
+    if address is not None:
+        address = str(address or "").strip().lower()
+        if address and ("@" not in address or " " in address or len(address) > 120):
+            return {"ok": False, "error": "That isn't an email address."}
+        C.set_setting("email_from", address)
+    return {"ok": True, "from": str(C.get_setting("email_from") or "")}
+
+
+@anvil.server.callable(require_user=True)
 def demo_load():
     C.require_admin()
     DemoData.load()

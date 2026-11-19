@@ -2,6 +2,7 @@ from anvil import *
 import anvil.js
 
 from ._anvil_designer import SiteSectionTemplate
+from ... import state
 
 
 class SiteSection(SiteSectionTemplate):
@@ -15,6 +16,10 @@ class SiteSection(SiteSectionTemplate):
             node.setAttribute("open", "")
         self.classes["ok"] = bool(s["ok"])
         self.classes["off"] = not s["on"]
+        self.grip.visible = bool(s.get("movable"))
+        self.classes["movable"] = bool(s.get("movable"))
+        if s.get("movable"):  # Pages.Website's drag-to-reorder (PP.sortable) finds the sections by this
+            state.set_attr(self, "data-sort-id", s["id"])
         self.title_label.text = s["title"]
         self.sum_label.text = s.get("sum") or ""
         self.fields_panel.items = [{"spec": f, "model": s["model"], "rid": s["rid"]} for f in s["fields"]]

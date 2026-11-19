@@ -77,8 +77,18 @@ def plural(n, one, many=None):
     return "%d %s" % (n, one if n == 1 else (many or one + "s"))
 
 
+MOVABLE = ["about", "menu", "live", "location", "gallery", "reviews", "highlights", "contact"]  # dragged into any order
+
+
+def order(m):
+    """The page's sections in the order the manager dragged them into (content.order), unknown/missing ones added at the end."""
+    saved = [x for x in (m.get("content.order") or []) if x in MOVABLE]
+    return saved + [x for x in MOVABLE if x not in saved]
+
+
 def sections(m):
-    """[{id, title, toggle, ok, sum, fields: [spec]}] for the builder. A spec is {type, path?, label?, ...}."""
+    """[{id, title, toggle, ok, sum, fields: [spec], movable}] for the builder, the page's own sections in their order
+    (between "Top of the page" and "Google & sharing"). A spec is {type, path?, label?, ...}."""
     F, D, c = m.F, m.D, m.D["counts"]
     con = F["content"]
     hero = con.get("hero") or {}
@@ -153,6 +163,8 @@ def sections(m):
                      "hint": "One or two sentences. It shows under your name in Google results and when the link is shared."},
                     {"type": "info", "text": "Your website also tells Google your opening hours, address and booking link, so they can show in search results."}]},
     ]
+    by = {s["id"]: s for s in out}
+    out = [by["look"], by["hero"]] + [dict(by[i], movable=True) for i in order(m)] + [by["seo"]]
     for s in out:
         on = not s.get("toggle") or bool(m.get("content.sections." + str(s["toggle"])))
         s["on"] = on

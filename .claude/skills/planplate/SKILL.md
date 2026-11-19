@@ -58,14 +58,15 @@ client_code/
   Components/       RestaurantNav (the restaurant sub-menu on every restaurant page), AuthBox (sign in/up/reset),
                     SlotPicker (guests/calendar/times for #book and #r), Timeline (pp-timeline.js),
                     FloorPlan (pp-floor.js: Tables and event room set-ups), PhotoField
-  Pages/            Landing Auth Dashboard Today Reservations Guests Hours Tables Events Dishes Gallery Website Share
-                    Settings Profile Admin + guest pages Book Manage PublicMenu
+  Pages/            Landing Auth Dashboard Today Reservations Guests Hours Tables Events Dishes Gallery Website Elements
+                    Share Settings Profile Admin + guest pages Book Manage PublicMenu
   Items/            RepeatingPanel rows (Chip is the generic pill: {label, value, on, disabled, group} -> x-chip)
   Dialogs/          BookingEditor WalkIn DaySheet NewRestaurant PeriodEditor SpecialEditor QuickHours SpecialDish PostPhoto
                     PhotoPicker EventEditor DishEditor SectionEditor GuestCard
 theme/assets/       app.css (template tokens set to PlanPlate's look + --pp-* aliases + each page's styles),
                     pp-kit.js (window.PP: dates, time-zone search field, QR, Cloudflare/Cloudinary upload, .ics), pp-timeline.js,
-                    pp-floor.js, planplate-gallery.js (the <planplate-gallery> web component), photos, icons
+                    pp-floor.js, pp-showcase.js (<planplate-showcase>, the gallery since Nov 19 2026), planplate-gallery.js
+                    (the OLD <planplate-gallery>, kept for embeds already on sites like dilettante.lv), photos, icons
 server_code/        Booking (rules engine), Portal (manager callables), Public (guest callables, /embed.js),
                     Menu, Board (Today, specials, posts, events), Media (Cloudflare R2, Cloudinary or Anvil media, /photo, /gallery feed),
                     Site (website builder, /_/api/site/<path>), Notify (emails), Guests (guest book), GuestNews
@@ -219,6 +220,49 @@ dark, guest + member) and fails on serious problems; add new pages to its page l
   text by real contrast (black when neither ink passes); the menu tabs are toggle buttons (aria-pressed).
 - The brass is `#826638` now (was #9c7a43, 3.4:1); `--c-faint` #70695e light / #8f8980 dark; `--c-warn` #8a5e0e.
 
+## Big parties: tables pushed together (Nov 19 2026)
+
+- `dining_tables.joinable` (bool; missing/None = joinable; read with `B.joinable(t)`): untick booths, bar, fixed tables
+  (lock + hatching on the plan, pp-floor.js `fixed`).
+- `B.seat_party(ctx, d, t, party, dur)` -> (unit, plan): a free table/fixed join first; else `B.plan_for`: free joinable
+  tables in the same area within `NEAR` (34% of the floor) of each other, at most `MAX_JOIN` (4), fewest spare seats;
+  else the same after moving ONE not-yet-seated single-table booking to another free unit. Plan = {ids, seats, join,
+  moves, text}; stored in `reservations.table_plan` (`B.save_plan` / `B.plan_of`, both survive a missing column).
+- Online (`Public._book`): a plan = always **pending**, the plan text starts the review reason; `guest_slots` offers
+  such times with `review`. Approving (`Portal.set_status` pending -> confirmed) runs `B.apply_moves` (re-checks the
+  destination, finds another free table if it got taken, history line on the moved booking) and copies the plan text
+  into the staff note. Staff bookings (`_save_reservation`, tables "auto") apply the plan straight away.
+- Tables page: joinable tick, "Try a big party" (`Portal.test_party` -> kind table/join/move/none, tables light up
+  green, booked ones dim), "How PlanPlate seats a big party" card; the old joins are now "Always joined".
+- Booking editor: opens at once (the table check runs on `show`), "Times that day" chips from `get_options.times`
+  (free / join "+" / full), past dates/times refused for new or moved bookings (`Portal._is_past`, 15+ min grace;
+  walk-ins and seated/done/no-show are exempt); `min_date` = today for new bookings.
+
+## Website elements, Reserve button, gallery (Nov 19 2026)
+
+- **Elements tab** (`Pages/Elements`, `#elements/<rid>`, manager): every paste-able code, grouped Booking / Menu /
+  Opening hours / Photos / For developers. Share & QR keeps only QR codes, table cards and plain links.
+- **Reserve button** (`Public.embed_js`, `/_/api/embed.js?r=<slug>`): PlanPlate-styled like a Google sign-in button,
+  options `style=ink|brass|light|outline`, `shape=pill|rounded`, `size=sm|md|lg`, `lang`, `label`, `button=none` (own
+  element with `data-planplate-open` only). Old pasted own-button snippets still work (no button when hooks exist and
+  no `button` option). Binds each element once, so pasting twice is harmless. Its window has the ONLY Close button: the
+  booking form has none of its own any more (`pp-embedded` html class pads the header for the window's X).
+- **Menu widget** (`/_/api/menu.js`, `/_/api/menu`) now lists the uploaded menu files first (`Menu.menu_files`), then dishes.
+- **Gallery** = `<planplate-showcase restaurant="<slug>">` + `/_/theme/pp-showcase.js` (shadow DOM, no deps). Feed
+  `/_/api/showcase/<slug>` = {style, photos}; the look lives in `sites.gallery` (keys in `Media.GALLERY_CHOICES`:
+  layout mosaic|masonry|spotlight|slideshow|carousel|editorial|grid|polaroid, tone, gap, corners, frame, captions,
+  hover, show, lightbox, autoplay + size, motion, accent, background, heading). Attribute `look='{json}'` overrides
+  (the Gallery page's live preview), `no-heading` (the website builder), `fresh`. Lightbox lives in its own shadow
+  root on <body>. Gallery page: layout cards (`Items/LayoutCard`), chip options (`Items/OptionRow`), computer/phone
+  preview, `RECOMMENDED` look per layout, drag-to-reorder photos (grip, `PP.sortable`).
+- **Drag to reorder** = `PP.sortable(el, {item, handle, onEnd})` in pp-kit.js (pointer events + arrow keys on the
+  grip). Website builder: the 8 page sections (`site_model.MOVABLE`) -> `content.order` -> `Site.Render.order()`
+  (the "live" block = today + specials + events; the site's menu follows). Grips sit OUTSIDE <summary> (axe
+  nested-interactive).
+- **Email sender**: Admin -> Email -> Send from (`app_settings.email_from`, `Notify.from_address`). Needs the Anvil Email
+  service on custom SMTP (MailerSend, planplate.com, as the old apps did); a failing send falls back to Anvil's
+  address. `from_name` = "<restaurant> (PlanPlate)".
+
 ## Recipes
 
 - **New restaurant page:** Pages/X with RestaurantNav, add to router (PAGES, RESTAURANT, _form), pp.TABS, flow.js + phone.js.
@@ -242,13 +286,17 @@ dark, guest + member) and fails on serious problems; add new pages to its page l
 `APP_MAKER/legal-kit/apps/restres.json`; build + install there, then `python tools/assets.py`. The facts file has its own
 `"version"` (2026-11-04, later than the kit's): bump it when PlanPlate's documents change in a way people must re-accept.
 
-**The booking form's three ticks (EU rules, user's decision 2026-11-04):**
-1. The restaurant's privacy notice (required; its text is stored with the booking: `consent`, `consent_text`, `consent_at`).
-2. **PlanPlate's own agreement** (required, no tick = no booking, checked in the browser AND in `Public.book`): PlanPlate,
-   the booking service, keeps a record of the booking and emails the guest about it. Stored as `pp_consent`,
-   `pp_consent_text` (the exact words), `pp_consent_at`. Link opens PlanPlate's Privacy Policy (`legal.open("privacy")`).
-3. **PlanPlate news** (optional, never pre-ticked): "PlanPlate may also email me now and then with news and offers".
-   Marketing consent must be optional under GDPR Art. 7(4) and ePrivacy, so never make it required or pre-tick it.
+**The booking form: one line + one optional tick (user's decision 2026-11-19; was three ticks since 2026-11-04):**
+1. **"By booking, you accept <restaurant>'s privacy notice and PlanPlate's Privacy Policy..."** above/below the Book
+   button (`accept_label`, links `privacy_link` = the restaurant's notice shown inline, `pp_policy_link` = `legal.open("privacy")`).
+   No tick boxes: a booking runs on the contract, it needs the guest informed, not consent. The browser always sends
+   `consent` + `pp_consent` True; the server still stores the restaurant's notice (`consent_text`) and the exact line
+   (`pp_consent_text` = `GuestNews.consent_text(lang, name)`), with times. The user asked to pre-tick boxes: required
+   boxes became this line instead (a pre-ticked box carries no legal weight).
+2. **PlanPlate news** (optional, NEVER pre-ticked: CJEU Planet49, GDPR Recital 32): "Yes, email me PlanPlate news and
+   offers now and then. They may include discounts on future bookings (not this one)..." The discount wording is the
+   user's incentive; it must say "future" and "not this one". Marketing consent stays optional (GDPR Art. 7(4)).
+   Required fields (name, email, phone) carry a star (role `pp-req`, set in Book._a11y) and "* Required".
    Yes = a row in `pp_contacts` (one per lower-cased email: subscribed, consent_text, consent_at, stopped_at, token) +
    `reservations.pp_news`. Guests switch it on/off on `#r/<token>` (`set_guest_news`) or with the stop link
    `/_/api/news/stop/<token>` (GET shows a button, POST stops: mail scanners open links). Guest emails carry the stop link
