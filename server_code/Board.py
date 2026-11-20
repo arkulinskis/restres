@@ -129,6 +129,7 @@ def _today(r):
             continue
         arrivals.append({"id": x.get_id(), "time": B.hm(start), "name": x["name"] or "", "party": int(x["party"] or 0),
                          "status": x["status"], "seated": x["status"] == "seated", "due": x["status"] == "confirmed" and start <= t,
+                         "coming": bool(B.history_flags(x)["coming"]),
                          "tables": [ctx.by_id[i]["name"] for i in (x["tables"] or []) if i in ctx.by_id]})
     busy = B.busy_ids(ctx, today, t, 1)
     week = []
@@ -136,9 +137,13 @@ def _today(r):
         d = today + timedelta(days=n)
         div, dsrc = B.day_hours(ctx, d)
         rs = ctx.reservations(d)
+        covers = sum(int(x["party"] or 0) for x in rs)
         week.append({"date": d.isoformat(), "hours": B.intervals_text(div), "label": dsrc["label"] if dsrc["kind"] == "special" else "",
-                     "bookings": len(rs), "covers": sum(int(x["party"] or 0) for x in rs),
+                     "bookings": len(rs), "covers": covers, "seats": ctx.total_seats,
+                     "quiet": _quiet(ctx, d, div, covers, today, t),
                      "events": [e["title"] for e in B.events_on(ctx, d)]})
+    from . import Remind
+    reminders = Remind.summary(r, ctx, now)  # Today's "Remind tomorrow's guests (12)"
     s = MD.site_row(r, create=False)
     origin = anvil.server.get_app_origin()
     role = _role(r, _user())
@@ -149,7 +154,7 @@ def _today(r):
         "stats": {"bookings": len(res), "covers": sum(int(x["party"] or 0) for x in res), "pending": len(_pending(r)),
                   "in_now": sum(int(x["party"] or 0) for x in res if int(x["start_min"]) <= t < int(x["start_min"]) + int(x["duration"] or 0)),
                   "free_tables": len([x for x in ctx.tables if x.get_id() not in busy]), "tables": len(ctx.tables)},
-        "arrivals": arrivals[:8], "more_arrivals": max(0, len(arrivals) - 8), "week": week,
+        "arrivals": arrivals[:8], "more_arrivals": max(0, len(arrivals) - 8), "week": week, "tomorrow": reminders,
         "specials": [special_view(x, today, origin) for x in specials(r) if not (x["end"] is not None and x["end"] < today)],
         "posts": [post_view(p, origin) for p in posts(r, 6)],
         "events": [event_view(e, origin) for e in events_between(r, today, today + timedelta(days=30))][:6],
@@ -159,6 +164,105 @@ def _today(r):
         "checklist": _checklist(r, s),
         "default_hours": _regular_hours(ctx, today),
     }
+
+
+QUIET = 0.4  # an open day with fewer guests booked than this share of the seats gets the "Quiet" chip
+
+
+def _quiet(ctx, d, iv, covers, today, now_min):
+    """Worth filling: open for online bookings, guests booked under 40% of the seats, and (today) still serving later."""
+    if not iv or not ctx.total_seats:
+        return False
+    sp = ctx.specials.get(d)
+    if sp is not None and not sp["closed"] and sp["no_online"]:
+        return False
+    if d == today and not any(c - B.setting(ctx.r, "last_booking_min") > now_min for o, c in iv):
+        return False
+    return covers < QUIET * ctx.total_seats
+
+
+# Fill a quiet night: the texts on the story image and in the caption, per language. {When} = Tonight / This Friday...
+FILL = {
+    "en": {"h1": "Tables free", "scan": "Scan to book", "sub": "Book in a few taps", "by": "Bookings by PlanPlate",
+           "caption": "{When} at {r}: a few tables are still free ({times}). Book in a few taps: {link}",
+           "tonight": "tonight", "today": "today", "tomorrow": "tomorrow", "this": "this {day}",
+           "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]},
+    "fr": {"h1": "Tables libres", "scan": "Scannez pour réserver", "sub": "Réservez en quelques secondes",
+           "by": "Réservations par PlanPlate",
+           "caption": "{When} chez {r} : il reste quelques tables ({times}). Réservez en quelques secondes : {link}",
+           "tonight": "ce soir", "today": "aujourd'hui", "tomorrow": "demain", "this": "ce {day}",
+           "days": ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]},
+    "lv": {"h1": "Brīvi galdiņi", "scan": "Skenējiet, lai rezervētu", "sub": "Rezervējiet dažos klikšķos",
+           "by": "Rezervācijas: PlanPlate",
+           "caption": "{When} restorānā {r} vēl ir brīvi galdiņi ({times}). Rezervējiet dažos klikšķos: {link}",
+           "tonight": "šovakar", "today": "šodien", "tomorrow": "rīt", "this": "šo {day}",
+           "days": ["pirmdien", "otrdien", "trešdien", "ceturtdien", "piektdien", "sestdien", "svētdien"]},
+}
+
+
+def _fill_when(d, today, evening, lang):
+    t = FILL[lang]
+    if d == today:
+        return t["tonight"] if evening else t["today"]
+    if d == today + timedelta(days=1):
+        return t["tomorrow"]
+    return t["this"].replace("{day}", t["days"][d.weekday()])
+
+
+def _cap(s):
+    return s[:1].upper() + s[1:] if s else s
+
+
+def _spread(times, n):
+    """At most n of the times, spread over the day (the image has room for a row or two of chips)."""
+    if len(times) <= n:
+        return list(times)
+    step = (len(times) - 1) / float(n - 1)
+    return [times[int(round(i * step))] for i in range(n)]
+
+
+def _kit_photo(r, today, origin):
+    """The picture for the story: the newest photo of the day, else the first gallery photo, else none."""
+    p = latest_post(r, today)
+    if p is not None and p["photo"] is not None and (p["photo"]["kind"] or "image") == "image":
+        return MD.view(p["photo"], origin)
+    photos = MD.gallery_photos(r)
+    return MD.view(photos[0], origin) if photos else None
+
+
+@anvil.server.callable(require_user=True)
+def get_fill_kit(rid, day):
+    """Today -> The week ahead -> Fill it (managers): what the share kit for a quiet day needs. The free times (for 2,
+    and which of them also seat 4), a photo, the image texts and captions in the restaurant's languages, and the link
+    that opens the booking form on that date (#book/<slug>/<lang>/<date>)."""
+    r = _rest(rid, "manager")
+    ctx = B.Ctx(r)
+    today = B.local_now(r).date()
+    try:
+        d = B.parse_date(day)
+    except ValueError:
+        return {"ok": False, "error": "Pick a day."}
+    if d < today:
+        return {"ok": False, "error": "That day is over."}
+    for_two = [s["time"] for s in B.guest_slots(ctx, d, 2) if s["state"] == "open"]
+    for_four = set(s["time"] for s in B.guest_slots(ctx, d, 4) if s["state"] == "open")
+    origin = anvil.server.get_app_origin()
+    evening = any(B.parse_hm(x) >= 16 * 60 for x in for_two) if for_two else True
+    shown = _spread(for_two, 6)
+    texts = {}
+    for lang in B.languages(r):
+        t = FILL[lang]
+        when = _fill_when(d, today, evening, lang)
+        link = "%s/#book/%s/%s/%s" % (origin, r["slug"], lang, d.isoformat())
+        times = ", ".join(x.replace(":", "h") if lang == "fr" else x for x in shown)
+        texts[lang] = {"h1": t["h1"], "h2": when, "scan": t["scan"], "sub": t["sub"], "by": t["by"], "link": link,
+                       "caption": t["caption"].replace("{When}", _cap(when)).replace("{r}", r["name"] or "")
+                                               .replace("{times}", times).replace("{link}", link)}
+    rs = ctx.reservations(d)
+    return {"ok": True, "date": d.isoformat(), "today": today.isoformat(), "name": r["name"] or "", "slug": r["slug"],
+            "times": for_two, "shown": shown, "four": [x for x in for_two if x in for_four],
+            "photo": _kit_photo(r, today, origin), "languages": B.languages(r), "language": B.language(r), "texts": texts,
+            "covers": sum(int(x["party"] or 0) for x in rs), "seats": ctx.total_seats}
 
 
 def _regular_hours(ctx, d):

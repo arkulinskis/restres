@@ -48,7 +48,7 @@
       rows.map(function (row) {
         var blocks = live.filter(function (r) { return row.id ? r.tables.indexOf(row.id) >= 0 : !r.tables.length; }).map(function (r) {
           var joined = r.tables.length > 1 ? ' · ' + r.table_names.join('+') : '';
-          var vip = r.guest && r.guest.visits > 2 ? ' ★' : '';
+          var vip = (r.guest && r.guest.visits > 2 ? ' ★' : '') + (r.coming && r.status === 'confirmed' ? ' ✓' : '');
           return '<button type="button" class="blk ' + r.status + '" data-id="' + esc(r.id) + '" style="left:' + pos(r.start_min) + ';width:' + w(r.duration) + '" title="' +
             esc(r.time + '–' + r.end + ' · ' + r.name + ' · ' + r.party + ' guests' + (r.status === 'pending' ? ' · awaiting approval' : r.status === 'seated' ? ' · seated' : '')) +
             '"><b>' + esc(r.name) + vip + '</b> · ' + r.party + esc(joined) + '</button>';

@@ -3,12 +3,16 @@ custom_component: true
 events:
   - name: change
     description: The guests, date or time changed (read .party, .date, .time, .review)
+  - name: waitlist
+    description: The guest wants the waitlist for the chosen date and party (only when .waitlist is True)
 toolbox_item:
   title: Table picker (guests, date, time)
   group: PlanPlate
 help_text: |
   The guest's booking picker: number of guests, a month calendar of open days, then the free times from Public.get_slots.
   Used by the booking form (#book) and the guest's reservation page (#r). Call setup(...) once the restaurant is loaded.
+  A full day shows the nearest days with room (Public.get_slots alt_days); with .waitlist True it also offers the
+  waitlist ("None of these times? Join the waitlist") and raises `waitlist`.
 ---
 <div class="pp-pick">
   <div class="pp-step">
@@ -38,6 +42,14 @@ help_text: |
     <anvil-component type="RepeatingPanel" name="times_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips", "pp-times"]'></anvil-component>
     <anvil-component type="Label" name="review_note" prop:role='["pp-tnote", "pp-tnote-dot"]' prop:visible="false"></anvil-component>
     <anvil-component type="Label" name="walk_note" prop:role='["pp-tnote"]' prop:visible="false"></anvil-component>
+    <div class="pp-alt" anvil:name="alt_box">
+      <anvil-component type="Label" name="alt_label" prop:role='["pp-tnote"]'></anvil-component>
+      <anvil-component type="RepeatingPanel" name="alt_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips", "pp-alt-days"]'></anvil-component>
+    </div>
+    <div class="pp-wait-offer" anvil:name="wait_box">
+      <anvil-component type="Label" name="wait_q" prop:role='["pp-tnote"]'></anvil-component>
+      <anvil-component type="Button" name="wait_button" prop:role='["btn", "btn-sm", "ic-clock"]'></anvil-component>
+    </div>
   </div>
   <anvil-component type="Label" name="sr_status" prop:role='["sr"]'></anvil-component>
 </div>

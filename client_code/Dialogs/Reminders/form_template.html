@@ -1,0 +1,17 @@
+<div class="ui pp pp-dlg pp-remind">
+  <div class="pp-dlg-head">
+    <anvil-component type="Label" name="title_label" prop:role='["dlg-title"]' prop:text="Remind your guests"></anvil-component>
+    <anvil-component type="Label" name="count_badge" prop:role='["badge"]' prop:visible="false"></anvil-component>
+  </div>
+  <p class="pp-lead">Each message opens on this phone or computer, written in the guest's language with their private link: they tap it to confirm, or cancel and free the table. Nothing is sent by PlanPlate.</p>
+  <anvil-component type="Label" name="loading_label" prop:role='["muted", "small"]' prop:text="Getting the list…"></anvil-component>
+  <div class="pp-remind-list" anvil:name="list_box">
+    <anvil-component type="RepeatingPanel" name="rows_panel" prop:item_template="PlanPlate_2_0.Items.RemindRow"></anvil-component>
+  </div>
+  <div class="ui-empty" anvil:name="empty_box"><anvil-component type="Label" name="empty_label"></anvil-component></div>
+  <anvil-component type="Label" name="pending_label" prop:role='["hint"]' prop:visible="false"></anvil-component>
+  <anvil-component type="Label" name="message" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+  <div class="ui-row end">
+    <anvil-component type="Button" name="close_button" prop:text="Done" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+</div>

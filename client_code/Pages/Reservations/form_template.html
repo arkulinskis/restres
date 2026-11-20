@@ -25,6 +25,13 @@
           <anvil-component type="Label" name="peak_label"></anvil-component>
         </div>
         <anvil-component type="RepeatingPanel" name="events_panel" prop:item_template="PlanPlate_2_0.Items.DayEvent"></anvil-component>
+        <section class="ui-card pp-waitlist" anvil:name="wait_card">
+          <div class="pp-box-hd"><h3><i class="ic ic-clock"></i> Waitlist</h3>
+            <anvil-component type="Label" name="wait_count" prop:role='["badge"]'></anvil-component><span class="ui-spacer"></span>
+            <anvil-component type="Label" name="wait_free" prop:role='["badge", "badge-good"]' prop:visible="false"></anvil-component></div>
+          <anvil-component type="Label" name="wait_hint" prop:role='["hint"]' prop:text="Guests who found this day full. When a table frees up, Book takes them in (they get the usual confirmation email), or Call or Message them first."></anvil-component>
+          <anvil-component type="RepeatingPanel" name="wait_panel" prop:item_template="PlanPlate_2_0.Items.WaitRow"></anvil-component>
+        </section>
       </div>
       <div class="pp-daybar" anvil:name="upcoming_head">
         <anvil-component type="Label" name="upcoming_title" prop:role='["sec-title"]' prop:text="Upcoming bookings"></anvil-component>
@@ -42,13 +49,14 @@
         <anvil-component type="Label" name="updated_label" prop:role='["muted", "small", "pp-updated"]'></anvil-component>
         <span class="ui-spacer"></span>
         <anvil-component type="Button" name="print_button" prop:text="Day sheet" prop:role='["btn", "btn-ghost", "ic-print", "pp-hide-m"]' prop:tooltip="Print the day's bookings for the host stand"></anvil-component>
+        <anvil-component type="Button" name="remind_button" prop:text="Remind" prop:role='["btn", "ic-chat"]' prop:tooltip="Send this day's guests a reminder from your own phone or email (WhatsApp, SMS, email)"></anvil-component>
         <anvil-component type="Button" name="walkin_button" prop:text="Walk-in" prop:role='["btn", "ic-users"]' prop:tooltip="Seat someone who just walked in"></anvil-component>
         <anvil-component type="Button" name="new_button" prop:text="New booking" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
       </div>
 
       <div anvil:name="timeline_part">
         <anvil-component type="PlanPlate_2_0.Components.Timeline" name="timeline"></anvil-component>
-        <p class="ui-hint">Click an empty spot on a table's row to book it at that time. Striped bookings are waiting for approval; ★ marks a regular.</p>
+        <p class="ui-hint">Click an empty spot on a table's row to book it at that time. Striped bookings are waiting for approval; ★ marks a regular; ✓ means the guest confirmed they're coming.</p>
       </div>
       <div anvil:name="list_part">
         <div class="ui-card pp-res-list" anvil:name="list_card">

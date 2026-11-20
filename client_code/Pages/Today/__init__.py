@@ -16,6 +16,7 @@ class Today(TodayTemplate):
         self.specials_panel.add_event_handler("x-edit", self._edit_special)
         self.specials_panel.add_event_handler("x-toggle", self._toggle_special)
         self.arrivals_panel.add_event_handler("x-status", self._arrival_status)
+        self.week_panel.add_event_handler("x-fill", self._fill)
         self._draw()
 
     def _arrival_status(self, res, status, **event_args):
@@ -50,7 +51,8 @@ class Today(TodayTemplate):
         self.more_arrivals.visible = bool(D.get("more_arrivals"))
         self.more_arrivals.text = "and %d more" % (D.get("more_arrivals") or 0)
         top = max([w["covers"] for w in D["week"]] + [1])
-        self.week_panel.items = [dict(w, _today=i == 0, _max=top) for i, w in enumerate(D["week"])]
+        self.week_panel.items = [dict(w, _today=i == 0, _max=top, _manage=m) for i, w in enumerate(D["week"])]
+        self._draw_shield(D.get("tomorrow") or {})
         # photo of the day
         p = D["posts"][0] if D["posts"] else None
         fresh = bool(p and p["date"] == D["today"])
@@ -82,6 +84,34 @@ class Today(TodayTemplate):
         self.check_box.visible = m and bool(left)
         self.check_count.text = "%d of %d" % (len(D["checklist"]) - len(left), len(D["checklist"]))
         self.check_panel.items = [dict(c, _rid=rid) for c in D["checklist"]]
+
+    def _draw_shield(self, tm):
+        """The no-show shield: "Remind tomorrow's guests (12)", with how many were reminded and are coming."""
+        n = int(tm.get("bookings") or 0)
+        self.shield_box.visible = n > 0
+        if not n:
+            return
+        word = tm.get("word") or "tomorrow"
+        self.shield_title.text = "No-show shield · %s" % (word[:1].upper() + word[1:])
+        bits = [state.plural(n, "booking"), "%d reminded" % (tm.get("reminded") or 0)]
+        if tm.get("coming"):
+            bits.append("%d coming" % tm["coming"])
+        self.shield_text.text = " · ".join(bits)
+        left = int(tm.get("left") or 0)
+        self.remind_button.text = "%s (%d)" % (tm.get("title") or "Remind tomorrow's guests", left) if left else "All reminded · open the list"
+        self.remind_button.role = ["btn", "btn-sm", "ic-chat"] + (["btn-primary"] if left else ["btn-ghost"])
+
+    @handle("remind_button", "click")
+    def remind_button_click(self, **event_args):
+        from ...Dialogs.Reminders import Reminders
+        alert(Reminders(self.rid, (self.D.get("tomorrow") or {}).get("date")), buttons=[], large=True, role="app-dialog", dismissible=True)
+        self.D = anvil.server.call("get_today", self.rid)  # the numbers on the card
+        self._draw()
+
+    def _fill(self, date, **event_args):
+        """The week ahead -> Fill it: the share kit for a quiet day."""
+        from ...Dialogs.FillNight import FillNight
+        alert(FillNight(self.rid, date), buttons=[], large=True, role="app-dialog", dismissible=True)
 
     def _apply(self, res, msg=None):
         if res:

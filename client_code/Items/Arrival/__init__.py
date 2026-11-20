@@ -14,6 +14,7 @@ class Arrival(ArrivalTemplate):
         a = self.item
         self.time_label.text = a["time"]
         self.name_label.text = "%s · %s%s" % (a["name"], state.plural(a["party"], "guest"), (" · " + " + ".join(a["tables"])) if a.get("tables") else "")
+        self.coming_badge.visible = bool(a.get("coming")) and a.get("status") == "confirmed"
         self._next = None
         if a.get("seated"):
             self.badge.text, self.badge.role, self._next = "Here now", ["badge", "badge-good"], "done"

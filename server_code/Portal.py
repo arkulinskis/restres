@@ -245,6 +245,8 @@ def delete_restaurant(rid, confirm_name):
                   app_tables.events, app_tables.sites, app_tables.photos, app_tables.guests, app_tables.menu_files):
         for row in list(table.search(restaurant=r)):
             row.delete()
+    from . import Waitlist
+    Waitlist.delete_for(r)
     r.delete()
     return {"ok": True}
 
@@ -269,6 +271,7 @@ def _settings_view(r):
     v.update({k: B.setting(r, k) for k in B.SETTINGS})
     v.update({"id": r.get_id(), "slug": r["slug"], "timezone": r["timezone"] or "UTC", "accepting": r["accepting"] is not False,
               "over_capacity": r["over_capacity"] or "review", "review_notes": B.flag(r, "review_notes"),
+              "review_no_shows": B.flag(r, "review_no_shows"),
               "default_privacy": B.DEFAULT_PRIVACY,
               "emails_on": r["emails_on"] is not False, "language": B.language(r), "languages": B.languages(r),
               "owner_email": r["owner"]["email"] if r["owner"] else "", "legacy_id": r["legacy_id"] or "",
@@ -343,12 +346,13 @@ def save_settings(rid, data):
     if "over_capacity" in data:
         upd["over_capacity"] = data["over_capacity"] if data["over_capacity"] in B.OVER_CAPACITY else "review"
     r.update(**upd)
-    if "review_notes" in data and bool(data["review_notes"]) != B.flag(r, "review_notes"):
-        try:  # its own write: the column is new, and the other settings must save even before the database has it
-            r["review_notes"] = bool(data["review_notes"])
-        except Exception:
-            return {"ok": False, "error": "Your other settings are saved. “Read requests first” needs a database update: "
-                                          "open the app in the Anvil editor and accept the schema change, then try again."}
+    for col, label in (("review_notes", "Read requests first"), ("review_no_shows", "Guests who missed a booking before")):
+        if col in data and bool(data[col]) != B.flag(r, col):
+            try:  # its own write: the column is new, and the other settings must save even before the database has it
+                r[col] = bool(data[col])
+            except Exception:
+                return {"ok": False, "error": "Your other settings are saved. “%s” needs a database update: open the app in "
+                                              "the Anvil editor and accept the schema change, then try again." % label}
     return {"ok": True, "settings": _settings_view(r), "nav": _nav(r)}
 
 
@@ -714,6 +718,8 @@ def get_day(rid, day=None):
         v["analysis"] = _analysis(ctx, x)  # ctx loads each date's reservations on first use
         pending.append(v)
     pending = _with_guests(r, pending)
+    from . import Waitlist
+    waitlist = Waitlist.day_view(r, ctx, d, now)  # None while the live database has no waitlist table yet
     return {
         "nav": _nav(r), "date": d.isoformat(), "today": now.date().isoformat(),
         "now_min": now.hour * 60 + now.minute if d == now.date() else None,
@@ -722,7 +728,8 @@ def get_day(rid, day=None):
         "reservations": _with_guests(r, [B.reservation_view(x, ctx, staff=True) for x in rows]),
         "summary": {"bookings": len(live), "covers": sum(int(x["party"] or 0) for x in live), "peak": peak,
                     "pending_today": len([x for x in live if x["status"] == "pending"])},
-        "curve": curve, "pending": pending, "stamp": _stamp(rows, _pending(r)),
+        "curve": curve, "pending": pending, "stamp": _stamp(rows, _pending(r), len(waitlist or [])),
+        "waitlist": waitlist, "waitlist_on": waitlist is not None, "can_remind": d >= now.date(),
         "events": [{"id": e.get_id(), "title": e["title"] or "", "start": B.hm(int(e["start_min"] or 0)), "end": B.hm(int(e["end_min"] or 0)),
                     "kind": e["kind"] or "public", "blocks": bool(e["blocks"]), "guests": int(e["guests"] or 0),
                     "setup": e["layout"] is not None} for e in B.events_on(ctx, d)],
@@ -730,12 +737,12 @@ def get_day(rid, day=None):
     }
 
 
-def _stamp(rows, pending):
-    """A fingerprint of a day's bookings plus everything waiting for approval. The Reservations page (the screen at
-    the host stand) asks for it once a minute and reloads, with a chime, only when it changed."""
+def _stamp(rows, pending, waiting=0):
+    """A fingerprint of a day's bookings plus everything waiting for approval and the day's waitlist. The Reservations
+    page (the screen at the host stand) asks for it once a minute and reloads, with a chime, only when it changed."""
     stamps = [B.iso(x["updated"] or x["created"]) or "" for x in list(rows) + list(pending)]
     return {"bookings": len([x for x in rows if x["status"] in B.ACTIVE or x["status"] == "done"]),
-            "pending": len(pending), "rows": len(rows), "last": max(stamps) if stamps else ""}
+            "pending": len(pending), "rows": len(rows), "last": max(stamps) if stamps else "", "waitlist": int(waiting)}
 
 
 @anvil.server.callable(require_user=True)
@@ -745,7 +752,8 @@ def get_day_stamp(rid, day=None):
         d = B.parse_date(day) if day else B.local_now(r).date()
     except ValueError:
         d = B.local_now(r).date()
-    return _stamp(list(app_tables.reservations.search(restaurant=r, date=d)), _pending(r))
+    from . import Waitlist
+    return _stamp(list(app_tables.reservations.search(restaurant=r, date=d)), _pending(r), Waitlist.count(r, d))
 
 
 @anvil.server.callable(require_user=True)
@@ -885,13 +893,16 @@ def _save_reservation(r, data):
     if plan is not None and plan["text"] not in fields["staff_note"]:
         fields["staff_note"] = (plan["text"] + " " + fields["staff_note"]).strip()[:1000]
     if res is None:
+        if data.get("language") in B.LANGS:  # e.g. booked from the waitlist: the confirmation goes out in the guest's language
+            fields["language"] = data["language"]
         res = app_tables.reservations.add_row(restaurant=r, token=B.new_token(), created=B.now_utc(), history=[],
                                               consent=False, capacity_pct=B.occupancy(ctx, d, t, dur), **fields)
         B.add_history(res, "staff", "Added by staff (%s)." % source.replace("_", "-"))
     else:
         before = res["status"]
         res.update(**fields)
-        B.add_history(res, "staff", "Edited by staff." + (" Status: %s → %s." % (before, status) if before != status else ""))
+        B.add_history(res, "staff", "Edited by staff." + (" Status: %s → %s." % (before, status) if before != status else "") +
+                      (" Moved to %s %s." % (d.isoformat(), B.hm(t)) if moved else ""), kind="moved" if moved else None)
     if plan is not None:
         B.save_plan(res, plan)
     return {"ok": True, "id": res.get_id(), "warnings": warnings, "plan": plan["text"] if plan else ""}
@@ -902,6 +913,9 @@ def save_reservation(rid, data):
     r = _rest(rid)
     out = _save_reservation(r, dict(data or {}))
     if out.get("ok"):
+        if data.get("waitlist_id"):  # booked from Reservations -> Waitlist: the entry leaves the list
+            from . import Waitlist
+            out["waitlist_booked"] = Waitlist.mark_booked(r, data["waitlist_id"], out["id"])
         if data.get("notify"):  # "Email the guest" ticked in the booking editor
             try:
                 from . import Notify

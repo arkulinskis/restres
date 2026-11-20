@@ -59,6 +59,13 @@ class Manage(ManageTemplate):
         self.f_date.text, self.f_time.text, self.f_party.text = pp.fmt_date(r["date"], "short"), r["time"], str(r["party"])
         self.f_date_l.text, self.f_time_l.text, self.f_party_l.text = T("date"), T("time"), T("guests")
         self.who_label.text = r["name"] + ("  ·  “%s”" % r["notes"] if r.get("notes") else "")
+        # the no-show shield: "Yes, we're coming" (from 48 h before, or once the restaurant sent a reminder)
+        coming = bool(r.get("coming")) and st == "confirmed"
+        self.coming_box.visible = coming or bool(D.get("can_confirm"))
+        self.coming_q.visible = self.coming_button.visible = not coming
+        self.coming_q.text, self.coming_button.text = T("comingQ"), T("coming")
+        self.coming_done.visible = coming
+        self.coming_done.text = "✓ " + T("comingDone")
         self.change_button.visible = bool(D.get("can_change"))
         self.change_button.text = T("changeRes")
         self.ics_button.visible = live
@@ -88,6 +95,21 @@ class Manage(ManageTemplate):
         if self.mode == "change":
             self.picker.redraw()
         self._draw()
+
+    @handle("coming_button", "click")
+    def coming_button_click(self, **event_args):
+        """The guest confirms they're coming: the restaurant's host stand shows it next to the booking."""
+        self.coming_button.enabled = False
+        try:
+            r = anvil.server.call("confirm_coming", self.token)
+        finally:
+            self.coming_button.enabled = True
+        if r and r.get("ok"):
+            self.D = r
+            self._draw()
+            state.toast(T("comingDone"), "ok")
+        else:
+            state.toast((r or {}).get("error") or "Something went wrong.", "error")
 
     @handle("change_button", "click")
     def change_button_click(self, **event_args):

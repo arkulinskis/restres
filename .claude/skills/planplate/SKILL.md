@@ -263,6 +263,40 @@ dark, guest + member) and fails on serious problems; add new pages to its page l
   service on custom SMTP (MailerSend, planplate.com, as the old apps did); a failing send falls back to Anvil's
   address. `from_name` = "<restaurant> (PlanPlate)".
 
+## No-show shield, waitlist, fill a quiet night (2026-11-20)
+
+- **No-show shield** (`server_code/Remind.py`): reminders go from the restaurant's OWN phone/email, never from PlanPlate
+  (no SMS/email sending was added). `get_reminders(rid, day)` (staff; default = tomorrow or the next open day) lists the
+  confirmed bookings with a message in the guest's language (TEXT en/fr/lv: "see you tomorrow at 19:30 at ... Tap to
+  confirm, or cancel: <#r link>") and `wa.me` / `sms:` / `mailto:` links (`wa_number` adds the country code from the
+  restaurant's phone or time zone). Tapping one calls `mark_reminded` -> history line `kind: "remind"` + channel.
+  Guests tap **Yes, we're coming** on `#r/<token>` (`Public.confirm_coming`, rate-limited; shown from 48 h before or
+  once reminded: `Public._can_confirm`) -> `kind: "confirm"`. Both are read with `Booking.history_flags` (a
+  `kind: "moved"` line resets them) and appear as `reminded` / `coming` in `reservation_view`: "✓ Coming" badge in
+  `Items/ResRow`, `Items/Arrival` and the timeline (✓). UI: Today's card "Remind tomorrow's guests (N)"
+  (`Board._today` -> `tomorrow` = `Remind.summary`), Reservations -> Remind (the day shown), `Dialogs/Reminders` +
+  `Items/RemindRow`. **No schema change** for this part.
+- **Repeat no-shows wait** (`restaurants.review_no_shows`, new column, read with `B.flag`): Settings -> Approvals ->
+  "Guests who missed a booking before". `Public._book` asks `Guests.no_shows_of` (status no_show, same guest-book key or
+  phone digits) and makes the booking pending with "Didn't come to 2 earlier bookings (last 3 Oct)."
+- **Waitlist** (`server_code/Waitlist.py`, new table `waitlist`): `_table()` is None until the schema is accepted, so
+  `get_booking_form` sends `waitlist: False` and nothing changes on live. `Public.get_slots` adds `alt_days` (3 nearest
+  days with room, within 7 days) when no time is open; `Components/SlotPicker` shows them as chips, plus "None of these
+  times? Join the waitlist" (event `waitlist`). `Pages/Book` step "wait" reuses the details card (Lunch / Dinner / Any
+  time chips, no news tick, the same accept line) -> `join_waitlist` (honeypot, rate limit, open day in the window, one
+  entry per email per day, entries 30+ days old are deleted). Reservations shows the day's entries (`get_day` ->
+  `waitlist`, `Items/WaitRow`: "Table free at 19:30" = `Waitlist._fits`, Book / Call / Message / Remove); Book opens the
+  editor with `waitlist_id` + `language`, `save_reservation` -> `Waitlist.mark_booked`. `_stamp` counts the waitlist, so
+  a new entry reloads Reservations with a chime.
+- **Fill a quiet night**: `Board._today` week rows carry `seats` + `quiet` (open, under 40% of the seats booked, still
+  serving). `Items/WeekRow` shows Quiet + **Fill it** (managers) -> `Dialogs/FillNight` -> `Board.get_fill_kit`
+  (managers: free times for 2 and 4, photo of the day or first gallery photo, image texts + captions per language,
+  link `#book/<slug>/<lang>/<date>`). `PP.storyPng` (pp-kit.js) draws the 1080x1920 story on a canvas (photo skipped
+  when it fails or taints the canvas), `PP.shareFile` = share sheet with the file, else download + copy.
+  `Pages/Book` reads a YYYY-MM-DD in the address and opens that day.
+- Demo: two of the next open day's bookings are reminded (one "coming"); two waitlist entries today (once the table exists).
+- Not tested yet beyond the launch check (user's rule 2026-11-20): server tests and flow.js lines for these are still to write.
+
 ## Recipes
 
 - **New restaurant page:** Pages/X with RestaurantNav, add to router (PAGES, RESTAURANT, _form), pp.TABS, flow.js + phone.js.

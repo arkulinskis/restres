@@ -36,6 +36,11 @@
           <div class="ui-stack">
             <div class="pp-details-hd"><anvil-component type="Label" name="details_h" prop:role='["pp-step-h"]'></anvil-component>
               <anvil-component type="Label" name="req_note" prop:role='["pp-req-note"]'></anvil-component></div>
+            <div class="pp-wait-when" anvil:name="wait_when">
+              <anvil-component type="Label" name="wait_when_h" prop:role='["field-cap"]'></anvil-component>
+              <anvil-component type="RepeatingPanel" name="window_panel" prop:item_template="PlanPlate_2_0.Items.Chip" prop:role='["chips"]'></anvil-component>
+              <anvil-component type="Label" name="wait_note" prop:role='["pp-note", "pp-wait-note"]'></anvil-component>
+            </div>
             <label class="ui-field"><anvil-component type="Label" name="name_cap" prop:role=\'["field-cap", "pp-req"]\'></anvil-component><anvil-component type="TextBox" name="name_box"></anvil-component></label>
             <div class="pp-split">
               <label class="ui-field"><anvil-component type="Label" name="email_cap" prop:role=\'["field-cap", "pp-req"]\'></anvil-component><anvil-component type="TextBox" name="email_box" prop:type="email"></anvil-component></label>
@@ -72,6 +77,7 @@
             <a class="ui-btn primary" anvil:name="manage_link" href="#"><anvil-component type="Label" name="manage_label"></anvil-component></a>
             <anvil-component type="Button" name="copy_button" prop:role='["btn", "ic-copy"]'></anvil-component>
             <anvil-component type="Button" name="ics_button" prop:role='["btn", "btn-ghost", "ic-calendar"]'></anvil-component>
+            <anvil-component type="Button" name="again_button" prop:role='["btn", "ic-calendar"]' prop:visible="false"></anvil-component>
           </div>
         </div>
 

@@ -157,6 +157,7 @@ def _build():
             row = app_tables.reservations.get_by_id(out["id"]) if out.get("ok") else None
             if row is not None:
                 row.update(review_reason=why, capacity_pct=86 if n == 0 else 40)
+    _shield_and_waitlist(r, today, open_days)
     # the guest book's own notes
     from . import Guests
     for gi, note, tags in [(0, "Likes the corner table by the window. Sparkling water.", ["Regular", "VIP"]),
@@ -174,6 +175,33 @@ def _build():
     return rid
 
 
+def _shield_and_waitlist(r, today, open_days):
+    """The no-show shield and the waitlist, already in use: two of the next open day's bookings were reminded (one
+    guest said they're coming), and two people wait for a table today (only once the waitlist table exists)."""
+    from . import Booking as B, Waitlist
+    nxt = [d for d in open_days if d > today]
+    if nxt:
+        rows = sorted([x for x in app_tables.reservations.search(restaurant=r, date=nxt[0]) if x["status"] == "confirmed"],
+                      key=lambda x: int(x["start_min"] or 0))
+        for i, (channel, coming) in enumerate((("whatsapp", True), ("email", False))):
+            if i < len(rows):
+                B.add_history(rows[i], "staff", "Reminder sent by %s." % ("WhatsApp" if channel == "whatsapp" else "Email"),
+                              kind="remind", channel=channel)
+                if coming:
+                    B.add_history(rows[i], "guest", "The guest confirmed they are coming.", kind="confirm")
+    T = Waitlist._table()
+    if T is None or not open_days:
+        return
+    d = open_days[0]
+    for k, (name, email, phone, party, win, lang, notes) in enumerate([
+            ("Inès Laurent", "ines.laurent@example.com", "+1 514 555 0131", 2, "dinner", "fr", "Any table is fine"),
+            ("Ben Carter", "ben.carter@example.com", "+1 438 555 0132", 4, "any", "en", "")]):
+        a, b = Waitlist.WINDOWS[win]
+        T.add_row(restaurant=r, token=B.new_token(), date=d, party=party, from_min=a, to_min=b, name=name, email=email,
+                  phone=phone, notes=notes, language=lang, status="waiting", consent_text="", pp_consent_text="",
+                  reservation=None, created=C.now() - dt.timedelta(hours=3 - k), updated=C.now())
+
+
 def remove(remember=True):
     demo_owners = list(app_tables.users.search(is_demo=True))
     for r in list(app_tables.restaurants.search()):
@@ -184,6 +212,8 @@ def remove(remember=True):
                           app_tables.guests, app_tables.menu_files):
                 for row in list(table.search(restaurant=r)):
                     row.delete()
+            from . import Waitlist
+            Waitlist.delete_for(r)
             r.delete()
     for u in demo_owners:
         u.delete()

@@ -37,6 +37,8 @@ class Reservations(ReservationsTemplate):
             panel.add_event_handler("x-status", self._status_event)
             panel.add_event_handler("x-edit", self._edit_event)
         self.approvals_panel.add_event_handler("x-goto", self._goto_event)
+        self.wait_panel.add_event_handler("x-book", self._book_wait)
+        self.wait_panel.add_event_handler("x-remove", self._remove_wait)
         self._draw()
 
     # ---------------------------------------------------------------- drawing
@@ -60,6 +62,14 @@ class Reservations(ReservationsTemplate):
         manager = pp.can(D["nav"]["restaurant"].get("role"), "manager")
         self.events_panel.items = [dict(e, rid=self.rid, manager=manager) for e in D.get("events") or []]
         view = self.view
+        waits: list = list(D.get("waitlist") or [])
+        self.wait_card.visible = bool(waits) and view != "upcoming"
+        self.wait_count.text = str(len(waits))
+        free = [w for w in waits if w.get("fits")]
+        self.wait_free.visible = bool(free)
+        self.wait_free.text = "Table free at %s" % free[0]["fits"] if len(free) == 1 else "%d can be seated" % len(free)
+        self.wait_panel.items = waits
+        self.remind_button.visible = bool(D.get("can_remind")) and view != "upcoming"
         for name in VIEWS:
             getattr(self, "view_" + name).classes["on"] = view == name
             getattr(self, name + "_part").visible = view == name
@@ -216,6 +226,35 @@ class Reservations(ReservationsTemplate):
         if day:
             self._show(day)
 
+    # ---------------------------------------------------------------- the no-show shield and the waitlist
+    @handle("remind_button", "click")
+    def remind_button_click(self, **event_args):
+        from ...Dialogs.Reminders import Reminders
+        if self._dialog(Reminders(self.rid, self.D["date"]), role="app-dialog"):
+            self.load(self.D["date"])
+
+    def _book_wait(self, entry, **event_args):
+        """Waitlist -> Book: the booking editor with the guest's details and the free time; saving clears the entry."""
+        step = self.D["settings"]["slot_min"]
+        t = entry.get("fits") or ("19:00" if entry.get("window") != "lunch" else "12:00")
+        if not entry.get("fits") and self.D.get("now_min") is not None and self.D["date"] == self.D["today"]:
+            t = pp.hm(((self.D["now_min"] + step - 1) // step) * step)
+        self._editor(preset={"date": entry["date"], "time": t, "party": entry["party"], "name": entry["name"],
+                             "email": entry.get("email") or "", "phone": entry.get("phone") or "", "notes": entry.get("notes") or "",
+                             "source": "phone", "waitlist_id": entry["id"], "language": entry.get("language") or "en"})
+
+    def _remove_wait(self, entry, **event_args):
+        self._dialogs += 1
+        try:
+            sure = confirm("They leave the waitlist. Nobody is told: call or message them first if you like.",
+                           title="Remove %s from the waitlist?" % entry["name"], buttons=[("Keep", False), ("Remove", True)])
+            r = state.call("remove_waitlist", self.rid, entry["id"]) if sure else None
+        finally:
+            self._dialogs -= 1
+        if r:
+            state.toast("Removed from the waitlist", "ok")
+            self._show(r["day"])
+
     def _bell(self):
         shell = getattr(self, "layout", None)
         if shell is not None and hasattr(shell, "refresh_alerts"):
@@ -275,9 +314,10 @@ class Reservations(ReservationsTemplate):
             return
         requests = int(stamp.get("pending") or 0) - int(old.get("pending") or 0)
         bookings = int(stamp.get("rows") or 0) - int(old.get("rows") or 0)
+        waits = int(stamp.get("waitlist") or 0) - int(old.get("waitlist") or 0)
         self._show(day)
-        if requests > 0 or bookings > 0:
-            msg = "New request waiting for approval" if requests > 0 else "New booking"
+        if requests > 0 or bookings > 0 or waits > 0:
+            msg = "New request waiting for approval" if requests > 0 else ("New booking" if bookings > 0 else "Someone joined the waitlist")
             self.live_status.text = msg
             state.toast(msg)
             if self.chime:

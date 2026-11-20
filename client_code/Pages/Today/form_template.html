@@ -25,6 +25,14 @@
 
       <div class="pp-cols">
         <div class="pp-col">
+          <div class="ui-card pp-box pp-shield" anvil:name="shield_box">
+            <i class="ic ic-shield pp-shield-ic" aria-hidden="true"></i>
+            <div class="pp-shield-txt">
+              <anvil-component type="Label" name="shield_title" prop:role='["strong"]'></anvil-component>
+              <anvil-component type="Label" name="shield_text" prop:role='["muted", "small"]'></anvil-component>
+            </div>
+            <anvil-component type="Button" name="remind_button" prop:role='["btn", "btn-sm", "btn-primary", "ic-chat"]'></anvil-component>
+          </div>
           <div class="ui-card pp-box">
             <div class="pp-box-hd"><h3>Who's coming</h3><span class="ui-spacer"></span><a class="ui-btn ghost sm" anvil:name="all_link" href="#">All bookings <i class="ic ic-right"></i></a></div>
             <anvil-component type="RepeatingPanel" name="arrivals_panel" prop:item_template="PlanPlate_2_0.Items.Arrival"></anvil-component>

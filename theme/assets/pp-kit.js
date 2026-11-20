@@ -149,6 +149,7 @@
     var q = window.qrcode(0, 'M'); q.addData(text); q.make();
     return q;
   }
+  PP.qrMatrix = qrMatrix;  // the story image (PP.storyPng) draws its QR code from it too
   PP.qrSvg = function (text, px) {
     var q = qrMatrix(text);
     if (!q) return '<div class="hint">QR codes need an internet connection to load.</div>';
@@ -553,6 +554,134 @@
     a.href = URL.createObjectURL(new Blob([body], { type: 'text/calendar' }));
     a.download = 'reservation.ics';
     document.body.appendChild(a); a.click(); a.remove();
+  };
+
+  // ---------- Fill a quiet night (Today -> The week ahead -> Fill it): a 1080x1920 story image to post, and sharing.
+  // PP.storyPng(o) -> Promise of a PNG data URL. o = {name, h1, h2, dateText, times: ["18:00", ...], scan, sub, by,
+  // link (the QR code), photo (url or null)}. A photo that doesn't load, or comes from a server that doesn't allow it
+  // (it "taints" the canvas), is left out: the image is drawn again without it.
+  function loadImg(src) {
+    return new Promise(function (ok) {
+      if (!src) { ok(null); return; }
+      var im = new Image(), done = false;
+      var timer = setTimeout(function () { if (!done) { done = true; ok(null); } }, 8000);
+      im.crossOrigin = 'anonymous';
+      im.onload = function () { if (!done) { done = true; clearTimeout(timer); ok(im); } };
+      im.onerror = function () { if (!done) { done = true; clearTimeout(timer); ok(null); } };
+      im.src = src;
+    });
+  }
+  function fitFont(g, text, style, size, family, max) {
+    var s = size;
+    g.font = style + ' ' + s + 'px ' + family;
+    while (s > 24 && g.measureText(text).width > max) { s -= 4; g.font = style + ' ' + s + 'px ' + family; }
+    return s;
+  }
+  function rrect(g, x, y, w, h, r) {
+    g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+  }
+  function drawStory(o, photo) {
+    var W = 1080, H = 1920, TOP = 1060;
+    var INK = '#1d1b18', PAPER = '#faf8f4', BRASS = '#c9a56a', BRASS_DARK = '#826638', MUTED = '#6f6a62';
+    var SERIF = '"Cormorant Garamond", Georgia, serif', SANS = 'Inter, "Segoe UI", Arial, sans-serif';
+    var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    var g = cv.getContext('2d');
+    g.fillStyle = INK; g.fillRect(0, 0, W, H);
+    if (photo) {  // the photo fills the top and melts into the ink below it
+      var k = Math.max(W / photo.width, TOP / photo.height), pw = photo.width * k, ph = photo.height * k;
+      g.drawImage(photo, (W - pw) / 2, (TOP - ph) / 2, pw, ph);
+      var fade = g.createLinearGradient(0, TOP - 480, 0, TOP);
+      fade.addColorStop(0, 'rgba(29,27,24,0)'); fade.addColorStop(1, 'rgba(29,27,24,1)');
+      g.fillStyle = fade; g.fillRect(0, TOP - 480, W, 482);
+      var veil = g.createLinearGradient(0, 0, 0, 280);
+      veil.addColorStop(0, 'rgba(29,27,24,.6)'); veil.addColorStop(1, 'rgba(29,27,24,0)');
+      g.fillStyle = veil; g.fillRect(0, 0, W, 280);
+    } else {  // no photo: PlanPlate's plate, seen from above, in brass
+      var glow = g.createRadialGradient(W / 2, 600, 40, W / 2, 600, 640);
+      glow.addColorStop(0, 'rgba(201,165,106,.2)'); glow.addColorStop(1, 'rgba(201,165,106,0)');
+      g.fillStyle = glow; g.fillRect(0, 0, W, TOP);
+      g.lineCap = 'round';
+      g.strokeStyle = 'rgba(201,165,106,.55)'; g.lineWidth = 6;
+      g.beginPath(); g.arc(W / 2, 600, 300, 0, Math.PI * 2); g.stroke();
+      g.strokeStyle = 'rgba(201,165,106,.32)'; g.lineWidth = 4;
+      g.beginPath(); g.arc(W / 2, 600, 196, 0, Math.PI * 2); g.stroke();
+      g.strokeStyle = 'rgba(201,165,106,.62)'; g.lineWidth = 7;
+      g.beginPath(); g.moveTo(W / 2, 478); g.lineTo(W / 2, 722); g.stroke();
+    }
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    var name = String(o.name || '').toUpperCase();
+    if ('letterSpacing' in g) g.letterSpacing = '6px';
+    g.fillStyle = PAPER; fitFont(g, name, '600', 40, SANS, 900); g.fillText(name, W / 2, 150);
+    if ('letterSpacing' in g) g.letterSpacing = '0px';
+    g.fillStyle = PAPER; fitFont(g, o.h1 || '', '600', 136, SERIF, 960); g.fillText(o.h1 || '', W / 2, 1205);
+    g.fillStyle = BRASS; fitFont(g, o.h2 || '', 'italic 500', 136, SERIF, 960); g.fillText(o.h2 || '', W / 2, 1335);
+    g.fillStyle = 'rgba(250,248,244,.74)'; g.font = '500 38px ' + SANS; g.fillText(o.dateText || '', W / 2, 1418);
+    // the free times as chips, centred, at most two rows
+    var times = (o.times || []).slice(0, 8), rows = [[]], rowW = [0], GAP = 18, PAD = 30, CH = 78;
+    g.font = '600 40px ' + SANS;
+    times.forEach(function (t) {
+      var w = g.measureText(t).width + PAD * 2, i = rows.length - 1;
+      if (rowW[i] + w + (rows[i].length ? GAP : 0) > 960 && rows[i].length) { rows.push([]); rowW.push(0); i += 1; }
+      rowW[i] += w + (rows[i].length ? GAP : 0); rows[i].push([t, w]);
+    });
+    rows.slice(0, 2).forEach(function (row, ri) {
+      var x = (W - rowW[ri]) / 2, y = 1468 + ri * (CH + 16);
+      row.forEach(function (c) {
+        rrect(g, x, y, c[1], CH, CH / 2); g.strokeStyle = BRASS; g.lineWidth = 3; g.stroke();
+        g.fillStyle = PAPER; g.fillText(c[0], x + c[1] / 2, y + 53); x += c[1] + GAP;
+      });
+    });
+    // the booking card: QR code + "Scan to book"
+    var cy = 1662, chh = 200;
+    rrect(g, 80, cy, 920, chh, 30); g.fillStyle = PAPER; g.fill();
+    var q = PP.qrMatrix ? PP.qrMatrix(o.link || '') : null;
+    if (q) {
+      var n = q.getModuleCount(), size = 160, cell = size / n, qx = 112, qy = cy + 20;
+      g.fillStyle = INK;
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (q.isDark(r, c)) g.fillRect(qx + c * cell, qy + r * cell, cell + 0.4, cell + 0.4);
+    }
+    var tx = q ? 314 : 130, tw = 1000 - 40 - tx;
+    g.textAlign = 'left';
+    g.fillStyle = INK; fitFont(g, o.scan || '', '600', 46, SANS, tw); g.fillText(o.scan || '', tx, cy + 84);
+    g.fillStyle = MUTED; fitFont(g, o.sub || '', '400', 32, SANS, tw); g.fillText(o.sub || '', tx, cy + 132);
+    g.fillStyle = BRASS_DARK; fitFont(g, o.by || '', '600', 26, SANS, tw); g.fillText(o.by || '', tx, cy + 176);
+    return cv;
+  }
+  PP.storyPng = function (o) {
+    o = o || {};
+    var want = ['600 136px "Cormorant Garamond"', 'italic 500 136px "Cormorant Garamond"', '600 40px Inter', '500 38px Inter', '400 32px Inter'];
+    var fonts = document.fonts && document.fonts.load
+      ? Promise.all(want.map(function (f) { return document.fonts.load(f).catch(function () { return null; }); })) : Promise.resolve();
+    return fonts.then(function () { return loadImg(o.photo); }).then(function (img) {
+      try { return drawStory(o, img).toDataURL('image/png'); }
+      catch (e) { return drawStory(o, null).toDataURL('image/png'); }  // a tainted canvas: no photo then
+    });
+  };
+  PP.dataUrlBlob = function (url) {
+    var parts = String(url).split(','), bin = atob(parts[1] || ''), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new Blob([bytes], { type: ((parts[0] || '').match(/:(.*?);/) || [])[1] || 'image/png' });
+  };
+  PP.downloadUrl = function (url, filename) {
+    var a = document.createElement('a'); a.href = url; a.download = filename || 'planplate.png';
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  // PP.shareFile(dataUrl, text, filename) -> Promise of "shared" | "cancelled" | "downloaded": the phone's share sheet
+  // with the image (Instagram, WhatsApp...), else (computers) the image is downloaded and the caption copied.
+  PP.shareFile = function (url, text, filename) {
+    var file = null;
+    try { file = new File([PP.dataUrlBlob(url)], filename || 'planplate.png', { type: 'image/png' }); } catch (e) { file = null; }
+    function fallback() {
+      PP.downloadUrl(url, filename);
+      if (text) PP.copy(text, 'Image saved. Caption copied');
+      return 'downloaded';
+    }
+    if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      return navigator.share({ files: [file], text: text || '' }).then(function () { return 'shared'; },
+        function (e) { return e && e.name === 'AbortError' ? 'cancelled' : fallback(); });
+    }
+    return Promise.resolve(fallback());
   };
 
 })();

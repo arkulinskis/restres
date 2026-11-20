@@ -23,7 +23,8 @@ class BookingEditor(BookingEditorTemplate):
                          "party": 2, "notes": "", "staff_note": "", "status": "confirmed", "source": "phone", "tables": []}, **(preset or {}))
         self.res = r
         walk_in = self.is_new and r.get("source") == "walk_in"
-        self.title_label.text = ("Seat a walk-in" if walk_in else "Add a booking") if self.is_new else r["name"]
+        self.title_label.text = ("Seat a walk-in" if walk_in else ("Book from the waitlist" if r.get("waitlist_id") else "Add a booking")
+                                 if self.is_new else r["name"])
         self.status_badge.visible = not self.is_new
         self.status_badge.text = pp.STATUS.get(r["status"], r["status"])
         self.status_badge.role = ["badge", pp.STATUS_ROLE.get(r["status"], "badge")]
@@ -190,6 +191,9 @@ class BookingEditor(BookingEditorTemplate):
                        notes=self.notes_box.text or "", staff_note=self.staff_box.text or "")
         if self.is_new and self.res.get("status") == "seated":
             payload["status"] = "seated"
+        if self.is_new and self.res.get("waitlist_id"):  # booked from Reservations -> Waitlist: the entry leaves the list
+            payload["waitlist_id"] = self.res["waitlist_id"]
+            payload["language"] = self.res.get("language") or "en"  # the confirmation email in the guest's language
         self.save_button.enabled = False
         try:
             r = anvil.server.call("save_reservation", self.rid, payload)

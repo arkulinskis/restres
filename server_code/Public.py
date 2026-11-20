@@ -84,9 +84,10 @@ def get_booking_form(slug, lang=None):
         return {"ok": False, "error": "We couldn't find this restaurant. Check the link and try again."}
     ctx = B.Ctx(r)
     lang = B.pick_language(r, lang)
+    from . import Waitlist
     return {"ok": True, "restaurant": B.public_restaurant(r, lang), "days": _days(ctx), "today": B.local_now(r).date().isoformat(),
             "lang": lang, "privacy": {x: B.public_restaurant(r, x)["privacy_text"] for x in B.languages(r)},
-            "pp": GuestNews.texts()}
+            "pp": GuestNews.texts(), "waitlist": Waitlist.available()}
 
 
 @anvil.server.callable
@@ -108,8 +109,28 @@ def get_slots(slug, day, party, token=None):
         if exclude is not None and exclude["restaurant"] != r:
             exclude = None
     iv, src = B.day_hours(ctx, d)
-    return {"ok": True, "date": d.isoformat(), "party": party, "slots": B.guest_slots(ctx, d, party, exclude),
-            "hours": B.intervals_text(iv), "closed": not iv, "label": src.get("label") if src.get("kind") == "special" else ""}
+    slots = B.guest_slots(ctx, d, party, exclude)
+    out = {"ok": True, "date": d.isoformat(), "party": party, "slots": slots,
+           "hours": B.intervals_text(iv), "closed": not iv, "label": src.get("label") if src.get("kind") == "special" else ""}
+    if iv and not token and not any(s["state"] == "open" for s in slots):
+        out["alt_days"] = _alt_days(ctx, d, party)  # a full day is no dead end: the nearest days with room
+    return out
+
+
+def _alt_days(ctx, d, party, want=3, reach=7):
+    """Up to `want` days within `reach` days of d (nearest first, either side) where a table for the party is free."""
+    earliest, last = B.booking_window(ctx)
+    found = []
+    for k in range(1, reach + 1):
+        for dd in (d + timedelta(days=k), d - timedelta(days=k)):
+            if len(found) >= want or dd < earliest.date() or dd > last:
+                continue
+            free = [s for s in B.guest_slots(ctx, dd, party) if s["state"] == "open"]
+            if free:
+                found.append({"date": dd.isoformat(), "times": len(free), "first": free[0]["time"]})
+        if len(found) >= want:
+            break
+    return sorted(found, key=lambda x: x["date"])
 
 
 @tables.in_transaction
@@ -124,6 +145,11 @@ def _book(r, d, t, party, guest, consent_text, lang="en", pp=None):
     if unit is None and plan is None:
         return None, "Sorry, that time was just taken. Please pick another time."
     status, reason, pct = B.check_rules(ctx, d, t, party, dur, notes=guest["notes"])
+    if B.flag(r, "review_no_shows"):  # Settings -> Approvals: "Guests who missed a booking before wait for me"
+        from . import Guests
+        missed, last = Guests.no_shows_of(r, guest["email"], guest["phone"], guest["name"])
+        if missed:
+            status, reason = "pending", (Guests.no_show_reason(missed, last) + " " + reason).strip()
     if plan is not None:  # tables have to be pushed together (maybe after moving another booking): a manager decides
         status, reason = "pending", ("No single table fits. " + plan["text"] + " " + reason).strip()
     now = B.now_utc()
@@ -204,11 +230,21 @@ def _can(res):
             live and start > now)
 
 
+def _can_confirm(res):
+    """May the guest tap "Yes, we're coming"? A confirmed booking that hasn't started, from 48 hours before (or as soon
+    as the restaurant sent a reminder: a closed Sunday and Monday can mean reminding on Saturday for Tuesday)."""
+    if res["status"] != "confirmed" or res["date"] is None:
+        return False
+    start = datetime.combine(res["date"], time()) + timedelta(minutes=int(res["start_min"] or 0))
+    now = B.local_now(res["restaurant"])
+    return start > now and (start - now <= timedelta(hours=48) or bool(B.history_flags(res)["reminded"]))
+
+
 def _guest_reply(res):
     r = res["restaurant"]
     can_change, can_cancel = _can(res)
     out = {"ok": True, "reservation": B.reservation_view(res), "restaurant": B.public_restaurant(r, res["language"]),
-           "can_change": can_change, "can_cancel": can_cancel,
+           "can_change": can_change, "can_cancel": can_cancel, "can_confirm": _can_confirm(res),
            "guest": {"email": res["email"] or "", "phone": res["phone"] or ""},
            "news": GuestNews.subscribed(res["email"]), "pp": GuestNews.texts()}
     if can_change:
@@ -230,6 +266,7 @@ def _change(res, d, t, party, guest):
     r = res["restaurant"]
     ctx = B.Ctx(r)
     same_slot = res["date"] == d and int(res["start_min"]) == t and int(res["party"]) == party
+    new_time = res["date"] != d or int(res["start_min"]) != t  # a reminder or a "we're coming" was for the old time
     changes = []
     for k in ("name", "phone", "notes", "email"):
         if guest[k] != (res[k] or ""):
@@ -253,7 +290,7 @@ def _change(res, d, t, party, guest):
                    review_reason=reason if status == "pending" else "", capacity_pct=pct, **guest)
         changes.insert(0, "moved to %s %s for %d" % (d.isoformat(), B.hm(t), party))
     res["updated"] = B.now_utc()
-    B.add_history(res, "guest", "Changed: " + ", ".join(changes) + ".")
+    B.add_history(res, "guest", "Changed: " + ", ".join(changes) + ".", kind="moved" if new_time else None)
     return None
 
 
@@ -302,6 +339,24 @@ def cancel_reservation(token):
         Notify.reservation_event(res, "cancelled")
     except Exception as e:
         print("notify failed:", e)
+    return _guest_reply(res)
+
+
+@anvil.server.callable
+def confirm_coming(token):
+    """The guest taps "Yes, we're coming" on their reservation page (usually from the restaurant's reminder). The host
+    stand then shows "Coming" next to the booking (it reads the history: Booking.history_flags)."""
+    from . import common as C
+    if C.rate_limited("confirm_coming", 20, 3600):
+        return {"ok": False, "error": "Too many tries. Please try again in a while."}
+    res = _by_token(token)
+    if res is None:
+        return {"ok": False, "error": "Reservation not found."}
+    if not _can_confirm(res):
+        return {"ok": False, "error": "This reservation can't be confirmed online any more."}
+    if not B.history_flags(res)["coming"]:
+        res["updated"] = B.now_utc()
+        B.add_history(res, "guest", "The guest confirmed they are coming.", kind="confirm")
     return _guest_reply(res)
 
 

@@ -171,10 +171,31 @@ def unique_slug(base, exclude=None):
         n += 1
 
 
-def add_history(res, by, what):
+def add_history(res, by, what, kind=None, **extra):
+    """One line in the booking's history. `kind` marks the lines other features read back (history_flags):
+    "remind" (a reminder went out, + channel), "confirm" (the guest said they're coming), "moved" (new date or time)."""
     h = list(res["history"] or [])
-    h.append({"at": iso(now_utc()), "by": by, "what": what})
+    entry = {"at": iso(now_utc()), "by": by, "what": what}
+    if kind:
+        entry["kind"] = kind
+    entry.update(extra)
+    h.append(entry)
     res["history"] = h[-50:]
+
+
+def history_flags(res):
+    """The no-show shield, read from the history (no extra column): the last reminder {at, channel} and when the guest
+    tapped "Yes, we're coming" (None when they haven't). Both start again when the booking moves to another time."""
+    reminded, coming = None, None
+    for h in res["history"] or []:
+        kind = h.get("kind") if isinstance(h, dict) else None
+        if kind == "remind":
+            reminded = {"at": h.get("at") or "", "channel": h.get("channel") or ""}
+        elif kind == "confirm":
+            coming = h.get("at") or ""
+        elif kind == "moved":
+            reminded, coming = None, None
+    return {"reminded": reminded, "coming": coming}
 
 
 def _created_key(row):
@@ -584,7 +605,10 @@ def reservation_view(res, ctx=None, staff=False):
         "party": int(res["party"] or 0), "name": res["name"] or "", "status": res["status"],
         "source": res["source"] or "online", "notes": res["notes"] or "", "language": res["language"] or "en",
     }
+    flags = history_flags(res)
+    v["coming"] = flags["coming"]
     if staff:
+        v["reminded"] = flags["reminded"]
         names = []
         if ctx is not None:
             names = [ctx.by_id[i]["name"] for i in (res["tables"] or []) if i in ctx.by_id]

@@ -16,6 +16,7 @@ class SlotPicker(SlotPickerTemplate):
     def __init__(self, **properties):
         self.slug, self.token, self.days, self.today, self.max_party = "", None, [], None, 8
         self.party, self.date, self.time, self.review = 2, None, None, False
+        self.waitlist = False  # the booking form sets it when the restaurant has the waitlist (Waitlist.available)
         self.month = ""
         self.slots: dict = {}
         self.error = ""
@@ -25,6 +26,7 @@ class SlotPicker(SlotPickerTemplate):
         self.party_panel.add_event_handler("x-chip", self._party)
         self.times_panel.add_event_handler("x-chip", self._time)
         self.days_panel.add_event_handler("x-day", self._day)
+        self.alt_panel.add_event_handler("x-chip", self._alt)
 
     def setup(self, slug, days, today=None, max_party=8, party=2, date=None, time=None, token=None):
         """days = [{date, open}] from the server; token = the guest's own booking (left out of the availability)."""
@@ -72,6 +74,7 @@ class SlotPicker(SlotPickerTemplate):
         r: dict = self.slots
         self.times_panel.items = []
         self.review_note.visible = self.walk_note.visible = False
+        self.alt_box.visible = self.wait_box.visible = False
         msg = ""
         if not self.date:
             msg = T("pickDate")
@@ -98,10 +101,24 @@ class SlotPicker(SlotPickerTemplate):
             self.times_panel.items = items
             self.review_note.visible, self.review_note.text = rev, "• " + T("reviewNote")
             self.walk_note.visible, self.walk_note.text = walk, T("walkNote")
+            self._draw_full_day(r, any_open, slots)
         self.times_msg.visible = bool(msg)
         self.times_msg.text = msg
         free = len([x for x in self.times_panel.items or [] if x.get("value")])
         self.sr_status.text = msg or (T("timesFree", n=free, d=pp.fmt_date(self.date)) if self.date else "")
+
+    def _draw_full_day(self, r, any_open, slots):
+        """A full day is no dead end: the nearest days with room, and the waitlist (when the restaurant has it)."""
+        alts: list = list(r.get("alt_days") or [])
+        self.alt_box.visible = bool(alts) and not any_open
+        self.alt_label.text = T("altDays")
+        self.alt_panel.items = [{"label": window.PP.fmtShort(a["date"]), "value": a["date"], "group": "alt",
+                                 "aria": pp.fmt_date(a["date"])} for a in alts]
+        self.wait_box.visible = bool(self.waitlist) and bool(slots)
+        self.wait_q.visible = any_open
+        self.wait_q.text = T("waitNone")
+        self.wait_button.text = T("waitJoin")
+        self.wait_button.role = ["btn", "btn-sm", "ic-clock"] + ([] if any_open else ["btn-primary"])
 
     def _load(self):
         self.slots, self.error = {}, ""
@@ -136,6 +153,16 @@ class SlotPicker(SlotPickerTemplate):
     def _day(self, date, **event_args):
         self.date, self.time = date, None
         self._load()
+
+    def _alt(self, value, **event_args):
+        """One of the nearest days with room: show that day (and its month)."""
+        if value:
+            self.date, self.time, self.month = value, None, value[:7]
+            self._load()
+
+    @handle("wait_button", "click")
+    def wait_button_click(self, **event_args):
+        self.raise_event("waitlist")
 
     def _time(self, value, **event_args):
         if value:

@@ -52,6 +52,8 @@
               <anvil-component type="DropDown" name="over_drop" prop:items='[["Ask me to approve", "review"], ["Suggest walking in", "walk_in"]]'></anvil-component></div>
             <div class="pp-rule"><div><div class="t">Read requests first</div><div class="d">When a guest writes a request (an allergy, a high chair, a birthday), the booking waits for your approval instead of confirming by itself.</div></div>
               <anvil-component type="CheckBox" name="review_notes_box" prop:text="Wait for me"></anvil-component></div>
+            <div class="pp-rule"><div><div class="t">Guests who missed a booking before</div><div class="d">When someone who didn't come to an earlier booking books online again (same email or phone), it waits for your approval, with the reason. No card hold needed.</div></div>
+              <anvil-component type="CheckBox" name="review_no_shows_box" prop:text="Wait for me"></anvil-component></div>
           </section>
 
           <section class="ui-card pp-sec" id="st-form"><h2>Booking form</h2><p class="pp-lead">Texts on the form your guests fill in.</p>

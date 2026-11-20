@@ -76,6 +76,31 @@ def index(r, today=None):
     return out
 
 
+MONTHS3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+
+def no_shows_of(r, email, phone, name):
+    """(how many times, last date) this guest didn't come to an earlier booking at restaurant r. Only rows marked
+    no_show are read; the guest is the same person as in the guest book (key_of), or has the same phone number."""
+    key = key_of(email, phone, name)
+    digits = re.sub(r"\D", "", str(phone or ""))
+    if not key:
+        return 0, None
+    hits = []
+    for x in app_tables.reservations.search(restaurant=r, status="no_show"):
+        theirs = re.sub(r"\D", "", str(x["phone"] or ""))
+        if _row_key(x) == key or (len(digits) >= 6 and len(theirs) >= 6 and theirs[-9:] == digits[-9:]):
+            hits.append(x["date"])
+    dates = [d for d in hits if d is not None]
+    return len(hits), (max(dates) if dates else None)
+
+
+def no_show_reason(n, last):
+    """Why an online booking waits (Settings -> Approvals -> "Guests who missed a booking before wait for me")."""
+    when = (" (last %d %s)" % (last.day, MONTHS3[last.month - 1])) if last else ""
+    return "Didn't come to %s%s." % ("an earlier booking" if n == 1 else "%d earlier bookings" % n, when)
+
+
 def badge(g):
     """The small view the day timeline and the booking editor show next to a name."""
     if not g:

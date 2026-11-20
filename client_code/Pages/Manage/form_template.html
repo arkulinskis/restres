@@ -25,6 +25,11 @@
             <anvil-component type="Label" name="who_label" prop:role='["muted", "small"]'></anvil-component>
           </div>
           <div class="pp-done-acts">
+            <div class="pp-coming" anvil:name="coming_box">
+              <anvil-component type="Label" name="coming_q" prop:role='["pp-coming-q"]'></anvil-component>
+              <anvil-component type="Button" name="coming_button" prop:role='["btn", "btn-good", "ic-check"]'></anvil-component>
+              <anvil-component type="Label" name="coming_done" prop:role='["pp-coming-done"]' prop:visible="false"></anvil-component>
+            </div>
             <anvil-component type="Button" name="change_button" prop:role='["btn", "btn-primary", "ic-edit"]'></anvil-component>
             <anvil-component type="Button" name="ics_button" prop:role='["btn", "ic-calendar"]'></anvil-component>
             <anvil-component type="Button" name="cancel_button" prop:role='["btn", "btn-danger"]'></anvil-component>

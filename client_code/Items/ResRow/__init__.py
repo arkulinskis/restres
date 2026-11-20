@@ -25,6 +25,11 @@ class ResRow(ResRowTemplate):
             self.guest_badge.text = "VIP" if g.get("vip") else "Regular" if g.get("regular") else "%d no-show" % g["no_shows"]
             if not g.get("vip") and not g.get("regular"):
                 self.guest_badge.role = ["badge", "badge-bad"]
+        # the no-show shield: the guest tapped "Yes, we're coming" (or at least got a reminder)
+        if r["status"] == "confirmed" and (r.get("coming") or r.get("reminded")):
+            self.shield_badge.visible = True
+            self.shield_badge.text = "✓ Coming" if r.get("coming") else "Reminded"
+            self.shield_badge.role = ["badge", "badge-good"] if r.get("coming") else ["badge"]
         self.notes_label.visible = bool(r.get("notes"))
         self.notes_label.text = "“%s”" % r["notes"] if r.get("notes") else ""
         self.staff_label.visible = bool(r.get("staff_note"))

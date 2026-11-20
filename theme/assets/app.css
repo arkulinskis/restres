@@ -1595,3 +1595,64 @@ a.anvil-file-loader.anvil-component[class*="anvil-role-ic-"] label i.anvil-compo
 .pp-el-more[open] > summary { color: var(--c-ink); }
 .pp-el-group .pp-codeblock:first-child { border-top: 0; }
 
+
+/* ---------------------------------------------------------------- 2026-11-20: no-show shield, waitlist, fill a quiet night */
+/* the guest's page: "Yes, we're coming" */
+.pp-coming { display: grid; gap: 10px; padding: 14px 16px; border-radius: var(--radius-sm); background: var(--c-good-soft); text-align: center; }
+.anvil-role-pp-coming-q { font-size: .92rem; color: var(--c-ink); }
+.anvil-role-pp-coming-done { font-weight: 600; color: var(--c-good); }
+/* Today: the reminder card */
+.pp-shield { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px 14px; }
+.pp-shield-ic { width: 22px; height: 22px; color: var(--c-accent); }
+.pp-shield-txt { display: grid; gap: 2px; min-width: 0; }
+@media (max-width: 560px) {
+  .pp-shield { grid-template-columns: auto minmax(0, 1fr); }
+  .pp-shield > .anvil-role-btn { grid-column: 1 / -1; }
+  .pp-shield > .anvil-role-btn > button { width: 100%; }
+}
+/* the reminder list (Dialogs/Reminders) */
+.pp-remind-list { margin-top: 6px; }
+.pp-rmd { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 16px; padding: 12px 0; border-top: 1px solid var(--c-line); }
+.pp-rmd-main { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; min-width: 0; }
+.pp-rmd-who { display: grid; gap: 3px; min-width: 0; }
+.pp-rmd-line, .pp-wrow-line, .pp-wk-line, .pp-arr-who { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.anvil-role-pp-rmd-msg { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pp-rmd-acts, .pp-wrow-acts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.pp-rmd-acts .ui-btn .ic, .pp-wrow-acts .ui-btn .ic { width: 15px; height: 15px; }
+.pp-rmd.done .anvil-role-pp-t { color: var(--c-muted); }
+@media (max-width: 640px) {
+  .pp-rmd, .pp-wrow { grid-template-columns: minmax(0, 1fr); }
+  .pp-rmd-acts, .pp-wrow-acts { justify-content: flex-start; }
+  .pp-rmd-acts { padding-left: 62px; }
+}
+/* Reservations: the day's waitlist */
+.pp-waitlist { margin: 14px 0 4px; padding: 14px 18px 8px; }
+.pp-waitlist .pp-box-hd { margin-bottom: 4px; }
+.pp-waitlist .pp-box-hd h3 { display: flex; align-items: center; gap: 8px; }
+.pp-wrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 16px; padding: 12px 0; border-top: 1px solid var(--c-line); }
+.pp-wrow-main { display: grid; gap: 3px; min-width: 0; }
+/* the booking form: nearest days with room, the waitlist offer, the waitlist step */
+.pp-alt .anvil-role-pp-tnote { margin-bottom: 6px; }
+.pp-wait-offer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--c-line); }
+.pp-wait-offer .anvil-role-pp-tnote { margin-top: 0; }
+.pp-wait-when { display: grid; gap: 8px; }
+.anvil-role-pp-wait-note { font-size: .88rem; color: var(--c-muted); }
+/* Today -> The week ahead: quiet days and "Fill it" */
+.pp-wkrow { grid-template-columns: 90px minmax(0, 1fr) auto auto; }
+.pp-wkrow.quiet .bar > span { background: var(--c-warn); }
+@media (max-width: 560px) {
+  .pp-wkrow { grid-template-columns: 76px minmax(0, 1fr) auto; }
+  .pp-wkrow > .anvil-role-pp-fill-btn { grid-column: 2 / -1; justify-self: start; }
+}
+/* the share kit (Dialogs/FillNight) */
+.pp-fill-grid { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 22px; align-items: start; margin-top: 14px; }
+.pp-fill-prev img { display: block; width: 100%; aspect-ratio: 9 / 16; border-radius: 16px; background: #1d1b18; box-shadow: var(--shadow-lg);
+  animation: pp-fill-in var(--dur-slow) var(--ease-out); }
+.pp-fill-side { display: grid; gap: 12px; min-width: 0; }
+.pp-fill-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+@keyframes pp-fill-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .pp-fill-prev img { animation: none; } }
+@media (max-width: 640px) {
+  .pp-fill-grid { grid-template-columns: minmax(0, 1fr); }
+  .pp-fill-prev { justify-self: center; width: min(240px, 70vw); }
+}

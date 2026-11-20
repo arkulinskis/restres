@@ -1012,6 +1012,11 @@ db_schema:
         width: 200
       name: review_notes
       type: bool
+    - admin_ui:
+        order: 43
+        width: 200
+      name: review_no_shows
+      type: bool
     indexes: []
     server: full
     title: Restaurants
@@ -1325,6 +1330,99 @@ db_schema:
     indexes: []
     server: full
     title: Users
+  waitlist:
+    client: none
+    columns:
+    - admin_ui:
+        order: 0
+        width: 200
+      name: restaurant
+      target: restaurants
+      type: link_single
+    - admin_ui:
+        order: 1
+        width: 200
+      name: token
+      type: string
+    - admin_ui:
+        order: 2
+        width: 200
+      name: date
+      type: date
+    - admin_ui:
+        order: 3
+        width: 200
+      name: party
+      type: number
+    - admin_ui:
+        order: 4
+        width: 200
+      name: from_min
+      type: number
+    - admin_ui:
+        order: 5
+        width: 200
+      name: to_min
+      type: number
+    - admin_ui:
+        order: 6
+        width: 200
+      name: name
+      type: string
+    - admin_ui:
+        order: 7
+        width: 200
+      name: email
+      type: string
+    - admin_ui:
+        order: 8
+        width: 200
+      name: phone
+      type: string
+    - admin_ui:
+        order: 9
+        width: 200
+      name: notes
+      type: string
+    - admin_ui:
+        order: 10
+        width: 200
+      name: language
+      type: string
+    - admin_ui:
+        order: 11
+        width: 200
+      name: status
+      type: string
+    - admin_ui:
+        order: 12
+        width: 200
+      name: consent_text
+      type: string
+    - admin_ui:
+        order: 13
+        width: 200
+      name: pp_consent_text
+      type: string
+    - admin_ui:
+        order: 14
+        width: 200
+      name: reservation
+      target: reservations
+      type: link_single
+    - admin_ui:
+        order: 15
+        width: 200
+      name: created
+      type: datetime
+    - admin_ui:
+        order: 16
+        width: 200
+      name: updated
+      type: datetime
+    indexes: []
+    server: full
+    title: Waitlist
 metadata:
   description: 'Run bookings for all your restaurants: opening hours, a drag-and-drop floor plan, automatic approvals, menus,
     specials, events and a booking form for your website.'
@@ -1393,10 +1491,10 @@ native_deps:
     <!-- Prepsto feedback panel: every "Submit feedback" link and button opens it (it is the only feedback channel). No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->
     <script src="https://prepsto.com/_/theme/widget.js" data-prepsto="3jhqeaj" data-button="false" data-label="Submit feedback" async></script>
     <link rel="stylesheet" href="_/theme/icons.css?v=dbadc7ab1d">
-    <link rel="stylesheet" href="_/theme/app.css?v=5a98f5eb24">
+    <link rel="stylesheet" href="_/theme/app.css?v=0148799a22">
     <script src="_/theme/app-kit.js?v=9790718203"></script>
-    <script src="_/theme/pp-kit.js?v=6e4702eeb1"></script>
-    <script src="_/theme/pp-timeline.js?v=21a8c268cb"></script>
+    <script src="_/theme/pp-kit.js?v=4b38a816d9"></script>
+    <script src="_/theme/pp-timeline.js?v=e445fd629c"></script>
     <script src="_/theme/pp-floor.js?v=4c48b53605"></script>
 package_name: PlanPlate_2_0
 runtime_options:

@@ -1,0 +1,18 @@
+<div class="pp-rmd">
+  <div class="pp-rmd-main">
+    <anvil-component type="Label" name="time_label" prop:role='["strong", "pp-t"]'></anvil-component>
+    <div class="pp-rmd-who">
+      <div class="pp-rmd-line">
+        <anvil-component type="Label" name="name_label" prop:role='["strong"]'></anvil-component>
+        <anvil-component type="Label" name="state_badge" prop:role='["badge"]' prop:visible="false"></anvil-component>
+      </div>
+      <anvil-component type="Label" name="msg_label" prop:role='["muted", "small", "pp-rmd-msg"]'></anvil-component>
+    </div>
+  </div>
+  <div class="pp-rmd-acts">
+    <a class="ui-btn sm" anvil:name="wa_link" href="#" target="_blank" rel="noopener" anvil:on-dom:click="self.wa_click"><i class="ic ic-chat"></i>WhatsApp</a>
+    <a class="ui-btn sm" anvil:name="sms_link" href="#" anvil:on-dom:click="self.sms_click"><i class="ic ic-phone"></i>SMS</a>
+    <a class="ui-btn sm" anvil:name="mail_link" href="#" anvil:on-dom:click="self.mail_click"><i class="ic ic-mail"></i>Email</a>
+    <anvil-component type="Button" name="copy_button" prop:text="Copy" prop:role='["btn", "btn-sm", "btn-ghost", "ic-copy"]'></anvil-component>
+  </div>
+</div>
